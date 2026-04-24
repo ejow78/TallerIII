@@ -1,13 +1,18 @@
 import React from 'react';
-import Hero from './components/Hero';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { LandingPage } from './components/landing-page';
+import TermsPage from './components/terms-page';
+import PrivacyPage from './components/privacy-page';
 
 function App() {
   return (
-    <div className="min-h-screen bg-background text-text-main font-sans selection:bg-accent/30">
-      <main>
-        <Hero />
-      </main>
-    </div>
+    <Router>
+      <Routes>
+        <Route path="/" element={<LandingPage />} />
+        <Route path="/terms" element={<TermsPage />} />
+        <Route path="/privacy" element={<PrivacyPage />} />
+      </Routes>
+    </Router>
   );
 }
 
