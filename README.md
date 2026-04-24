@@ -10,7 +10,7 @@ Stack Tecnológico
 
 Este proyecto utiliza el stack MERN para garantizar escalabilidad y flexibilidad:
 
-    Frontend: React.js con Tailwind CSS
+    Frontend: React + Tailwind CSS
 
     Backend: Node.js
 
