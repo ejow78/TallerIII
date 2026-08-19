@@ -33,10 +33,20 @@ export default function App() {
     const hostname = window.location.hostname;
     const pathname = window.location.pathname;
 
-    if (hostname === "app.repairit.cloud" && pathname === "/") {
-      window.location.href = "/dashboard";
-    } else if (hostname === "tracking.repairit.cloud" && pathname === "/") {
-      window.location.href = "/seguimiento/demo-id";
+    if (hostname.includes("repairit.cloud")) {
+      // Si está en el dashboard pero no en app.repairit.cloud, redirigir a app.repairit.cloud/dashboard
+      if (hostname !== "app.repairit.cloud" && pathname.startsWith("/dashboard")) {
+        window.location.href = `https://app.repairit.cloud${pathname}`;
+        return;
+      }
+      if (hostname === "app.repairit.cloud" && pathname === "/") {
+        window.location.href = "/dashboard";
+        return;
+      }
+      if (hostname === "tracking.repairit.cloud" && pathname === "/") {
+        window.location.href = "/seguimiento/demo-id";
+        return;
+      }
     }
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
