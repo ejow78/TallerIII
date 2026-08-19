@@ -6,7 +6,6 @@
 ![Vite](https://img.shields.io/badge/Vite-8-purple?logo=vite)
 ![TailwindCSS](https://img.shields.io/badge/TailwindCSS-v4-06B6D4?logo=tailwindcss)
 ![Supabase](https://img.shields.io/badge/Supabase-PostgreSQL%2015-3FCF8E?logo=supabase)
-![License](https://img.shields.io/badge/Licencia-Propietaria-red)
 
 ---
 
