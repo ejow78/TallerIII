@@ -11,20 +11,23 @@ export default function PublicLayout() {
         <div className="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
 
           {/* Logo del Proyecto (RepairIT) */}
-          <Link to="/" className="flex items-center gap-2">
+          <a
+            href={window.location.hostname.includes("repairit.cloud") ? "https://repairit.cloud" : "/"}
+            className="flex items-center gap-2"
+          >
             <span className="font-outfit text-2xl font-black tracking-tight text-foreground">
               Repair<span className="text-primary">IT</span>
             </span>
-          </Link>
+          </a>
 
           {/* Menú de Navegación de la Landing - Optimizado para Móviles */}
           <nav className="flex items-center gap-4 sm:gap-6">
-            <Link
-              to="/"
+            <a
+              href={window.location.hostname.includes("repairit.cloud") ? "https://repairit.cloud" : "/"}
               className="hidden md:block text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
             >
               Inicio
-            </Link>
+            </a>
             <a
               href="#caracteristicas"
               className="hidden md:block text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
@@ -51,7 +54,9 @@ export default function PublicLayout() {
             </a>
             <Separator orientation="vertical" className="hidden md:block h-4 !self-center" />
             <Button asChild variant="outline" size="sm" className="text-primary border-primary/20 hover:border-primary/40 bg-primary/10 hover:bg-primary/20 font-bold transition-all duration-200">
-              <Link to="/login">Panel Técnico</Link>
+              <a href={window.location.hostname.includes("repairit.cloud") ? "https://app.repairit.cloud/dashboard" : "/login"}>
+                Panel Técnico
+              </a>
             </Button>
           </nav>
 

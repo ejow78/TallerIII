@@ -128,9 +128,12 @@ export default function TrackingPage() {
 
       {/* Botón de retorno simple */}
       <div>
-        <Link to="/" className="inline-flex items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground transition-colors font-medium">
+        <a
+          href={window.location.hostname.includes("repairit.cloud") ? "https://repairit.cloud" : "/"}
+          className="inline-flex items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground transition-colors font-medium cursor-pointer"
+        >
           <ArrowLeft className="w-3.5 h-3.5" /> Volver al Inicio
-        </Link>
+        </a>
       </div>
 
       {/* Tarjeta Principal de Resumen del Dispositivo */}
