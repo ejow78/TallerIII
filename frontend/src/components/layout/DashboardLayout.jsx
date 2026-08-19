@@ -1,7 +1,14 @@
+import { useState, useEffect } from "react";
 import { NavLink, Outlet, useNavigate, useLocation } from "react-router-dom";
 import { Separator } from "@/components/ui/separator";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import {
   SidebarProvider,
   Sidebar,
@@ -29,15 +36,60 @@ import {
   LogOut,
   Wrench,
   Store,
-  Settings
+  Settings,
+  PlusCircle,
+  Users,
+  ChevronDown,
+  KeyRound,
+  ShoppingCart
 } from "lucide-react";
 import { toast } from "sonner";
+
+import { api } from "@/services/api";
+import { ShieldAlert } from "lucide-react";
 
 export default function DashboardLayout() {
   const navigate = useNavigate();
   const location = useLocation();
 
+  const user = JSON.parse(localStorage.getItem("repairit_user") || "{}");
+  const isSuperAdmin = user.role === "superadmin";
+
+  const [venues, setVenues] = useState([]);
+  const [activeVenue, setActiveVenue] = useState(null);
+
+  useEffect(() => {
+    if (!isSuperAdmin) {
+      const loadVenues = async () => {
+        try {
+          const profile = await api.auth.getProfile();
+          setActiveVenue(profile);
+          const data = await api.auth.getVenues();
+          setVenues(data);
+        } catch (err) {
+          console.error("Error al cargar sucursales en header:", err.message);
+        }
+      };
+      loadVenues();
+    }
+  }, [isSuperAdmin]);
+
+  const handleHeaderSwitchVenue = async (venueId) => {
+    try {
+      const updatedUser = await api.auth.switchVenue(venueId);
+      const localUser = JSON.parse(localStorage.getItem("repairit_user") || "{}");
+      localStorage.setItem("repairit_user", JSON.stringify({ ...localUser, venueId: updatedUser.venueId }));
+      toast.success("Sucursal cambiada correctamente");
+      setTimeout(() => {
+        window.location.reload();
+      }, 500);
+    } catch (err) {
+      toast.error("Error al cambiar de sucursal", { description: err.message });
+    }
+  };
+
   const handleLogout = () => {
+    api.auth.logout();
     toast.success("Sesión cerrada correctamente.");
     navigate("/");
   };
@@ -45,6 +97,45 @@ export default function DashboardLayout() {
   // Determinar los Breadcrumbs basados en la ruta actual
   const getBreadcrumbs = () => {
     const path = location.pathname;
+    if (isSuperAdmin) {
+      if (path === "/dashboard/usuarios") {
+        return (
+          <BreadcrumbList>
+            <BreadcrumbItem>
+              <BreadcrumbLink asChild>
+                <NavLink to="/dashboard">Panel</NavLink>
+              </BreadcrumbLink>
+            </BreadcrumbItem>
+            <BreadcrumbSeparator />
+            <BreadcrumbItem>
+              <BreadcrumbPage>Gestión de Usuarios</BreadcrumbPage>
+            </BreadcrumbItem>
+          </BreadcrumbList>
+        );
+      }
+      return (
+        <BreadcrumbList>
+          <BreadcrumbItem>
+            <BreadcrumbPage>Suscripciones de Clientes</BreadcrumbPage>
+          </BreadcrumbItem>
+        </BreadcrumbList>
+      );
+    }
+    if (path === "/dashboard/nuevo-ingreso") {
+      return (
+        <BreadcrumbList>
+          <BreadcrumbItem>
+            <BreadcrumbLink asChild>
+              <NavLink to="/dashboard">Panel</NavLink>
+            </BreadcrumbLink>
+          </BreadcrumbItem>
+          <BreadcrumbSeparator />
+          <BreadcrumbItem>
+            <BreadcrumbPage>Ingreso de Equipos</BreadcrumbPage>
+          </BreadcrumbItem>
+        </BreadcrumbList>
+      );
+    }
     if (path === "/dashboard/ordenes") {
       return (
         <BreadcrumbList>
@@ -56,6 +147,21 @@ export default function DashboardLayout() {
           <BreadcrumbSeparator />
           <BreadcrumbItem>
             <BreadcrumbPage>Órdenes de Servicio</BreadcrumbPage>
+          </BreadcrumbItem>
+        </BreadcrumbList>
+      );
+    }
+    if (path === "/dashboard/clientes") {
+      return (
+        <BreadcrumbList>
+          <BreadcrumbItem>
+            <BreadcrumbLink asChild>
+              <NavLink to="/dashboard">Panel</NavLink>
+            </BreadcrumbLink>
+          </BreadcrumbItem>
+          <BreadcrumbSeparator />
+          <BreadcrumbItem>
+            <BreadcrumbPage>Directorio de Clientes</BreadcrumbPage>
           </BreadcrumbItem>
         </BreadcrumbList>
       );
@@ -110,10 +216,7 @@ export default function DashboardLayout() {
             {/* Logo de la Empresa */}
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
-                <div className="w-8 h-8 rounded-lg bg-primary flex items-center justify-center text-primary-foreground font-bold">
-                  <Wrench className="w-4 h-4" />
-                </div>
-                <span className="font-outfit text-lg font-black tracking-tight text-foreground">
+                <span className="font-outfit text-xl font-black tracking-tight text-foreground">
                   Repair<span className="text-primary">IT</span>
                 </span>
               </div>
@@ -122,36 +225,94 @@ export default function DashboardLayout() {
 
           <SidebarContent className="p-4 pt-6">
             <SidebarMenu className="space-y-1">
+              {isSuperAdmin ? (
+                <>
+                  <SidebarMenuItem>
+                    <SidebarMenuButton asChild isActive={location.pathname === "/dashboard"}>
+                      <NavLink to="/dashboard" end className="flex items-center gap-3 w-full">
+                        <LayoutDashboard className="w-4 h-4" />
+                        <span>Suscripciones</span>
+                      </NavLink>
+                    </SidebarMenuButton>
+                  </SidebarMenuItem>
 
-              <SidebarMenuItem>
-                <SidebarMenuButton asChild isActive={location.pathname === "/dashboard"}>
-                  <NavLink to="/dashboard" end className="flex items-center gap-3 w-full">
-                    <LayoutDashboard className="w-4 h-4" />
-                    <span>Inicio</span>
-                  </NavLink>
-                </SidebarMenuButton>
-              </SidebarMenuItem>
+                  <SidebarMenuItem>
+                    <SidebarMenuButton asChild isActive={location.pathname === "/dashboard/usuarios"}>
+                      <NavLink to="/dashboard/usuarios" className="flex items-center gap-3 w-full">
+                        <Users className="w-4 h-4" />
+                        <span>Usuarios</span>
+                      </NavLink>
+                    </SidebarMenuButton>
+                  </SidebarMenuItem>
+                </>
+              ) : (
+                <>
+                  <SidebarMenuItem>
+                    <SidebarMenuButton asChild isActive={location.pathname === "/dashboard"}>
+                      <NavLink to="/dashboard" end className="flex items-center gap-3 w-full">
+                        <LayoutDashboard className="w-4 h-4" />
+                        <span>Inicio</span>
+                      </NavLink>
+                    </SidebarMenuButton>
+                  </SidebarMenuItem>
 
-              <SidebarMenuItem>
-                <SidebarMenuButton asChild isActive={location.pathname === "/dashboard/ordenes"}>
-                  <NavLink to="/dashboard/ordenes" className="flex items-center gap-3 w-full">
-                    <ClipboardList className="w-4 h-4" />
-                    <span>Órdenes de Servicio</span>
-                  </NavLink>
-                </SidebarMenuButton>
-              </SidebarMenuItem>
+                  <SidebarMenuItem>
+                    <SidebarMenuButton asChild isActive={location.pathname === "/dashboard/nuevo-ingreso"}>
+                      <NavLink to="/dashboard/nuevo-ingreso" className="flex items-center gap-3 w-full">
+                        <PlusCircle className="w-4 h-4" />
+                        <span>Nuevo Ingreso</span>
+                      </NavLink>
+                    </SidebarMenuButton>
+                  </SidebarMenuItem>
 
-              <SidebarMenuItem>
-                <SidebarMenuButton asChild isActive={location.pathname === "/dashboard/inventario"}>
-                  <NavLink to="/dashboard/inventario" className="flex items-center gap-3 w-full">
-                    <Package className="w-4 h-4" />
-                    <span>Inventario de Insumos</span>
-                  </NavLink>
-                </SidebarMenuButton>
-              </SidebarMenuItem>
+                  <SidebarMenuItem>
+                    <SidebarMenuButton asChild isActive={location.pathname === "/dashboard/ordenes"}>
+                      <NavLink to="/dashboard/ordenes" className="flex items-center gap-3 w-full">
+                        <ClipboardList className="w-4 h-4" />
+                        <span>Órdenes de Servicio</span>
+                      </NavLink>
+                    </SidebarMenuButton>
+                  </SidebarMenuItem>
 
+                  <SidebarMenuItem>
+                    <SidebarMenuButton asChild isActive={location.pathname === "/dashboard/clientes"}>
+                      <NavLink to="/dashboard/clientes" className="flex items-center gap-3 w-full">
+                        <Users className="w-4 h-4" />
+                        <span>Clientes</span>
+                      </NavLink>
+                    </SidebarMenuButton>
+                  </SidebarMenuItem>
 
+                  <SidebarMenuItem>
+                    <SidebarMenuButton asChild isActive={location.pathname === "/dashboard/inventario"}>
+                      <NavLink to="/dashboard/inventario" className="flex items-center gap-3 w-full">
+                        <Package className="w-4 h-4" />
+                        <span>Inventario de Insumos</span>
+                      </NavLink>
+                    </SidebarMenuButton>
+                  </SidebarMenuItem>
 
+                  <SidebarMenuItem>
+                    <SidebarMenuButton asChild isActive={location.pathname === "/dashboard/caja"}>
+                      <NavLink to="/dashboard/caja" className="flex items-center gap-3 w-full">
+                        <ShoppingCart className="w-4 h-4" />
+                        <span>Caja</span>
+                      </NavLink>
+                    </SidebarMenuButton>
+                  </SidebarMenuItem>
+
+                  {user.role === "admin" && user.subscriptionPlan === "Multi-Taller Pro" && (
+                    <SidebarMenuItem>
+                      <SidebarMenuButton asChild isActive={location.pathname === "/dashboard/cuentas"}>
+                        <NavLink to="/dashboard/cuentas" className="flex items-center gap-3 w-full">
+                          <KeyRound className="w-4 h-4" />
+                          <span>Cuentas de Acceso</span>
+                        </NavLink>
+                      </SidebarMenuButton>
+                    </SidebarMenuItem>
+                  )}
+                </>
+              )}
             </SidebarMenu>
           </SidebarContent>
 
@@ -159,24 +320,34 @@ export default function DashboardLayout() {
             <div className="flex items-center justify-between px-2 w-full gap-2">
               <div className="flex items-center gap-3 min-w-0">
                 <div className="w-8 h-8 rounded-full bg-primary/10 border border-primary/20 flex items-center justify-center font-bold text-xs text-primary uppercase shrink-0">
-                  EO
+                  {isSuperAdmin
+                    ? "SA"
+                    : activeVenue && activeVenue.name
+                    ? activeVenue.name.split(" ").map(n => n[0]).join("").substring(0, 2).toUpperCase()
+                    : "TL"}
                 </div>
                 <div className="text-xs truncate min-w-0">
-                  <span className="text-foreground font-bold block leading-none truncate">Edgar Ortiz</span>
-                  <span className="text-muted-foreground block text-[10px] mt-1 truncate">Administrador</span>
+                  <span className="text-foreground font-bold block leading-none truncate">
+                    {isSuperAdmin ? "Plataforma Central" : activeVenue ? activeVenue.name : "Cargando Taller..."}
+                  </span>
+                  <span className="text-muted-foreground block text-[10px] mt-1 truncate">
+                    {isSuperAdmin ? "Super Admin" : `${user.name || "Usuario"} (${user.role === "admin" ? "Admin" : "Técnico"})`}
+                  </span>
                 </div>
               </div>
-              <Button
-                asChild
-                variant="ghost"
-                size="icon"
-                className="h-8 w-8 text-muted-foreground hover:text-foreground cursor-pointer shrink-0"
-                title="Configuración de Taller"
-              >
-                <NavLink to="/dashboard/perfil">
-                  <Settings className="w-4 h-4" />
-                </NavLink>
-              </Button>
+              {!isSuperAdmin && (
+                <Button
+                  asChild
+                  variant="ghost"
+                  size="icon"
+                  className="h-8 w-8 text-muted-foreground hover:text-foreground cursor-pointer shrink-0"
+                  title="Configuración de Taller"
+                >
+                  <NavLink to="/dashboard/perfil">
+                    <Settings className="w-4 h-4" />
+                  </NavLink>
+                </Button>
+              )}
             </div>
 
             <Button
@@ -203,8 +374,42 @@ export default function DashboardLayout() {
                 {getBreadcrumbs()}
               </Breadcrumb>
             </div>
-            <div className="text-[10px] text-muted-foreground font-mono select-none">
-              Taller Central &bull; Activo
+            <div className="flex items-center gap-3">
+              {isSuperAdmin ? (
+                <div className="text-[10px] text-muted-foreground font-mono select-none">
+                  Plataforma RepairIT • SuperAdmin
+                </div>
+              ) : (
+                <div className="flex items-center gap-2">
+                  <span className="text-[10px] text-muted-foreground font-mono select-none">Sucursal:</span>
+                  {venues.length > 1 ? (
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <Button variant="outline" size="sm" className="h-7 border border-border/80 px-2 text-[10px] font-bold rounded flex items-center gap-1 select-none cursor-pointer">
+                          {activeVenue ? activeVenue.name : "Cargando..."}
+                          <ChevronDown className="w-3 h-3 opacity-60" />
+                        </Button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent className="bg-card border-border text-foreground text-[10px]">
+                        {venues.map((v) => (
+                          <DropdownMenuItem
+                            key={v._id}
+                            onClick={() => handleHeaderSwitchVenue(v._id)}
+                            className="text-[10px] transition-colors cursor-pointer flex items-center justify-between gap-4"
+                          >
+                            <span>{v.name}</span>
+                            {v._id === activeVenue?._id && <span className="text-primary font-bold">✓</span>}
+                          </DropdownMenuItem>
+                        ))}
+                      </DropdownMenuContent>
+                    </DropdownMenu>
+                  ) : (
+                    <span className="text-[10px] text-foreground font-bold font-mono">
+                      {activeVenue ? activeVenue.name : "Cargando..."}
+                    </span>
+                  )}
+                </div>
+              )}
             </div>
           </header>
 

@@ -1,14 +1,25 @@
-import { useState } from "react";
-import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
+import { useState, useEffect } from "react";
+import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
-import { Checkbox } from "@/components/ui/checkbox";
-import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
-import { Separator } from "@/components/ui/separator";
 import { toast } from "sonner";
-import { PlusCircle, ClipboardList, Trash2, ChevronDown } from "lucide-react";
+import { 
+  ClipboardList, 
+  Trash2, 
+  ChevronDown, 
+  Search, 
+  FileSpreadsheet, 
+  Printer, 
+  Stethoscope, 
+  FileText, 
+  Plus, 
+  X, 
+  DollarSign, 
+  Save 
+} from "lucide-react";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -16,103 +27,329 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 
+import { api } from "@/services/api";
+
 export default function OrdersPage() {
-  // Estado para la tabla dinámica de órdenes de servicio
-  const [orders, setOrders] = useState([
-    {
-      id: "RT-2026-ASUS",
-      clientName: "Edgar Javier Ortiz",
-      clientDni: "44.375.912",
-      deviceType: "Notebook",
-      deviceModel: "ASUS ROG Strix G15",
-      serial: "SN-98218-ASUS",
-      issue: "Calentamiento excesivo y reinicios aleatorios.",
-      status: "presupuestado",
-      date: "05/06/2026"
-    },
-    {
-      id: "RT-2026-MOCK",
-      clientName: "Cliente Registrado",
-      clientDni: "29.987.654",
-      deviceType: "Celular",
-      deviceModel: "Samsung S23 Ultra",
-      serial: "SN-PENDIENTE",
-      issue: "Pantalla astillada tras caída física y puerto de carga flojo.",
-      status: "diagnostico",
-      date: "08/06/2026"
+  const [orders, setOrders] = useState([]);
+  const [clients, setClients] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [statusFilter, setStatusFilter] = useState("todos");
+
+  // Estado del perfil del taller cargado de la DB
+  const [profile, setProfile] = useState({
+    name: "RepairIT - Taller Central",
+    address: "Av. Sarmiento 1234, San Miguel de Tucumán",
+    phone: "+54 381 4223344",
+    email: "central@repairit.cloud"
+  });
+
+  // Modal Diagnóstico y Presupuesto
+  const [showDiagModal, setShowDiagModal] = useState(false);
+  const [diagOrder, setDiagOrder] = useState(null);
+  const [diagText, setDiagText] = useState("");
+  const [diagStatus, setDiagStatus] = useState("diagnostico");
+  const [budgetItems, setBudgetItems] = useState([{ desc: "", price: "" }]);
+  const [savingDiag, setSavingDiag] = useState(false);
+
+  const loadData = async () => {
+    try {
+      setLoading(true);
+      const ordersData = await api.orders.getAll();
+      const clientsData = await api.clients.getAll();
+      setOrders(ordersData);
+      setClients(clientsData);
+      
+      try {
+        const profileData = await api.auth.getProfile();
+        setProfile({
+          name: profileData.name || "RepairIT - Taller Central",
+          address: profileData.address || "Av. Sarmiento 1234, San Miguel de Tucumán",
+          phone: profileData.phone || "+54 381 4223344",
+          email: profileData.email || "central@repairit.cloud"
+        });
+      } catch (err) {
+        console.error("Error al cargar perfil del taller:", err);
+      }
+    } catch (error) {
+      toast.error("Error al cargar órdenes de servicio", {
+        description: error.message || "Por favor, intente nuevamente."
+      });
+    } finally {
+      setLoading(false);
     }
-  ]);
+  };
 
-  // Pestaña activa
-  const [activeTab, setActiveTab] = useState("registro");
+  useEffect(() => {
+    loadData();
+  }, []);
 
-  // Estados del formulario
-  const [clientName, setClientName] = useState("");
-  const [clientDni, setClientDni] = useState("");
-  const [clientPhone, setClientPhone] = useState("");
-  const [clientEmail, setClientEmail] = useState("");
-  const [deviceType, setDeviceType] = useState("Notebook");
-  const [deviceModel, setDeviceModel] = useState("");
-  const [serial, setSerial] = useState("");
-  const [issue, setIssue] = useState("");
-  const [acceptTerms, setAcceptTerms] = useState(false);
+  // Abrir Modal de Diagnóstico y Presupuesto
+  const handleOpenDiagModal = (order) => {
+    setDiagOrder(order);
+    setDiagText(order.diagnosis || "");
+    setDiagStatus(order.status || "diagnostico");
+    
+    if (order.budget && Array.isArray(order.budget.items) && order.budget.items.length > 0) {
+      setBudgetItems(order.budget.items.map(i => ({ desc: i.desc, price: i.price?.toString() || "" })));
+    } else {
+      setBudgetItems([{ desc: "", price: "" }]);
+    }
 
-  // Registrar orden
-  const handleRegisterOrder = (e) => {
+    setShowDiagModal(true);
+  };
+
+  const handleAddBudgetItem = () => {
+    setBudgetItems([...budgetItems, { desc: "", price: "" }]);
+  };
+
+  const handleRemoveBudgetItem = (index) => {
+    setBudgetItems(budgetItems.filter((_, i) => i !== index));
+  };
+
+  const handleBudgetItemChange = (index, field, value) => {
+    const updated = [...budgetItems];
+    updated[index][field] = value;
+    setBudgetItems(updated);
+  };
+
+  const handleSaveDiagnosis = async (e) => {
     e.preventDefault();
+    if (!diagOrder) return;
 
-    if (!acceptTerms) {
-      toast.error("Debe aceptar los términos de recepción técnica.");
+    try {
+      setSavingDiag(true);
+
+      const validBudgetItems = budgetItems
+        .filter(i => i.desc.trim() !== "")
+        .map(i => ({ desc: i.desc.trim(), price: Number(i.price) || 0 }));
+
+      const totalBudget = validBudgetItems.reduce((acc, i) => acc + i.price, 0);
+
+      const budgetData = validBudgetItems.length > 0 ? {
+        items: validBudgetItems,
+        total: totalBudget,
+        approved: diagOrder.budget?.approved || false,
+        dateApproved: diagOrder.budget?.dateApproved || null
+      } : null;
+
+      await api.orders.updateDiagnosisAndBudget(diagOrder._id, {
+        diagnosis: diagText,
+        budget: budgetData,
+        status: diagStatus
+      });
+
+      toast.success("Diagnóstico y Presupuesto guardados", {
+        description: `Se actualizó la orden ${diagOrder.trackingCode}.`
+      });
+
+      setShowDiagModal(false);
+      loadData();
+    } catch (error) {
+      toast.error("Error al guardar diagnóstico", {
+        description: error.message || "Por favor, intente nuevamente."
+      });
+    } finally {
+      setSavingDiag(false);
+    }
+  };
+
+  // Exportar listado a Excel CSV
+  const handleExportToExcel = () => {
+    if (orders.length === 0) {
+      toast.error("No hay órdenes registradas para exportar.");
       return;
     }
 
-    const trackingCode = `RT-2026-${Math.random().toString(36).substring(2, 6).toUpperCase()}`;
-    const newOrder = {
-      id: trackingCode,
-      clientName,
-      clientDni,
-      deviceType,
-      deviceModel,
-      serial: serial || "SN-PENDIENTE",
-      issue,
-      status: "ingresado",
-      date: new Date().toLocaleDateString("es-AR")
-    };
-
-    setOrders([newOrder, ...orders]);
-
-    toast.success("¡Dispositivo Registrado!", {
-      description: `Código de seguimiento: ${trackingCode}.`,
+    const headers = ["ID Orden", "Cliente", "DNI", "Dispositivo", "Falla Reportada", "Diagnostico", "Total Presupuesto", "Fecha Ingreso", "Estado"];
+    const rows = orders.map(o => {
+      const client = o.clientId || {};
+      const budgetTotal = o.budget ? o.budget.items?.reduce((s, i) => s + i.price, 0) || 0 : 0;
+      return [
+        o.trackingCode || o._id,
+        `"${client.name || "N/A"}"`,
+        `"${client.dni || "N/A"}"`,
+        `"${o.deviceType} ${o.deviceModel}"`,
+        `"${(o.issue || "").replace(/"/g, '""')}"`,
+        `"${(o.diagnosis || "").replace(/"/g, '""')}"`,
+        budgetTotal,
+        o.date,
+        o.status.toUpperCase()
+      ];
     });
 
-    // Resetear formulario y mover a la pestaña de listado
-    setClientName("");
-    setClientDni("");
-    setClientPhone("");
-    setClientEmail("");
-    setDeviceType("Notebook");
-    setDeviceModel("");
-    setSerial("");
-    setIssue("");
-    setAcceptTerms(false);
-    setActiveTab("control");
+    const csvContent = "data:text/csv;charset=utf-8,\uFEFF" + [headers.join(","), ...rows.map(r => r.join(","))].join("\n");
+    const encodedUri = encodeURI(csvContent);
+    const link = document.createElement("a");
+    link.setAttribute("href", encodedUri);
+    link.setAttribute("download", `Ordenes_Reparacion_${new Date().toISOString().split("T")[0]}.csv`);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+
+    toast.success("Listado de órdenes exportado a Excel CSV.");
   };
 
-  // Eliminar orden localmente (simulado)
-  const handleDeleteOrder = (id) => {
-    setOrders(orders.filter(o => o.id !== id));
-    toast.error(`Orden ${id} eliminada del listado.`);
+  // Imprimir comprobante de recepción
+  const handlePrintOrder = (order) => {
+    const client = order.clientId || {};
+    const venueName = profile.name;
+    const venueAddress = profile.address;
+    const venuePhone = profile.phone;
+    const venueEmail = profile.email;
+
+    const printWindow = window.open("", "_blank", "width=800,height=900");
+    if (!printWindow) {
+      toast.error("El navegador bloqueó la ventana emergente de impresión.");
+      return;
+    }
+
+    const budgetItemsHtml = order.budget?.items?.map(i => `
+      <tr>
+        <td style="padding: 6px 0; border-bottom: 1px solid #f1f5f9;">${i.desc}</td>
+        <td style="padding: 6px 0; border-bottom: 1px solid #f1f5f9; text-align: right; font-weight: bold;">$${i.price.toLocaleString("es-AR")}</td>
+      </tr>
+    `).join("") || "";
+
+    const totalBudget = order.budget?.items?.reduce((s, i) => s + i.price, 0) || 0;
+
+    printWindow.document.write(`
+      <!DOCTYPE html>
+      <html>
+        <head>
+          <title>Comprobante de Recepción - Orden #${order.trackingCode}</title>
+          <style>
+            body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; padding: 30px; color: #333; font-size: 13px; }
+            .header { display: flex; justify-content: space-between; align-items: flex-start; border-bottom: 2px solid #2563eb; padding-bottom: 15px; margin-bottom: 20px; }
+            .logo { font-size: 22px; font-weight: bold; color: #1e293b; }
+            .info { font-size: 11px; color: #64748b; margin-top: 2px; }
+            .order-no { font-size: 11px; font-weight: bold; color: #2563eb; text-align: right; text-transform: uppercase; }
+            .order-no-val { font-size: 20px; font-weight: bold; font-family: monospace; color: #0f172a; }
+            .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 20px; }
+            .section { border: 1px solid #e2e8f0; border-radius: 6px; padding: 15px; background: #fff; }
+            .section-title { font-size: 11px; font-weight: bold; color: #2563eb; text-transform: uppercase; border-bottom: 1px solid #f1f5f9; padding-bottom: 6px; margin-bottom: 10px; }
+            .label { font-weight: bold; font-size: 10px; color: #777; display: block; margin-top: 5px; text-transform: uppercase; }
+            .val { font-size: 13px; margin-bottom: 5px; color: #111; }
+            .full-width { grid-column: span 2; }
+            .footer { margin-top: 40px; border-top: 1px solid #eee; padding-top: 15px; }
+          </style>
+        </head>
+        <body>
+          <div class="header">
+            <div>
+              <div class="logo">${venueName}</div>
+              <div class="info">Dirección: ${venueAddress}</div>
+              <div class="info">Teléfono: ${venuePhone} &bull; Email: ${venueEmail}</div>
+            </div>
+            <div>
+              <div class="order-no">ORDEN DE SERVICIO</div>
+              <div class="order-no-val">N° ${order.trackingCode}</div>
+            </div>
+          </div>
+          
+          <div class="grid">
+            <div class="section full-width">
+              <div class="section-title">DATOS DEL CLIENTE</div>
+              <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 20px;">
+                <div>
+                  <span class="label">Cliente</span>
+                  <div class="val" style="font-weight: bold; font-size: 14px;">${client.name || "N/A"}</div>
+                  <span class="label">DNI / Identificación</span>
+                  <div class="val">${client.dni || "N/A"}</div>
+                  <span class="label">Contacto</span>
+                  <div class="val">${client.phone || ""} &bull; ${client.email || ""}</div>
+                </div>
+                <div style="border-left: 1px solid #eee; padding-left: 20px;">
+                  <span class="label">Fecha de Ingreso</span>
+                  <div class="val">${order.date}</div>
+                  <span class="label">Hora</span>
+                  <div class="val">${order.time || "10:30"} hs</div>
+                </div>
+              </div>
+            </div>
+            
+            <div class="section full-width">
+              <div class="section-title">DETALLES DEL EQUIPO</div>
+              <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 10px;">
+                <div>
+                  <span class="label">Tipo de Equipo</span>
+                  <div class="val">${order.deviceType}</div>
+                </div>
+                <div>
+                  <span class="label">Marca y Modelo</span>
+                  <div class="val">${order.deviceModel}</div>
+                </div>
+              </div>
+              <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; border-top: 1px solid #f1f5f9; padding-top: 10px;">
+                <div>
+                  <span class="label">Accesorios Recibidos</span>
+                  <div class="val">${order.accessories || "Ninguno"}</div>
+                </div>
+                <div>
+                  <span class="label">Estado Cosmético</span>
+                  <div class="val">${order.cosmetic || "Sin detalles"}</div>
+                </div>
+              </div>
+            </div>
+
+            <div class="section full-width">
+              <div class="section-title">FALLA REPORTADA POR CLIENTE</div>
+              <div class="val" style="white-space: pre-wrap; background: #f8fafc; padding: 10px; border-radius: 4px; border: 1px solid #e2e8f0;">${order.issue}</div>
+            </div>
+
+            ${order.diagnosis ? `
+              <div class="section full-width">
+                <div class="section-title">DIAGNÓSTICO TÉCNICO DE LABORATORIO</div>
+                <div class="val" style="white-space: pre-wrap; background: #eff6ff; padding: 10px; border-radius: 4px; border: 1px solid #bfdbfe; color: #1e3a8a;">${order.diagnosis}</div>
+              </div>
+            ` : ""}
+
+            ${budgetItemsHtml ? `
+              <div class="section full-width">
+                <div class="section-title">PRESUPUESTO ESTIMADO DEL SERVICIO</div>
+                <table style="width: 100%; border-collapse: collapse; margin-top: 5px;">
+                  ${budgetItemsHtml}
+                </table>
+                <div style="text-align: right; margin-top: 10px; font-size: 15px; font-weight: bold;">
+                  TOTAL PREVISTO: $${totalBudget.toLocaleString("es-AR")}
+                </div>
+              </div>
+            ` : ""}
+          </div>
+
+          <div class="footer">
+            <div style="border-top: 1px solid #eee; padding-top: 15px; text-align: left;">
+              <div style="font-size: 16px; font-weight: bold; color: #111;">Repair<span style="color: #2563eb;">IT</span></div>
+              <div style="font-size: 10px; color: #777;">repairit.cloud &bull; Seguimiento online disponible con su N° de orden</div>
+            </div>
+          </div>
+          
+          <script>
+            window.onload = function() {
+              window.print();
+              setTimeout(function() { window.close(); }, 500);
+            };
+          </script>
+        </body>
+      </html>
+    `);
+    printWindow.document.close();
   };
 
-  // Manejar cambio de estado en la tabla
-  const handleStatusChange = (id, newStatus) => {
-    setOrders(prev => prev.map(o => o.id === id ? { ...o, status: newStatus } : o));
-    toast.success(`Estado de orden ${id} actualizado`, {
-      description: `Nuevo estado: ${newStatus.toUpperCase()}`,
-    });
+  const handleStatusChange = async (id, newStatus) => {
+    try {
+      await api.orders.updateStatus(id, newStatus, `Estado cambiado a ${newStatus.toUpperCase()}`);
+      toast.success(`Estado de orden actualizado`, {
+        description: `Nuevo estado: ${newStatus.toUpperCase()}`,
+      });
+      loadData();
+    } catch (error) {
+      toast.error("Error al actualizar estado", {
+        description: error.message || "Por favor, intente nuevamente."
+      });
+    }
   };
 
-  // Selector interactivo de estado de tipo Dropdown Menu de shadcn
   const getStatusDropdown = (orderId, currentStatus) => {
     let colorClass = "";
     let statusLabel = "";
@@ -122,24 +359,29 @@ export default function OrdersPage() {
         statusLabel = "Ingresado";
         break;
       case "diagnostico":
-        colorClass = "bg-amber-500/10 text-amber-400 border-amber-500/25 hover:bg-amber-500/20";
+        colorClass = "bg-purple-500/10 text-purple-400 border-purple-500/25 hover:bg-purple-500/20";
         statusLabel = "En Diagnóstico";
         break;
       case "presupuestado":
-        colorClass = "bg-purple-500/10 text-purple-400 border-purple-500/25 hover:bg-purple-500/20";
+        colorClass = "bg-amber-500/10 text-amber-400 border-amber-500/25 hover:bg-amber-500/20";
         statusLabel = "Presupuestado";
         break;
       case "reparacion":
-        colorClass = "bg-blue-500/10 text-blue-400 border-blue-500/25 hover:bg-blue-500/20";
+      case "en_reparacion":
+        colorClass = "bg-indigo-500/10 text-indigo-400 border-indigo-500/25 hover:bg-indigo-500/20";
         statusLabel = "En Reparación";
         break;
       case "listo":
         colorClass = "bg-emerald-500/10 text-emerald-400 border-emerald-500/25 hover:bg-emerald-500/20";
         statusLabel = "Listo";
         break;
-      default:
-        colorClass = "bg-zinc-800 text-zinc-400 border-zinc-700/60 hover:bg-zinc-800/80";
+      case "entregado":
+        colorClass = "bg-muted text-muted-foreground border-border hover:bg-muted/80";
         statusLabel = "Entregado";
+        break;
+      default:
+        colorClass = "bg-secondary text-secondary-foreground";
+        statusLabel = currentStatus;
     }
 
     return (
@@ -148,47 +390,29 @@ export default function OrdersPage() {
           <Button
             variant="outline"
             size="sm"
-            className={`h-8 border px-2.5 text-xs font-semibold rounded-md flex items-center gap-1.5 cursor-pointer transition-colors shadow-sm select-none ${colorClass}`}
+            className={`h-7 border px-2.5 text-[11px] font-bold rounded-lg flex items-center gap-1 cursor-pointer transition-all ${colorClass}`}
           >
             {statusLabel}
-            <ChevronDown className="w-3.5 h-3.5 opacity-60 shrink-0" />
+            <ChevronDown className="w-3 h-3 opacity-70" />
           </Button>
         </DropdownMenuTrigger>
-        <DropdownMenuContent align="start" className="bg-card border-border/80 text-foreground w-44 shadow-xl p-1.5 space-y-1">
-          <DropdownMenuItem
-            onClick={() => handleStatusChange(orderId, "ingresado")}
-            className="text-xs font-semibold rounded-md py-1.5 px-2.5 transition-colors cursor-pointer select-none border bg-sky-500/10 text-sky-400 border-sky-500/15 hover:bg-sky-500/20 hover:text-sky-350 focus:bg-sky-500/20 focus:text-sky-350"
-          >
+        <DropdownMenuContent className="bg-card border-border text-foreground">
+          <DropdownMenuItem onClick={() => handleStatusChange(orderId, "ingresado")} className="text-xs cursor-pointer">
             Ingresado
           </DropdownMenuItem>
-          <DropdownMenuItem
-            onClick={() => handleStatusChange(orderId, "diagnostico")}
-            className="text-xs font-semibold rounded-md py-1.5 px-2.5 transition-colors cursor-pointer select-none border bg-amber-500/10 text-amber-400 border-amber-500/15 hover:bg-amber-500/20 hover:text-amber-350 focus:bg-amber-500/20 focus:text-amber-350"
-          >
+          <DropdownMenuItem onClick={() => handleStatusChange(orderId, "diagnostico")} className="text-xs cursor-pointer">
             En Diagnóstico
           </DropdownMenuItem>
-          <DropdownMenuItem
-            onClick={() => handleStatusChange(orderId, "presupuestado")}
-            className="text-xs font-semibold rounded-md py-1.5 px-2.5 transition-colors cursor-pointer select-none border bg-purple-500/10 text-purple-400 border-purple-500/15 hover:bg-purple-500/20 hover:text-purple-350 focus:bg-purple-500/20 focus:text-purple-350"
-          >
+          <DropdownMenuItem onClick={() => handleStatusChange(orderId, "presupuestado")} className="text-xs cursor-pointer">
             Presupuestado
           </DropdownMenuItem>
-          <DropdownMenuItem
-            onClick={() => handleStatusChange(orderId, "reparacion")}
-            className="text-xs font-semibold rounded-md py-1.5 px-2.5 transition-colors cursor-pointer select-none border bg-blue-500/10 text-blue-400 border-blue-500/15 hover:bg-blue-500/20 hover:text-blue-350 focus:bg-blue-500/20 focus:text-blue-350"
-          >
+          <DropdownMenuItem onClick={() => handleStatusChange(orderId, "reparacion")} className="text-xs cursor-pointer">
             En Reparación
           </DropdownMenuItem>
-          <DropdownMenuItem
-            onClick={() => handleStatusChange(orderId, "listo")}
-            className="text-xs font-semibold rounded-md py-1.5 px-2.5 transition-colors cursor-pointer select-none border bg-emerald-500/10 text-emerald-400 border-emerald-500/15 hover:bg-emerald-500/20 hover:text-emerald-350 focus:bg-emerald-500/20 focus:text-emerald-350"
-          >
+          <DropdownMenuItem onClick={() => handleStatusChange(orderId, "listo")} className="text-xs cursor-pointer">
             Listo
           </DropdownMenuItem>
-          <DropdownMenuItem
-            onClick={() => handleStatusChange(orderId, "entregado")}
-            className="text-xs font-semibold rounded-md py-1.5 px-2.5 transition-colors cursor-pointer select-none border bg-zinc-800 text-zinc-400 border-zinc-700/60 hover:bg-zinc-800/80 hover:text-zinc-350 focus:bg-zinc-800/80 focus:text-zinc-350"
-          >
+          <DropdownMenuItem onClick={() => handleStatusChange(orderId, "entregado")} className="text-xs cursor-pointer">
             Entregado
           </DropdownMenuItem>
         </DropdownMenuContent>
@@ -196,277 +420,329 @@ export default function OrdersPage() {
     );
   };
 
+  const filteredOrders = orders.filter((o) => {
+    const client = o.clientId || {};
+    const term = searchQuery.toLowerCase().trim();
+    const matchesSearch = 
+      (o.trackingCode && o.trackingCode.toLowerCase().includes(term)) ||
+      (client.name && client.name.toLowerCase().includes(term)) ||
+      (client.dni && client.dni.includes(term)) ||
+      (o.deviceModel && o.deviceModel.toLowerCase().includes(term));
+
+    const matchesStatus = statusFilter === "todos" || o.status === statusFilter;
+    return matchesSearch && matchesStatus;
+  });
+
   return (
     <div className="space-y-6">
       {/* Cabecera interna */}
       <div className="space-y-1">
-        <h1 className="font-outfit text-3xl font-bold text-foreground tracking-tight">
-          Órdenes de Servicio
+        <h1 className="font-outfit text-3xl font-bold text-foreground tracking-tight flex items-center gap-2.5">
+          <ClipboardList className="w-7 h-7 text-primary shrink-0" />
+          <span>Órdenes de Servicio</span>
         </h1>
         <p className="text-xs text-muted-foreground font-light">
-          Alta de dispositivos ingresados y control de trazabilidad técnica del taller.
+          Seguimiento de trazabilidad técnica del taller, carga de diagnósticos, presupuestos y cambio de estados.
         </p>
       </div>
 
-      {/* Selector de Pestañas (Tabs) estilo shadcn */}
-      <div className="flex border-b border-border/60 gap-6">
-        <button
-          onClick={() => setActiveTab("registro")}
-          className={`pb-3 text-sm font-semibold tracking-wide border-b-2 transition-all cursor-pointer relative ${
-            activeTab === "registro"
-              ? "border-primary text-foreground"
-              : "border-transparent text-muted-foreground hover:text-foreground"
-          }`}
-        >
-          Registrar Ingreso
-        </button>
-        <button
-          onClick={() => setActiveTab("control")}
-          className={`pb-3 text-sm font-semibold tracking-wide border-b-2 transition-all cursor-pointer relative ${
-            activeTab === "control"
-              ? "border-primary text-foreground"
-              : "border-transparent text-muted-foreground hover:text-foreground"
-          }`}
-        >
-          Control de Trazabilidad y Estados
-        </button>
-      </div>
-
       <div className="animate-fade-in pt-2">
-        {activeTab === "registro" ? (
-          <div className="max-w-2xl mx-auto w-full">
-            {/* Formulario de Ingreso de Dispositivo (Card shadcn) */}
-            <Card className="bg-card/40 border-border p-6 shadow-xl backdrop-blur-sm space-y-6">
-              <div className="space-y-1">
-                <CardTitle className="font-outfit text-lg font-bold text-foreground flex items-center gap-2 border-0 pb-0">
-                  <PlusCircle className="w-5 h-5 text-primary" />
-                  Ingreso de Equipo
-                </CardTitle>
-                <CardDescription className="text-xs text-muted-foreground">
-                  Registrá los datos del cliente y el dispositivo a reparar.
-                </CardDescription>
+        <Card className="bg-card/20 border-border p-6 shadow-sm flex flex-col justify-between">
+          <div className="space-y-4">
+            <div className="flex items-center justify-between border-b border-border/50 pb-3">
+              <CardTitle className="font-outfit text-base font-bold text-foreground/90 flex items-center gap-2 border-0 pb-0">
+                <ClipboardList className="w-4.5 h-4.5 text-muted-foreground" />
+                Control de Trazabilidad
+              </CardTitle>
+              <span className="text-[9px] text-muted-foreground uppercase tracking-widest font-mono font-bold">Total: {orders.length} Equipos</span>
+            </div>
+
+            {/* Filtros y Buscador */}
+            <div className="flex flex-col sm:flex-row gap-3 items-center justify-between py-2 border-b border-border/30">
+              <div className="relative w-full sm:max-w-xs flex items-center">
+                <Search className="w-4 h-4 text-muted-foreground absolute left-3 pointer-events-none" />
+                <Input
+                  type="text"
+                  placeholder="N° orden, nombre, DNI, modelo..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="bg-background/80 border-border text-xs w-full pl-9 h-9"
+                />
               </div>
-
-              <form onSubmit={handleRegisterOrder} className="space-y-4">
-                
-                {/* Sección: Datos del Cliente */}
-                <div className="space-y-3">
-                  <span className="text-[10px] font-bold text-primary uppercase tracking-wider block">1. Datos del Cliente</span>
-                  
-                  <div className="space-y-1.5">
-                    <Label htmlFor="client-name" className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider block">Nombre Completo</Label>
-                    <Input 
-                      id="client-name"
-                      type="text" 
-                      required 
-                      value={clientName} 
-                      onChange={(e) => setClientName(e.target.value)} 
-                      placeholder="Edgar Ortiz"
-                      className="bg-background/85 border-border focus-visible:ring-1 focus-visible:ring-primary text-xs"
-                    />
-                  </div>
-
-                  <div className="grid grid-cols-2 gap-3">
-                    <div className="space-y-1.5">
-                      <Label htmlFor="client-dni" className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider block">DNI / Identificación</Label>
-                      <Input 
-                        id="client-dni"
-                        type="text" 
-                        required 
-                        value={clientDni} 
-                        onChange={(e) => setClientDni(e.target.value)} 
-                        placeholder="44.375.912"
-                        className="bg-background/85 border-border focus-visible:ring-1 focus-visible:ring-primary text-xs font-mono"
-                      />
-                    </div>
-                    <div className="space-y-1.5">
-                      <Label htmlFor="client-phone" className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider block">Teléfono</Label>
-                      <Input 
-                        id="client-phone"
-                        type="text" 
-                        required 
-                        value={clientPhone} 
-                        onChange={(e) => setClientPhone(e.target.value)} 
-                        placeholder="+54 381 1234567"
-                        className="bg-background/85 border-border focus-visible:ring-1 focus-visible:ring-primary text-xs"
-                      />
-                    </div>
-                  </div>
-
-                  <div className="space-y-1.5">
-                    <Label htmlFor="client-email" className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider block">Email</Label>
-                    <Input 
-                      id="client-email"
-                      type="email" 
-                      required 
-                      value={clientEmail} 
-                      onChange={(e) => setClientEmail(e.target.value)} 
-                      placeholder="edgar@repairit.cloud"
-                      className="bg-background/85 border-border focus-visible:ring-1 focus-visible:ring-primary text-xs"
-                    />
-                  </div>
-                </div>
-
-                <Separator className="border-border/60" />
-
-                {/* Sección: Datos del Equipo */}
-                <div className="space-y-3">
-                  <span className="text-[10px] font-bold text-primary uppercase tracking-wider block">2. Datos del Equipo</span>
-                  
-                  <div className="grid grid-cols-2 gap-3">
-                    <div className="space-y-1.5">
-                      <Label htmlFor="device-type" className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider block">Tipo</Label>
-                      <select 
-                        id="device-type"
-                        value={deviceType}
-                        onChange={(e) => setDeviceType(e.target.value)}
-                        className="w-full h-9 bg-background/85 border border-border rounded-md px-3 py-1 text-xs text-foreground focus:outline-none focus:ring-1 focus:ring-primary"
-                      >
-                        <option value="Notebook">Notebook</option>
-                        <option value="PC Escritorio">PC Escritorio</option>
-                        <option value="Consola">Consola</option>
-                        <option value="Celular">Celular</option>
-                        <option value="Otro">Otro</option>
-                      </select>
-                    </div>
-                    <div className="space-y-1.5">
-                      <Label htmlFor="device-serial" className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider block">Número de Serie</Label>
-                      <Input 
-                        id="device-serial"
-                        type="text" 
-                        value={serial} 
-                        onChange={(e) => setSerial(e.target.value)} 
-                        placeholder="SN-XXXXX"
-                        className="bg-background/85 border-border focus-visible:ring-1 focus-visible:ring-primary text-xs font-mono"
-                      />
-                    </div>
-                  </div>
-
-                  <div className="space-y-1.5">
-                    <Label htmlFor="device-model" className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider block">Marca y Modelo</Label>
-                    <Input 
-                      id="device-model"
-                      type="text" 
-                      required 
-                      value={deviceModel} 
-                      onChange={(e) => setDeviceModel(e.target.value)} 
-                      placeholder="ASUS ROG Strix G15"
-                      className="bg-background/85 border-border focus-visible:ring-1 focus-visible:ring-primary text-xs"
-                    />
-                  </div>
-
-                  <div className="space-y-1.5">
-                    <Label htmlFor="device-issue" className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider block">Falla Reportada</Label>
-                    <Textarea 
-                      id="device-issue"
-                      required 
-                      rows={3}
-                      value={issue} 
-                      onChange={(e) => setIssue(e.target.value)} 
-                      placeholder="Describí los síntomas del dispositivo..."
-                      className="bg-background/85 border-border focus-visible:ring-1 focus-visible:ring-primary text-xs resize-none"
-                    />
-                  </div>
-                </div>
-
-                {/* Checkbox de Recepción */}
-                <div className="flex items-start space-x-2 pt-2">
-                  <Checkbox 
-                    id="terms" 
-                    checked={acceptTerms} 
-                    onCheckedChange={(checked) => setAcceptTerms(checked)}
-                    className="border-border focus-visible:ring-primary"
-                  />
-                  <div className="grid gap-1 leading-none">
-                    <Label
-                      htmlFor="terms"
-                      className="text-[10px] text-muted-foreground font-light leading-tight select-none cursor-pointer"
-                    >
-                      Confirmo la recepción física del equipo y autorizo la apertura del dispositivo para su diagnóstico.
-                    </Label>
-                  </div>
-                </div>
-
-                <Button 
-                  type="submit"
-                  className="w-full bg-primary hover:bg-primary/90 text-primary-foreground font-bold text-xs py-2 rounded-md transition-all select-none cursor-pointer mt-2"
+              <div className="flex gap-2 w-full sm:w-auto">
+                <select
+                  value={statusFilter}
+                  onChange={(e) => setStatusFilter(e.target.value)}
+                  className="h-9 bg-background/85 border border-border rounded-lg px-3 py-1 text-xs text-foreground focus:outline-none focus:ring-1 focus:ring-primary w-full sm:w-auto"
                 >
-                  Registrar Ingreso
+                  <option value="todos">Todos los estados</option>
+                  <option value="ingresado">Ingresado</option>
+                  <option value="diagnostico">En Diagnóstico</option>
+                  <option value="presupuestado">Presupuestado</option>
+                  <option value="reparacion">En Reparación</option>
+                  <option value="listo">Listo</option>
+                  <option value="entregado">Entregado</option>
+                </select>
+                <Button
+                  onClick={handleExportToExcel}
+                  variant="outline"
+                  className="h-9 border-emerald-500/40 hover:bg-emerald-500/10 text-emerald-400 text-xs font-bold flex items-center gap-1.5 cursor-pointer select-none rounded-lg"
+                  title="Exportar órdenes a Excel"
+                >
+                  <FileSpreadsheet className="w-4 h-4" />
+                  Excel
                 </Button>
-
-              </form>
-            </Card>
-          </div>
-        ) : (
-          /* Listado y Control de Órdenes Registradas (Card shadcn) */
-          <Card className="bg-card/20 border-border p-6 shadow-sm flex flex-col justify-between">
-            <div className="space-y-4">
-              <div className="flex items-center justify-between border-b border-border/50 pb-3">
-                <CardTitle className="font-outfit text-base font-bold text-foreground/90 flex items-center gap-2 border-0 pb-0">
-                  <ClipboardList className="w-4.5 h-4.5 text-muted-foreground" />
-                  Control de Trazabilidad
-                </CardTitle>
-                <span className="text-[9px] text-muted-foreground uppercase tracking-widest font-mono font-bold">Total: {orders.length} Equipos</span>
               </div>
+            </div>
 
-              {orders.length > 0 ? (
-                <div className="overflow-x-auto">
-                  <table className="w-full text-left text-xs border-collapse">
-                    <thead>
-                      <tr className="border-b border-border/60 text-muted-foreground uppercase tracking-wider font-semibold">
-                        <th className="py-3 px-2">Código</th>
-                        <th className="py-3 px-2">Cliente</th>
-                        <th className="py-3 px-2">Dispositivo</th>
-                        <th className="py-3 px-2">Fecha</th>
-                        <th className="py-3 px-2">Estado (Editar)</th>
-                        <th className="py-3 px-2 text-right">Acción</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {orders.map((o) => (
-                        <tr key={o.id} className="border-b border-border/40 hover:bg-card/30 transition-colors">
-                          <td className="py-3.5 px-2 font-mono font-bold text-primary">{o.id}</td>
+            {/* Tabla de Órdenes */}
+            {loading ? (
+              <div className="text-center py-16 text-xs text-muted-foreground font-light">
+                <div className="w-6 h-6 border-2 border-primary border-t-transparent rounded-full animate-spin mx-auto mb-2" />
+                Cargando órdenes de servicio...
+              </div>
+            ) : filteredOrders.length > 0 ? (
+              <div className="overflow-x-auto">
+                <table className="w-full text-left text-xs border-collapse">
+                  <thead>
+                    <tr className="border-b border-border/60 text-muted-foreground uppercase tracking-wider font-semibold">
+                      <th className="py-3 px-2">N° de Orden</th>
+                      <th className="py-3 px-2">Cliente</th>
+                      <th className="py-3 px-2">Dispositivo</th>
+                      <th className="py-3 px-2">Diagnóstico / Presupuesto</th>
+                      <th className="py-3 px-2">Estado</th>
+                      <th className="py-3 px-2 text-right">Acciones</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {filteredOrders.map((o) => {
+                      const client = o.clientId || {};
+                      const hasDiag = !!o.diagnosis;
+                      const hasBudget = o.budget && Array.isArray(o.budget.items) && o.budget.items.length > 0;
+                      const totalB = hasBudget ? o.budget.items.reduce((s, i) => s + i.price, 0) : 0;
+
+                      return (
+                        <tr key={o._id} className="border-b border-border/40 hover:bg-card/30 transition-colors">
+                          <td className="py-3.5 px-2 font-mono font-bold text-primary">{o.trackingCode}</td>
                           <td className="py-3.5 px-2">
-                            <span className="font-medium block">{o.clientName}</span>
-                            <span className="text-[10px] text-muted-foreground font-mono">{o.clientDni}</span>
+                            <span className="font-medium block">{client.name || "N/A"}</span>
+                            <div className="flex flex-col text-[10px] text-muted-foreground font-mono">
+                              {client.dni && <span>DNI: {client.dni}</span>}
+                              {client.phone && <span>Tel: {client.phone}</span>}
+                            </div>
                           </td>
                           <td className="py-3.5 px-2">
                             <span className="font-medium block">{o.deviceModel}</span>
                             <span className="text-[10px] text-muted-foreground">{o.deviceType}</span>
                           </td>
-                          <td className="py-3.5 px-2 text-muted-foreground">{o.date}</td>
-                          <td className="py-3.5 px-2">{getStatusDropdown(o.id, o.status)}</td>
+                          <td className="py-3.5 px-2">
+                            <div className="space-y-1">
+                              {hasDiag ? (
+                                <Badge variant="outline" className="text-[9px] bg-purple-500/10 text-purple-400 border-purple-500/20 font-bold block w-max">
+                                  Diagnóstico OK
+                                </Badge>
+                              ) : (
+                                <span className="text-[10px] text-muted-foreground/60 italic block">Sin Diagnóstico</span>
+                              )}
+                              {hasBudget ? (
+                                <span className="text-[11px] font-mono font-bold text-emerald-400 block">
+                                  ${totalB.toLocaleString("es-AR")}
+                                </span>
+                              ) : (
+                                <span className="text-[10px] text-muted-foreground/60 italic block">Sin Presupuesto</span>
+                              )}
+                            </div>
+                          </td>
+                          <td className="py-3.5 px-2">{getStatusDropdown(o._id, o.status)}</td>
                           <td className="py-3.5 px-2 text-right">
-                            <Button 
-                              variant="ghost" 
-                              size="icon-sm"
-                              onClick={() => handleDeleteOrder(o.id)}
-                              className="text-muted-foreground hover:text-red-400 hover:bg-red-950/15"
-                              title="Eliminar de la lista de prueba"
-                            >
-                              <Trash2 className="w-4 h-4" />
-                            </Button>
+                            <div className="flex items-center justify-end gap-1.5">
+                              <Button 
+                                variant="outline" 
+                                size="sm"
+                                onClick={() => handleOpenDiagModal(o)}
+                                className="h-8 px-2 text-xs font-bold border-primary/30 text-primary hover:bg-primary/10 rounded-lg flex items-center gap-1 cursor-pointer"
+                                title="Cargar Diagnóstico y Presupuesto"
+                              >
+                                <Stethoscope className="w-3.5 h-3.5" />
+                                Diag/Presup.
+                              </Button>
+
+                              <Button 
+                                variant="ghost" 
+                                size="icon-sm"
+                                onClick={() => handlePrintOrder(o)}
+                                className="h-8 w-8 text-muted-foreground hover:text-primary hover:bg-primary/10 rounded-full cursor-pointer"
+                                title="Imprimir Comprobante de Recepción"
+                              >
+                                <Printer className="w-4 h-4" />
+                              </Button>
+                            </div>
                           </td>
                         </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-              ) : (
-                <div className="text-center py-16 space-y-2">
-                  <p className="text-xs text-muted-foreground leading-normal font-light">
-                    No hay órdenes de servicio cargadas. Ve a la pestaña de "Registrar Ingreso" para añadir un ingreso técnico.
-                  </p>
-                </div>
-              )}
-            </div>
-
-            <div className="text-[10px] text-muted-foreground/80 mt-6 border-t border-border/40 pt-3">
-              * Nota: Los registros agregados persisten únicamente en el estado local de la sesión de prueba de React.
-            </div>
-          </Card>
-        )}
+                      );
+                    })}
+                  </tbody>
+                </table>
+              </div>
+            ) : (
+              <div className="text-center py-16 space-y-2">
+                <p className="text-xs text-muted-foreground leading-normal font-light">
+                  No se encontraron órdenes de servicio.
+                </p>
+              </div>
+            )}
+          </div>
+        </Card>
       </div>
+
+      {/* MODAL DE DIAGNÓSTICO Y PRESUPUESTO */}
+      {showDiagModal && diagOrder && (
+        <div className="fixed inset-0 z-50 bg-background/80 backdrop-blur-sm flex items-center justify-center p-4">
+          <Card className="bg-card border-border/80 shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto animate-in zoom-in-95 duration-150">
+            <CardHeader className="border-b border-border pb-4 flex flex-row items-center justify-between">
+              <div>
+                <CardTitle className="font-outfit text-lg font-bold text-foreground flex items-center gap-2">
+                  <Stethoscope className="w-5 h-5 text-primary" />
+                  Diagnóstico y Presupuesto
+                </CardTitle>
+                <span className="text-xs text-muted-foreground">
+                  Orden N° <strong className="font-mono text-foreground">{diagOrder.trackingCode}</strong> &bull; {diagOrder.deviceType} {diagOrder.deviceModel}
+                </span>
+              </div>
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={() => setShowDiagModal(false)}
+                className="h-8 w-8 text-muted-foreground hover:text-foreground rounded-full cursor-pointer"
+              >
+                <X className="w-4 h-4" />
+              </Button>
+            </CardHeader>
+
+            <form onSubmit={handleSaveDiagnosis} className="p-6 space-y-5">
+              
+              {/* Diagnóstico Técnico */}
+              <div className="space-y-2">
+                <Label htmlFor="diag-text" className="text-xs font-bold uppercase tracking-wider text-muted-foreground flex items-center gap-1.5">
+                  <FileText className="w-3.5 h-3.5 text-primary" />
+                  Diagnóstico Técnico de Laboratorio
+                </Label>
+                <Textarea
+                  id="diag-text"
+                  rows={4}
+                  placeholder="Escribe el diagnóstico técnico (fallas detectadas en inspección, componentes a reemplazar...)"
+                  value={diagText}
+                  onChange={(e) => setDiagText(e.target.value)}
+                  className="bg-background/80 border-border text-xs focus-visible:ring-1 focus-visible:ring-primary rounded-xl"
+                />
+              </div>
+
+              {/* Presupuesto de Mano de Obra y Repuestos */}
+              <div className="space-y-3 border-t border-border/60 pt-4">
+                <div className="flex items-center justify-between">
+                  <Label className="text-xs font-bold uppercase tracking-wider text-muted-foreground flex items-center gap-1.5">
+                    <DollarSign className="w-3.5 h-3.5 text-primary" />
+                    Ítems del Presupuesto (Mano de obra y repuestos)
+                  </Label>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    onClick={handleAddBudgetItem}
+                    className="h-7 text-[10px] font-bold border-primary/40 text-primary hover:bg-primary/10 rounded-lg flex items-center gap-1 cursor-pointer"
+                  >
+                    <Plus className="w-3 h-3" />
+                    Agregar Ítem
+                  </Button>
+                </div>
+
+                <div className="space-y-2 max-h-48 overflow-y-auto pr-1">
+                  {budgetItems.map((item, idx) => (
+                    <div key={idx} className="flex gap-2 items-center bg-muted/20 p-2 rounded-xl border border-border/50">
+                      <Input
+                        type="text"
+                        placeholder="Descripción (ej: Reemplazo de módulo pantalla)"
+                        value={item.desc}
+                        onChange={(e) => handleBudgetItemChange(idx, "desc", e.target.value)}
+                        className="bg-background text-xs h-8 flex-grow rounded-lg"
+                      />
+                      <div className="relative w-32 shrink-0">
+                        <span className="absolute left-2.5 top-2 text-xs font-mono text-muted-foreground">$</span>
+                        <Input
+                          type="number"
+                          placeholder="Monto"
+                          value={item.price}
+                          onChange={(e) => handleBudgetItemChange(idx, "price", e.target.value)}
+                          className="bg-background text-xs h-8 pl-6 font-mono rounded-lg"
+                        />
+                      </div>
+                      {budgetItems.length > 1 && (
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          size="icon"
+                          onClick={() => handleRemoveBudgetItem(idx)}
+                          className="h-8 w-8 text-destructive hover:text-destructive hover:bg-destructive/10 rounded-full cursor-pointer shrink-0"
+                        >
+                          <X className="w-3.5 h-3.5" />
+                        </Button>
+                      )}
+                    </div>
+                  ))}
+                </div>
+
+                {/* Total calculado */}
+                <div className="flex justify-between items-baseline bg-primary/5 p-3 rounded-xl border border-primary/20 mt-2">
+                  <span className="text-xs font-bold text-muted-foreground uppercase">TOTAL PRESUPUESTADO:</span>
+                  <span className="text-xl font-black font-outfit text-primary font-mono">
+                    ${budgetItems.reduce((acc, i) => acc + (Number(i.price) || 0), 0).toLocaleString("es-AR", { minimumFractionDigits: 2 })}
+                  </span>
+                </div>
+              </div>
+
+              {/* Cambiar Estado */}
+              <div className="space-y-2 border-t border-border/60 pt-4">
+                <Label htmlFor="diag-status" className="text-xs font-bold uppercase tracking-wider text-muted-foreground">
+                  Actualizar Estado de la Orden
+                </Label>
+                <select
+                  id="diag-status"
+                  value={diagStatus}
+                  onChange={(e) => setDiagStatus(e.target.value)}
+                  className="w-full h-9 bg-background border border-border rounded-xl px-3 text-xs font-semibold text-foreground focus:outline-none focus:ring-1 focus:ring-primary"
+                >
+                  <option value="diagnostico">En Diagnóstico</option>
+                  <option value="presupuestado">Presupuestado (Listo para envío al cliente)</option>
+                  <option value="reparacion">En Reparación</option>
+                  <option value="listo">Listo para Entregar</option>
+                </select>
+              </div>
+
+              {/* Botones de Acción */}
+              <div className="flex justify-end gap-3 border-t border-border/60 pt-4">
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => setShowDiagModal(false)}
+                  className="h-9 text-xs font-bold rounded-xl cursor-pointer"
+                >
+                  Cancelar
+                </Button>
+                <Button
+                  type="submit"
+                  disabled={savingDiag}
+                  className="h-9 bg-primary hover:bg-primary/95 text-primary-foreground font-bold text-xs px-5 rounded-xl cursor-pointer shadow-lg shadow-primary/20 flex items-center gap-1.5"
+                >
+                  <Save className="w-3.5 h-3.5" />
+                  {savingDiag ? "Guardando..." : "Guardar Diagnóstico y Presupuesto"}
+                </Button>
+              </div>
+
+            </form>
+          </Card>
+        </div>
+      )}
+
     </div>
   );
 }

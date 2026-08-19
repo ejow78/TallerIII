@@ -102,7 +102,7 @@ export default function LandingPage() {
 
           {/* Ejemplo rápido para testing */}
           <div className="text-xs text-muted-foreground font-medium">
-            ¿Querés probar? Ingresá <span onClick={() => setTrackingId("demo-id")} className="text-primary hover:underline cursor-pointer font-bold">demo-id</span> para ver una reparación simulada.
+            ¿Querés probar? Ingresá <span onClick={() => { setTrackingId("demo-id"); navigate("/seguimiento/demo-id"); }} className="text-primary hover:underline cursor-pointer font-bold">demo-id</span> para ver una reparación simulada.
           </div>
 
         </div>
