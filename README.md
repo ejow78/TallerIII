@@ -1,4 +1,4 @@
-# 🛠️ RepairIT
+# RepairIT
 
 > **Sistema de Gestión y Trazabilidad para Talleres de Servicio Técnico de Hardware**
 
@@ -10,7 +10,7 @@
 
 ---
 
-## 📖 Descripción
+## Descripción
 
 **RepairIT** es una plataforma web integral diseñada para la automatización del ciclo de vida de reparaciones de hardware. El sistema permite registrar equipos, gestionar estados de reparación mediante un flujo de trabajo dinámico y mantener un historial técnico trazable.
 
@@ -18,29 +18,29 @@ Facilita la comunicación transparente entre el técnico y el cliente mediante e
 
 ---
 
-## ⚡ Stack Tecnológico
+## Stack Tecnológico
 
 El proyecto utiliza una arquitectura **Serverless BaaS (Backend-as-a-Service)** moderna para garantizar máxima escalabilidad, rendimiento y seguridad:
 
 * **Frontend:** React 18 + Vite 8 + Tailwind CSS v4 + Shadcn UI / Radix Primitives + Lucide Icons + React Router DOM 6.
-* **Backend & Base de Datos:** Supabase (PostgreSQL 15), Supabase Auth con tokens **JWT**, Row Level Security (RLS) y Procedimientos Almacenados (RPC).
+* **Backend & Base de Datos:** Supabase (PostgreSQL), Supabase Auth con tokens **JWT**, Row Level Security (RLS) y Procedimientos Almacenados (RPC).
 * **Periféricos & Hardware:** Soporte para Lectores de Código de Barras (búfer de `100ms`) e Impresoras Térmicas de Tickets (58mm / 80mm).
 * **Localización:** Moneda e idioma configurados para Argentina (`es-AR`).
 
 ---
 
-## 🌟 Características Principales
+## Características Principales
 
-* **🛒 Caja Rápida (POS):** Cobro multimedio (Efectivo, Transf., Débito, Crédito), calculadora de vuelto con *"Pago Justo"*, atajos por teclas de función (`F2`, `F3`, `F4`, `F8`, `F9`), re-impresión de recibos e impresión térmica directa.
-* **📦 Control de Inventario:** Detección automática por escáner de código de barras, alertas de bajo stock, ajuste rápido (`+1`/`-1`) e importación/exportación masiva vía CSV.
-* **🩺 Diagnóstico Técnico y Presupuesto:** Modal interactivo para redactar diagnósticos de laboratorio, cargar presupuestos desglosados (mano de obra y repuestos) y permitir la **Aprobación Online por el Cliente**.
-* **🔍 Seguimiento en Tiempo Real:** Enlaces públicos por reparación sin requerir contraseñas, consulta interactiva por código NanoID y simulación `demo-id`.
-* **🏢 Gestión Multi-Sucursal y RLS:** Control de sedes para empresas con licencias *Multi-Taller Pro*, gestión de cuentas de personal (`create_venue_account`) y políticas RLS para aislamiento absoluto de datos.
-* **👑 Panel de SuperAdmin:** Supervisión global de inquilinos, asignación de planes y control centralizado de usuarios.
+* ** Caja Rápida (POS):** Cobro multimedio (Efectivo, Transf., Débito, Crédito), calculadora de vuelto con *"Pago Justo"*, atajos por teclas de función (`F2`, `F3`, `F4`, `F8`, `F9`), re-impresión de recibos e impresión térmica directa.
+* ** Control de Inventario:** Detección automática por escáner de código de barras, alertas de bajo stock, ajuste rápido (`+1`/`-1`) e importación/exportación masiva vía CSV.
+* ** Diagnóstico Técnico y Presupuesto:** Modal interactivo para redactar diagnósticos de laboratorio, cargar presupuestos desglosados (mano de obra y repuestos) y permitir la **Aprobación Online por el Cliente**.
+* ** Seguimiento en Tiempo Real:** Enlaces públicos por reparación sin requerir contraseñas, consulta interactiva por código NanoID y simulación `demo-id`.
+* ** Gestión Multi-Sucursal y RLS:** Control de sedes para empresas con licencias *Multi-Taller Pro*, gestión de cuentas de personal (`create_venue_account`) y políticas RLS para aislamiento absoluto de datos.
+* ** Panel de SuperAdmin:** Supervisión global de inquilinos, asignación de planes y control centralizado de usuarios.
 
 ---
 
-## 🚀 Instalación y Configuración
+##  Instalación y Configuración
 
 ### Requisitos Previos
 * Node.js v18+ y npm v9+
@@ -79,6 +79,6 @@ El proyecto utiliza una arquitectura **Serverless BaaS (Backend-as-a-Service)** 
 
 ---
 
-## 📝 Licencia y Créditos
+## Autor
 
-Desarrollado como proyecto de gestión y trazabilidad técnica para **RepairIT**.
+**Ortiz Edgar Javier**.
