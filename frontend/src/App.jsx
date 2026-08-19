@@ -34,12 +34,21 @@ export default function App() {
     const pathname = window.location.pathname;
 
     if (hostname.includes("repairit.cloud")) {
+      const token = localStorage.getItem("repairit_token");
       // Si está en el dashboard pero no en app.repairit.cloud, redirigir a app.repairit.cloud/dashboard
       if (hostname !== "app.repairit.cloud" && pathname.startsWith("/dashboard")) {
+        if (!token) {
+          window.location.href = "https://repairit.cloud/login";
+          return;
+        }
         window.location.href = `https://app.repairit.cloud${pathname}`;
         return;
       }
       if (hostname === "app.repairit.cloud" && pathname === "/") {
+        if (!token) {
+          window.location.href = "https://repairit.cloud/login";
+          return;
+        }
         window.location.href = "/dashboard";
         return;
       }

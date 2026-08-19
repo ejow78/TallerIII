@@ -59,6 +59,16 @@ export default function DashboardLayout() {
   const [activeVenue, setActiveVenue] = useState(null);
 
   useEffect(() => {
+    const token = localStorage.getItem("repairit_token");
+    if (!token) {
+      if (window.location.hostname.includes("repairit.cloud")) {
+        window.location.href = "https://repairit.cloud/login";
+      } else {
+        navigate("/login");
+      }
+      return;
+    }
+
     if (!isSuperAdmin) {
       const loadVenues = async () => {
         try {
@@ -88,10 +98,20 @@ export default function DashboardLayout() {
     }
   };
 
-  const handleLogout = () => {
-    api.auth.logout();
-    toast.success("Sesión cerrada correctamente.");
-    navigate("/");
+  const handleLogout = async () => {
+    try {
+      await api.auth.logout();
+      toast.success("Sesión cerrada correctamente.");
+    } catch (err) {
+      console.error("Error al cerrar sesión:", err);
+    } finally {
+      localStorage.clear();
+      if (window.location.hostname.includes("repairit.cloud")) {
+        window.location.href = "https://repairit.cloud";
+      } else {
+        window.location.href = "/";
+      }
+    }
   };
 
   // Determinar los Breadcrumbs basados en la ruta actual
