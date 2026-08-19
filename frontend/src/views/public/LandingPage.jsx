@@ -32,7 +32,20 @@ export default function LandingPage() {
   const handleSearch = (e) => {
     e.preventDefault();
     if (trackingId.trim()) {
-      navigate(`/seguimiento/${trackingId.trim()}`);
+      if (window.location.hostname.includes("repairit.cloud")) {
+        window.location.href = `https://tracking.repairit.cloud/seguimiento/${trackingId.trim()}`;
+      } else {
+        navigate(`/seguimiento/${trackingId.trim()}`);
+      }
+    }
+  };
+
+  const handleDemoClick = () => {
+    setTrackingId("demo-id");
+    if (window.location.hostname.includes("repairit.cloud")) {
+      window.location.href = "https://tracking.repairit.cloud/seguimiento/demo-id";
+    } else {
+      navigate("/seguimiento/demo-id");
     }
   };
 
@@ -102,7 +115,7 @@ export default function LandingPage() {
 
           {/* Ejemplo rápido para testing */}
           <div className="text-xs text-muted-foreground font-medium">
-            ¿Querés probar? Ingresá <span onClick={() => { setTrackingId("demo-id"); navigate("/seguimiento/demo-id"); }} className="text-primary hover:underline cursor-pointer font-bold">demo-id</span> para ver una reparación simulada.
+            ¿Querés probar? Ingresá <span onClick={handleDemoClick} className="text-primary hover:underline cursor-pointer font-bold">demo-id</span> para ver una reparación simulada.
           </div>
 
         </div>

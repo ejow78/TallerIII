@@ -29,6 +29,16 @@ export default function App() {
   const [sessionLoading, setSessionLoading] = useState(true);
 
   useEffect(() => {
+    // Detección inteligente de subdominio en producción
+    const hostname = window.location.hostname;
+    const pathname = window.location.pathname;
+
+    if (hostname === "app.repairit.cloud" && pathname === "/") {
+      window.location.href = "/dashboard";
+    } else if (hostname === "tracking.repairit.cloud" && pathname === "/") {
+      window.location.href = "/seguimiento/demo-id";
+    }
+
     const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
       if (session) {
         localStorage.setItem("repairit_token", session.access_token);
@@ -84,7 +94,11 @@ export default function App() {
               localStorage.setItem("repairit_user", JSON.stringify(userData));
               
               if (event === "SIGNED_IN") {
-                window.location.href = "/dashboard";
+                if (window.location.hostname.includes("repairit.cloud")) {
+                  window.location.href = "https://app.repairit.cloud/dashboard";
+                } else {
+                  window.location.href = "/dashboard";
+                }
               }
             }
           } catch (err) {
