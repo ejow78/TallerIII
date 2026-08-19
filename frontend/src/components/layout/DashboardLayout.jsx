@@ -52,6 +52,17 @@ export default function DashboardLayout() {
   const navigate = useNavigate();
   const location = useLocation();
 
+  // Guard síncrono: Impedir parpadeo visual (FOUC) si no hay token de sesión
+  const token = localStorage.getItem("repairit_token");
+  if (!token) {
+    if (window.location.hostname.includes("repairit.cloud")) {
+      window.location.href = "https://app.repairit.cloud/login";
+    } else {
+      return <Navigate to="/login" replace />;
+    }
+    return null;
+  }
+
   const user = JSON.parse(localStorage.getItem("repairit_user") || "{}");
   const isSuperAdmin = user.role === "superadmin";
 
@@ -59,16 +70,6 @@ export default function DashboardLayout() {
   const [activeVenue, setActiveVenue] = useState(null);
 
   useEffect(() => {
-    const token = localStorage.getItem("repairit_token");
-    if (!token) {
-      if (window.location.hostname.includes("repairit.cloud")) {
-        window.location.href = "https://repairit.cloud/login";
-      } else {
-        navigate("/login");
-      }
-      return;
-    }
-
     if (!isSuperAdmin) {
       const loadVenues = async () => {
         try {
