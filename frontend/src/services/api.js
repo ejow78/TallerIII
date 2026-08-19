@@ -50,30 +50,37 @@ export const api = {
         throw new Error(error.message);
       }
 
-      // Obtener perfil público asociado al usuario
-      const { data: profile, error: profileError } = await supabase
-        .from("profiles")
-        .select("*, organization:organizations(*), venue:venues(*)")
-        .eq("id", data.user.id)
-        .single();
+      // Guardar token inmediatamente
+      if (data?.session?.access_token) {
+        localStorage.setItem("repairit_token", data.session.access_token);
+      }
 
-      if (profileError) {
-        throw new Error("No se pudo obtener el perfil del usuario.");
+      // Obtener perfil público asociado al usuario
+      let profile = null;
+      try {
+        const { data: profData } = await supabase
+          .from("profiles")
+          .select("*, organization:organizations(*), venue:venues(*)")
+          .eq("id", data.user.id)
+          .maybeSingle();
+        profile = profData;
+      } catch (pErr) {
+        console.error("No se pudo cargar el perfil detallado:", pErr);
       }
 
       const userData = {
-        _id: profile.id,
-        name: profile.name,
+        _id: profile?.id || data.user.id,
+        name: profile?.name || data.user.email.split("@")[0],
         email: data.user.email,
-        role: profile.role,
-        organizationId: profile.organization_id,
-        venueId: profile.venue_id,
+        role: profile?.role || "admin",
+        organizationId: profile?.organization_id || null,
+        venueId: profile?.venue_id || null,
+        subscriptionPlan: profile?.organization?.subscription_plan || "Multi-Taller Pro",
+        subscriptionStatus: profile?.organization?.subscription_status || "activo",
         token: data.session.access_token,
       };
 
-      localStorage.setItem("repairit_token", data.session.access_token);
       localStorage.setItem("repairit_user", JSON.stringify(userData));
-
       return userData;
     },
 

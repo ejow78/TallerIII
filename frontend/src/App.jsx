@@ -35,6 +35,12 @@ export default function App() {
 
     if (hostname.includes("repairit.cloud")) {
       const token = localStorage.getItem("repairit_token");
+      if (hostname === "app.repairit.cloud" && pathname === "/login") {
+        if (token) {
+          window.location.href = "/dashboard";
+          return;
+        }
+      }
       if (hostname !== "app.repairit.cloud" && pathname === "/login") {
         window.location.href = "https://app.repairit.cloud/login";
         return;
