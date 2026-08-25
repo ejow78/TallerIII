@@ -1,9 +1,9 @@
 import { supabase } from "./supabaseClient";
 
-// Generador de código de seguimiento único alfanumérico (6 caracteres)
+// Generador de código de seguimiento alfanumérico de alta entropía (8 caracteres anti-fuerza bruta)
 const generateTrackingCode = () => {
-  const chars = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-  return "RT-" + Array.from({ length: 6 }, () => chars[Math.floor(Math.random() * chars.length)]).join("");
+  const chars = "23456789ABCDEFGHJKLMNPQRSTUVWXYZ";
+  return "RT-" + Array.from({ length: 8 }, () => chars[Math.floor(Math.random() * chars.length)]).join("");
 };
 
 // Helper para obtener el usuario de sessionStorage
