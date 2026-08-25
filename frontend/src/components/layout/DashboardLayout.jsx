@@ -63,32 +63,22 @@ export default function DashboardLayout() {
     return null;
   }
 
+  // Actualización síncrona del título del documento
+  const currentPath = location.pathname;
+  if (currentPath === "/dashboard/nuevo-ingreso") document.title = "RepairIT - Registrar Ingreso";
+  else if (currentPath === "/dashboard/ordenes") document.title = "RepairIT - Órdenes de Servicio";
+  else if (currentPath === "/dashboard/clientes") document.title = "RepairIT - Directorio de Clientes";
+  else if (currentPath === "/dashboard/inventario") document.title = "RepairIT - Inventario de Insumos";
+  else if (currentPath === "/dashboard/caja") document.title = "RepairIT - Control de Caja";
+  else if (currentPath === "/dashboard/usuarios") document.title = "RepairIT - Gestión de Usuarios";
+  else if (currentPath === "/dashboard/perfil") document.title = "RepairIT - Configuración de Taller";
+  else document.title = "RepairIT - Panel de Control";
+
   const user = JSON.parse(localStorage.getItem("repairit_user") || "{}");
   const isSuperAdmin = user.role === "superadmin";
 
   const [venues, setVenues] = useState([]);
   const [activeVenue, setActiveVenue] = useState(null);
-
-  useEffect(() => {
-    const path = location.pathname;
-    if (path === "/dashboard/nuevo-ingreso") {
-      document.title = "RepairIT - Registrar Ingreso";
-    } else if (path === "/dashboard/ordenes") {
-      document.title = "RepairIT - Órdenes de Servicio";
-    } else if (path === "/dashboard/clientes") {
-      document.title = "RepairIT - Directorio de Clientes";
-    } else if (path === "/dashboard/inventario") {
-      document.title = "RepairIT - Inventario de Insumos";
-    } else if (path === "/dashboard/caja") {
-      document.title = "RepairIT - Control de Caja";
-    } else if (path === "/dashboard/usuarios") {
-      document.title = "RepairIT - Gestión de Usuarios";
-    } else if (path === "/dashboard/perfil") {
-      document.title = "RepairIT - Configuración de Taller";
-    } else {
-      document.title = "RepairIT - Panel de Control";
-    }
-  }, [location.pathname]);
 
   useEffect(() => {
     if (!isSuperAdmin) {

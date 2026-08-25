@@ -10,6 +10,7 @@ import { api } from "@/services/api";
 import { supabase } from "@/services/supabaseClient";
 
 export default function LoginPage() {
+  document.title = "RepairIT - Iniciar Sesión";
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [rememberMe, setRememberMe] = useState(false);

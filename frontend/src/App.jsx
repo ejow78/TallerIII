@@ -30,39 +30,44 @@ export default function App() {
 
   useEffect(() => {
     // Detección inteligente de subdominio en producción
-    const hostname = window.location.hostname;
-    const pathname = window.location.pathname;
+    const checkSubdomain = () => {
+      const hostname = window.location.hostname;
+      const pathname = window.location.pathname;
 
-    if (hostname.includes("repairit.cloud")) {
-      const token = localStorage.getItem("repairit_token") || sessionStorage.getItem("repairit_token");
+      if (hostname.includes("repairit.cloud")) {
+        const token = localStorage.getItem("repairit_token") || sessionStorage.getItem("repairit_token");
 
-      // app.repairit.cloud es ESTRICTO y EXCLUSIVO para /dashboard y /login
-      if (hostname === "app.repairit.cloud") {
-        if (window.location.hash || (pathname !== "/login" && !pathname.startsWith("/dashboard"))) {
-          const hash = window.location.hash;
-          const targetPath = pathname === "/login" ? "" : pathname;
-          window.location.href = `https://repairit.cloud${targetPath}${hash}`;
-          return;
+        // app.repairit.cloud es ESTRICTO y EXCLUSIVO para /dashboard y /login
+        if (hostname === "app.repairit.cloud") {
+          if (window.location.hash || (pathname !== "/login" && !pathname.startsWith("/dashboard"))) {
+            const hash = window.location.hash;
+            const targetPath = pathname === "/login" ? "" : pathname;
+            window.location.href = `https://repairit.cloud${targetPath}${hash}`;
+            return;
+          }
         }
-      }
 
-      if (hostname !== "app.repairit.cloud" && pathname === "/login") {
-        window.location.href = "https://app.repairit.cloud/login";
-        return;
-      }
-      if (hostname !== "app.repairit.cloud" && pathname.startsWith("/dashboard")) {
-        if (!token) {
+        if (hostname !== "app.repairit.cloud" && pathname === "/login") {
           window.location.href = "https://app.repairit.cloud/login";
           return;
         }
-        window.location.href = `https://app.repairit.cloud${pathname}`;
-        return;
+        if (hostname !== "app.repairit.cloud" && pathname.startsWith("/dashboard")) {
+          if (!token) {
+            window.location.href = "https://app.repairit.cloud/login";
+            return;
+          }
+          window.location.href = `https://app.repairit.cloud${pathname}`;
+          return;
+        }
+        if (hostname === "tracking.repairit.cloud" && pathname === "/") {
+          window.location.href = "/seguimiento/demo-id";
+          return;
+        }
       }
-      if (hostname === "tracking.repairit.cloud" && pathname === "/") {
-        window.location.href = "/seguimiento/demo-id";
-        return;
-      }
-    }
+    };
+
+    checkSubdomain();
+    window.addEventListener("hashchange", checkSubdomain);
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
       if (session) {
@@ -182,6 +187,7 @@ export default function App() {
     });
 
     return () => {
+      window.removeEventListener("hashchange", checkSubdomain);
       subscription.unsubscribe();
     };
   }, []);
