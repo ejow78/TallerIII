@@ -38,8 +38,10 @@ export default function App() {
 
       // app.repairit.cloud es ESTRICTO y EXCLUSIVO para /dashboard y /login
       if (hostname === "app.repairit.cloud") {
-        if (pathname !== "/login" && !pathname.startsWith("/dashboard")) {
-          window.location.href = `https://repairit.cloud${pathname}${window.location.hash}`;
+        if (window.location.hash || (pathname !== "/login" && !pathname.startsWith("/dashboard"))) {
+          const hash = window.location.hash;
+          const targetPath = pathname === "/login" ? "" : pathname;
+          window.location.href = `https://repairit.cloud${targetPath}${hash}`;
           return;
         }
       }

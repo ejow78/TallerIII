@@ -3,6 +3,13 @@ import { Separator } from "@/components/ui/separator";
 import { Button } from "@/components/ui/button";
 
 export default function PublicLayout() {
+  const handleNavClick = (targetUrl) => (e) => {
+    if (window.location.hostname.includes("repairit.cloud")) {
+      e.preventDefault();
+      window.location.href = targetUrl;
+    }
+  };
+
   return (
     <div className="min-h-screen bg-background text-foreground flex flex-col font-sans selection:bg-primary/30 selection:text-primary relative">
 
@@ -13,6 +20,7 @@ export default function PublicLayout() {
           {/* Logo del Proyecto (RepairIT) */}
           <a
             href={window.location.hostname.includes("repairit.cloud") ? "https://repairit.cloud" : "/"}
+            onClick={handleNavClick("https://repairit.cloud")}
             className="flex items-center gap-2"
           >
             <span className="font-outfit text-2xl font-black tracking-tight text-foreground">
@@ -24,30 +32,35 @@ export default function PublicLayout() {
           <nav className="flex items-center gap-4 sm:gap-6">
             <a
               href={window.location.hostname.includes("repairit.cloud") ? "https://repairit.cloud" : "/"}
+              onClick={handleNavClick("https://repairit.cloud")}
               className="hidden md:block text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
             >
               Inicio
             </a>
             <a
               href={window.location.hostname.includes("repairit.cloud") ? "https://repairit.cloud/#caracteristicas" : "/#caracteristicas"}
+              onClick={handleNavClick("https://repairit.cloud/#caracteristicas")}
               className="hidden md:block text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
             >
               Servicios
             </a>
             <a
               href={window.location.hostname.includes("repairit.cloud") ? "https://repairit.cloud/#precios" : "/#precios"}
+              onClick={handleNavClick("https://repairit.cloud/#precios")}
               className="hidden md:block text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
             >
               Precios
             </a>
             <a
               href={window.location.hostname.includes("repairit.cloud") ? "https://repairit.cloud/#faq" : "/#faq"}
+              onClick={handleNavClick("https://repairit.cloud/#faq")}
               className="hidden md:block text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
             >
               Preguntas
             </a>
             <a
               href={window.location.hostname.includes("repairit.cloud") ? "https://repairit.cloud/#contacto" : "/#contacto"}
+              onClick={handleNavClick("https://repairit.cloud/#contacto")}
               className="hidden md:block text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
             >
               Contacto
@@ -86,12 +99,14 @@ export default function PublicLayout() {
             <div className="flex items-center gap-6">
               <a
                 href={window.location.hostname.includes("repairit.cloud") ? "https://repairit.cloud/privacidad" : "/privacidad"}
+                onClick={handleNavClick("https://repairit.cloud/privacidad")}
                 className="hover:text-foreground transition-colors"
               >
                 Privacidad
               </a>
               <a
                 href={window.location.hostname.includes("repairit.cloud") ? "https://repairit.cloud/terminos" : "/terminos"}
+                onClick={handleNavClick("https://repairit.cloud/terminos")}
                 className="hover:text-foreground transition-colors"
               >
                 Términos
