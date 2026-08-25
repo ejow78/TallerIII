@@ -6,9 +6,10 @@ const generateTrackingCode = () => {
   return "RT-" + Array.from({ length: 6 }, () => chars[Math.floor(Math.random() * chars.length)]).join("");
 };
 
-// Helper para obtener el usuario de localStorage
+// Helper para obtener el usuario de sessionStorage
 const getLocalUser = () => {
-  return JSON.parse(localStorage.getItem("repairit_user") || "{}");
+  const sessionData = sessionStorage.getItem("repairit_user") || localStorage.getItem("repairit_user");
+  return JSON.parse(sessionData || "{}");
 };
 
 const mapClient = (client) => {
@@ -50,8 +51,9 @@ export const api = {
         throw new Error(error.message);
       }
 
-      // Guardar token inmediatamente
+      // Guardar token inmediatamente en sessionStorage para expiración al cerrar navegador
       if (data?.session?.access_token) {
+        sessionStorage.setItem("repairit_token", data.session.access_token);
         localStorage.setItem("repairit_token", data.session.access_token);
       }
 
@@ -80,6 +82,7 @@ export const api = {
         token: data.session.access_token,
       };
 
+      sessionStorage.setItem("repairit_user", JSON.stringify(userData));
       localStorage.setItem("repairit_user", JSON.stringify(userData));
       return userData;
     },
