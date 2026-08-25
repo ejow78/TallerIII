@@ -4,9 +4,12 @@ import { Button } from "@/components/ui/button";
 
 export default function PublicLayout() {
   const handleNavClick = (targetUrl) => (e) => {
+    e.preventDefault();
     if (window.location.hostname.includes("repairit.cloud")) {
-      e.preventDefault();
       window.location.href = targetUrl;
+    } else {
+      const relativePath = targetUrl.replace("https://repairit.cloud", "");
+      window.location.href = relativePath || "/";
     }
   };
 
