@@ -29,25 +29,25 @@ export default function PublicLayout() {
               Inicio
             </a>
             <a
-              href="#caracteristicas"
+              href={window.location.hostname.includes("repairit.cloud") ? "https://repairit.cloud/#caracteristicas" : "/#caracteristicas"}
               className="hidden md:block text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
             >
               Servicios
             </a>
             <a
-              href="#precios"
+              href={window.location.hostname.includes("repairit.cloud") ? "https://repairit.cloud/#precios" : "/#precios"}
               className="hidden md:block text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
             >
               Precios
             </a>
             <a
-              href="#faq"
+              href={window.location.hostname.includes("repairit.cloud") ? "https://repairit.cloud/#faq" : "/#faq"}
               className="hidden md:block text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
             >
               Preguntas
             </a>
             <a
-              href="#contacto"
+              href={window.location.hostname.includes("repairit.cloud") ? "https://repairit.cloud/#contacto" : "/#contacto"}
               className="hidden md:block text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
             >
               Contacto
@@ -84,8 +84,18 @@ export default function PublicLayout() {
           </div>
           <div className="flex flex-col sm:flex-row items-center gap-4 sm:gap-6 text-xs text-muted-foreground font-medium w-full md:w-auto">
             <div className="flex items-center gap-6">
-              <Link to="/privacidad" className="hover:text-foreground transition-colors">Privacidad</Link>
-              <Link to="/terminos" className="hover:text-foreground transition-colors">Términos</Link>
+              <a
+                href={window.location.hostname.includes("repairit.cloud") ? "https://repairit.cloud/privacidad" : "/privacidad"}
+                className="hover:text-foreground transition-colors"
+              >
+                Privacidad
+              </a>
+              <a
+                href={window.location.hostname.includes("repairit.cloud") ? "https://repairit.cloud/terminos" : "/terminos"}
+                className="hover:text-foreground transition-colors"
+              >
+                Términos
+              </a>
             </div>
             <Separator orientation="vertical" className="hidden sm:block h-4" />
             <p className="text-muted-foreground/85 text-center sm:text-left">&copy; 2026 RepairIT. Edgar Javier Ortiz.</p>

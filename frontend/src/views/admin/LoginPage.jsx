@@ -163,10 +163,12 @@ export default function LoginPage() {
         <div className="text-center pt-2">
           <Button 
             variant="link"
-            onClick={() => navigate("/")}
+            asChild
             className="text-xs text-muted-foreground hover:text-foreground font-medium transition-colors cursor-pointer select-none"
           >
-            &larr; Volver a la consulta pública
+            <a href={window.location.hostname.includes("repairit.cloud") ? "https://repairit.cloud" : "/"}>
+              &larr; Volver a la consulta pública
+            </a>
           </Button>
         </div>
 
