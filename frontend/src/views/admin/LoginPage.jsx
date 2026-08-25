@@ -18,7 +18,7 @@ export default function LoginPage() {
 
   useEffect(() => {
     document.title = "RepairIT - Iniciar Sesión";
-    const token = localStorage.getItem("repairit_token");
+    const token = sessionStorage.getItem("repairit_token");
     if (token) {
       navigate("/dashboard");
     }

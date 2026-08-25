@@ -53,7 +53,7 @@ export default function DashboardLayout() {
   const location = useLocation();
 
   // Guard síncrono: Impedir parpadeo visual (FOUC) si no hay token de sesión
-  const token = localStorage.getItem("repairit_token");
+  const token = sessionStorage.getItem("repairit_token");
   if (!token) {
     if (window.location.hostname.includes("repairit.cloud")) {
       window.location.href = "https://app.repairit.cloud/login";
@@ -74,7 +74,7 @@ export default function DashboardLayout() {
   else if (currentPath === "/dashboard/perfil") document.title = "RepairIT - Configuración de Taller";
   else document.title = "RepairIT - Panel de Control";
 
-  const user = JSON.parse(localStorage.getItem("repairit_user") || "{}");
+  const user = JSON.parse(sessionStorage.getItem("repairit_user") || "{}");
   const isSuperAdmin = user.role === "superadmin";
 
   const [venues, setVenues] = useState([]);

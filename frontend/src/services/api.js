@@ -8,8 +8,7 @@ const generateTrackingCode = () => {
 
 // Helper para obtener el usuario de sessionStorage
 const getLocalUser = () => {
-  const sessionData = sessionStorage.getItem("repairit_user") || localStorage.getItem("repairit_user");
-  return JSON.parse(sessionData || "{}");
+  return JSON.parse(sessionStorage.getItem("repairit_user") || "{}");
 };
 
 const mapClient = (client) => {
@@ -54,7 +53,6 @@ export const api = {
       // Guardar token inmediatamente en sessionStorage para expiración al cerrar navegador
       if (data?.session?.access_token) {
         sessionStorage.setItem("repairit_token", data.session.access_token);
-        localStorage.setItem("repairit_token", data.session.access_token);
       }
 
       // Obtener perfil público asociado al usuario
@@ -83,7 +81,6 @@ export const api = {
       };
 
       sessionStorage.setItem("repairit_user", JSON.stringify(userData));
-      localStorage.setItem("repairit_user", JSON.stringify(userData));
       return userData;
     },
 

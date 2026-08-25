@@ -35,7 +35,7 @@ export default function App() {
       const pathname = window.location.pathname;
 
       if (hostname.includes("repairit.cloud")) {
-        const token = localStorage.getItem("repairit_token") || sessionStorage.getItem("repairit_token");
+        const token = sessionStorage.getItem("repairit_token");
 
         // app.repairit.cloud es ESTRICTO y EXCLUSIVO para /dashboard y /login
         if (hostname === "app.repairit.cloud") {
@@ -71,9 +71,9 @@ export default function App() {
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
       if (session) {
-        localStorage.setItem("repairit_token", session.access_token);
+        sessionStorage.setItem("repairit_token", session.access_token);
         
-        const localUser = JSON.parse(localStorage.getItem("repairit_user") || "{}");
+        const localUser = JSON.parse(sessionStorage.getItem("repairit_user") || "{}");
         if (
           !localUser._id ||
           !localUser.venueId ||
@@ -165,7 +165,7 @@ export default function App() {
                 subscriptionStatus: subStatus,
                 token: session.access_token,
               };
-              localStorage.setItem("repairit_user", JSON.stringify(userData));
+              sessionStorage.setItem("repairit_user", JSON.stringify(userData));
               
               if (event === "SIGNED_IN") {
                 if (window.location.hostname.includes("repairit.cloud")) {
@@ -180,8 +180,9 @@ export default function App() {
           }
         }
       } else {
-        localStorage.removeItem("repairit_token");
-        localStorage.removeItem("repairit_user");
+        sessionStorage.removeItem("repairit_token");
+        sessionStorage.removeItem("repairit_user");
+        localStorage.clear();
       }
       setSessionLoading(false);
     });
