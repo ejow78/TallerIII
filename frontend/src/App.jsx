@@ -35,12 +35,14 @@ export default function App() {
       const pathname = window.location.pathname;
 
       if (hostname.includes("repairit.cloud")) {
-        const token = sessionStorage.getItem("repairit_token");
+        const token = sessionStorage.getItem("repairit_token") || localStorage.getItem("repairit_token");
 
         // app.repairit.cloud es ESTRICTO y EXCLUSIVO para /dashboard y /login
         if (hostname === "app.repairit.cloud") {
-          if (window.location.hash || (pathname !== "/login" && !pathname.startsWith("/dashboard"))) {
-            const hash = window.location.hash;
+          const hash = window.location.hash;
+          const isAuthHash = hash.includes("access_token") || hash.includes("refresh_token") || hash.includes("error") || hash.includes("type=");
+
+          if ((hash && !isAuthHash) || (pathname !== "/login" && !pathname.startsWith("/dashboard"))) {
             const targetPath = pathname === "/login" ? "" : pathname;
             window.location.href = `https://repairit.cloud${targetPath}${hash}`;
             return;
@@ -72,8 +74,9 @@ export default function App() {
     const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
       if (session) {
         sessionStorage.setItem("repairit_token", session.access_token);
+        localStorage.setItem("repairit_token", session.access_token);
         
-        const localUser = JSON.parse(sessionStorage.getItem("repairit_user") || "{}");
+        const localUser = JSON.parse(sessionStorage.getItem("repairit_user") || localStorage.getItem("repairit_user") || "{}");
         if (
           !localUser._id ||
           !localUser.venueId ||
@@ -159,19 +162,20 @@ export default function App() {
                 name: profile.name,
                 email: session.user.email,
                 role: profile.role,
-                organizationId: profile.organization_id,
-                venueId: profile.venue_id,
                 subscriptionPlan: subPlan,
                 subscriptionStatus: subStatus,
+                organizationId: profile.organization_id,
+                venueId: profile.venue_id,
                 token: session.access_token,
               };
               sessionStorage.setItem("repairit_user", JSON.stringify(userData));
+              localStorage.setItem("repairit_user", JSON.stringify(userData));
               
               if (event === "SIGNED_IN") {
                 if (window.location.hostname.includes("repairit.cloud")) {
-                  window.location.href = "https://app.repairit.cloud/dashboard";
-                } else {
-                  window.location.href = "/dashboard";
+                  if (window.location.hostname !== "app.repairit.cloud") {
+                    window.location.href = "https://app.repairit.cloud/dashboard";
+                  }
                 }
               }
             }
