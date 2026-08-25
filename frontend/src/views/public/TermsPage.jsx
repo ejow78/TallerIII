@@ -1,7 +1,11 @@
+import { useEffect } from "react";
 import { Link } from "react-router-dom";
 import { Separator } from "@/components/ui/separator";
 
 export default function TermsPage() {
+  useEffect(() => {
+    document.title = "RepairIT - Términos y Condiciones";
+  }, []);
   return (
     <div className="flex-1 max-w-3xl w-full mx-auto px-6 py-16 space-y-8 animate-fade-in">
       <div className="space-y-3">

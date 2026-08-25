@@ -70,6 +70,27 @@ export default function DashboardLayout() {
   const [activeVenue, setActiveVenue] = useState(null);
 
   useEffect(() => {
+    const path = location.pathname;
+    if (path === "/dashboard/nuevo-ingreso") {
+      document.title = "RepairIT - Registrar Ingreso";
+    } else if (path === "/dashboard/ordenes") {
+      document.title = "RepairIT - Órdenes de Servicio";
+    } else if (path === "/dashboard/clientes") {
+      document.title = "RepairIT - Directorio de Clientes";
+    } else if (path === "/dashboard/inventario") {
+      document.title = "RepairIT - Inventario de Insumos";
+    } else if (path === "/dashboard/caja") {
+      document.title = "RepairIT - Control de Caja";
+    } else if (path === "/dashboard/usuarios") {
+      document.title = "RepairIT - Gestión de Usuarios";
+    } else if (path === "/dashboard/perfil") {
+      document.title = "RepairIT - Configuración de Taller";
+    } else {
+      document.title = "RepairIT - Panel de Control";
+    }
+  }, [location.pathname]);
+
+  useEffect(() => {
     if (!isSuperAdmin) {
       const loadVenues = async () => {
         try {

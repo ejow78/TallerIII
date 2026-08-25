@@ -60,6 +60,7 @@ export default function TrackingPage() {
   };
 
   useEffect(() => {
+    document.title = id ? `RepairIT - Seguimiento ${id}` : "RepairIT - Seguimiento de Orden";
     if (id) {
       loadOrder();
     }

@@ -1,21 +1,17 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" fill="none">
   <defs>
-    <linearGradient id="bg-grad" x1="0" y1="0" x2="512" y2="512" gradientUnits="userSpaceOnUse">
+    <linearGradient id="bg" x1="0" y1="0" x2="512" y2="512" gradientUnits="userSpaceOnUse">
       <stop offset="0%" stop-color="#0f172a"/>
-      <stop offset="100%" stop-color="#1e1b4b"/>
-    </linearGradient>
-    <linearGradient id="icon-grad" x1="0" y1="0" x2="512" y2="512" gradientUnits="userSpaceOnUse">
-      <stop offset="0%" stop-color="#3b82f6"/>
-      <stop offset="100%" stop-color="#8b5cf6"/>
+      <stop offset="100%" stop-color="#1e293b"/>
     </linearGradient>
   </defs>
+  <!-- Background Card -->
+  <rect width="512" height="512" rx="128" fill="url(#bg)"/>
+  <rect width="500" height="500" x="6" y="6" rx="122" stroke="#3b82f6" stroke-width="12" stroke-opacity="0.35"/>
   
-  <!-- Background Rounded Circle -->
-  <rect width="512" height="512" rx="128" fill="url(#bg-grad)"/>
-  <rect width="504" height="504" x="4" y="4" rx="124" stroke="url(#icon-grad)" stroke-width="8" stroke-opacity="0.3"/>
-  
-  <!-- Wrench & Screwdriver Icon -->
-  <g transform="translate(100, 100) scale(0.61)" fill="url(#icon-grad)">
-    <path d="M495.9 166.6c3.2 8.7.5 18.4-6.4 24.6l-43.3 39.4c1.1 8.3 1.7 16.8 1.7 25.4 0 49.3-17.7 94.6-47.3 129.8l102.3 102.3c12.5 12.5 12.5 32.8 0 45.3s-32.8 12.5-45.3 0L355.6 431.1C320.4 460.7 275.1 478.4 225.8 478.4c-119.5 0-216.4-96.9-216.4-216.4 0-40.4 11.1-78.2 30.4-110.6L2.3 133.9C-2.4 129.2-2.4 121.6 2.3 116.9l45.3-45.3c4.7-4.7 12.3-4.7 17 0l17.5 17.5C114.5 69.8 152.3 58.7 192.7 58.7c17.2 0 33.9 2 50 5.7L282.1 21c6.2-6.9 15.9-9.6 24.6-6.4s14.8 10.4 14.8 19.6v62.8c0 14.6 11.8 26.4 26.4 26.4h62.8c9.2 0 16.4 6.1 19.6 14.8zM225.8 398.4c77.3 0 140-62.7 140-140s-62.7-140-140-140-140 62.7-140 140 62.7 140 140 140z"/>
+  <!-- Text R (White) and IT (Blue) -->
+  <g font-family="system-ui, -apple-system, BlinkMacSystemFont, 'Outfit', 'Segoe UI', Roboto, sans-serif" font-weight="900" font-size="200" letter-spacing="-6">
+    <text x="75" y="325" fill="#ffffff">R</text>
+    <text x="215" y="325" fill="#3b82f6">IT</text>
   </g>
 </svg>

@@ -15,6 +15,7 @@ export default function LandingPage() {
   const [isMobile, setIsMobile] = useState(false);
 
   useEffect(() => {
+    document.title = "RepairIT";
     const handleResize = () => {
       setIsMobile(window.innerWidth < 640);
     };

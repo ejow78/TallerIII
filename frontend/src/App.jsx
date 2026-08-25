@@ -36,10 +36,10 @@ export default function App() {
     if (hostname.includes("repairit.cloud")) {
       const token = localStorage.getItem("repairit_token") || sessionStorage.getItem("repairit_token");
 
-      // Redirigir páginas públicas intentando abrirse en app.repairit.cloud de vuelta a repairit.cloud
+      // app.repairit.cloud es ESTRICTO y EXCLUSIVO para /dashboard y /login
       if (hostname === "app.repairit.cloud") {
-        if (pathname === "/privacidad" || pathname === "/terminos" || pathname.startsWith("/seguimiento")) {
-          window.location.href = `https://repairit.cloud${pathname}`;
+        if (pathname !== "/login" && !pathname.startsWith("/dashboard")) {
+          window.location.href = `https://repairit.cloud${pathname}${window.location.hash}`;
           return;
         }
       }
@@ -54,14 +54,6 @@ export default function App() {
           return;
         }
         window.location.href = `https://app.repairit.cloud${pathname}`;
-        return;
-      }
-      if (hostname === "app.repairit.cloud" && pathname === "/") {
-        if (!token) {
-          window.location.href = "https://repairit.cloud";
-          return;
-        }
-        window.location.href = "/dashboard";
         return;
       }
       if (hostname === "tracking.repairit.cloud" && pathname === "/") {
