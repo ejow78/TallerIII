@@ -36,7 +36,7 @@ export default function PrivacyPage() {
           <ul className="list-disc pl-5 space-y-1">
             <li><strong>Datos de Talleres y Usuarios Administradores:</strong> Nombre completo, correo electrónico, teléfono de contacto y razón social o nombre comercial del taller.</li>
             <li><strong>Datos de Clientes del Taller:</strong> Nombre completo, DNI/Identificación, teléfono y correo electrónico ingresados al registrar una orden de servicio.</li>
-            <li><strong>Información Técnica de Dispositivos:</strong> Tipo de equipo, marca, modelo, accesorios recibidos, estado cosmético, falla reportada y diagnósticos del laboratorio técnico.</li>
+            <li><strong>Información Técnica de Dispositivos:</strong> Tipo de equipo, marca, modelo, accesorios recibidos, estado cosmético, falla reportada y diagnósticos del taller técnico.</li>
             <li><strong>Datos Operativos y de Caja:</strong> Registros de presupuestos, ventas, movimientos de caja e inventario de insumos técnicos.</li>
           </ul>
         </div>

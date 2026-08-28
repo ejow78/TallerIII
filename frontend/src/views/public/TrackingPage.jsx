@@ -172,7 +172,7 @@ export default function TrackingPage() {
     try {
       const updated = await api.orders.approveBudget(order.trackingCode);
       toast.success("¡Presupuesto Aprobado!", {
-        description: "El laboratorio técnico iniciará las tareas de reparación."
+        description: "El taller técnico iniciará las tareas de reparación."
       });
       if (updated) {
         setOrder(updated);
@@ -395,7 +395,7 @@ export default function TrackingPage() {
               ) : (
                 <div className="text-center py-6 space-y-2">
                   <p className="text-xs text-muted-foreground font-light">
-                    Presupuesto pendiente de evaluación por el laboratorio técnico.
+                    Presupuesto pendiente de evaluación por el equipo técnico.
                   </p>
                   <Badge variant="secondary" className="text-[9px] font-bold uppercase tracking-wider">
                     En Evaluación

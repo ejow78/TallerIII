@@ -143,7 +143,7 @@ export default function LandingPage() {
 
           <div className="text-center max-w-2xl mx-auto space-y-3">
             <h2 className="font-outfit text-3xl font-bold text-foreground tracking-tight">
-              Soluciones Diseñadas para Dueños y Laboratorios Técnicos
+              Soluciones Diseñadas para tu Taller
             </h2>
             <p className="text-muted-foreground text-sm font-light">
               Potenciá la productividad de tu taller, automatizá la atención a clientes y mantené el control total de tus ingresos e inventario.
@@ -162,7 +162,7 @@ export default function LandingPage() {
               </CardHeader>
               <CardContent>
                 <p className="text-muted-foreground text-sm font-light leading-relaxed">
-                  Reducí hasta un 80% las llamadas de consulta. Tus clientes siguen el estado técnico en vivo y aprueban presupuestos online desde su celular.
+                  Eliminá las constantes consultas telefónicas. Tus clientes siguen el estado técnico en vivo y aprueban presupuestos online desde su celular.
                 </p>
               </CardContent>
             </Card>
@@ -222,7 +222,7 @@ export default function LandingPage() {
               </CardHeader>
               <CardContent>
                 <p className="text-muted-foreground text-sm font-light leading-relaxed">
-                  Gestioná múltiples locales o laboratorios desde una sola cuenta. Asigná roles específicos para recepcionistas, técnicos y administradores.
+                  Gestioná múltiples sucursales desde una sola cuenta. Asigná roles específicos para recepcionistas, técnicos y administradores.
                 </p>
               </CardContent>
             </Card>
@@ -231,13 +231,13 @@ export default function LandingPage() {
             <Card className="bg-card/45 border-border/60 hover:border-border transition-colors duration-200">
               <CardHeader className="space-y-4">
                 <div className="w-10 h-10 rounded-lg bg-primary/10 border border-primary/20 flex items-center justify-center text-primary">
-                  <BarChart3 className="w-5 h-5" />
+                  <Wrench className="w-5 h-5" />
                 </div>
-                <CardTitle className="font-outfit text-lg font-semibold text-foreground">Exportación a Excel en 1 Clic</CardTitle>
+                <CardTitle className="font-outfit text-lg font-semibold text-foreground">Historial y Ficha Técnica Digital</CardTitle>
               </CardHeader>
               <CardContent>
                 <p className="text-muted-foreground text-sm font-light leading-relaxed">
-                  Descargá en 1 solo clic todos los historiales de servicios, facturación e inventario en formato Excel CSV para tu gestión contable.
+                  Guardá diagnósticos detallados, repuestos presupuestados e historial de trazabilidad inalterable de cada dispositivo.
                 </p>
               </CardContent>
             </Card>
@@ -281,7 +281,7 @@ export default function LandingPage() {
                   </li>
                   <li className="flex items-start gap-2.5">
                     <Check className="w-4 h-4 text-primary shrink-0 mt-0.5" />
-                    <span>1 Sucursal o Laboratorio activo</span>
+                    <span>1 Sucursal activa</span>
                   </li>
                   <li className="flex items-start gap-2.5">
                     <Check className="w-4 h-4 text-primary shrink-0 mt-0.5" />
@@ -366,7 +366,7 @@ export default function LandingPage() {
                   </li>
                   <li className="flex items-start gap-2.5">
                     <Check className="w-4 h-4 text-primary shrink-0 mt-0.5" />
-                    <span>Sucursales y Laboratorios ilimitados</span>
+                    <span>Sucursales ilimitadas</span>
                   </li>
                   <li className="flex items-start gap-2.5">
                     <Check className="w-4 h-4 text-primary shrink-0 mt-0.5" />
@@ -390,13 +390,13 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* Sección de Preguntas Frecuentes (FAQ B2B para Dueños de Taller) */}
+      {/* Sección de Preguntas Frecuentes (FAQ) */}
       <section id="faq" className="py-20 px-6 bg-background border-t border-border/50 relative z-10">
         <div className="max-w-3xl mx-auto space-y-12">
 
           <div className="text-center space-y-3">
             <h2 className="font-outfit text-3xl font-bold text-foreground tracking-tight">
-              Preguntas Frecuentes de Dueños de Taller
+              Preguntas Frecuentes
             </h2>
             <p className="text-muted-foreground text-sm font-light">
               Respuestas claras a las dudas más comunes sobre la implementación de RepairIT en tu negocio.
@@ -455,7 +455,7 @@ export default function LandingPage() {
                   ¿Puedo administrar múltiples talleres o sucursales desde una sola cuenta?
                 </AccordionTrigger>
                 <AccordionContent className="text-muted-foreground text-sm font-light pb-4 leading-relaxed">
-                  Sí. Nuestro plan Multi-Sucursal permite gestionar múltiples laboratorios con inventarios, cajas y técnicos independientes, supervisados centralmente desde un panel de administración unificado.
+                  Sí. Nuestro plan Multi-Sucursal permite gestionar múltiples sucursales con inventarios, cajas y técnicos independientes, supervisados centralmente desde un panel de administración unificado.
                 </AccordionContent>
               </AccordionItem>
             </Accordion>

@@ -300,7 +300,7 @@ export default function OrdersPage() {
 
             ${order.diagnosis ? `
               <div class="section full-width">
-                <div class="section-title">DIAGNÓSTICO TÉCNICO DE LABORATORIO</div>
+                <div class="section-title">DIAGNÓSTICO TÉCNICO DEL TALLER</div>
                 <div class="val" style="white-space: pre-wrap; background: #eff6ff; padding: 10px; border-radius: 4px; border: 1px solid #bfdbfe; color: #1e3a8a;">${order.diagnosis}</div>
               </div>
             ` : ""}
@@ -637,7 +637,7 @@ export default function OrdersPage() {
               <div className="space-y-2">
                 <Label htmlFor="diag-text" className="text-xs font-bold uppercase tracking-wider text-muted-foreground flex items-center gap-1.5">
                   <FileText className="w-3.5 h-3.5 text-primary" />
-                  Diagnóstico Técnico de Laboratorio
+                  Diagnóstico Técnico del Taller
                 </Label>
                 <Textarea
                   id="diag-text"

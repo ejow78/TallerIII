@@ -524,7 +524,7 @@ export const api = {
           },
           history: [
             { date: "24/07/2026 09:30", text: "Equipo ingresado en recepción." },
-            { date: "24/07/2026 11:15", text: "Diagnóstico finalizado por el laboratorio técnico." },
+            { date: "24/07/2026 11:15", text: "Diagnóstico finalizado por el equipo técnico." },
             { date: "24/07/2026 11:30", text: "Presupuesto detallado generado y disponible online." }
           ]
         };
@@ -585,7 +585,7 @@ export const api = {
           },
           history: [
             { date: "24/07/2026 09:30", text: "Equipo ingresado en recepción." },
-            { date: "24/07/2026 11:15", text: "Diagnóstico finalizado por el laboratorio técnico." },
+            { date: "24/07/2026 11:15", text: "Diagnóstico finalizado por el equipo técnico." },
             { date: "24/07/2026 11:30", text: "Presupuesto detallado generado y disponible online." },
             { date: new Date().toLocaleDateString("es-AR") + " " + new Date().toLocaleTimeString("es-AR", { hour: "2-digit", minute: "2-digit" }), text: "Presupuesto aprobado online por el cliente (Demo)." }
           ]
