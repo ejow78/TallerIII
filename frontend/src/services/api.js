@@ -400,7 +400,7 @@ export const api = {
           issue: orderData.issue,
           date: orderData.date,
           time: orderData.time,
-          status: orderData.status || "ingresado",
+          status: orderData.status || "diagnostico",
         })
         .select()
         .single();
