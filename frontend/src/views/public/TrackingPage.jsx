@@ -170,11 +170,15 @@ export default function TrackingPage() {
     if (!order) return;
 
     try {
-      await api.orders.approveBudget(order.trackingCode);
+      const updated = await api.orders.approveBudget(order.trackingCode);
       toast.success("¡Presupuesto Aprobado!", {
         description: "El laboratorio técnico iniciará las tareas de reparación."
       });
-      loadOrder();
+      if (updated) {
+        setOrder(updated);
+      } else {
+        loadOrder();
+      }
     } catch (error) {
       toast.error("Error al aprobar presupuesto", {
         description: error.message || "Por favor, intente nuevamente."

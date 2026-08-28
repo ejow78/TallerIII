@@ -592,6 +592,17 @@ export const api = {
         };
       }
 
+      // Intentar primero función RPC segura de aprobación pública
+      try {
+        const { data: rpcData, error: rpcErr } = await supabase.rpc("approve_order_budget", { p_code: cleanCode });
+        if (!rpcErr && rpcData) {
+          return mapOrder(rpcData);
+        }
+      } catch (e) {
+        console.warn("RPC approve_order_budget no disponible, intentando update directo:", e);
+      }
+
+      // Update directo de respaldo
       const { data: order, error: readErr } = await supabase
         .from("orders")
         .select("id, budget, history")
