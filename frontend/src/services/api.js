@@ -493,8 +493,8 @@ export const api = {
     },
 
     track: async (code) => {
-      const cleanCode = (code || "").trim().toLowerCase();
-      if (cleanCode === "demo-id" || cleanCode === "demo") {
+      const cleanCode = (code || "").trim();
+      if (cleanCode.toLowerCase() === "demo-id" || cleanCode.toLowerCase() === "demo") {
         return {
           id: "demo-id-12345",
           _id: "demo-id-12345",
@@ -530,21 +530,27 @@ export const api = {
         };
       }
 
+      // Intentar primero función RPC segura de lectura pública
+      try {
+        const { data: rpcData, error: rpcErr } = await supabase.rpc("get_public_order_tracking", { p_code: cleanCode });
+        if (!rpcErr && rpcData) {
+          return mapOrder(rpcData);
+        }
+      } catch (e) {
+        console.warn("RPC get_public_order_tracking no disponible, intentando consulta directa:", e);
+      }
+
+      // Consulta directa de respaldo
       const { data, error } = await supabase
         .from("orders")
         .select("*, venueId:venues(*), clientId:clients(*)")
-        .eq("tracking_code", code)
+        .ilike("tracking_code", cleanCode)
         .maybeSingle();
 
       if (error) throw new Error(error.message);
       if (!data) throw new Error("Orden de servicio no encontrada.");
 
-      const mapped = mapOrder(data);
-      if (mapped && data.venueId) {
-        const v = Array.isArray(data.venueId) ? data.venueId[0] : data.venueId;
-        mapped.venueId = v ? { ...v, _id: v.id } : null;
-      }
-      return mapped;
+      return mapOrder(data);
     },
 
     approveBudget: async (code) => {
