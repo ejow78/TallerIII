@@ -13,7 +13,7 @@ const getLocalUser = () => {
 
 const mapClient = (client) => {
   if (!client) return null;
-  if (typeof client === "string") return client;
+  if (typeof client === "string") return { name: "Cliente", _id: client };
   const c = Array.isArray(client) ? client[0] : client;
   if (!c) return null;
   return {
@@ -22,12 +22,23 @@ const mapClient = (client) => {
   };
 };
 
+const mapVenue = (venue) => {
+  if (!venue) return null;
+  if (typeof venue === "string") return { name: "Taller Central", _id: venue };
+  const v = Array.isArray(venue) ? venue[0] : venue;
+  if (!v) return null;
+  return {
+    ...v,
+    _id: v.id,
+  };
+};
+
 const mapOrder = (order) => {
   if (!order) return null;
   return {
     ...order,
     _id: order.id,
-    venueId: order.venue_id,
+    venueId: mapVenue(order.venueId || order.venue_id),
     clientId: mapClient(order.clientId || order.client_id),
     trackingCode: order.tracking_code,
     deviceType: order.device_type,
@@ -375,7 +386,7 @@ export const api = {
       if (!user.venueId || user.venueId === "undefined") return [];
       const { data, error } = await supabase
         .from("orders")
-        .select("*, clientId:clients(*)")
+        .select("*, clientId:clients(*), venueId:venues(*)")
         .eq("venue_id", user.venueId);
 
       if (error) throw new Error(error.message);

@@ -161,7 +161,6 @@ export default function TrackingPage() {
         <div className="pt-5 space-y-3">
           <div className="flex justify-between items-center text-xs">
             <span className="text-muted-foreground font-light">Progreso del servicio</span>
-            <span className="font-mono font-bold text-primary">{Math.round(progressPercent)}%</span>
           </div>
           
           <Progress value={progressPercent} className="h-2 bg-muted [&>div]:bg-primary rounded-full" />

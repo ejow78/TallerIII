@@ -18,7 +18,8 @@ import {
   Plus, 
   X, 
   DollarSign, 
-  Save 
+  Save,
+  ExternalLink 
 } from "lucide-react";
 import {
   DropdownMenu,
@@ -523,7 +524,18 @@ export default function OrdersPage() {
 
                       return (
                         <tr key={o._id} className="border-b border-border/40 hover:bg-card/30 transition-colors">
-                          <td className="py-3.5 px-2 font-mono font-bold text-primary">{o.trackingCode}</td>
+                          <td className="py-3.5 px-2 font-mono font-bold text-primary">
+                            <a
+                              href={window.location.hostname.includes("repairit.cloud") ? `https://tracking.repairit.cloud/seguimiento/${o.trackingCode}` : `/seguimiento/${o.trackingCode}`}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="hover:underline inline-flex items-center gap-1 group"
+                              title="Abrir página de seguimiento del cliente"
+                            >
+                              <span>{o.trackingCode}</span>
+                              <ExternalLink className="w-3 h-3 opacity-50 group-hover:opacity-100 transition-opacity" />
+                            </a>
+                          </td>
                           <td className="py-3.5 px-2">
                             <span className="font-medium block">{client.name || "N/A"}</span>
                             <div className="flex flex-col text-[10px] text-muted-foreground font-mono">
