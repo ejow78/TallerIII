@@ -592,11 +592,13 @@ export const api = {
         };
       }
 
-      const { data: order } = await supabase
+      const { data: order, error: readErr } = await supabase
         .from("orders")
-        .select("budget, history")
-        .eq("tracking_code", code)
-        .single();
+        .select("id, budget, history")
+        .ilike("tracking_code", cleanCode)
+        .maybeSingle();
+
+      if (readErr || !order) throw new Error("No se encontró la orden de servicio.");
 
       const budget = order.budget || {};
       budget.approved = true;
@@ -614,9 +616,9 @@ export const api = {
           budget,
           history,
         })
-        .eq("tracking_code", code)
+        .eq("id", order.id)
         .select()
-        .single();
+        .maybeSingle();
 
       if (error) throw new Error(error.message);
       return mapOrder(data);

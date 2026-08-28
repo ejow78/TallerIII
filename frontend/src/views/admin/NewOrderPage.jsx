@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useState, useEffect } from "react";
+import { useNavigate, useLocation } from "react-router-dom";
 import { Card, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -13,6 +13,7 @@ import { PlusCircle } from "lucide-react";
 
 export default function NewOrderPage() {
   const navigate = useNavigate();
+  const location = useLocation();
 
   // Estados del formulario
   const [clientName, setClientName] = useState("");
@@ -25,6 +26,17 @@ export default function NewOrderPage() {
   const [cosmeticCondition, setCosmeticCondition] = useState("");
   const [issue, setIssue] = useState("");
   const [acceptTerms, setAcceptTerms] = useState(false);
+
+  useEffect(() => {
+    if (location.state?.client) {
+      const c = location.state.client;
+      if (c.name) setClientName(c.name);
+      if (c.dni) setClientDni(c.dni);
+      if (c.phone) setClientPhone(c.phone);
+      if (c.email) setClientEmail(c.email);
+      toast.info(`Datos precargados para cliente: ${c.name}`);
+    }
+  }, [location.state]);
 
   // Registrar orden
   const handleRegisterOrder = async (e) => {

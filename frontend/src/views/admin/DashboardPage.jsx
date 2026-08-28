@@ -24,6 +24,7 @@ import {
   ChevronDown,
   Search,
   LayoutDashboard,
+  ExternalLink,
 } from "lucide-react";
 import { Link } from "react-router-dom";
 import { api } from "@/services/api";
@@ -439,7 +440,18 @@ export default function DashboardPage() {
                       const clientName = o.clientId && typeof o.clientId === "object" ? o.clientId.name : "N/A";
                       return (
                         <tr key={o._id} className="border-b border-border/20 hover:bg-card/10">
-                          <td className="py-2.5 font-mono font-bold text-primary">{o.trackingCode}</td>
+                          <td className="py-2.5 font-mono font-bold text-primary">
+                            <a
+                              href={window.location.hostname.includes("repairit.cloud") ? `https://tracking.repairit.cloud/seguimiento/${o.trackingCode}` : `/seguimiento/${o.trackingCode}`}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="hover:underline inline-flex items-center gap-1 group text-primary"
+                              title="Abrir seguimiento online del cliente"
+                            >
+                              <span>{o.trackingCode}</span>
+                              <ExternalLink className="w-3 h-3 opacity-60 group-hover:opacity-100 transition-opacity shrink-0" />
+                            </a>
+                          </td>
                           <td className="py-2.5 font-medium">{clientName}</td>
                           <td className="py-2.5 text-muted-foreground">{o.deviceModel}</td>
                           <td className="py-2.5 text-right">

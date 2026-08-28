@@ -104,7 +104,7 @@ export default function LandingPage() {
 
           {/* Subtítulo */}
           <p className="text-muted-foreground text-base md:text-lg max-w-xl mx-auto font-light leading-relaxed">
-            Hacemos el seguimiento de tu reparación simple. Consultá   el estado de tu equipo en tiempo real y aprobá presupuestos con un solo clic, sin contraseñas.
+            Controlá órdenes de servicio, repuestos e ingresos en tiempo real. Brindá seguimiento público a tus clientes y aprobá presupuestos sin fricción.
           </p>
 
           {/* Buscador de NanoID (CTA) - Optimizado para móviles */}

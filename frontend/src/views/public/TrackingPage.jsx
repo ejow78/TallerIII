@@ -66,6 +66,105 @@ export default function TrackingPage() {
     }
   }, [id]);
 
+  // Descargar / Imprimir Ficha PDF
+  const handleDownloadPdf = () => {
+    if (!order) return;
+    const printWindow = window.open("", "_blank");
+    if (!printWindow) {
+      toast.error("No se pudo abrir la ventana de impresión. Habilitá los pop-ups.");
+      return;
+    }
+
+    const clientName = order.clientId?.name || "Cliente";
+    const venueName = order.venueId?.name || "Taller RepairIT";
+    const venueAddress = order.venueId?.address || "Sucursal Central";
+    const budgetTotal = order.budget?.items ? order.budget.items.reduce((s, i) => s + (i.price || 0), 0) : 0;
+
+    printWindow.document.write(`
+      <!DOCTYPE html>
+      <html>
+        <head>
+          <title>Ficha de Servicio - ${order.trackingCode}</title>
+          <style>
+            body { font-family: sans-serif; padding: 30px; color: #111; max-width: 800px; margin: 0 auto; }
+            .header { display: flex; justify-content: space-between; border-bottom: 2px solid #3b82f6; padding-bottom: 15px; margin-bottom: 20px; }
+            .logo { font-size: 24px; font-weight: bold; color: #3b82f6; }
+            .badge { background: #3b82f6; color: #fff; padding: 4px 12px; border-radius: 4px; font-weight: bold; font-size: 14px; text-transform: uppercase; }
+            .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 20px; }
+            .box { background: #f8fafc; border: 1px solid #e2e8f0; padding: 15px; border-radius: 8px; }
+            .title { font-size: 12px; text-transform: uppercase; color: #64748b; font-weight: bold; margin-bottom: 5px; }
+            .val { font-size: 15px; font-weight: 600; }
+            table { width: 100%; border-collapse: collapse; margin-top: 15px; }
+            th { text-align: left; background: #f1f5f9; padding: 8px; font-size: 12px; }
+            td { padding: 8px; border-bottom: 1px solid #e2e8f0; font-size: 13px; }
+            .total { font-size: 18px; font-weight: bold; color: #3b82f6; text-align: right; margin-top: 15px; }
+            .footer { margin-top: 40px; text-align: center; font-size: 11px; color: #94a3b8; border-top: 1px solid #e2e8f0; padding-top: 15px; }
+          </style>
+        </head>
+        <body>
+          <div class="header">
+            <div>
+              <div class="logo">RepairIT</div>
+              <div style="font-size: 12px; color: #64748b;">Comprobante de Servicio Técnico</div>
+            </div>
+            <div>
+              <span class="badge">${(order.status || "INGRESADO").replace("_", " ")}</span>
+              <div style="font-size: 14px; font-weight: bold; text-align: right; margin-top: 5px;">#${order.trackingCode}</div>
+            </div>
+          </div>
+
+          <div class="grid">
+            <div class="box">
+              <div class="title">Datos del Cliente</div>
+              <div class="val">${clientName}</div>
+            </div>
+            <div class="box">
+              <div class="title">Sucursal de Atención</div>
+              <div class="val">${venueName}</div>
+              <div style="font-size: 12px; color: #64748b;">${venueAddress}</div>
+            </div>
+          </div>
+
+          <div class="box" style="margin-bottom: 20px;">
+            <div class="title">Dispositivo & Falla Reportada</div>
+            <div class="val" style="margin-bottom: 5px;">${order.deviceType} - ${order.deviceModel}</div>
+            <div style="font-size: 13px; color: #334155;"><strong>Falla:</strong> ${order.issue || "Sin especificar"}</div>
+            ${order.diagnosis ? `<div style="font-size: 13px; color: #334155; margin-top: 5px;"><strong>Diagnóstico Técnico:</strong> ${order.diagnosis}</div>` : ""}
+          </div>
+
+          ${order.budget?.items?.length ? `
+            <div class="title">Presupuesto Detallado</div>
+            <table>
+              <thead>
+                <tr>
+                  <th>Concepto / Repuesto</th>
+                  <th style="text-align: right;">Precio</th>
+                </tr>
+              </thead>
+              <tbody>
+                ${order.budget.items.map(item => `
+                  <tr>
+                    <td>${item.desc}</td>
+                    <td style="text-align: right;">$${Number(item.price).toLocaleString("es-AR")}</td>
+                  </tr>
+                `).join("")}
+              </tbody>
+            </table>
+            <div class="total">Total: $${budgetTotal.toLocaleString("es-AR")}</div>
+          ` : ""}
+
+          <div class="footer">
+            Documento generado digitalmente por RepairIT Cloud • https://tracking.repairit.cloud/seguimiento/${order.trackingCode}
+          </div>
+          <script>
+            window.onload = function() { window.print(); };
+          </script>
+        </body>
+      </html>
+    `);
+    printWindow.document.close();
+  };
+
   // Aprobación online del presupuesto
   const handleApproveBudget = async () => {
     if (!order) return;
@@ -304,7 +403,7 @@ export default function TrackingPage() {
             <div className="pt-3 border-t border-border/40">
               <Button
                 variant="ghost"
-                onClick={() => toast.info("Comprobante en formato digital disponible.")}
+                onClick={handleDownloadPdf}
                 className="w-full text-xs font-semibold text-muted-foreground hover:text-foreground flex items-center justify-center gap-1.5 h-8 cursor-pointer"
               >
                 <Download className="w-3.5 h-3.5" /> Descargar Ficha PDF

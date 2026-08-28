@@ -18,8 +18,10 @@ import {
 } from "@/components/ui/alert-dialog";
 
 import { api } from "@/services/api";
+import { useNavigate } from "react-router-dom";
 
 export default function ClientsPage() {
+  const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState("control");
   const [clients, setClients] = useState([]);
   const [orders, setOrders] = useState([]);
@@ -272,6 +274,15 @@ export default function ClientsPage() {
                           </td>
                           <td className="py-3.5 px-2 text-right">
                             <div className="flex items-center justify-end gap-1">
+                              <Button 
+                                variant="ghost" 
+                                size="icon-sm"
+                                onClick={() => navigate("/dashboard/nuevo-ingreso", { state: { client } })}
+                                className="text-muted-foreground hover:text-emerald-400 hover:bg-emerald-950/15"
+                                title="Crear nueva orden de reparación para este cliente"
+                              >
+                                <PlusCircle className="w-4 h-4" />
+                              </Button>
                               <Button 
                                 variant="ghost" 
                                 size="icon-sm"
