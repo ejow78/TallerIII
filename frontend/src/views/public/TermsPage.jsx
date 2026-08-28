@@ -3,9 +3,8 @@ import { Link } from "react-router-dom";
 import { Separator } from "@/components/ui/separator";
 
 export default function TermsPage() {
-  useEffect(() => {
-    document.title = "RepairIT - Términos y Condiciones";
-  }, []);
+  document.title = "RepairIT - Términos de Servicio";
+
   return (
     <div className="flex-1 max-w-3xl w-full mx-auto px-6 py-16 space-y-8 animate-fade-in">
       <div className="space-y-3">
@@ -16,7 +15,7 @@ export default function TermsPage() {
           Términos de Servicio
         </h1>
         <p className="text-xs text-muted-foreground font-mono">
-          Última actualización: 9 de Junio de 2026
+          Última actualización: 28 de Agosto de 2026
         </p>
       </div>
 
@@ -24,30 +23,51 @@ export default function TermsPage() {
 
       <article className="prose prose-slate dark:prose-invert text-sm text-muted-foreground leading-relaxed space-y-6">
         <p>
-          Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.
+          Bienvenido a <strong>RepairIT</strong>. Al acceder o utilizar nuestra plataforma de gestión de talleres y trazabilidad de ordenes de servicio técnico, aceptas cumplir con los siguientes Términos de Servicio.
         </p>
 
         <div className="space-y-3">
           <h2 className="font-outfit text-xl font-bold text-foreground">
-            Lorem Ipsum Dolor
+            1. Descripción del Servicio
           </h2>
           <p>
-            Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum. Consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
+            RepairIT es una plataforma Software como Servicio (SaaS) diseñada para la administración integral de talleres de reparación técnica. Permite el control de órdenes de servicio, presupuestos, inventario de repuestos, arqueos de caja y consulta de seguimiento online para clientes finales.
           </p>
-          <ul className="list-disc pl-5 space-y-1">
-            <li>Ut enim ad minim veniam, quis nostrud.</li>
-            <li>Ullamco laboris nisi ut aliquip ex ea commodo.</li>
-            <li>Duis aute irure dolor in reprehenderit in voluptate.</li>
-            <li>Velit esse cillum dolore eu fugiat nulla pariatur.</li>
-          </ul>
         </div>
 
         <div className="space-y-3">
           <h2 className="font-outfit text-xl font-bold text-foreground">
-            Consectetur Adipiscing
+            2. Cuentas de Usuario y Seguridad
           </h2>
           <p>
-            Curabitur pretium tincidunt lacus. Nulla gravida orci a odio. Nullam varius, turpis et commodo pharetra, est eros bibendum elit, nec luctus magna felis sollicitudin mauris. Integer in mauris eu nibh euismod gravida. Duis ac tellus et risus vulputate vehicula. Donec porta diam eu massa. Quisque diam lorem, interdum vitae, dapibus ac, scelerisque vitae, pede.
+            Los talleres registrados son responsables de mantener la confidencialidad de sus credenciales de acceso. Cada usuario es responsable de todas las actividades operativas, cargas de presupuesto y cambios de estado ejecutados bajo su cuenta.
+          </p>
+        </div>
+
+        <div className="space-y-3">
+          <h2 className="font-outfit text-xl font-bold text-foreground">
+            3. Uso del Sistema de Seguimiento Online
+          </h2>
+          <p>
+            El código único de seguimiento generado por el sistema (ej. <code>RT-8K9M2P4X</code>) permite a los clientes consultar el avance técnico de su dispositivo. Los talleres se comprometen a cargar diagnósticos y presupuestos veraces en el sistema.
+          </p>
+        </div>
+
+        <div className="space-y-3">
+          <h2 className="font-outfit text-xl font-bold text-foreground">
+            4. Disponibilidad y Propiedad Intelectual
+          </h2>
+          <p>
+            RepairIT realiza esfuerzos continuos para garantizar una disponibilidad del 99.9% del servicio. El diseño, código fuente, marca y logotipos de RepairIT son propiedad exclusiva de la plataforma.
+          </p>
+        </div>
+
+        <div className="space-y-3">
+          <h2 className="font-outfit text-xl font-bold text-foreground">
+            5. Modificaciones de los Términos
+          </h2>
+          <p>
+            Nos reservamos el derecho de actualizar estos Términos de Servicio en cualquier momento. Las modificaciones entrarán en vigencia inmediatamente tras su publicación en <code>https://repairit.cloud/terminos</code>.
           </p>
         </div>
       </article>

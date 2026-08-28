@@ -3,9 +3,8 @@ import { Link } from "react-router-dom";
 import { Separator } from "@/components/ui/separator";
 
 export default function PrivacyPage() {
-  useEffect(() => {
-    document.title = "RepairIT - Políticas de Privacidad";
-  }, []);
+  document.title = "RepairIT - Políticas de Privacidad";
+
   return (
     <div className="flex-1 max-w-3xl w-full mx-auto px-6 py-16 space-y-8 animate-fade-in">
       <div className="space-y-3">
@@ -16,7 +15,7 @@ export default function PrivacyPage() {
           Políticas de Privacidad
         </h1>
         <p className="text-xs text-muted-foreground font-mono">
-          Última actualización: 9 de Junio de 2026
+          Última actualización: 28 de Agosto de 2026
         </p>
       </div>
 
@@ -24,30 +23,62 @@ export default function PrivacyPage() {
 
       <article className="prose prose-slate dark:prose-invert text-sm text-muted-foreground leading-relaxed space-y-6">
         <p>
-          Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.
+          En <strong>RepairIT</strong> nos tomamos muy en serio la privacidad y la protección de los datos de nuestros usuarios, talleres adheridos y clientes finales. Esta política describe la información que recopilamos, cómo la utilizamos y las medidas de seguridad aplicadas.
         </p>
 
         <div className="space-y-3">
           <h2 className="font-outfit text-xl font-bold text-foreground">
-            Lorem Ipsum Dolor
+            1. Información que Recopilamos
           </h2>
           <p>
-            Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum. Consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
+            Para brindar el servicio de trazabilidad y gestión de talleres técnicos, recopilamos los siguientes datos:
           </p>
           <ul className="list-disc pl-5 space-y-1">
-            <li>Ut enim ad minim veniam, quis nostrud.</li>
-            <li>Ullamco laboris nisi ut aliquip ex ea commodo.</li>
-            <li>Duis aute irure dolor in reprehenderit in voluptate.</li>
-            <li>Velit esse cillum dolore eu fugiat nulla pariatur.</li>
+            <li><strong>Datos de Talleres y Usuarios Administradores:</strong> Nombre completo, correo electrónico, teléfono de contacto y razón social o nombre comercial del taller.</li>
+            <li><strong>Datos de Clientes del Taller:</strong> Nombre completo, DNI/Identificación, teléfono y correo electrónico ingresados al registrar una orden de servicio.</li>
+            <li><strong>Información Técnica de Dispositivos:</strong> Tipo de equipo, marca, modelo, accesorios recibidos, estado cosmético, falla reportada y diagnósticos del laboratorio técnico.</li>
+            <li><strong>Datos Operativos y de Caja:</strong> Registros de presupuestos, ventas, movimientos de caja e inventario de insumos técnicos.</li>
           </ul>
         </div>
 
         <div className="space-y-3">
           <h2 className="font-outfit text-xl font-bold text-foreground">
-            Consectetur Adipiscing
+            2. Uso de la Información
           </h2>
           <p>
-            Curabitur pretium tincidunt lacus. Nulla gravida orci a odio. Nullam varius, turpis et commodo pharetra, est eros bibendum elit, nec luctus magna felis sollicitudin mauris. Integer in mauris eu nibh euismod gravida. Duis ac tellus et risus vulputate vehicula. Donec porta diam eu massa. Quisque diam lorem, interdum vitae, dapibus ac, scelerisque vitae, pede.
+            La información recopilada se utiliza exclusivamente para los siguientes fines:
+          </p>
+          <ul className="list-disc pl-5 space-y-1">
+            <li>Permitir a los clientes consultar el estado de reparación de sus dispositivos en tiempo real mediante su código único de seguimiento.</li>
+            <li>Facilitar a los talleres la gestión operativa de sus órdenes de servicio, control de inventario y caja.</li>
+            <li>Gestionar la autenticación de usuarios y la seguridad del sistema mediante Supabase Auth.</li>
+          </ul>
+        </div>
+
+        <div className="space-y-3">
+          <h2 className="font-outfit text-xl font-bold text-foreground">
+            3. Seguridad y Aislamiento de Datos (Multi-Tenant)
+          </h2>
+          <p>
+            RepairIT utiliza arquitectura <strong>PostgreSQL con Row Level Security (RLS)</strong>. Esto garantiza que la información de cada taller esté completamente aislada a nivel de base de datos, impidiendo que usuarios de otros talleres accedan a datos ajenos. Las transmisiones de datos están cifradas mediante protocolos HTTPS/TLS.
+          </p>
+        </div>
+
+        <div className="space-y-3">
+          <h2 className="font-outfit text-xl font-bold text-foreground">
+            4. Cookies y Almacenamiento Local
+          </h2>
+          <p>
+            Utilizamos <code>sessionStorage</code> del navegador para mantener la sesión de usuario activa únicamente mientras la ventana permanezca abierta. Al cerrar el navegador, los tokens de autenticación se destruyen automáticamente por seguridad.
+          </p>
+        </div>
+
+        <div className="space-y-3">
+          <h2 className="font-outfit text-xl font-bold text-foreground">
+            5. Derechos del Usuario y Contacto
+          </h2>
+          <p>
+            Los usuarios pueden solicitar el acceso, corrección o eliminación de sus datos personales poniéndose en contacto con el administrador del servicio a través de <code>contacto@repairit.cloud</code>.
           </p>
         </div>
       </article>

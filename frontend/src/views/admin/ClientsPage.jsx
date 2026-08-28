@@ -337,7 +337,7 @@ export default function ClientsPage() {
                     required 
                     value={clientName} 
                     onChange={(e) => setClientName(e.target.value)} 
-                    placeholder="Edgar Ortiz"
+                    placeholder="Ej. Juan Pérez"
                     className="bg-background/85 border-border focus-visible:ring-1 focus-visible:ring-primary text-xs"
                   />
                 </div>
@@ -352,7 +352,7 @@ export default function ClientsPage() {
                       disabled={editingId !== null}
                       value={clientDni} 
                       onChange={(e) => setClientDni(e.target.value)} 
-                      placeholder="44.375.912"
+                      placeholder="Ej. 38.450.123"
                       className="bg-background/85 border-border focus-visible:ring-1 focus-visible:ring-primary text-xs font-mono disabled:opacity-60"
                     />
                   </div>
@@ -378,7 +378,7 @@ export default function ClientsPage() {
                     required 
                     value={clientEmail} 
                     onChange={(e) => setClientEmail(e.target.value)} 
-                    placeholder="edgar@repairit.cloud"
+                    placeholder="cliente@ejemplo.com"
                     className="bg-background/85 border-border focus-visible:ring-1 focus-visible:ring-primary text-xs"
                   />
                 </div>

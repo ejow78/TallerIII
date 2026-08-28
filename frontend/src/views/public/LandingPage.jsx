@@ -433,7 +433,7 @@ export default function LandingPage() {
                     required
                     value={contactName}
                     onChange={(e) => setContactName(e.target.value)}
-                    placeholder="Edgar Ortiz"
+                    placeholder="Ej. Juan Pérez"
                     className="bg-background/80 border-border focus-visible:ring-1 focus-visible:ring-primary text-sm"
                   />
                 </div>
@@ -445,7 +445,7 @@ export default function LandingPage() {
                     required
                     value={contactEmail}
                     onChange={(e) => setContactEmail(e.target.value)}
-                    placeholder="edgar@repairit.cloud"
+                    placeholder="contacto@ejemplo.com"
                     className="bg-background/80 border-border focus-visible:ring-1 focus-visible:ring-primary text-sm"
                   />
                 </div>
