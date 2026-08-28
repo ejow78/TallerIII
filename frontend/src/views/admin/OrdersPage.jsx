@@ -406,7 +406,7 @@ export default function OrdersPage() {
           <DropdownMenuItem onClick={() => handleStatusChange(orderId, "presupuestado")} className="text-xs cursor-pointer">
             Presupuestado
           </DropdownMenuItem>
-          <DropdownMenuItem onClick={() => handleStatusChange(orderId, "reparacion")} className="text-xs cursor-pointer">
+          <DropdownMenuItem onClick={() => handleStatusChange(orderId, "en_reparacion")} className="text-xs cursor-pointer">
             En Reparación
           </DropdownMenuItem>
           <DropdownMenuItem onClick={() => handleStatusChange(orderId, "listo")} className="text-xs cursor-pointer">

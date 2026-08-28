@@ -400,6 +400,7 @@ export const api = {
           issue: orderData.issue,
           date: orderData.date,
           time: orderData.time,
+          status: orderData.status || "ingresado",
         })
         .select()
         .single();
@@ -409,9 +410,14 @@ export const api = {
     },
 
     update: async (id, orderData) => {
+      const payload = { ...orderData };
+      if (payload.status === "reparacion") {
+        payload.status = "en_reparacion";
+      }
+
       const { data, error } = await supabase
         .from("orders")
-        .update(orderData)
+        .update(payload)
         .eq("id", id)
         .select()
         .single();
@@ -421,6 +427,8 @@ export const api = {
     },
 
     updateStatus: async (id, status, text) => {
+      const dbStatus = status === "reparacion" ? "en_reparacion" : status;
+
       // Obtener orden actual para leer su historial
       const { data: order } = await supabase
         .from("orders")
@@ -435,7 +443,7 @@ export const api = {
 
       const { data, error } = await supabase
         .from("orders")
-        .update({ status, history })
+        .update({ status: dbStatus, history })
         .eq("id", id)
         .select()
         .single();
