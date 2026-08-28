@@ -8,6 +8,21 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Card, CardHeader, CardTitle, CardContent, CardDescription, CardFooter } from "@/components/ui/card";
 import { Accordion, AccordionItem, AccordionTrigger, AccordionContent } from "@/components/ui/accordion";
 import { toast } from "sonner";
+import { 
+  QrCode, 
+  DollarSign, 
+  PackageCheck, 
+  Printer, 
+  Building2, 
+  BarChart3, 
+  Wrench, 
+  Search, 
+  Check,
+  CheckCircle2, 
+  ShieldCheck, 
+  Zap, 
+  Clock 
+} from "lucide-react";
 
 export default function LandingPage() {
   const [trackingId, setTrackingId] = useState("");
@@ -122,68 +137,107 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* Sección de Características */}
+      {/* Sección de Características (Servicios para Dueños de Taller) */}
       <section id="caracteristicas" className="py-20 px-6 bg-background border-t border-border/50 relative z-10">
         <div className="max-w-7xl mx-auto space-y-12">
 
           <div className="text-center max-w-2xl mx-auto space-y-3">
             <h2 className="font-outfit text-3xl font-bold text-foreground tracking-tight">
-              ¿Por qué elegir RepairIT?
+              Soluciones Diseñadas para Dueños y Laboratorios Técnicos
             </h2>
             <p className="text-muted-foreground text-sm font-light">
-              Nuestra plataforma está diseñada para ofrecerte una visión transparente en cada etapa de la reparación.
+              Potenciá la productividad de tu taller, automatizá la atención a clientes y mantené el control total de tus ingresos e inventario.
             </p>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8 pt-4">
 
-            {/* Feature 1 con Card de shadcn */}
+            {/* Feature 1 */}
             <Card className="bg-card/45 border-border/60 hover:border-border transition-colors duration-200">
               <CardHeader className="space-y-4">
                 <div className="w-10 h-10 rounded-lg bg-primary/10 border border-primary/20 flex items-center justify-center text-primary">
-                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
-                  </svg>
+                  <QrCode className="w-5 h-5" />
                 </div>
-                <CardTitle className="font-outfit text-lg font-semibold text-foreground">Trazabilidad Instantánea</CardTitle>
+                <CardTitle className="font-outfit text-lg font-semibold text-foreground">Portal de Seguimiento 24/7</CardTitle>
               </CardHeader>
               <CardContent>
                 <p className="text-muted-foreground text-sm font-light leading-relaxed">
-                  Olvidate de las llamadas telefónicas. A través de tu enlace único podés ver si tu equipo está ingresado, diagnosticado o listo para retirar.
+                  Reducí hasta un 80% las llamadas de consulta. Tus clientes siguen el estado técnico en vivo y aprueban presupuestos online desde su celular.
                 </p>
               </CardContent>
             </Card>
 
-            {/* Feature 2 con Card de shadcn */}
+            {/* Feature 2 */}
             <Card className="bg-card/45 border-border/60 hover:border-border transition-colors duration-200">
               <CardHeader className="space-y-4">
                 <div className="w-10 h-10 rounded-lg bg-primary/10 border border-primary/20 flex items-center justify-center text-primary">
-                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                  </svg>
+                  <DollarSign className="w-5 h-5" />
                 </div>
-                <CardTitle className="font-outfit text-lg font-semibold text-foreground">Aprobación Online</CardTitle>
+                <CardTitle className="font-outfit text-lg font-semibold text-foreground">Control de Caja y Arqueos</CardTitle>
               </CardHeader>
               <CardContent>
                 <p className="text-muted-foreground text-sm font-light leading-relaxed">
-                  Visualizá el presupuesto de mano de obra y repuestos en detalle. Podés aprobar o rechazar la reparación desde tu misma interfaz de consulta.
+                  Administrá señas, cobros de mano de obra y ventas de repuestos. Mantené el balance financiero de tus sucursales sin desfasajes ni pérdidas.
                 </p>
               </CardContent>
             </Card>
 
-            {/* Feature 3 con Card de shadcn */}
+            {/* Feature 3 */}
             <Card className="bg-card/45 border-border/60 hover:border-border transition-colors duration-200">
               <CardHeader className="space-y-4">
                 <div className="w-10 h-10 rounded-lg bg-primary/10 border border-primary/20 flex items-center justify-center text-primary">
-                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
-                  </svg>
+                  <PackageCheck className="w-5 h-5" />
                 </div>
-                <CardTitle className="font-outfit text-lg font-semibold text-foreground">Control de Insumos</CardTitle>
+                <CardTitle className="font-outfit text-lg font-semibold text-foreground">Inventario y Alertas de Stock</CardTitle>
               </CardHeader>
               <CardContent>
                 <p className="text-muted-foreground text-sm font-light leading-relaxed">
-                  El sistema audita el stock técnico y descuenta automáticamente los componentes utilizados, asegurando que siempre tengamos repuestos disponibles.
+                  Controlá el stock de pantallas, módulos, integrados y baterías. El sistema descuenta insumos al reparar y te avisa cuando necesitás reponer.
+                </p>
+              </CardContent>
+            </Card>
+
+            {/* Feature 4 */}
+            <Card className="bg-card/45 border-border/60 hover:border-border transition-colors duration-200">
+              <CardHeader className="space-y-4">
+                <div className="w-10 h-10 rounded-lg bg-primary/10 border border-primary/20 flex items-center justify-center text-primary">
+                  <Printer className="w-5 h-5" />
+                </div>
+                <CardTitle className="font-outfit text-lg font-semibold text-foreground">Ingreso Rápido y Fichas Físicas</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-muted-foreground text-sm font-light leading-relaxed">
+                  Registrá dispositivos en menos de 30 segundos. Imprimí el comprobante físico de recepción para el cliente y pegá la etiqueta al equipo.
+                </p>
+              </CardContent>
+            </Card>
+
+            {/* Feature 5 */}
+            <Card className="bg-card/45 border-border/60 hover:border-border transition-colors duration-200">
+              <CardHeader className="space-y-4">
+                <div className="w-10 h-10 rounded-lg bg-primary/10 border border-primary/20 flex items-center justify-center text-primary">
+                  <Building2 className="w-5 h-5" />
+                </div>
+                <CardTitle className="font-outfit text-lg font-semibold text-foreground">Multi-Sucursal y Permisos</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-muted-foreground text-sm font-light leading-relaxed">
+                  Gestioná múltiples locales o laboratorios desde una sola cuenta. Asigná roles específicos para recepcionistas, técnicos y administradores.
+                </p>
+              </CardContent>
+            </Card>
+
+            {/* Feature 6 */}
+            <Card className="bg-card/45 border-border/60 hover:border-border transition-colors duration-200">
+              <CardHeader className="space-y-4">
+                <div className="w-10 h-10 rounded-lg bg-primary/10 border border-primary/20 flex items-center justify-center text-primary">
+                  <BarChart3 className="w-5 h-5" />
+                </div>
+                <CardTitle className="font-outfit text-lg font-semibold text-foreground">Exportación a Excel en 1 Clic</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-muted-foreground text-sm font-light leading-relaxed">
+                  Descargá en 1 solo clic todos los historiales de servicios, facturación e inventario en formato Excel CSV para tu gestión contable.
                 </p>
               </CardContent>
             </Card>
@@ -222,22 +276,20 @@ export default function LandingPage() {
                 <div className="border-t border-border/40 my-4" />
                 <ul className="space-y-3 text-xs text-muted-foreground font-light">
                   <li className="flex items-start gap-2.5">
-                    <svg className="w-4 h-4 text-primary shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M5 13l4 4L19 7" />
-                    </svg>
-                    <span>Lorem ipsum dolor sit amet, consectetur adipiscing elit.</span>
+                    <Check className="w-4 h-4 text-primary shrink-0 mt-0.5" />
+                    <span>Hasta 100 Órdenes de Servicio al mes</span>
                   </li>
                   <li className="flex items-start gap-2.5">
-                    <svg className="w-4 h-4 text-primary shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M5 13l4 4L19 7" />
-                    </svg>
-                    <span>Sed do eiusmod tempor incididunt ut labore.</span>
+                    <Check className="w-4 h-4 text-primary shrink-0 mt-0.5" />
+                    <span>1 Sucursal o Laboratorio activo</span>
                   </li>
                   <li className="flex items-start gap-2.5">
-                    <svg className="w-4 h-4 text-primary shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M5 13l4 4L19 7" />
-                    </svg>
-                    <span>Ut enim ad minim veniam, quis nostrud.</span>
+                    <Check className="w-4 h-4 text-primary shrink-0 mt-0.5" />
+                    <span>Portal de seguimiento online para clientes</span>
+                  </li>
+                  <li className="flex items-start gap-2.5">
+                    <Check className="w-4 h-4 text-primary shrink-0 mt-0.5" />
+                    <span>Impresión de fichas físicas de recepción</span>
                   </li>
                 </ul>
               </CardContent>
@@ -267,28 +319,24 @@ export default function LandingPage() {
                 <div className="border-t border-border/40 my-4" />
                 <ul className="space-y-3 text-xs text-muted-foreground font-light">
                   <li className="flex items-start gap-2.5">
-                    <svg className="w-4 h-4 text-primary shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M5 13l4 4L19 7" />
-                    </svg>
-                    <span>Lorem ipsum dolor sit amet, consectetur adipiscing elit.</span>
+                    <Check className="w-4 h-4 text-primary shrink-0 mt-0.5" />
+                    <span>Órdenes de Servicio ilimitadas</span>
                   </li>
                   <li className="flex items-start gap-2.5">
-                    <svg className="w-4 h-4 text-primary shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M5 13l4 4L19 7" />
-                    </svg>
-                    <span>Duis aute irure dolor in reprehenderit in voluptate.</span>
+                    <Check className="w-4 h-4 text-primary shrink-0 mt-0.5" />
+                    <span>Control de Inventario y Alertas de Stock</span>
                   </li>
                   <li className="flex items-start gap-2.5">
-                    <svg className="w-4 h-4 text-primary shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M5 13l4 4L19 7" />
-                    </svg>
-                    <span>Excepteur sint occaecat cupidatat non proident.</span>
+                    <Check className="w-4 h-4 text-primary shrink-0 mt-0.5" />
+                    <span>Control de Caja y Arqueos Diarios</span>
                   </li>
                   <li className="flex items-start gap-2.5">
-                    <svg className="w-4 h-4 text-primary shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M5 13l4 4L19 7" />
-                    </svg>
-                    <span>Sunt in culpa qui officia deserunt mollit.</span>
+                    <Check className="w-4 h-4 text-primary shrink-0 mt-0.5" />
+                    <span>Aprobación de Presupuestos Online</span>
+                  </li>
+                  <li className="flex items-start gap-2.5">
+                    <Check className="w-4 h-4 text-primary shrink-0 mt-0.5" />
+                    <span>Exportación a Excel CSV en 1 clic</span>
                   </li>
                 </ul>
               </CardContent>
@@ -313,22 +361,20 @@ export default function LandingPage() {
                 <div className="border-t border-border/40 my-4" />
                 <ul className="space-y-3 text-xs text-muted-foreground font-light">
                   <li className="flex items-start gap-2.5">
-                    <svg className="w-4 h-4 text-primary shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M5 13l4 4L19 7" />
-                    </svg>
-                    <span>Lorem ipsum dolor sit amet, consectetur adipiscing elit.</span>
+                    <Check className="w-4 h-4 text-primary shrink-0 mt-0.5" />
+                    <span>Todo lo incluido en el Plan Taller Pro</span>
                   </li>
                   <li className="flex items-start gap-2.5">
-                    <svg className="w-4 h-4 text-primary shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M5 13l4 4L19 7" />
-                    </svg>
-                    <span>Velit esse cillum dolore eu fugiat nulla pariatur.</span>
+                    <Check className="w-4 h-4 text-primary shrink-0 mt-0.5" />
+                    <span>Sucursales y Laboratorios ilimitados</span>
                   </li>
                   <li className="flex items-start gap-2.5">
-                    <svg className="w-4 h-4 text-primary shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M5 13l4 4L19 7" />
-                    </svg>
-                    <span>Mollis pretium lorem primis iaculis cubilia.</span>
+                    <Check className="w-4 h-4 text-primary shrink-0 mt-0.5" />
+                    <span>Gestión de Perfiles (SuperAdmin / Técnico / Recepción)</span>
+                  </li>
+                  <li className="flex items-start gap-2.5">
+                    <Check className="w-4 h-4 text-primary shrink-0 mt-0.5" />
+                    <span>Soporte Técnico Prioritario 24/7</span>
                   </li>
                 </ul>
               </CardContent>
@@ -344,63 +390,72 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* Sección de Preguntas Frecuentes (FAQ) */}
+      {/* Sección de Preguntas Frecuentes (FAQ B2B para Dueños de Taller) */}
       <section id="faq" className="py-20 px-6 bg-background border-t border-border/50 relative z-10">
         <div className="max-w-3xl mx-auto space-y-12">
 
           <div className="text-center space-y-3">
             <h2 className="font-outfit text-3xl font-bold text-foreground tracking-tight">
-              Preguntas Frecuentes
+              Preguntas Frecuentes de Dueños de Taller
             </h2>
             <p className="text-muted-foreground text-sm font-light">
-              Todo lo que necesitás saber sobre RepairIT y nuestro sistema de trazabilidad.
+              Respuestas claras a las dudas más comunes sobre la implementación de RepairIT en tu negocio.
             </p>
           </div>
 
           <div className="pt-4">
             <Accordion type="single" collapsible className="w-full space-y-4">
               <AccordionItem value="item-1" className="border border-border/60 bg-card/45 rounded-lg px-4 hover:border-border transition-colors">
-                <AccordionTrigger className="text-base text-foreground font-semibold py-4 hover:no-underline font-outfit">
-                  ¿Cómo funciona el seguimiento de mi reparación?
+                <AccordionTrigger className="text-base text-foreground font-semibold py-4 hover:no-underline font-outfit text-left">
+                  ¿Qué necesito para empezar a utilizar RepairIT en mi taller?
                 </AccordionTrigger>
                 <AccordionContent className="text-muted-foreground text-sm font-light pb-4 leading-relaxed">
-                  Vas a recibir un código de seguimiento único al registrar tu equipo en nuestro taller. Solo tenes que ingresarlo en el buscador de la página de inicio para ver el estado de tu equipo en tiempo real, sin necesidad de crear una cuenta o recordar contraseñas.
+                  Solo necesitás un navegador web (Chrome, Firefox o Edge) en tu computadora, tablet o celular. No requiere instalar ningún software ni configurar servidores locales. Podés crear tu cuenta y empezar a cargar órdenes en 2 minutos.
                 </AccordionContent>
               </AccordionItem>
 
               <AccordionItem value="item-2" className="border border-border/60 bg-card/45 rounded-lg px-4 hover:border-border transition-colors">
-                <AccordionTrigger className="text-base text-foreground font-semibold py-4 hover:no-underline font-outfit">
-                  ¿Puedo aprobar presupuestos en línea?
+                <AccordionTrigger className="text-base text-foreground font-semibold py-4 hover:no-underline font-outfit text-left">
+                  ¿Cómo reduce RepairIT las llamadas telefónicas de mis clientes?
                 </AccordionTrigger>
                 <AccordionContent className="text-muted-foreground text-sm font-light pb-4 leading-relaxed">
-                  Sí. Cuando el técnico realice el diagnóstico y cargue el presupuesto de mano de obra e insumos, podrás visualizar el detalle en tu panel de seguimiento y aprobar o rechazar la reparación de forma digital con un solo clic.
+                  Al ingresar un equipo, el sistema genera un código único de seguimiento (ej. RT-8K9M2P4X). Tus clientes ingresan a la web desde su celular para ver si su equipo está en diagnóstico, presupuestado o listo para retirar sin necesidad de llamarte.
                 </AccordionContent>
               </AccordionItem>
 
               <AccordionItem value="item-3" className="border border-border/60 bg-card/45 rounded-lg px-4 hover:border-border transition-colors">
-                <AccordionTrigger className="text-base text-foreground font-semibold py-4 hover:no-underline font-outfit">
-                  ¿Tienen cargos ocultos adicionales?
+                <AccordionTrigger className="text-base text-foreground font-semibold py-4 hover:no-underline font-outfit text-left">
+                  ¿Pueden mis clientes aprobar o rechazar presupuestos en línea?
                 </AccordionTrigger>
                 <AccordionContent className="text-muted-foreground text-sm font-light pb-4 leading-relaxed">
-                  No, para nada. La transparencia es nuestro pilar fundamental. Desglosamos cada centavo en el presupuesto de repuestos y mano de obra. Los planes de suscripción de taller también están fijados sin sorpresas ni letra chica.
+                  Exacto. Cuando cargás el diagnóstico y los ítems del presupuesto, el cliente puede revisar el detalle de repuestos y mano de obra desde su celular y presionar "Aprobar Presupuesto", dejando constancia digital con fecha y hora.
                 </AccordionContent>
               </AccordionItem>
 
               <AccordionItem value="item-4" className="border border-border/60 bg-card/45 rounded-lg px-4 hover:border-border transition-colors">
-                <AccordionTrigger className="text-base text-foreground font-semibold py-4 hover:no-underline font-outfit">
-                  ¿Mis datos personales y del dispositivo están seguros?
+                <AccordionTrigger className="text-base text-foreground font-semibold py-4 hover:no-underline font-outfit text-left">
+                  ¿Cómo funciona el control de inventario y caja?
                 </AccordionTrigger>
                 <AccordionContent className="text-muted-foreground text-sm font-light pb-4 leading-relaxed">
-                  Absolutamente. Cumplimos rigurosamente con las normativas locales de protección de datos personales. Toda tu información y la de tus equipos está cifrada y almacenada en servidores de alta seguridad.
+                  RepairIT descuenta automáticamente del stock los repuestos e insumos utilizados en cada reparación. Además, registra las señas, ventas de mostrador y cobros finales en tu balance de caja diario por sucursal.
                 </AccordionContent>
               </AccordionItem>
 
               <AccordionItem value="item-5" className="border border-border/60 bg-card/45 rounded-lg px-4 hover:border-border transition-colors">
-                <AccordionTrigger className="text-base text-foreground font-semibold py-4 hover:no-underline font-outfit">
-                  ¿Qué sucede si tengo más de una sucursal o taller?
+                <AccordionTrigger className="text-base text-foreground font-semibold py-4 hover:no-underline font-outfit text-left">
+                  ¿Qué tan segura está la información de mi taller y mis clientes?
                 </AccordionTrigger>
                 <AccordionContent className="text-muted-foreground text-sm font-light pb-4 leading-relaxed">
-                  Disponemos de un plan Multi-Sucursal especialmente diseñado para redes de soporte técnico. Te permite gestionar múltiples tenants o locaciones con perfiles independientes pero administrados centralmente.
+                  Utilizamos arquitectura de base de datos PostgreSQL con Row Level Security (RLS). Los datos de tu taller están totalmente aislados e inalterables, protegidos bajo cifrado HTTPS/TLS de grado bancario.
+                </AccordionContent>
+              </AccordionItem>
+
+              <AccordionItem value="item-6" className="border border-border/60 bg-card/45 rounded-lg px-4 hover:border-border transition-colors">
+                <AccordionTrigger className="text-base text-foreground font-semibold py-4 hover:no-underline font-outfit text-left">
+                  ¿Puedo administrar múltiples talleres o sucursales desde una sola cuenta?
+                </AccordionTrigger>
+                <AccordionContent className="text-muted-foreground text-sm font-light pb-4 leading-relaxed">
+                  Sí. Nuestro plan Multi-Sucursal permite gestionar múltiples laboratorios con inventarios, cajas y técnicos independientes, supervisados centralmente desde un panel de administración unificado.
                 </AccordionContent>
               </AccordionItem>
             </Accordion>
