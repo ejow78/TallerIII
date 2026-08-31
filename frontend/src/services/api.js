@@ -51,10 +51,16 @@ const mapOrder = (order) => {
 export const api = {
   // Autenticación & Perfil
   auth: {
-    login: async (email, password, rememberMe = false) => {
+    login: async (email, password, rememberMe = false, captchaToken = null) => {
+      const authOptions = {};
+      if (captchaToken) {
+        authOptions.captchaToken = captchaToken;
+      }
+
       const { data, error } = await supabase.auth.signInWithPassword({
         email,
         password,
+        options: authOptions,
       });
 
       if (error) {

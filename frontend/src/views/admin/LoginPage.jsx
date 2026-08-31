@@ -1,6 +1,6 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useNavigate, Link } from "react-router-dom";
-import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
+import { Card, CardTitle, CardDescription } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
@@ -8,12 +8,16 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { toast } from "sonner";
 import { api } from "@/services/api";
 import { supabase } from "@/services/supabaseClient";
+import { Turnstile } from "@marsidev/react-turnstile";
 
 export default function LoginPage() {
   document.title = "RepairIT - Iniciar Sesión";
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [rememberMe, setRememberMe] = useState(false);
+  const [captchaToken, setCaptchaToken] = useState("");
+  const turnstileRef = useRef(null);
+  const siteKey = import.meta.env.VITE_TURNSTILE_SITE_KEY || "0x4AAAAAAEjQ5UUbknAkvYB3";
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -54,7 +58,7 @@ export default function LoginPage() {
         localStorage.removeItem("repairit_saved_email");
       }
 
-      const data = await api.auth.login(email, password, rememberMe);
+      const data = await api.auth.login(email, password, rememberMe, captchaToken);
       toast.success("¡Acceso concedido!", {
         description: `Bienvenido de vuelta, ${data.name}.`
       });
@@ -63,6 +67,9 @@ export default function LoginPage() {
       toast.error("Error al iniciar sesión", {
         description: error.message || "Credenciales inválidas. Intente nuevamente."
       });
+      if (turnstileRef.current) {
+        turnstileRef.current.reset();
+      }
     }
   };
 
@@ -140,6 +147,21 @@ export default function LoginPage() {
               ¿Todavía no tenés cuenta?
             </Link>
           </div>
+
+          {/* Cloudflare Turnstile */}
+          {siteKey && (
+            <div className="flex justify-center pt-1 overflow-hidden">
+              <Turnstile
+                ref={turnstileRef}
+                siteKey={siteKey}
+                onSuccess={(token) => setCaptchaToken(token)}
+                options={{
+                  theme: "dark",
+                  size: "flexible",
+                }}
+              />
+            </div>
+          )}
 
           <Button 
             type="submit" 
