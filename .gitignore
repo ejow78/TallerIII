@@ -49,3 +49,10 @@ out
 *.sln
 *.sw?
 Thumbs.db
+
+# Archivos Locales de Manual y Presentacion Expo
+manual*
+*manual*
+*debrief*
+docs_local/
+

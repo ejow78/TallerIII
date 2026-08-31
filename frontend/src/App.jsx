@@ -11,6 +11,7 @@ import DashboardLayout from "@/components/layout/DashboardLayout";
 import LandingPage from "@/views/public/LandingPage";
 import TrackingPage from "@/views/public/TrackingPage";
 import LoginPage from "@/views/admin/LoginPage";
+import RegisterPage from "@/views/admin/RegisterPage";
 import PrivacyPage from "@/views/public/PrivacyPage";
 import TermsPage from "@/views/public/TermsPage";
 
@@ -37,20 +38,20 @@ export default function App() {
       if (hostname.includes("repairit.cloud")) {
         const token = sessionStorage.getItem("repairit_token") || localStorage.getItem("repairit_token");
 
-        // app.repairit.cloud es ESTRICTO y EXCLUSIVO para /dashboard y /login
+        // app.repairit.cloud es ESTRICTO y EXCLUSIVO para /dashboard, /login y /registro
         if (hostname === "app.repairit.cloud") {
           const hash = window.location.hash;
           const isAuthHash = hash.includes("access_token") || hash.includes("refresh_token") || hash.includes("error") || hash.includes("type=");
 
-          if ((hash && !isAuthHash) || (pathname !== "/login" && !pathname.startsWith("/dashboard"))) {
-            const targetPath = pathname === "/login" ? "" : pathname;
+          if ((hash && !isAuthHash) || (pathname !== "/login" && pathname !== "/registro" && !pathname.startsWith("/dashboard"))) {
+            const targetPath = pathname === "/login" || pathname === "/registro" ? "" : pathname;
             window.location.href = `https://repairit.cloud${targetPath}${hash}`;
             return;
           }
         }
 
-        if (hostname !== "app.repairit.cloud" && pathname === "/login") {
-          window.location.href = "https://app.repairit.cloud/login";
+        if (hostname !== "app.repairit.cloud" && (pathname === "/login" || pathname === "/registro")) {
+          window.location.href = `https://app.repairit.cloud${pathname}`;
           return;
         }
         if (hostname !== "app.repairit.cloud" && pathname.startsWith("/dashboard")) {
@@ -94,9 +95,13 @@ export default function App() {
             if (!profile) {
               // Auto-creación de perfil si no existe en la base de datos
               try {
+                const workshopTitle = session.user.user_metadata?.workshop_name || "Taller RepairIT";
+                const personName = session.user.user_metadata?.name || session.user.email.split("@")[0];
+                const phoneContact = session.user.user_metadata?.phone || "+54 381 4223344";
+
                 const { data: newOrg } = await supabase
                   .from("organizations")
-                  .insert({ name: "Taller RepairIT", subscription_plan: "Multi-Taller Pro", subscription_status: "activo" })
+                  .insert({ name: workshopTitle, subscription_plan: "Multi-Taller Pro", subscription_status: "activo" })
                   .select()
                   .single();
 
@@ -106,8 +111,8 @@ export default function App() {
                     organization_id: newOrg?.id,
                     name: "Sucursal Central",
                     email: session.user.email,
-                    phone: "+54 381 4223344",
-                    address: "Av. Sarmiento 1234",
+                    phone: phoneContact,
+                    address: "Casa Central",
                   })
                   .select()
                   .single();
@@ -118,7 +123,7 @@ export default function App() {
                     id: session.user.id,
                     organization_id: newOrg?.id,
                     venue_id: newVenue?.id,
-                    name: session.user.email.split("@")[0],
+                    name: personName,
                     role: "admin",
                   })
                   .select()
@@ -129,7 +134,7 @@ export default function App() {
                 console.error("Error al autogenerar perfil:", createErr);
                 profile = {
                   id: session.user.id,
-                  name: session.user.email.split("@")[0],
+                  name: session.user.user_metadata?.name || session.user.email.split("@")[0],
                   role: "admin",
                   organization_id: null,
                   venue_id: null
@@ -217,6 +222,7 @@ export default function App() {
           <Route index element={<LandingPage />} />
           <Route path="seguimiento/:id" element={<TrackingPage />} />
           <Route path="login" element={<LoginPage />} />
+          <Route path="registro" element={<RegisterPage />} />
           <Route path="privacidad" element={<PrivacyPage />} />
           <Route path="terminos" element={<TermsPage />} />
         </Route>

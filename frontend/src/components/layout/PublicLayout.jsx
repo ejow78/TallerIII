@@ -71,7 +71,12 @@ export default function PublicLayout() {
             <Separator orientation="vertical" className="hidden md:block h-4 !self-center" />
             <Button asChild variant="outline" size="sm" className="text-primary border-primary/20 hover:border-primary/40 bg-primary/10 hover:bg-primary/20 font-bold transition-all duration-200">
               <a href={window.location.hostname.includes("repairit.cloud") ? "https://app.repairit.cloud/login" : "/login"}>
-                Panel Técnico
+                Ingresar
+              </a>
+            </Button>
+            <Button asChild size="sm" className="bg-primary hover:bg-primary/90 text-primary-foreground font-bold transition-all duration-200 hidden sm:inline-flex">
+              <a href={window.location.hostname.includes("repairit.cloud") ? "https://app.repairit.cloud/registro" : "/registro"}>
+                Registrar Taller
               </a>
             </Button>
           </nav>

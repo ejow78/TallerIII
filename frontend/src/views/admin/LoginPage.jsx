@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -69,7 +69,7 @@ export default function LoginPage() {
             Acceso al Panel Técnico
           </CardTitle>
           <CardDescription className="text-xs text-muted-foreground font-light">
-            Ingresa tus credenciales autorizadas para gestionar las órdenes y el inventario.
+            Ingresá tus credenciales autorizadas para gestionar las órdenes y el inventario.
           </CardDescription>
         </div>
 
@@ -162,7 +162,19 @@ export default function LoginPage() {
           Iniciar sesión con Google
         </Button>
 
-        <div className="text-center pt-2">
+        <div className="text-center pt-1 border-t border-border/60">
+          <p className="text-xs text-muted-foreground">
+            ¿Todavía no tenés cuenta?{" "}
+            <Link 
+              to="/registro"
+              className="text-primary hover:underline font-bold transition-colors"
+            >
+              Registrá tu taller acá
+            </Link>
+          </p>
+        </div>
+
+        <div className="text-center pt-1">
           <Button 
             variant="link"
             asChild
