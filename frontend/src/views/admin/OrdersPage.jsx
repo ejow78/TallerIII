@@ -19,7 +19,10 @@ import {
   X, 
   DollarSign, 
   Save,
-  ExternalLink 
+  ExternalLink,
+  CheckCircle,
+  Clock,
+  XCircle 
 } from "lucide-react";
 import {
   DropdownMenu,
@@ -549,17 +552,42 @@ export default function OrdersPage() {
                           </td>
                           <td className="py-3.5 px-2">
                             <div className="space-y-1">
-                              {hasDiag ? (
-                                <Badge variant="outline" className="text-[9px] bg-purple-500/10 text-purple-400 border-purple-500/20 font-bold block w-max">
-                                  Diagnóstico OK
-                                </Badge>
-                              ) : (
-                                <span className="text-[10px] text-muted-foreground/60 italic block">Sin Diagnóstico</span>
-                              )}
+                              <div className="flex flex-wrap items-center gap-1">
+                                {hasDiag ? (
+                                  <Badge variant="outline" className="text-[9px] bg-purple-500/10 text-purple-400 border-purple-500/20 font-bold block w-max">
+                                    Diagnóstico OK
+                                  </Badge>
+                                ) : (
+                                  <span className="text-[10px] text-muted-foreground/60 italic block">Sin Diagnóstico</span>
+                                )}
+
+                                {hasBudget && (
+                                  o.budget?.approved ? (
+                                    <Badge className="text-[9px] bg-emerald-500/15 text-emerald-400 border-emerald-500/30 font-bold px-1.5 py-0 flex items-center gap-1">
+                                      <span>Aprobado</span>
+                                      <span>✓</span>
+                                    </Badge>
+                                  ) : o.budget?.rejected ? (
+                                    <Badge className="text-[9px] bg-rose-500/15 text-rose-400 border-rose-500/30 font-bold px-1.5 py-0">
+                                      Rechazado ✕
+                                    </Badge>
+                                  ) : (
+                                    <Badge className="text-[9px] bg-amber-500/15 text-amber-400 border-amber-500/30 font-semibold px-1.5 py-0">
+                                      Pendiente
+                                    </Badge>
+                                  )
+                                )}
+                              </div>
+
                               {hasBudget ? (
-                                <span className="text-[11px] font-mono font-bold text-emerald-400 block">
-                                  ${totalB.toLocaleString("es-AR")}
-                                </span>
+                                <div className="text-[11px] font-mono font-bold text-emerald-400 flex items-center gap-1">
+                                  <span>${totalB.toLocaleString("es-AR")}</span>
+                                  {o.budget?.dateApproved && (
+                                    <span className="text-[9px] text-muted-foreground font-normal">
+                                      ({o.budget.dateApproved})
+                                    </span>
+                                  )}
+                                </div>
                               ) : (
                                 <span className="text-[10px] text-muted-foreground/60 italic block">Sin Presupuesto</span>
                               )}
@@ -633,6 +661,33 @@ export default function OrdersPage() {
 
             <form onSubmit={handleSaveDiagnosis} className="p-6 space-y-5">
               
+              {/* Banner de Estado del Presupuesto */}
+              {diagOrder.budget?.approved ? (
+                <div className="p-3 bg-emerald-500/10 border border-emerald-500/25 rounded-xl flex items-center justify-between text-xs text-emerald-400">
+                  <div className="flex items-center gap-2">
+                    <CheckCircle className="w-4 h-4 text-emerald-400 shrink-0" />
+                    <span><strong>Presupuesto Aprobado por el Cliente</strong> {diagOrder.budget.dateApproved && `el ${diagOrder.budget.dateApproved}`}</span>
+                  </div>
+                  <Badge className="bg-emerald-500/20 border-emerald-500/40 text-emerald-400 font-bold text-[10px]">Aprobado</Badge>
+                </div>
+              ) : diagOrder.budget?.rejected ? (
+                <div className="p-3 bg-rose-500/10 border border-rose-500/25 rounded-xl flex items-center justify-between text-xs text-rose-400">
+                  <div className="flex items-center gap-2">
+                    <XCircle className="w-4 h-4 text-rose-400 shrink-0" />
+                    <span><strong>Presupuesto Rechazado por el Cliente</strong></span>
+                  </div>
+                  <Badge className="bg-rose-500/20 border-rose-500/40 text-rose-400 font-bold text-[10px]">Rechazado</Badge>
+                </div>
+              ) : diagOrder.budget?.items?.length ? (
+                <div className="p-3 bg-amber-500/10 border border-amber-500/25 rounded-xl flex items-center justify-between text-xs text-amber-400">
+                  <div className="flex items-center gap-2">
+                    <Clock className="w-4 h-4 text-amber-400 shrink-0" />
+                    <span><strong>Presupuesto Pendiente de Aprobación</strong> del cliente en el portal público</span>
+                  </div>
+                  <Badge variant="outline" className="border-amber-500/40 text-amber-400 font-bold text-[10px]">Pendiente</Badge>
+                </div>
+              ) : null}
+
               {/* Diagnóstico Técnico */}
               <div className="space-y-2">
                 <Label htmlFor="diag-text" className="text-xs font-bold uppercase tracking-wider text-muted-foreground flex items-center gap-1.5">
