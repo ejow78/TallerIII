@@ -513,7 +513,7 @@ export default function OrdersPage() {
                       <th className="py-3 px-2">N° de Orden</th>
                       <th className="py-3 px-2">Cliente</th>
                       <th className="py-3 px-2">Dispositivo</th>
-                      <th className="py-3 px-2">Diagnóstico / Presupuesto</th>
+                      <th className="py-3 px-2">Diagnóstico</th>
                       <th className="py-3 px-2">Estado</th>
                       <th className="py-3 px-2 text-right">Acciones</th>
                     </tr>
@@ -550,22 +550,24 @@ export default function OrdersPage() {
                             <span className="font-medium block">{o.deviceModel}</span>
                             <span className="text-[10px] text-muted-foreground">{o.deviceType}</span>
                           </td>
-                          <td className="py-3.5 px-2">
+                          <td className="py-3.5 px-2 max-w-[200px]">
                             <div className="space-y-1">
-                              <div className="flex flex-wrap items-center gap-1">
-                                {hasDiag ? (
-                                  <Badge variant="outline" className="text-[9px] bg-purple-500/10 text-purple-400 border-purple-500/20 font-bold block w-max">
-                                    Diagnóstico OK
-                                  </Badge>
-                                ) : (
-                                  <span className="text-[10px] text-muted-foreground/60 italic block">Sin Diagnóstico</span>
-                                )}
+                              {hasDiag ? (
+                                <span className="font-medium text-foreground truncate block" title={o.diagnosis}>
+                                  {o.diagnosis}
+                                </span>
+                              ) : (
+                                <span className="text-[11px] text-muted-foreground/60 italic block">Sin diagnóstico</span>
+                              )}
 
-                                {hasBudget && (
-                                  o.budget?.approved ? (
-                                    <Badge className="text-[9px] bg-emerald-500/15 text-emerald-400 border-emerald-500/30 font-bold px-1.5 py-0 flex items-center gap-1">
-                                      <span>Aprobado</span>
-                                      <span>✓</span>
+                              {hasBudget && (
+                                <div className="flex items-center gap-1.5 pt-0.5">
+                                  <span className="text-[11px] font-mono font-bold text-emerald-400">
+                                    ${totalB.toLocaleString("es-AR")}
+                                  </span>
+                                  {o.budget?.approved ? (
+                                    <Badge className="text-[9px] bg-emerald-500/15 text-emerald-400 border-emerald-500/30 font-bold px-1.5 py-0">
+                                      Aprobado ✓
                                     </Badge>
                                   ) : o.budget?.rejected ? (
                                     <Badge className="text-[9px] bg-rose-500/15 text-rose-400 border-rose-500/30 font-bold px-1.5 py-0">
@@ -575,21 +577,8 @@ export default function OrdersPage() {
                                     <Badge className="text-[9px] bg-amber-500/15 text-amber-400 border-amber-500/30 font-semibold px-1.5 py-0">
                                       Pendiente
                                     </Badge>
-                                  )
-                                )}
-                              </div>
-
-                              {hasBudget ? (
-                                <div className="text-[11px] font-mono font-bold text-emerald-400 flex items-center gap-1">
-                                  <span>${totalB.toLocaleString("es-AR")}</span>
-                                  {o.budget?.dateApproved && (
-                                    <span className="text-[9px] text-muted-foreground font-normal">
-                                      ({o.budget.dateApproved})
-                                    </span>
                                   )}
                                 </div>
-                              ) : (
-                                <span className="text-[10px] text-muted-foreground/60 italic block">Sin Presupuesto</span>
                               )}
                             </div>
                           </td>
@@ -601,10 +590,10 @@ export default function OrdersPage() {
                                 size="sm"
                                 onClick={() => handleOpenDiagModal(o)}
                                 className="h-8 px-2 text-xs font-bold border-primary/30 text-primary hover:bg-primary/10 rounded-lg flex items-center gap-1 cursor-pointer"
-                                title="Cargar Diagnóstico y Presupuesto"
+                                title="Cargar o editar diagnóstico"
                               >
                                 <Stethoscope className="w-3.5 h-3.5" />
-                                Diag/Presup.
+                                Diagnóstico
                               </Button>
 
                               <Button 
@@ -801,7 +790,7 @@ export default function OrdersPage() {
                   className="h-9 bg-primary hover:bg-primary/95 text-primary-foreground font-bold text-xs px-5 rounded-xl cursor-pointer shadow-lg shadow-primary/20 flex items-center gap-1.5"
                 >
                   <Save className="w-3.5 h-3.5" />
-                  {savingDiag ? "Guardando..." : "Guardar Diagnóstico y Presupuesto"}
+                  {savingDiag ? "Guardando..." : "Guardar Diagnóstico"}
                 </Button>
               </div>
 
