@@ -51,7 +51,7 @@ const mapOrder = (order) => {
 export const api = {
   // Autenticación & Perfil
   auth: {
-    login: async (email, password) => {
+    login: async (email, password, rememberMe = false) => {
       const { data, error } = await supabase.auth.signInWithPassword({
         email,
         password,
@@ -61,9 +61,14 @@ export const api = {
         throw new Error(error.message);
       }
 
-      // Guardar token inmediatamente en sessionStorage para expiración al cerrar navegador
+      // Guardar token en storage correspondiente
       if (data?.session?.access_token) {
         sessionStorage.setItem("repairit_token", data.session.access_token);
+        if (rememberMe) {
+          localStorage.setItem("repairit_token", data.session.access_token);
+        } else {
+          localStorage.removeItem("repairit_token");
+        }
       }
 
       // Obtener perfil público asociado al usuario
@@ -92,6 +97,11 @@ export const api = {
       };
 
       sessionStorage.setItem("repairit_user", JSON.stringify(userData));
+      if (rememberMe) {
+        localStorage.setItem("repairit_user", JSON.stringify(userData));
+      } else {
+        localStorage.removeItem("repairit_user");
+      }
       return userData;
     },
 

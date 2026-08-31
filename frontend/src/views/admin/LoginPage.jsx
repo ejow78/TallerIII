@@ -18,7 +18,12 @@ export default function LoginPage() {
 
   useEffect(() => {
     document.title = "RepairIT - Iniciar Sesión";
-    const token = sessionStorage.getItem("repairit_token");
+    const savedEmail = localStorage.getItem("repairit_saved_email");
+    if (savedEmail) {
+      setEmail(savedEmail);
+      setRememberMe(true);
+    }
+    const token = sessionStorage.getItem("repairit_token") || localStorage.getItem("repairit_token");
     if (token) {
       navigate("/dashboard");
     }
@@ -43,7 +48,13 @@ export default function LoginPage() {
   const handleLogin = async (e) => {
     e.preventDefault();
     try {
-      const data = await api.auth.login(email, password);
+      if (rememberMe) {
+        localStorage.setItem("repairit_saved_email", email.trim());
+      } else {
+        localStorage.removeItem("repairit_saved_email");
+      }
+
+      const data = await api.auth.login(email, password, rememberMe);
       toast.success("¡Acceso concedido!", {
         description: `Bienvenido de vuelta, ${data.name}.`
       });
@@ -105,25 +116,34 @@ export default function LoginPage() {
             />
           </div>
 
-          {/* Recordarme en este dispositivo */}
-          <div className="flex items-center space-x-2 pt-1">
-            <Checkbox 
-              id="remember" 
-              checked={rememberMe} 
-              onCheckedChange={(checked) => setRememberMe(checked)}
-              className="border-border focus-visible:ring-primary"
-            />
-            <Label
-              htmlFor="remember"
-              className="text-xs text-muted-foreground font-light cursor-pointer select-none"
+          {/* Recordarme y Registro en la misma fila */}
+          <div className="flex items-center justify-between pt-1 gap-2">
+            <div className="flex items-center space-x-2">
+              <Checkbox 
+                id="remember" 
+                checked={rememberMe} 
+                onCheckedChange={(checked) => setRememberMe(checked)}
+                className="border-border focus-visible:ring-primary"
+              />
+              <Label
+                htmlFor="remember"
+                className="text-xs text-muted-foreground font-light cursor-pointer select-none"
+              >
+                Recordarme
+              </Label>
+            </div>
+
+            <Link 
+              to="/registro"
+              className="text-xs text-primary hover:underline font-medium transition-colors"
             >
-              Recordarme en este dispositivo
-            </Label>
+              ¿Todavía no tenés cuenta?
+            </Link>
           </div>
 
           <Button 
             type="submit" 
-            className="w-full bg-primary hover:bg-primary/90 text-primary-foreground font-bold text-sm py-2.5 rounded-lg shadow-lg shadow-primary/15 transition-all mt-3 cursor-pointer select-none"
+            className="w-full bg-primary hover:bg-primary/90 text-primary-foreground font-bold text-sm py-2.5 rounded-lg shadow-lg shadow-primary/15 transition-all mt-2 cursor-pointer select-none"
           >
             Iniciar Sesión
           </Button>
@@ -161,18 +181,6 @@ export default function LoginPage() {
           </svg>
           Iniciar sesión con Google
         </Button>
-
-        <div className="text-center pt-1 border-t border-border/60">
-          <p className="text-xs text-muted-foreground">
-            ¿Todavía no tenés cuenta?{" "}
-            <Link 
-              to="/registro"
-              className="text-primary hover:underline font-bold transition-colors"
-            >
-              Registrá tu taller acá
-            </Link>
-          </p>
-        </div>
 
         <div className="text-center pt-1">
           <Button 
