@@ -32,6 +32,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 
 import { api } from "@/services/api";
+import { sendBudgetReadyEmail, sendOrderReadyEmail } from "@/services/emailService";
 
 export default function OrdersPage() {
   const [orders, setOrders] = useState([]);
@@ -146,6 +147,23 @@ export default function OrdersPage() {
       toast.success("Diagnóstico y Presupuesto guardados", {
         description: `Se actualizó la orden ${diagOrder.trackingCode}.`
       });
+
+      // Enviar correo de presupuesto listo si el cliente tiene email y hay presupuesto cargado
+      const clientEmail = diagOrder.clientId?.email;
+      if (clientEmail && clientEmail.includes("@") && budgetData) {
+        sendBudgetReadyEmail({
+          to: clientEmail.trim(),
+          clientName: diagOrder.clientId?.name || "Cliente",
+          orderCode: diagOrder.trackingCode,
+          deviceType: diagOrder.deviceType,
+          deviceModel: diagOrder.deviceModel,
+          diagnosis: diagText.trim(),
+          budgetTotal: totalBudget.toLocaleString("es-AR"),
+          workshopName: workshopProfile?.name || "RepairIT",
+          workshopPhone: workshopProfile?.phone || "",
+          workshopAddress: workshopProfile?.address || "",
+        }).catch((err) => console.warn("No se pudo enviar email de presupuesto:", err));
+      }
 
       setShowDiagModal(false);
       loadData();
@@ -346,6 +364,25 @@ export default function OrdersPage() {
       toast.success(`Estado de orden actualizado`, {
         description: `Nuevo estado: ${newStatus.toUpperCase()}`,
       });
+
+      // Si el nuevo estado es "listo", enviar correo de retiro al cliente
+      if (newStatus === "listo") {
+        const targetOrder = orders.find(o => o._id === id);
+        const clientEmail = targetOrder?.clientId?.email;
+        if (clientEmail && clientEmail.includes("@")) {
+          sendOrderReadyEmail({
+            to: clientEmail.trim(),
+            clientName: targetOrder.clientId?.name || "Cliente",
+            orderCode: targetOrder.trackingCode,
+            deviceType: targetOrder.deviceType,
+            deviceModel: targetOrder.deviceModel,
+            workshopName: workshopProfile?.name || "RepairIT",
+            workshopPhone: workshopProfile?.phone || "",
+            workshopAddress: workshopProfile?.address || "",
+          }).catch((err) => console.warn("No se pudo enviar email de equipo listo:", err));
+        }
+      }
+
       loadData();
     } catch (error) {
       toast.error("Error al actualizar estado", {

@@ -10,6 +10,7 @@ import { Separator } from "@/components/ui/separator";
 import { api } from "@/services/api";
 import { toast } from "sonner";
 import { PlusCircle } from "lucide-react";
+import { sendOrderCreatedEmail } from "@/services/emailService";
 
 export default function NewOrderPage() {
   const navigate = useNavigate();
@@ -74,6 +75,19 @@ export default function NewOrderPage() {
       toast.success("¡Dispositivo Registrado!", {
         description: `Código de seguimiento: ${order.trackingCode}.`,
       });
+
+      // 3. Enviar confirmación por correo electrónico automáticamente
+      if (clientEmail && clientEmail.includes("@")) {
+        sendOrderCreatedEmail({
+          to: clientEmail.trim(),
+          clientName: clientName.trim(),
+          orderCode: order.trackingCode,
+          deviceType,
+          deviceModel,
+          issue,
+          workshopName: "RepairIT",
+        }).catch((err) => console.warn("No se pudo enviar email de recepción:", err));
+      }
 
       // Resetear formulario y navegar a la lista
       setClientName("");
