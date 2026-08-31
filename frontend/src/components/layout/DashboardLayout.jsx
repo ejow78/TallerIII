@@ -47,13 +47,14 @@ import { toast } from "sonner";
 
 import { api } from "@/services/api";
 import { ShieldAlert } from "lucide-react";
+import OnboardingModal from "@/components/common/OnboardingModal";
 
 export default function DashboardLayout() {
   const navigate = useNavigate();
   const location = useLocation();
 
   // Guard síncrono: Impedir parpadeo visual (FOUC) si no hay token de sesión
-  const token = sessionStorage.getItem("repairit_token");
+  const token = sessionStorage.getItem("repairit_token") || localStorage.getItem("repairit_token");
   if (!token) {
     if (window.location.hostname.includes("repairit.cloud")) {
       window.location.href = "https://app.repairit.cloud/login";
@@ -449,6 +450,9 @@ export default function DashboardLayout() {
           <main className="flex-grow p-6 md:p-8 overflow-y-auto max-w-7xl w-full mx-auto">
             <Outlet />
           </main>
+
+          {/* Modal de Bienvenida para Talleres Nuevos */}
+          <OnboardingModal />
 
         </SidebarInset>
 

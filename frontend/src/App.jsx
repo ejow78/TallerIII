@@ -12,6 +12,8 @@ import LandingPage from "@/views/public/LandingPage";
 import TrackingPage from "@/views/public/TrackingPage";
 import LoginPage from "@/views/admin/LoginPage";
 import RegisterPage from "@/views/admin/RegisterPage";
+import ForgotPasswordPage from "@/views/admin/ForgotPasswordPage";
+import ResetPasswordPage from "@/views/admin/ResetPasswordPage";
 import PrivacyPage from "@/views/public/PrivacyPage";
 import TermsPage from "@/views/public/TermsPage";
 
@@ -38,13 +40,14 @@ export default function App() {
       if (hostname.includes("repairit.cloud")) {
         const token = sessionStorage.getItem("repairit_token") || localStorage.getItem("repairit_token");
 
-        // app.repairit.cloud es ESTRICTO y EXCLUSIVO para /dashboard, /login y /registro
+        // app.repairit.cloud es ESTRICTO y EXCLUSIVO para /dashboard, /login, /registro, /recuperar-password y /reset-password
         if (hostname === "app.repairit.cloud") {
           const hash = window.location.hash;
           const isAuthHash = hash.includes("access_token") || hash.includes("refresh_token") || hash.includes("error") || hash.includes("type=");
+          const isAllowedAuthPath = pathname === "/login" || pathname === "/registro" || pathname === "/recuperar-password" || pathname === "/olvide-password" || pathname === "/reset-password";
 
-          if ((hash && !isAuthHash) || (pathname !== "/login" && pathname !== "/registro" && !pathname.startsWith("/dashboard"))) {
-            const targetPath = pathname === "/login" || pathname === "/registro" ? "" : pathname;
+          if ((hash && !isAuthHash) || (!isAllowedAuthPath && !pathname.startsWith("/dashboard"))) {
+            const targetPath = isAllowedAuthPath ? "" : pathname;
             window.location.href = `https://repairit.cloud${targetPath}${hash}`;
             return;
           }
@@ -223,6 +226,9 @@ export default function App() {
           <Route path="seguimiento/:id" element={<TrackingPage />} />
           <Route path="login" element={<LoginPage />} />
           <Route path="registro" element={<RegisterPage />} />
+          <Route path="recuperar-password" element={<ForgotPasswordPage />} />
+          <Route path="olvide-password" element={<ForgotPasswordPage />} />
+          <Route path="reset-password" element={<ResetPasswordPage />} />
           <Route path="privacidad" element={<PrivacyPage />} />
           <Route path="terminos" element={<TermsPage />} />
         </Route>
