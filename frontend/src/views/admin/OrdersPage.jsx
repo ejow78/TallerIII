@@ -151,18 +151,22 @@ export default function OrdersPage() {
       // Enviar correo de presupuesto listo si el cliente tiene email y hay presupuesto cargado
       const clientEmail = diagOrder.clientId?.email;
       if (clientEmail && clientEmail.includes("@") && budgetData) {
-        sendBudgetReadyEmail({
-          to: clientEmail.trim(),
-          clientName: diagOrder.clientId?.name || "Cliente",
-          orderCode: diagOrder.trackingCode,
-          deviceType: diagOrder.deviceType,
-          deviceModel: diagOrder.deviceModel,
-          diagnosis: diagText.trim(),
-          budgetTotal: totalBudget.toLocaleString("es-AR"),
-          workshopName: workshopProfile?.name || "RepairIT",
-          workshopPhone: workshopProfile?.phone || "",
-          workshopAddress: workshopProfile?.address || "",
-        }).catch((err) => console.warn("No se pudo enviar email de presupuesto:", err));
+        try {
+          await sendBudgetReadyEmail({
+            to: clientEmail.trim(),
+            clientName: diagOrder.clientId?.name || "Cliente",
+            orderCode: diagOrder.trackingCode,
+            deviceType: diagOrder.deviceType,
+            deviceModel: diagOrder.deviceModel,
+            diagnosis: diagText.trim(),
+            budgetTotal: totalBudget.toLocaleString("es-AR"),
+            workshopName: profile?.name || "RepairIT",
+            workshopPhone: profile?.phone || "",
+            workshopAddress: profile?.address || "",
+          });
+        } catch (err) {
+          console.warn("No se pudo enviar email de presupuesto:", err);
+        }
       }
 
       setShowDiagModal(false);
@@ -370,16 +374,20 @@ export default function OrdersPage() {
         const targetOrder = orders.find(o => o._id === id);
         const clientEmail = targetOrder?.clientId?.email;
         if (clientEmail && clientEmail.includes("@")) {
-          sendOrderReadyEmail({
-            to: clientEmail.trim(),
-            clientName: targetOrder.clientId?.name || "Cliente",
-            orderCode: targetOrder.trackingCode,
-            deviceType: targetOrder.deviceType,
-            deviceModel: targetOrder.deviceModel,
-            workshopName: workshopProfile?.name || "RepairIT",
-            workshopPhone: workshopProfile?.phone || "",
-            workshopAddress: workshopProfile?.address || "",
-          }).catch((err) => console.warn("No se pudo enviar email de equipo listo:", err));
+          try {
+            await sendOrderReadyEmail({
+              to: clientEmail.trim(),
+              clientName: targetOrder.clientId?.name || "Cliente",
+              orderCode: targetOrder.trackingCode,
+              deviceType: targetOrder.deviceType,
+              deviceModel: targetOrder.deviceModel,
+              workshopName: profile?.name || "RepairIT",
+              workshopPhone: profile?.phone || "",
+              workshopAddress: profile?.address || "",
+            });
+          } catch (err) {
+            console.warn("No se pudo enviar email de equipo listo:", err);
+          }
         }
       }
 
