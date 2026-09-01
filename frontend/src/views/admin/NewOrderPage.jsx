@@ -83,6 +83,7 @@ export default function NewOrderPage() {
         issue,
         date: dateStr,
         time: timeStr,
+        status: "ingresado",
       });
 
       toast.success("¡Dispositivo Registrado!", {

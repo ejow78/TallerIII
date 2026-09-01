@@ -403,7 +403,8 @@ export const api = {
       const { data, error } = await supabase
         .from("orders")
         .select("*, clientId:clients(*), venueId:venues(*)")
-        .eq("venue_id", user.venueId);
+        .eq("venue_id", user.venueId)
+        .order("created_at", { ascending: false, nullsFirst: false });
 
       if (error) throw new Error(error.message);
 
@@ -427,7 +428,7 @@ export const api = {
           issue: orderData.issue,
           date: orderData.date,
           time: orderData.time,
-          status: orderData.status || "diagnostico",
+          status: orderData.status || "ingresado",
         })
         .select()
         .single();

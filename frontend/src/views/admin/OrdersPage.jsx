@@ -62,7 +62,16 @@ export default function OrdersPage() {
       setLoading(true);
       const ordersData = await api.orders.getAll();
       const clientsData = await api.clients.getAll();
-      setOrders(ordersData);
+      
+      // Ordenamiento cronológico estable por fecha de creación (los más recientes primero)
+      const sortedOrders = (ordersData || []).sort((a, b) => {
+        const timeA = a.created_at ? new Date(a.created_at).getTime() : 0;
+        const timeB = b.created_at ? new Date(b.created_at).getTime() : 0;
+        if (timeB !== timeA) return timeB - timeA;
+        return (b._id || "").localeCompare(a._id || "");
+      });
+
+      setOrders(sortedOrders);
       setClients(clientsData);
       
       try {
@@ -479,7 +488,12 @@ export default function OrdersPage() {
       (client.dni && client.dni.includes(term)) ||
       (o.deviceModel && o.deviceModel.toLowerCase().includes(term));
 
-    const matchesStatus = statusFilter === "todos" || o.status === statusFilter;
+    const matchesStatus = 
+      statusFilter === "todos" || 
+      o.status === statusFilter ||
+      (statusFilter === "en_reparacion" && (o.status === "en_reparacion" || o.status === "reparacion")) ||
+      (statusFilter === "reparacion" && (o.status === "en_reparacion" || o.status === "reparacion"));
+
     return matchesSearch && matchesStatus;
   });
 
@@ -529,7 +543,7 @@ export default function OrdersPage() {
                   <option value="ingresado">Ingresado</option>
                   <option value="diagnostico">En Diagnóstico</option>
                   <option value="presupuestado">Presupuestado</option>
-                  <option value="reparacion">En Reparación</option>
+                  <option value="en_reparacion">En Reparación</option>
                   <option value="listo">Listo</option>
                   <option value="entregado">Entregado</option>
                 </select>
@@ -573,17 +587,28 @@ export default function OrdersPage() {
 
                       return (
                         <tr key={o._id} className="border-b border-border/40 hover:bg-card/30 transition-colors">
-                          <td className="py-3.5 px-2 font-mono font-bold text-primary">
-                            <a
-                              href={window.location.hostname.includes("repairit.cloud") ? `https://tracking.repairit.cloud/seguimiento/${o.trackingCode}` : `/seguimiento/${o.trackingCode}`}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              className="hover:underline inline-flex items-center gap-1 group"
-                              title="Abrir página de seguimiento del cliente"
-                            >
-                              <span>{o.trackingCode}</span>
-                              <ExternalLink className="w-3 h-3 opacity-50 group-hover:opacity-100 transition-opacity" />
-                            </a>
+                          <td className="py-3.5 px-2">
+                            <div className="font-mono font-bold text-primary">
+                              <a
+                                href={window.location.hostname.includes("repairit.cloud") ? `https://tracking.repairit.cloud/seguimiento/${o.trackingCode}` : `/seguimiento/${o.trackingCode}`}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="hover:underline inline-flex items-center gap-1 group"
+                                title="Abrir página de seguimiento del cliente"
+                              >
+                                <span>{o.trackingCode}</span>
+                                <ExternalLink className="w-3 h-3 opacity-50 group-hover:opacity-100 transition-opacity" />
+                              </a>
+                            </div>
+                            <div className="text-[10px] text-muted-foreground font-mono flex items-center gap-1 mt-0.5 whitespace-nowrap">
+                              <span>{o.date || (o.created_at ? new Date(o.created_at).toLocaleDateString("es-AR") : "")}</span>
+                              {(o.time || o.created_at) && (
+                                <>
+                                  <span className="opacity-40">•</span>
+                                  <span>{o.time || new Date(o.created_at).toLocaleTimeString("es-AR", { hour: "2-digit", minute: "2-digit" })}</span>
+                                </>
+                              )}
+                            </div>
                           </td>
                           <td className="py-3.5 px-2">
                             <span className="font-medium block">{client.name || "N/A"}</span>
