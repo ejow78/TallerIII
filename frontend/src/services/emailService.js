@@ -1,8 +1,10 @@
+import { supabase } from "./supabaseClient";
+
 const RESEND_API_KEY = import.meta.env.VITE_RESEND_API_KEY;
 const SENDER_EMAIL = "RepairIT <notificaciones@repairit.cloud>";
 
 /**
- * Función base para despachar correos por Resend API
+ * Función base para despachar correos por Resend API (vía RPC Supabase pg_net o Directo)
  */
 async function sendResendEmail({ to, subject, html }) {
   if (!to || !to.includes("@")) {
@@ -10,6 +12,23 @@ async function sendResendEmail({ to, subject, html }) {
     return false;
   }
 
+  // 1. Intentar envío seguro a través de Supabase RPC (sin bloqueo de CORS de navegador)
+  try {
+    const { data: rpcData, error: rpcErr } = await supabase.rpc("send_resend_email", {
+      p_to: to,
+      p_subject: subject,
+      p_html: html,
+    });
+
+    if (!rpcErr && rpcData?.success) {
+      console.log("[emailService] Correo enviado exitosamente vía Supabase RPC:", to);
+      return true;
+    }
+  } catch (err) {
+    console.warn("[emailService] RPC no disponible, intentando vía fetch directo:", err);
+  }
+
+  // 2. Fallback por fetch directo si la RPC aún no está creada
   try {
     const res = await fetch("https://api.resend.com/emails", {
       method: "POST",
