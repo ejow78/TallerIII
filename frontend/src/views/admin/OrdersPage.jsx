@@ -159,6 +159,7 @@ export default function OrdersPage() {
             deviceType: diagOrder.deviceType,
             deviceModel: diagOrder.deviceModel,
             diagnosis: diagText.trim(),
+            budgetItems: validBudgetItems,
             budgetTotal: totalBudget.toLocaleString("es-AR"),
             workshopName: profile?.name || "RepairIT",
             workshopPhone: profile?.phone || "",

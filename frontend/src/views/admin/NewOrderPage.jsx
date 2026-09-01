@@ -27,6 +27,19 @@ export default function NewOrderPage() {
   const [cosmeticCondition, setCosmeticCondition] = useState("");
   const [issue, setIssue] = useState("");
   const [acceptTerms, setAcceptTerms] = useState(false);
+  const [profile, setProfile] = useState(null);
+
+  useEffect(() => {
+    const loadProfile = async () => {
+      try {
+        const p = await api.auth.getProfile();
+        setProfile(p);
+      } catch (err) {
+        console.error("Error al cargar perfil en NewOrderPage:", err);
+      }
+    };
+    loadProfile();
+  }, []);
 
   useEffect(() => {
     if (location.state?.client) {
@@ -86,7 +99,9 @@ export default function NewOrderPage() {
             deviceType,
             deviceModel,
             issue,
-            workshopName: "RepairIT",
+            workshopName: profile?.name || "RepairIT",
+            workshopPhone: profile?.phone || "",
+            workshopAddress: profile?.address || "",
           });
         } catch (err) {
           console.warn("No se pudo enviar email de recepción:", err);

@@ -100,11 +100,29 @@ export async function sendBudgetReadyEmail({
   deviceType,
   deviceModel,
   diagnosis,
+  budgetItems = [],
   budgetTotal = "0",
   workshopName = "RepairIT",
   workshopPhone = "",
   workshopAddress = ""
 }) {
+  // Construir tabla HTML estilizada para los ítems del presupuesto
+  let budgetItemsHtml = "";
+  if (Array.isArray(budgetItems) && budgetItems.length > 0) {
+    const rows = budgetItems.map(item => `
+      <tr>
+        <td style="padding: 6px 0; color: #374151; font-size: 13px; border-bottom: 1px solid #f3f4f6;">${item.desc}</td>
+        <td align="right" style="padding: 6px 0; font-weight: 600; color: #111827; font-size: 13px; border-bottom: 1px solid #f3f4f6; font-family: monospace;">$${Number(item.price || 0).toLocaleString("es-AR")}</td>
+      </tr>
+    `).join("");
+
+    budgetItemsHtml = `
+      <table border="0" width="100%" cellPadding="0" cellSpacing="0" style="margin-bottom: 12px; border-top: 1px solid #e5e7eb; padding-top: 8px;">
+        ${rows}
+      </table>
+    `;
+  }
+
   return sendResendTemplate({
     to,
     templateId: "presupuesto-listo",
@@ -114,6 +132,7 @@ export async function sendBudgetReadyEmail({
       device_type: deviceType || "Dispositivo",
       device_model: deviceModel || "",
       diagnosis: diagnosis || "Inspección técnica completada.",
+      budget_items_html: budgetItemsHtml,
       budget_total: budgetTotal,
       workshop_name: workshopName,
       workshop_phone: workshopPhone,
