@@ -78,15 +78,19 @@ export default function NewOrderPage() {
 
       // 3. Enviar confirmación por correo electrónico automáticamente
       if (clientEmail && clientEmail.includes("@")) {
-        sendOrderCreatedEmail({
-          to: clientEmail.trim(),
-          clientName: clientName.trim(),
-          orderCode: order.trackingCode,
-          deviceType,
-          deviceModel,
-          issue,
-          workshopName: "RepairIT",
-        }).catch((err) => console.warn("No se pudo enviar email de recepción:", err));
+        try {
+          await sendOrderCreatedEmail({
+            to: clientEmail.trim(),
+            clientName: clientName.trim(),
+            orderCode: order.trackingCode,
+            deviceType,
+            deviceModel,
+            issue,
+            workshopName: "RepairIT",
+          });
+        } catch (err) {
+          console.warn("No se pudo enviar email de recepción:", err);
+        }
       }
 
       // Resetear formulario y navegar a la lista
