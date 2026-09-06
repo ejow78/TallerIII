@@ -44,6 +44,7 @@ export default function LandingPage() {
   const [contactEmail, setContactEmail] = useState("");
   const [contactMessage, setContactMessage] = useState("");
   const [acceptTerms, setAcceptTerms] = useState(false);
+  const [isSendingContact, setIsSendingContact] = useState(false);
 
   const handleSearch = (e) => {
     e.preventDefault();
@@ -65,23 +66,43 @@ export default function LandingPage() {
     }
   };
 
-  const handleContactSubmit = (e) => {
+  const handleContactSubmit = async (e) => {
     e.preventDefault();
     if (!acceptTerms) {
       toast.error("Debe aceptar los términos de privacidad.");
       return;
     }
+    if (!contactName.trim() || !contactEmail.trim() || !contactMessage.trim()) {
+      toast.error("Por favor complete todos los campos.");
+      return;
+    }
 
-    // Simulación del envío de mensaje de contacto
-    toast.success("¡Mensaje enviado con éxito!", {
-      description: `Gracias por contactarte, ${contactName}. Te responderemos a la brevedad.`,
-    });
+    setIsSendingContact(true);
+    try {
+      const { sendContactEmail } = await import("@/services/emailService");
+      const ok = await sendContactEmail({
+        name: contactName.trim(),
+        email: contactEmail.trim(),
+        message: contactMessage.trim(),
+      });
 
-    // Resetear formulario
-    setContactName("");
-    setContactEmail("");
-    setContactMessage("");
-    setAcceptTerms(false);
+      if (ok) {
+        toast.success("¡Mensaje enviado con éxito!", {
+          description: `Gracias por contactarte, ${contactName}. Te responderemos a la brevedad.`,
+        });
+        setContactName("");
+        setContactEmail("");
+        setContactMessage("");
+        setAcceptTerms(false);
+      } else {
+        toast.error("No se pudo enviar el mensaje. Podés escribirnos directo a contacto@repairit.cloud");
+      }
+    } catch (err) {
+      console.error(err);
+      toast.error("Error al enviar mensaje.");
+    } finally {
+      setIsSendingContact(false);
+    }
   };
 
   return (
@@ -541,9 +562,10 @@ export default function LandingPage() {
 
               <Button
                 type="submit"
+                disabled={isSendingContact}
                 className="w-full bg-primary hover:bg-primary/90 text-primary-foreground font-bold text-sm py-2.5 rounded-lg transition-all mt-2 cursor-pointer select-none"
               >
-                Enviar Consulta
+                {isSendingContact ? "Enviando mensaje..." : "Enviar Consulta"}
               </Button>
 
             </form>

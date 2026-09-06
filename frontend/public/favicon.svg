@@ -1,17 +1,8 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" fill="none">
-  <defs>
-    <linearGradient id="bg" x1="0" y1="0" x2="512" y2="512" gradientUnits="userSpaceOnUse">
-      <stop offset="0%" stop-color="#0f172a"/>
-      <stop offset="100%" stop-color="#1e293b"/>
-    </linearGradient>
-  </defs>
-  <!-- Background Card -->
-  <rect width="512" height="512" rx="128" fill="url(#bg)"/>
-  <rect width="500" height="500" x="6" y="6" rx="122" stroke="#3b82f6" stroke-width="12" stroke-opacity="0.35"/>
-  
-  <!-- Text R (White) and IT (Blue) -->
-  <g font-family="system-ui, -apple-system, BlinkMacSystemFont, 'Outfit', 'Segoe UI', Roboto, sans-serif" font-weight="900" font-size="200" letter-spacing="-6">
-    <text x="75" y="325" fill="#ffffff">R</text>
-    <text x="215" y="325" fill="#3b82f6">IT</text>
+  <!-- Letras RIT sin fondo -->
+  <g font-family="system-ui, -apple-system, BlinkMacSystemFont, 'Outfit', 'Segoe UI', Roboto, sans-serif" font-weight="900" font-size="240" letter-spacing="-8">
+    <text x="50%" y="54%" dominant-baseline="middle" text-anchor="middle">
+      <tspan fill="#f8fafc">R</tspan><tspan fill="#4ca5ff">IT</tspan>
+    </text>
   </g>
 </svg>
