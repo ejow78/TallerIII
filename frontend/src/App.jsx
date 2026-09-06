@@ -1,7 +1,6 @@
 import { useState, useEffect, lazy, Suspense } from "react";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { Toaster } from "@/components/ui/sonner";
-import { supabase } from "@/services/supabaseClient";
 
 // Layouts
 import PublicLayout from "@/components/layout/PublicLayout";
@@ -81,133 +80,155 @@ export default function App() {
     checkSubdomain();
     window.addEventListener("hashchange", checkSubdomain);
 
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
-      if (session) {
-        sessionStorage.setItem("repairit_token", session.access_token);
-        localStorage.setItem("repairit_token", session.access_token);
-        
-        const localUser = JSON.parse(sessionStorage.getItem("repairit_user") || localStorage.getItem("repairit_user") || "{}");
-        if (
-          !localUser._id ||
-          !localUser.venueId ||
-          localUser.venueId === "undefined" ||
-          localUser._id !== session.user.id ||
-          localUser.token !== session.access_token
-        ) {
-          try {
-            let { data: profile } = await supabase
-              .from("profiles")
-              .select("id, name, role, organization_id, venue_id")
-              .eq("id", session.user.id)
-              .maybeSingle();
+    let unsubscribeAuth = null;
 
-            if (!profile) {
-              // Auto-creación de perfil si no existe en la base de datos
+    const hasToken = typeof window !== "undefined" && !!(sessionStorage.getItem("repairit_token") || localStorage.getItem("repairit_token"));
+    const isAuthOrDashboard = typeof window !== "undefined" && (
+      window.location.pathname.startsWith("/dashboard") ||
+      window.location.pathname === "/login" ||
+      window.location.pathname === "/registro" ||
+      window.location.pathname.startsWith("/reset-password") ||
+      window.location.hostname.startsWith("app.") ||
+      (window.location.hash && (window.location.hash.includes("access_token") || window.location.hash.includes("type=")))
+    );
+
+    if (hasToken || isAuthOrDashboard) {
+      import("@/services/supabaseClient").then(({ supabase }) => {
+        const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
+          if (session) {
+            sessionStorage.setItem("repairit_token", session.access_token);
+            localStorage.setItem("repairit_token", session.access_token);
+            
+            const localUser = JSON.parse(sessionStorage.getItem("repairit_user") || localStorage.getItem("repairit_user") || "{}");
+            if (
+              !localUser._id ||
+              !localUser.venueId ||
+              localUser.venueId === "undefined" ||
+              localUser._id !== session.user.id ||
+              localUser.token !== session.access_token
+            ) {
               try {
-                const workshopTitle = session.user.user_metadata?.workshop_name || "Taller RepairIT";
-                const personName = session.user.user_metadata?.name || session.user.email.split("@")[0];
-                const phoneContact = session.user.user_metadata?.phone || "+54 381 4223344";
-
-                const { data: newOrg } = await supabase
-                  .from("organizations")
-                  .insert({ name: workshopTitle, subscription_plan: "Multi-Taller Pro", subscription_status: "activo" })
-                  .select()
-                  .single();
-
-                const { data: newVenue } = await supabase
-                  .from("venues")
-                  .insert({
-                    organization_id: newOrg?.id,
-                    name: "Sucursal Central",
-                    email: session.user.email,
-                    phone: phoneContact,
-                    address: "Casa Central",
-                  })
-                  .select()
-                  .single();
-
-                const { data: newProf } = await supabase
+                let { data: profile } = await supabase
                   .from("profiles")
-                  .insert({
-                    id: session.user.id,
-                    organization_id: newOrg?.id,
-                    venue_id: newVenue?.id,
-                    name: personName,
-                    role: "admin",
-                  })
-                  .select()
-                  .single();
-
-                profile = newProf;
-              } catch (createErr) {
-                console.error("Error al autogenerar perfil:", createErr);
-                profile = {
-                  id: session.user.id,
-                  name: session.user.user_metadata?.name || session.user.email.split("@")[0],
-                  role: "admin",
-                  organization_id: null,
-                  venue_id: null
-                };
-              }
-            }
-
-            let subPlan = "Multi-Taller Pro";
-            let subStatus = "activo";
-
-            if (profile?.organization_id) {
-              try {
-                const { data: org } = await supabase
-                  .from("organizations")
-                  .select("subscription_plan, subscription_status")
-                  .eq("id", profile.organization_id)
+                  .select("id, name, role, organization_id, venue_id")
+                  .eq("id", session.user.id)
                   .maybeSingle();
-                if (org) {
-                  subPlan = org.subscription_plan || "Multi-Taller Pro";
-                  subStatus = org.subscription_status || "activo";
-                }
-              } catch (orgErr) {
-                console.error("Error al sincronizar organización:", orgErr);
-              }
-            }
 
-            if (profile) {
-              const userData = {
-                _id: profile.id,
-                name: profile.name,
-                email: session.user.email,
-                role: profile.role,
-                subscriptionPlan: subPlan,
-                subscriptionStatus: subStatus,
-                organizationId: profile.organization_id,
-                venueId: profile.venue_id,
-                token: session.access_token,
-              };
-              sessionStorage.setItem("repairit_user", JSON.stringify(userData));
-              localStorage.setItem("repairit_user", JSON.stringify(userData));
-              
-              if (event === "SIGNED_IN") {
-                if (window.location.hostname.includes("repairit.cloud")) {
-                  if (window.location.hostname !== "app.repairit.cloud") {
-                    window.location.href = "https://app.repairit.cloud/dashboard";
+                if (!profile) {
+                  // Auto-creación de perfil si no existe en la base de datos
+                  try {
+                    const workshopTitle = session.user.user_metadata?.workshop_name || "Taller RepairIT";
+                    const personName = session.user.user_metadata?.name || session.user.email.split("@")[0];
+                    const phoneContact = session.user.user_metadata?.phone || "+54 381 4223344";
+
+                    const { data: newOrg } = await supabase
+                      .from("organizations")
+                      .insert({ name: workshopTitle, subscription_plan: "Multi-Taller Pro", subscription_status: "activo" })
+                      .select()
+                      .single();
+
+                    const { data: newVenue } = await supabase
+                      .from("venues")
+                      .insert({
+                        organization_id: newOrg?.id,
+                        name: "Sucursal Central",
+                        email: session.user.email,
+                        phone: phoneContact,
+                        address: "Casa Central",
+                      })
+                      .select()
+                      .single();
+
+                    const { data: newProf } = await supabase
+                      .from("profiles")
+                      .insert({
+                        id: session.user.id,
+                        organization_id: newOrg?.id,
+                        venue_id: newVenue?.id,
+                        name: personName,
+                        role: "admin",
+                      })
+                      .select()
+                      .single();
+
+                    profile = newProf;
+                  } catch (createErr) {
+                    console.error("Error al autogenerar perfil:", createErr);
+                    profile = {
+                      id: session.user.id,
+                      name: session.user.user_metadata?.name || session.user.email.split("@")[0],
+                      role: "admin",
+                      organization_id: null,
+                      venue_id: null
+                    };
                   }
                 }
+
+                let subPlan = "Multi-Taller Pro";
+                let subStatus = "activo";
+
+                if (profile?.organization_id) {
+                  try {
+                    const { data: org } = await supabase
+                      .from("organizations")
+                      .select("subscription_plan, subscription_status")
+                      .eq("id", profile.organization_id)
+                      .maybeSingle();
+                    if (org) {
+                      subPlan = org.subscription_plan || "Multi-Taller Pro";
+                      subStatus = org.subscription_status || "activo";
+                    }
+                  } catch (orgErr) {
+                    console.error("Error al sincronizar organización:", orgErr);
+                  }
+                }
+
+                if (profile) {
+                  const userData = {
+                    _id: profile.id,
+                    name: profile.name,
+                    email: session.user.email,
+                    role: profile.role,
+                    subscriptionPlan: subPlan,
+                    subscriptionStatus: subStatus,
+                    organizationId: profile.organization_id,
+                    venueId: profile.venue_id,
+                    token: session.access_token,
+                  };
+                  sessionStorage.setItem("repairit_user", JSON.stringify(userData));
+                  localStorage.setItem("repairit_user", JSON.stringify(userData));
+                  
+                  if (event === "SIGNED_IN") {
+                    if (window.location.hostname.includes("repairit.cloud")) {
+                      if (window.location.hostname !== "app.repairit.cloud") {
+                        window.location.href = "https://app.repairit.cloud/dashboard";
+                      }
+                    }
+                  }
+                }
+              } catch (err) {
+                console.error("Error al sincronizar perfil en onAuthStateChange:", err);
               }
             }
-          } catch (err) {
-            console.error("Error al sincronizar perfil en onAuthStateChange:", err);
+          } else {
+            sessionStorage.removeItem("repairit_token");
+            sessionStorage.removeItem("repairit_user");
+            localStorage.clear();
           }
-        }
-      } else {
-        sessionStorage.removeItem("repairit_token");
-        sessionStorage.removeItem("repairit_user");
-        localStorage.clear();
-      }
+          setSessionLoading(false);
+        });
+        unsubscribeAuth = () => subscription.unsubscribe();
+      }).catch(err => {
+        console.error("Error al cargar autenticación:", err);
+        setSessionLoading(false);
+      });
+    } else {
       setSessionLoading(false);
-    });
+    }
 
     return () => {
       window.removeEventListener("hashchange", checkSubdomain);
-      subscription.unsubscribe();
+      if (unsubscribeAuth) unsubscribeAuth();
     };
   }, []);
 
