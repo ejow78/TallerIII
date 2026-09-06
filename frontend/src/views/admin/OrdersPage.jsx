@@ -190,40 +190,85 @@ export default function OrdersPage() {
     }
   };
 
-  // Exportar listado a Excel CSV
-  const handleExportToExcel = () => {
+  // Exportar listado a Excel (.xlsx nativo)
+  const handleExportToExcel = async () => {
     if (orders.length === 0) {
       toast.error("No hay órdenes registradas para exportar.");
       return;
     }
 
-    const headers = ["ID Orden", "Cliente", "DNI", "Dispositivo", "Falla Reportada", "Diagnostico", "Total Presupuesto", "Fecha Ingreso", "Estado"];
-    const rows = orders.map(o => {
-      const client = o.clientId || {};
-      const budgetTotal = o.budget ? o.budget.items?.reduce((s, i) => s + i.price, 0) || 0 : 0;
-      return [
-        o.trackingCode || o._id,
-        `"${client.name || "N/A"}"`,
-        `"${client.dni || "N/A"}"`,
-        `"${o.deviceType} ${o.deviceModel}"`,
-        `"${(o.issue || "").replace(/"/g, '""')}"`,
-        `"${(o.diagnosis || "").replace(/"/g, '""')}"`,
-        budgetTotal,
-        o.date,
-        o.status.toUpperCase()
+    try {
+      toast.info("Generando archivo Excel...");
+      const { default: writeXlsxFile } = await import("write-excel-file/browser");
+
+      const columns = [
+        {
+          header: { value: "ID Orden", fontWeight: "bold", backgroundColor: "#0284c7", color: "#ffffff", align: "center" },
+          cell: o => ({ type: String, value: o.trackingCode || o._id || "N/A", align: "center" }),
+          width: 18
+        },
+        {
+          header: { value: "Cliente", fontWeight: "bold", backgroundColor: "#0284c7", color: "#ffffff" },
+          cell: o => ({ type: String, value: o.clientId?.name || "N/A" }),
+          width: 26
+        },
+        {
+          header: { value: "DNI", fontWeight: "bold", backgroundColor: "#0284c7", color: "#ffffff", align: "center" },
+          cell: o => ({ type: String, value: String(o.clientId?.dni || "N/A"), align: "center" }),
+          width: 15
+        },
+        {
+          header: { value: "Dispositivo", fontWeight: "bold", backgroundColor: "#0284c7", color: "#ffffff" },
+          cell: o => ({ type: String, value: `${o.deviceType || ""} ${o.deviceModel || ""}`.trim() || "N/A" }),
+          width: 26
+        },
+        {
+          header: { value: "Falla Reportada", fontWeight: "bold", backgroundColor: "#0284c7", color: "#ffffff" },
+          cell: o => ({ type: String, value: o.issue || "Sin especificar" }),
+          width: 34
+        },
+        {
+          header: { value: "Diagnóstico", fontWeight: "bold", backgroundColor: "#0284c7", color: "#ffffff" },
+          cell: o => ({ type: String, value: o.diagnosis || "Pendiente" }),
+          width: 34
+        },
+        {
+          header: { value: "Presupuesto", fontWeight: "bold", backgroundColor: "#0284c7", color: "#ffffff", align: "right" },
+          cell: o => {
+            const total = o.budget?.items?.reduce((s, i) => s + (Number(i.price) || 0), 0) || 0;
+            return { type: Number, value: total, format: "$#,##0.00", align: "right" };
+          },
+          width: 18
+        },
+        {
+          header: { value: "Fecha Ingreso", fontWeight: "bold", backgroundColor: "#0284c7", color: "#ffffff", align: "center" },
+          cell: o => {
+            let formattedDate = o.date || "";
+            if (o.date && !isNaN(new Date(o.date).getTime())) {
+              formattedDate = new Date(o.date).toLocaleDateString("es-AR");
+            }
+            return { type: String, value: formattedDate, align: "center" };
+          },
+          width: 16
+        },
+        {
+          header: { value: "Estado", fontWeight: "bold", backgroundColor: "#0284c7", color: "#ffffff", align: "center" },
+          cell: o => ({
+            type: String,
+            value: (o.status || "").toUpperCase(),
+            align: "center",
+            fontWeight: "bold"
+          }),
+          width: 18
+        }
       ];
-    });
 
-    const csvContent = "data:text/csv;charset=utf-8,\uFEFF" + [headers.join(","), ...rows.map(r => r.join(","))].join("\n");
-    const encodedUri = encodeURI(csvContent);
-    const link = document.createElement("a");
-    link.setAttribute("href", encodedUri);
-    link.setAttribute("download", `Ordenes_Reparacion_${new Date().toISOString().split("T")[0]}.csv`);
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-
-    toast.success("Listado de órdenes exportado a Excel CSV.");
+      await writeXlsxFile(orders, { columns }).toFile(`Ordenes_Reparacion_${new Date().toISOString().split("T")[0]}.xlsx`);
+      toast.success("Listado de órdenes exportado a Excel (.xlsx).");
+    } catch (err) {
+      console.error("Error al generar Excel:", err);
+      toast.error("Error al exportar el archivo Excel.");
+    }
   };
 
   // Imprimir comprobante de recepción
