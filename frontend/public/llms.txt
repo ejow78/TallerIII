@@ -1,0 +1,11 @@
+# RepairIT
+> Plataforma de gestión integral y seguimiento en tiempo real para talleres de servicio técnico de dispositivos electrónicos e informática.
+
+## Enlaces Principales
+- Portal de Seguimiento y Portada: https://repairit.cloud
+- Acceso al Taller / Administración: https://app.repairit.cloud
+
+## Funcionalidades
+- Seguimiento de reparaciones para clientes mediante código de seguimiento y validación DNI.
+- Gestión de órdenes de servicio técnico, presupuestos e inventario.
+- Notificaciones automáticas por correo electrónico.

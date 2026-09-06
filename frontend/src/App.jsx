@@ -1,32 +1,38 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, lazy, Suspense } from "react";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { Toaster } from "@/components/ui/sonner";
 import { supabase } from "@/services/supabaseClient";
 
 // Layouts
 import PublicLayout from "@/components/layout/PublicLayout";
-import DashboardLayout from "@/components/layout/DashboardLayout";
+const DashboardLayout = lazy(() => import("@/components/layout/DashboardLayout"));
 
 // Vistas Públicas
 import LandingPage from "@/views/public/LandingPage";
-import TrackingPage from "@/views/public/TrackingPage";
-import LoginPage from "@/views/admin/LoginPage";
-import RegisterPage from "@/views/admin/RegisterPage";
-import ForgotPasswordPage from "@/views/admin/ForgotPasswordPage";
-import ResetPasswordPage from "@/views/admin/ResetPasswordPage";
-import PrivacyPage from "@/views/public/PrivacyPage";
-import TermsPage from "@/views/public/TermsPage";
+const TrackingPage = lazy(() => import("@/views/public/TrackingPage"));
+const LoginPage = lazy(() => import("@/views/admin/LoginPage"));
+const RegisterPage = lazy(() => import("@/views/admin/RegisterPage"));
+const ForgotPasswordPage = lazy(() => import("@/views/admin/ForgotPasswordPage"));
+const ResetPasswordPage = lazy(() => import("@/views/admin/ResetPasswordPage"));
+const PrivacyPage = lazy(() => import("@/views/public/PrivacyPage"));
+const TermsPage = lazy(() => import("@/views/public/TermsPage"));
 
 // Vistas Privadas (Dashboard)
-import DashboardPage from "@/views/admin/DashboardPage";
-import NewOrderPage from "@/views/admin/NewOrderPage";
-import OrdersPage from "@/views/admin/OrdersPage";
-import ClientsPage from "@/views/admin/ClientsPage";
-import InventoryPage from "@/views/admin/InventoryPage";
-import ProfilePage from "@/views/admin/ProfilePage";
-import SuperAdminUsersPage from "@/views/admin/SuperAdminUsersPage";
-import VenueAccountsPage from "@/views/admin/VenueAccountsPage";
-import POSPage from "@/views/admin/POSPage";
+const DashboardPage = lazy(() => import("@/views/admin/DashboardPage"));
+const NewOrderPage = lazy(() => import("@/views/admin/NewOrderPage"));
+const OrdersPage = lazy(() => import("@/views/admin/OrdersPage"));
+const ClientsPage = lazy(() => import("@/views/admin/ClientsPage"));
+const InventoryPage = lazy(() => import("@/views/admin/InventoryPage"));
+const ProfilePage = lazy(() => import("@/views/admin/ProfilePage"));
+const SuperAdminUsersPage = lazy(() => import("@/views/admin/SuperAdminUsersPage"));
+const VenueAccountsPage = lazy(() => import("@/views/admin/VenueAccountsPage"));
+const POSPage = lazy(() => import("@/views/admin/POSPage"));
+
+const RouteFallback = () => (
+  <div className="flex h-64 w-full items-center justify-center">
+    <div className="w-8 h-8 border-4 border-primary border-t-transparent rounded-full animate-spin" />
+  </div>
+);
 
 export default function App() {
   const [sessionLoading, setSessionLoading] = useState(true);
@@ -205,7 +211,8 @@ export default function App() {
     };
   }, []);
 
-  if (sessionLoading) {
+  const isDashboardRoute = typeof window !== "undefined" && (window.location.pathname.startsWith("/dashboard") || window.location.hostname.startsWith("app."));
+  if (sessionLoading && isDashboardRoute) {
     return (
       <div className="flex h-screen w-screen items-center justify-center bg-background text-foreground">
         <div className="text-center space-y-4">
@@ -218,35 +225,37 @@ export default function App() {
 
   return (
     <BrowserRouter>
-      <Routes>
-        
-        {/* Entorno Público (seguimiento.repairit.cloud) */}
-        <Route path="/" element={<PublicLayout />}>
-          <Route index element={<LandingPage />} />
-          <Route path="seguimiento/:id" element={<TrackingPage />} />
-          <Route path="login" element={<LoginPage />} />
-          <Route path="registro" element={<RegisterPage />} />
-          <Route path="recuperar-password" element={<ForgotPasswordPage />} />
-          <Route path="olvide-password" element={<ForgotPasswordPage />} />
-          <Route path="reset-password" element={<ResetPasswordPage />} />
-          <Route path="privacidad" element={<PrivacyPage />} />
-          <Route path="terminos" element={<TermsPage />} />
-        </Route>
+      <Suspense fallback={<RouteFallback />}>
+        <Routes>
+          
+          {/* Entorno Público (seguimiento.repairit.cloud) */}
+          <Route path="/" element={<PublicLayout />}>
+            <Route index element={<LandingPage />} />
+            <Route path="seguimiento/:id" element={<TrackingPage />} />
+            <Route path="login" element={<LoginPage />} />
+            <Route path="registro" element={<RegisterPage />} />
+            <Route path="recuperar-password" element={<ForgotPasswordPage />} />
+            <Route path="olvide-password" element={<ForgotPasswordPage />} />
+            <Route path="reset-password" element={<ResetPasswordPage />} />
+            <Route path="privacidad" element={<PrivacyPage />} />
+            <Route path="terminos" element={<TermsPage />} />
+          </Route>
 
-        {/* Entorno Administrativo (dashboard.repairit.cloud) */}
-        <Route path="/dashboard" element={<DashboardLayout />}>
-          <Route index element={<DashboardPage />} />
-          <Route path="nuevo-ingreso" element={<NewOrderPage />} />
-          <Route path="ordenes" element={<OrdersPage />} />
-          <Route path="clientes" element={<ClientsPage />} />
-          <Route path="inventario" element={<InventoryPage />} />
-          <Route path="perfil" element={<ProfilePage />} />
-          <Route path="usuarios" element={<SuperAdminUsersPage />} />
-          <Route path="cuentas" element={<VenueAccountsPage />} />
-          <Route path="caja" element={<POSPage />} />
-        </Route>
+          {/* Entorno Administrativo (dashboard.repairit.cloud) */}
+          <Route path="/dashboard" element={<DashboardLayout />}>
+            <Route index element={<DashboardPage />} />
+            <Route path="nuevo-ingreso" element={<NewOrderPage />} />
+            <Route path="ordenes" element={<OrdersPage />} />
+            <Route path="clientes" element={<ClientsPage />} />
+            <Route path="inventario" element={<InventoryPage />} />
+            <Route path="perfil" element={<ProfilePage />} />
+            <Route path="usuarios" element={<SuperAdminUsersPage />} />
+            <Route path="cuentas" element={<VenueAccountsPage />} />
+            <Route path="caja" element={<POSPage />} />
+          </Route>
 
-      </Routes>
+        </Routes>
+      </Suspense>
       <Toaster position="top-center" richColors />
     </BrowserRouter>
   );
