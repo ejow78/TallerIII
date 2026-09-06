@@ -178,32 +178,18 @@ export async function sendContactEmail({ name, email, message }) {
   }
 
   try {
-    const res = await fetch("https://api.resend.com/emails", {
-      method: "POST",
-      headers: {
-        "Authorization": `Bearer ${RESEND_API_KEY}`,
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify({
-        from: "RepairIT Web <notificaciones@repairit.cloud>",
-        to: ["contacto@repairit.cloud"],
-        reply_to: email,
-        subject: `Nueva consulta de ${name} - repairit.cloud`,
-        html: `
-          <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #e2e8f0; border-radius: 10px;">
-            <h2 style="color: #0f172a; margin-top: 0;">Nueva consulta desde la web</h2>
-            <p style="margin: 8px 0;"><strong>Nombre:</strong> ${name}</p>
-            <p style="margin: 8px 0;"><strong>Email del cliente:</strong> <a href="mailto:${email}">${email}</a></p>
-            <hr style="border: none; border-top: 1px solid #e2e8f0; margin: 16px 0;" />
-            <p style="margin-bottom: 8px;"><strong>Mensaje:</strong></p>
-            <div style="background-color: #f8fafc; padding: 14px; border-radius: 8px; font-size: 15px; color: #334155; line-height: 1.5; white-space: pre-wrap;">${message}</div>
-            <p style="font-size: 12px; color: #94a3b8; margin-top: 20px;">Podés responder directamente a este correo para escribirle a ${name}.</p>
-          </div>
-        `
-      })
+    const { data, error } = await supabase.rpc("send_contact_email", {
+      p_name: name,
+      p_email: email,
+      p_message: message,
     });
 
-    return res.ok;
+    if (error) {
+      console.error("[emailService] Error al llamar a RPC send_contact_email:", error);
+      return false;
+    }
+
+    return data?.success === true;
   } catch (err) {
     console.error("[emailService] Error al enviar mensaje de contacto:", err);
     return false;
