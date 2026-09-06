@@ -98,7 +98,7 @@ export default function LandingPage() {
   const [honeypot, setHoneypot] = useState("");
   const [turnstileToken, setTurnstileToken] = useState("");
   const turnstileRef = useRef(null);
-  const siteKey = import.meta.env.VITE_TURNSTILE_SITE_KEY || "0x4AAAAAAEjQ5UUbknAkvYB3";
+  const siteKey = import.meta.env.VITE_TURNSTILE_SITE_KEY_CONTACT || "0x4AAAAAAEp8qYavkgDDO4aC";
 
   const handleSearch = (e) => {
     e.preventDefault();
@@ -144,8 +144,10 @@ export default function LandingPage() {
       return;
     }
 
-    if (siteKey && !turnstileToken) {
-      toast.error("Por favor complete la verificación de seguridad anti-robot.");
+    const activeToken = turnstileToken || turnstileRef.current?.getResponse?.();
+    if (siteKey && !activeToken) {
+      turnstileRef.current?.execute?.();
+      toast.error("Verificando seguridad, por favor intente nuevamente en un segundo.");
       return;
     }
 
@@ -676,18 +678,21 @@ export default function LandingPage() {
                 />
               </div>
 
-              {/* Cloudflare Turnstile Anti-Bot */}
+              {/* Cloudflare Turnstile Anti-Bot (Modo Invisible) */}
               {siteKey && (
-                <div className="flex justify-center pt-2 overflow-hidden">
+                <div className="hidden" aria-hidden="true" style={{ display: "none" }}>
                   <Turnstile
                     ref={turnstileRef}
                     siteKey={siteKey}
                     onSuccess={(token) => setTurnstileToken(token)}
                     onError={() => setTurnstileToken("")}
-                    onExpire={() => setTurnstileToken("")}
+                    onExpire={() => {
+                      setTurnstileToken("");
+                      turnstileRef.current?.reset();
+                    }}
                     options={{
+                      size: "invisible",
                       theme: "dark",
-                      size: "flexible",
                     }}
                   />
                 </div>
