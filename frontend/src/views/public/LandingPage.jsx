@@ -1,6 +1,5 @@
 import { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
-import { Turnstile } from "@marsidev/react-turnstile";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -96,9 +95,6 @@ export default function LandingPage() {
   const [acceptTerms, setAcceptTerms] = useState(false);
   const [isSendingContact, setIsSendingContact] = useState(false);
   const [honeypot, setHoneypot] = useState("");
-  const [turnstileToken, setTurnstileToken] = useState("");
-  const turnstileRef = useRef(null);
-  const siteKey = import.meta.env.VITE_TURNSTILE_SITE_KEY_CONTACT || "0x4AAAAAAEp8qYavkgDDO4aC";
 
   const handleSearch = (e) => {
     e.preventDefault();
@@ -123,9 +119,8 @@ export default function LandingPage() {
   const handleContactSubmit = async (e) => {
     e.preventDefault();
 
-    // 1. Trampa Honeypot para bots automáticos
+    // 1. Trampa Honeypot para bots automáticos (si viene lleno, es un bot)
     if (honeypot.trim()) {
-      // Simular éxito para despistar al bot sin enviar nada
       toast.success("¡Mensaje enviado con éxito!", {
         description: "Gracias por contactarte.",
       });
@@ -141,13 +136,6 @@ export default function LandingPage() {
     }
     if (!contactName.trim() || !contactEmail.trim() || !contactMessage.trim()) {
       toast.error("Por favor complete todos los campos.");
-      return;
-    }
-
-    const activeToken = turnstileToken || turnstileRef.current?.getResponse?.();
-    if (siteKey && !activeToken) {
-      turnstileRef.current?.execute?.();
-      toast.error("Verificando seguridad, por favor intente nuevamente en un segundo.");
       return;
     }
 
@@ -168,18 +156,12 @@ export default function LandingPage() {
         setContactEmail("");
         setContactMessage("");
         setAcceptTerms(false);
-        setTurnstileToken("");
-        turnstileRef.current?.reset();
       } else {
         toast.error(res?.error || "No se pudo enviar el mensaje. Podés escribirnos directo a contacto@repairit.cloud");
-        setTurnstileToken("");
-        turnstileRef.current?.reset();
       }
     } catch (err) {
-      console.error(err);
+      console.error("[LandingPage] Error:", err);
       toast.error("Error al enviar el mensaje.");
-      setTurnstileToken("");
-      turnstileRef.current?.reset();
     } finally {
       setIsSendingContact(false);
     }
@@ -677,26 +659,6 @@ export default function LandingPage() {
                   onChange={(e) => setHoneypot(e.target.value)}
                 />
               </div>
-
-              {/* Cloudflare Turnstile Anti-Bot (Modo Invisible) */}
-              {siteKey && (
-                <div className="hidden" aria-hidden="true" style={{ display: "none" }}>
-                  <Turnstile
-                    ref={turnstileRef}
-                    siteKey={siteKey}
-                    onSuccess={(token) => setTurnstileToken(token)}
-                    onError={() => setTurnstileToken("")}
-                    onExpire={() => {
-                      setTurnstileToken("");
-                      turnstileRef.current?.reset();
-                    }}
-                    options={{
-                      size: "invisible",
-                      theme: "dark",
-                    }}
-                  />
-                </div>
-              )}
 
               <Button
                 type="submit"
