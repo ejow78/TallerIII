@@ -241,11 +241,11 @@ export default function LandingPage() {
                 <div className="w-10 h-10 rounded-lg bg-primary/10 border border-primary/20 flex items-center justify-center text-primary">
                   <QrCode className="w-5 h-5" />
                 </div>
-                <CardTitle className="font-outfit text-lg font-semibold text-foreground">Portal de Seguimiento 24/7</CardTitle>
+                <CardTitle className="font-outfit text-lg font-semibold text-foreground">Seguimiento en Vivo y Avisos por Email</CardTitle>
               </CardHeader>
               <CardContent>
                 <p className="text-muted-foreground text-sm font-light leading-relaxed">
-                  Eliminá las constantes consultas telefónicas. Tus clientes siguen el estado técnico en vivo y aprueban presupuestos online desde su celular.
+                  Tus clientes consultan el avance escaneando el código QR de su comprobante o desde la web. Además, reciben notificaciones automáticas por correo cuando su equipo ingresa o está listo para retirar.
                 </p>
               </CardContent>
             </Card>
@@ -254,13 +254,13 @@ export default function LandingPage() {
             <Card className="bg-card/45 border-border/60 hover:border-border transition-colors duration-200">
               <CardHeader className="space-y-4">
                 <div className="w-10 h-10 rounded-lg bg-primary/10 border border-primary/20 flex items-center justify-center text-primary">
-                  <DollarSign className="w-5 h-5" />
+                  <Wrench className="w-5 h-5" />
                 </div>
-                <CardTitle className="font-outfit text-lg font-semibold text-foreground">Control de Caja y Arqueos</CardTitle>
+                <CardTitle className="font-outfit text-lg font-semibold text-foreground">Presupuestos y Aprobación Online</CardTitle>
               </CardHeader>
               <CardContent>
                 <p className="text-muted-foreground text-sm font-light leading-relaxed">
-                  Administrá señas, cobros de mano de obra y ventas de repuestos. Mantené el balance financiero de tus sucursales sin desfasajes ni pérdidas.
+                  Cargá diagnósticos y presupuestos claros. Tu cliente revisa el detalle de repuestos y mano de obra desde su celular y lo aprueba con un clic, agilizando el trabajo sin malentendidos.
                 </p>
               </CardContent>
             </Card>
@@ -269,13 +269,13 @@ export default function LandingPage() {
             <Card className="bg-card/45 border-border/60 hover:border-border transition-colors duration-200">
               <CardHeader className="space-y-4">
                 <div className="w-10 h-10 rounded-lg bg-primary/10 border border-primary/20 flex items-center justify-center text-primary">
-                  <PackageCheck className="w-5 h-5" />
+                  <Printer className="w-5 h-5" />
                 </div>
-                <CardTitle className="font-outfit text-lg font-semibold text-foreground">Inventario y Alertas de Stock</CardTitle>
+                <CardTitle className="font-outfit text-lg font-semibold text-foreground">Recepción Ágil y Comprobantes con QR</CardTitle>
               </CardHeader>
               <CardContent>
                 <p className="text-muted-foreground text-sm font-light leading-relaxed">
-                  Controlá el stock de pantallas, módulos, integrados y baterías. El sistema descuenta insumos al reparar y te avisa cuando necesitás reponer.
+                  Registrá equipos en segundos documentando fallas, accesorios y estado cosmético. Emití comprobantes térmicos o en formato A4 listos para imprimir con código QR de seguimiento.
                 </p>
               </CardContent>
             </Card>
@@ -284,13 +284,13 @@ export default function LandingPage() {
             <Card className="bg-card/45 border-border/60 hover:border-border transition-colors duration-200">
               <CardHeader className="space-y-4">
                 <div className="w-10 h-10 rounded-lg bg-primary/10 border border-primary/20 flex items-center justify-center text-primary">
-                  <Printer className="w-5 h-5" />
+                  <PackageCheck className="w-5 h-5" />
                 </div>
-                <CardTitle className="font-outfit text-lg font-semibold text-foreground">Ingreso Rápido y Fichas Físicas</CardTitle>
+                <CardTitle className="font-outfit text-lg font-semibold text-foreground">Control de Stock y Repuestos</CardTitle>
               </CardHeader>
               <CardContent>
                 <p className="text-muted-foreground text-sm font-light leading-relaxed">
-                  Registrá dispositivos en menos de 30 segundos. Imprimí el comprobante físico de recepción para el cliente y pegá la etiqueta al equipo.
+                  Llevá el registro de piezas, accesorios e insumos. Consultá cantidades disponibles, recibí avisos de stock mínimo y exportá el catálogo completo a Excel (.xlsx) en 1 clic.
                 </p>
               </CardContent>
             </Card>
@@ -299,13 +299,13 @@ export default function LandingPage() {
             <Card className="bg-card/45 border-border/60 hover:border-border transition-colors duration-200">
               <CardHeader className="space-y-4">
                 <div className="w-10 h-10 rounded-lg bg-primary/10 border border-primary/20 flex items-center justify-center text-primary">
-                  <Building2 className="w-5 h-5" />
+                  <DollarSign className="w-5 h-5" />
                 </div>
-                <CardTitle className="font-outfit text-lg font-semibold text-foreground">Multi-Sucursal y Permisos</CardTitle>
+                <CardTitle className="font-outfit text-lg font-semibold text-foreground">Ventas de Mostrador y Cobros</CardTitle>
               </CardHeader>
               <CardContent>
                 <p className="text-muted-foreground text-sm font-light leading-relaxed">
-                  Gestioná múltiples sucursales desde una sola cuenta. Asigná roles específicos para recepcionistas, técnicos y administradores.
+                  Registrá ventas directas de accesorios, señas y cobros finales de reparaciones con distintos medios de pago, emitiendo tickets de venta de manera sencilla.
                 </p>
               </CardContent>
             </Card>
@@ -314,13 +314,13 @@ export default function LandingPage() {
             <Card className="bg-card/45 border-border/60 hover:border-border transition-colors duration-200">
               <CardHeader className="space-y-4">
                 <div className="w-10 h-10 rounded-lg bg-primary/10 border border-primary/20 flex items-center justify-center text-primary">
-                  <Wrench className="w-5 h-5" />
+                  <Building2 className="w-5 h-5" />
                 </div>
-                <CardTitle className="font-outfit text-lg font-semibold text-foreground">Historial y Ficha Técnica Digital</CardTitle>
+                <CardTitle className="font-outfit text-lg font-semibold text-foreground">Multi-Sucursal y Gestión de Técnicos</CardTitle>
               </CardHeader>
               <CardContent>
                 <p className="text-muted-foreground text-sm font-light leading-relaxed">
-                  Guardá diagnósticos detallados, repuestos presupuestados e historial de trazabilidad inalterable de cada dispositivo.
+                  Supervisá una o varias sucursales desde un mismo panel unificado. Asigná accesos para recepcionistas, técnicos y administradores con total trazabilidad.
                 </p>
               </CardContent>
             </Card>
@@ -531,7 +531,7 @@ export default function LandingPage() {
                   ¿Cómo reduce RepairIT las llamadas telefónicas de mis clientes?
                 </AccordionTrigger>
                 <AccordionContent className="text-muted-foreground text-sm font-light pb-4 leading-relaxed">
-                  Al ingresar un equipo, el sistema genera un código único de seguimiento (ej. RT-8K9M2P4X). Tus clientes ingresan a la web desde su celular para ver si su equipo está en diagnóstico, presupuestado o listo para retirar sin necesidad de llamarte.
+                  Al ingresar un equipo, el sistema genera un código único y un comprobante con código QR. Además, envía notificaciones automáticas por correo electrónico al cliente cuando el equipo ingresa, cuando se actualiza el presupuesto y en el momento exacto en que está listo para retirar, permitiéndole consultar los avances desde su celular sin necesidad de llamar al taller.
                 </AccordionContent>
               </AccordionItem>
 
@@ -558,7 +558,7 @@ export default function LandingPage() {
                   ¿Qué tan segura está la información de mi taller y mis clientes?
                 </AccordionTrigger>
                 <AccordionContent className="text-muted-foreground text-sm font-light pb-4 leading-relaxed">
-                  Utilizamos arquitectura de base de datos PostgreSQL con Row Level Security (RLS). Los datos de tu taller están totalmente aislados e inalterables, protegidos bajo cifrado HTTPS/TLS de grado bancario.
+                  Toda la información viaja y se almacena de forma cifrada y protegida en la nube. La plataforma cuenta con aislamiento estricto por taller, lo que garantiza que solo vos y tu personal autorizado puedan acceder a los datos de tus clientes, órdenes de servicio, inventario y movimientos de caja.
                 </AccordionContent>
               </AccordionItem>
 

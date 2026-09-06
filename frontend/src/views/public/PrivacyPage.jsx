@@ -15,7 +15,7 @@ export default function PrivacyPage() {
           Políticas de Privacidad
         </h1>
         <p className="text-xs text-muted-foreground font-mono">
-          Última actualización: 28 de Agosto de 2026
+          Última actualización: 6 de Septiembre de 2026
         </p>
       </div>
 
@@ -23,62 +23,81 @@ export default function PrivacyPage() {
 
       <article className="prose prose-slate dark:prose-invert text-sm text-muted-foreground leading-relaxed space-y-6">
         <p>
-          En <strong>RepairIT</strong> nos tomamos muy en serio la privacidad y la protección de los datos de nuestros usuarios, talleres adheridos y clientes finales. Esta política describe la información que recopilamos, cómo la utilizamos y las medidas de seguridad aplicadas.
+          En <strong>RepairIT</strong> priorizamos la privacidad, confidencialidad y protección de los datos de nuestros usuarios, talleres asociados y sus clientes finales. Esta política describe de forma transparente la información que se gestiona en la plataforma, su finalidad y las medidas de protección implementadas.
         </p>
 
         <div className="space-y-3">
           <h2 className="font-outfit text-xl font-bold text-foreground">
-            1. Información que Recopilamos
+            1. Información que se Gestiona en la Plataforma
           </h2>
           <p>
-            Para brindar el servicio de trazabilidad y gestión de talleres técnicos, recopilamos los siguientes datos:
+            Para brindar el servicio integral de gestión de talleres y seguimiento de reparaciones, la plataforma procesa:
           </p>
           <ul className="list-disc pl-5 space-y-1">
-            <li><strong>Datos de Talleres y Usuarios Administradores:</strong> Nombre completo, correo electrónico, teléfono de contacto y razón social o nombre comercial del taller.</li>
-            <li><strong>Datos de Clientes del Taller:</strong> Nombre completo, DNI/Identificación, teléfono y correo electrónico ingresados al registrar una orden de servicio.</li>
-            <li><strong>Información Técnica de Dispositivos:</strong> Tipo de equipo, marca, modelo, accesorios recibidos, estado cosmético, falla reportada y diagnósticos del taller técnico.</li>
-            <li><strong>Datos Operativos y de Caja:</strong> Registros de presupuestos, ventas, movimientos de caja e inventario de insumos técnicos.</li>
+            <li><strong>Datos de Talleres y Cuentas de Acceso:</strong> Nombre o razón social, correo electrónico, teléfono de contacto y configuración de sucursales y personal técnico.</li>
+            <li><strong>Datos de Clientes del Taller:</strong> Nombre, DNI/Identificación, teléfono y correo electrónico ingresados por el taller al momento de recepcionar un equipo.</li>
+            <li><strong>Información Técnica de Reparación:</strong> Tipo de equipo, marca, modelo, accesorios recibidos, fallas declaradas, diagnósticos técnicos y presupuestos.</li>
+            <li><strong>Registros Operativos:</strong> Ventas de mostrador, insumos y catálogo de repuestos ingresados por el taller.</li>
           </ul>
         </div>
 
         <div className="space-y-3">
           <h2 className="font-outfit text-xl font-bold text-foreground">
-            2. Uso de la Información
+            2. Finalidad del Uso de la Información
           </h2>
           <p>
-            La información recopilada se utiliza exclusivamente para los siguientes fines:
+            La información cargada en el sistema se utiliza exclusivamente con fines operativos y de servicio:
           </p>
           <ul className="list-disc pl-5 space-y-1">
-            <li>Permitir a los clientes consultar el estado de reparación de sus dispositivos en tiempo real mediante su código único de seguimiento.</li>
-            <li>Facilitar a los talleres la gestión operativa de sus órdenes de servicio, control de inventario y caja.</li>
-            <li>Gestionar la autenticación de usuarios y la seguridad del sistema mediante Supabase Auth.</li>
+            <li>Permitir a los clientes consultar en tiempo real el avance de su reparación mediante código único o escaneo de código QR.</li>
+            <li>Enviar notificaciones automáticas por correo electrónico al cliente cuando su equipo ingresa, cuando se genera un presupuesto o cuando el dispositivo está listo para ser retirado.</li>
+            <li>Facilitar a los talleres el registro organizado de sus servicios técnicos, stock de repuestos y comprobantes de recepción.</li>
+            <li>Autenticación y control de accesos seguro para administradores y técnicos.</li>
           </ul>
         </div>
 
         <div className="space-y-3">
           <h2 className="font-outfit text-xl font-bold text-foreground">
-            3. Seguridad y Aislamiento de Datos (Multi-Tenant)
+            3. Propiedad y No Comercialización de Datos
           </h2>
           <p>
-            RepairIT utiliza arquitectura <strong>PostgreSQL con Row Level Security (RLS)</strong>. Esto garantiza que la información de cada taller esté completamente aislada a nivel de base de datos, impidiendo que usuarios de otros talleres accedan a datos ajenos. Las transmisiones de datos están cifradas mediante protocolos HTTPS/TLS.
+            <strong>RepairIT no vende, no alquila ni comparte bajo ningún concepto la base de datos de clientes o talleres con terceros, empresas de publicidad o intermediarios.</strong> La información de clientes cargada por cada taller es de propiedad exclusiva del titular de la cuenta y se utiliza únicamente para el funcionamiento del servicio contratado.
           </p>
         </div>
 
         <div className="space-y-3">
           <h2 className="font-outfit text-xl font-bold text-foreground">
-            4. Cookies y Almacenamiento Local
+            4. Seguridad y Aislamiento de la Información
           </h2>
           <p>
-            Utilizamos <code>sessionStorage</code> del navegador para mantener la sesión de usuario activa únicamente mientras la ventana permanezca abierta. Al cerrar el navegador, los tokens de autenticación se destruyen automáticamente por seguridad.
+            Toda la información viaja y se almacena de forma cifrada y segura en la nube. La plataforma implementa un estricto esquema de aislamiento de datos por taller, lo que garantiza que ninguna cuenta pueda visualizar, consultar o modificar datos pertenecientes a otro taller o sucursal.
           </p>
         </div>
 
         <div className="space-y-3">
           <h2 className="font-outfit text-xl font-bold text-foreground">
-            5. Derechos del Usuario y Contacto
+            5. Portabilidad y Exportación de Datos
           </h2>
           <p>
-            Los usuarios pueden solicitar el acceso, corrección o eliminación de sus datos personales poniéndose en contacto con el administrador del servicio a través de <code>contacto@repairit.cloud</code>.
+            Reconocemos el derecho de cada taller a disponer de su propia información. Los administradores pueden exportar en cualquier momento sus listados de órdenes, cartera de clientes e inventario de insumos a archivos de hoja de cálculo estándar (.xlsx) y comprobantes imprimibles.
+          </p>
+        </div>
+
+        <div className="space-y-3">
+          <h2 className="font-outfit text-xl font-bold text-foreground">
+            6. Sesiones y Almacenamiento Local
+          </h2>
+          <p>
+            Para garantizar la seguridad en computadoras y terminales compartidas de taller, los tokens de acceso del personal se gestionan de forma segura y se destruyen al cerrar la sesión o cerrar el navegador, impidiendo accesos no autorizados.
+          </p>
+        </div>
+
+        <div className="space-y-3">
+          <h2 className="font-outfit text-xl font-bold text-foreground">
+            7. Contacto y Consultas de Privacidad
+          </h2>
+          <p>
+            Para consultas relacionadas con la privacidad, actualización o baja de cuentas, podés comunicarte directamente con nuestro equipo a través de <code>contacto@repairit.cloud</code>.
           </p>
         </div>
       </article>

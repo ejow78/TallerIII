@@ -15,7 +15,7 @@ export default function TermsPage() {
           Términos de Servicio
         </h1>
         <p className="text-xs text-muted-foreground font-mono">
-          Última actualización: 28 de Agosto de 2026
+          Última actualización: 6 de Septiembre de 2026
         </p>
       </div>
 
@@ -23,7 +23,7 @@ export default function TermsPage() {
 
       <article className="prose prose-slate dark:prose-invert text-sm text-muted-foreground leading-relaxed space-y-6">
         <p>
-          Bienvenido a <strong>RepairIT</strong>. Al acceder o utilizar nuestra plataforma de gestión de talleres y trazabilidad de ordenes de servicio técnico, aceptas cumplir con los siguientes Términos de Servicio.
+          Bienvenido a <strong>RepairIT</strong>. Al acceder o utilizar nuestra plataforma de gestión operativa y trazabilidad para talleres de servicio técnico, aceptas cumplir con los siguientes Términos de Servicio.
         </p>
 
         <div className="space-y-3">
@@ -31,43 +31,61 @@ export default function TermsPage() {
             1. Descripción del Servicio
           </h2>
           <p>
-            RepairIT es una plataforma Software como Servicio (SaaS) diseñada para la administración integral de talleres de reparación técnica. Permite el control de órdenes de servicio, presupuestos, inventario de repuestos, arqueos de caja y consulta de seguimiento online para clientes finales.
+            RepairIT es una plataforma Software como Servicio (SaaS) orientada a la administración de talleres de reparación técnica. Incluye herramientas para el registro de órdenes de trabajo, emisión de comprobantes con código QR, catálogo de repuestos, registro de ventas en mostrador, portal de seguimiento online para clientes y notificaciones automáticas por correo electrónico.
           </p>
         </div>
 
         <div className="space-y-3">
           <h2 className="font-outfit text-xl font-bold text-foreground">
-            2. Cuentas de Usuario y Seguridad
+            2. Cuentas de Acceso y Responsabilidad Operativa
           </h2>
           <p>
-            Los talleres registrados son responsables de mantener la confidencialidad de sus credenciales de acceso. Cada usuario es responsable de todas las actividades operativas, cargas de presupuesto y cambios de estado ejecutados bajo su cuenta.
+            Los talleres registrados son responsables de mantener la confidencialidad de sus credenciales y de administrar adecuadamente los roles de sus colaboradores (administradores, técnicos y recepcionistas). Cada taller es responsable de la veracidad de los diagnósticos, costos de repuestos y estados técnicos cargados en la plataforma.
           </p>
         </div>
 
         <div className="space-y-3">
           <h2 className="font-outfit text-xl font-bold text-foreground">
-            3. Uso del Sistema de Seguimiento Online
+            3. Seguimiento Online y Aprobación Digital de Presupuestos
           </h2>
           <p>
-            El código único de seguimiento generado por el sistema (ej. <code>RT-8K9M2P4X</code>) permite a los clientes consultar el avance técnico de su dispositivo. Los talleres se comprometen a cargar diagnósticos y presupuestos veraces en el sistema.
+            El sistema genera un código único de seguimiento y un comprobante con código QR para cada equipo ingresado. La plataforma habilita al cliente final a consultar el avance técnico y prestar su aprobación digital al presupuesto presentado por el taller, quedando registrada la constancia electrónica de dicha conformidad.
           </p>
         </div>
 
         <div className="space-y-3">
           <h2 className="font-outfit text-xl font-bold text-foreground">
-            4. Disponibilidad y Propiedad Intelectual
+            4. Notificaciones Automáticas por Correo Electrónico
           </h2>
           <p>
-            RepairIT realiza esfuerzos continuos para garantizar una disponibilidad del 99.9% del servicio. El diseño, código fuente, marca y logotipos de RepairIT son propiedad exclusiva de la plataforma.
+            RepairIT provee un canal de comunicación automatizado que notifica al cliente cuando su equipo ingresa, cuando se emite un presupuesto y cuando el dispositivo se encuentra listo para su retiro. Estas notificaciones tienen carácter informativo para facilitar la interacción entre el taller y su cliente.
           </p>
         </div>
 
         <div className="space-y-3">
           <h2 className="font-outfit text-xl font-bold text-foreground">
-            5. Modificaciones de los Términos
+            5. Delimitación de Responsabilidad y Custodia de Equipos
           </h2>
           <p>
-            Nos reservamos el derecho de actualizar estos Términos de Servicio en cualquier momento. Las modificaciones entrarán en vigencia inmediatamente tras su publicación en <code>https://repairit.cloud/terminos</code>.
+            RepairIT provee exclusivamente la infraestructura de software para la gestión y seguimiento digital. La ejecución material de las reparaciones, la calidad y garantía de los repuestos instalados, así como la custodia física de los dispositivos en el establecimiento comercial, son de exclusiva responsabilidad entre el taller prestador y sus respectivos clientes.
+          </p>
+        </div>
+
+        <div className="space-y-3">
+          <h2 className="font-outfit text-xl font-bold text-foreground">
+            6. Propiedad de los Datos y Exportación
+          </h2>
+          <p>
+            La información operativa, cartera de clientes y registros de inventario ingresados por cada taller son de su exclusiva propiedad. RepairIT no comercializa estos datos y provee herramientas nativas para la exportación de reportes en formato estándar (.xlsx) y comprobantes imprimibles en cualquier momento.
+          </p>
+        </div>
+
+        <div className="space-y-3">
+          <h2 className="font-outfit text-xl font-bold text-foreground">
+            7. Modificaciones y Contacto
+          </h2>
+          <p>
+            Nos reservamos el derecho de actualizar estos términos para reflejar mejoras operativas o normativas. Para cualquier duda legal o de servicio, podés contactarnos a través de <code>contacto@repairit.cloud</code>.
           </p>
         </div>
       </article>
