@@ -9,6 +9,7 @@ const DashboardLayout = lazy(() => import("@/components/layout/DashboardLayout")
 // Vistas Públicas
 import LandingPage from "@/views/public/LandingPage";
 const TrackingPage = lazy(() => import("@/views/public/TrackingPage"));
+const TrackingPortalPage = lazy(() => import("@/views/public/TrackingPortalPage"));
 const LoginPage = lazy(() => import("@/views/admin/LoginPage"));
 const RegisterPage = lazy(() => import("@/views/admin/RegisterPage"));
 const ForgotPasswordPage = lazy(() => import("@/views/admin/ForgotPasswordPage"));
@@ -87,7 +88,7 @@ export default function App() {
           return;
         }
         if (hostname === "tracking.repairit.cloud" && pathname === "/") {
-          window.location.href = "/seguimiento/demo-id";
+          window.location.href = "/consulta";
           return;
         }
       }
@@ -269,6 +270,9 @@ export default function App() {
           {/* Entorno Público (seguimiento.repairit.cloud) */}
           <Route path="/" element={<PublicLayout />}>
             <Route index element={<LandingPage />} />
+            <Route path="consulta" element={<TrackingPortalPage />} />
+            <Route path="tracking" element={<Navigate to="/consulta" replace />} />
+            <Route path="seguimiento" element={<Navigate to="/consulta" replace />} />
             <Route path="seguimiento/:id" element={<TrackingPage />} />
             <Route path="login" element={<LoginPage />} />
             <Route path="register" element={<RegisterPage />} />

@@ -39,18 +39,22 @@ export default function LandingPage() {
     handleResize();
     window.addEventListener("resize", handleResize);
 
-    // Centrar automáticamente en el Plan Pro (centro) al cargar en móvil
+    // Centrar horizontalmente en el Plan Pro (centro) al cargar en móvil sin desplazar la ventana
     const centerProCard = () => {
       if (pricingCarouselRef.current && window.innerWidth < 768) {
         const el = pricingCarouselRef.current;
         const cards = el.querySelectorAll(".pricing-card");
         if (cards[1]) {
-          cards[1].scrollIntoView({ behavior: "instant", inline: "center", block: "nearest" });
+          const cardLeft = cards[1].offsetLeft;
+          const cardWidth = cards[1].offsetWidth;
+          const containerWidth = el.offsetWidth;
+          el.scrollLeft = cardLeft - (containerWidth - cardWidth) / 2;
           setActivePlanIndex(1);
         }
       }
+      window.scrollTo(0, 0);
     };
-    const timer = setTimeout(centerProCard, 150);
+    const timer = setTimeout(centerProCard, 100);
 
     return () => {
       window.removeEventListener("resize", handleResize);
@@ -63,7 +67,13 @@ export default function LandingPage() {
       const el = pricingCarouselRef.current;
       const cards = el.querySelectorAll(".pricing-card");
       if (cards[index]) {
-        cards[index].scrollIntoView({ behavior: "smooth", inline: "center", block: "nearest" });
+        const cardLeft = cards[index].offsetLeft;
+        const cardWidth = cards[index].offsetWidth;
+        const containerWidth = el.offsetWidth;
+        el.scrollTo({
+          left: cardLeft - (containerWidth - cardWidth) / 2,
+          behavior: "smooth"
+        });
         setActivePlanIndex(index);
       }
     }
