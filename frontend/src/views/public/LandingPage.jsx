@@ -382,8 +382,10 @@ export default function LandingPage() {
                 </ul>
               </CardContent>
               <CardFooter className="pt-4 border-t border-border/30 bg-muted/20">
-                <Button className="w-full bg-secondary hover:bg-secondary/90 text-secondary-foreground font-semibold py-2 rounded-lg cursor-pointer" variant="outline">
-                  Comenzar gratis
+                <Button asChild className="w-full bg-secondary hover:bg-secondary/90 text-secondary-foreground font-semibold py-2 rounded-lg cursor-pointer" variant="outline">
+                  <a href={window.location.hostname.includes("repairit.cloud") ? "https://app.repairit.cloud/register" : "/register"}>
+                    Comenzar gratis
+                  </a>
                 </Button>
               </CardFooter>
             </Card>
@@ -424,13 +426,15 @@ export default function LandingPage() {
                   </li>
                   <li className="flex items-start gap-2.5">
                     <Check className="w-4 h-4 text-primary shrink-0 mt-0.5" />
-                    <span>Exportación a Excel CSV en 1 clic</span>
+                    <span>Exportación a Excel (.xlsx) en 1 clic</span>
                   </li>
                 </ul>
               </CardContent>
               <CardFooter className="pt-4 border-t border-border/30 bg-primary/5">
-                <Button className="w-full bg-primary hover:bg-primary/90 text-primary-foreground font-bold py-2 rounded-lg cursor-pointer">
-                  Suscribirse Ahora
+                <Button asChild className="w-full bg-primary hover:bg-primary/90 text-primary-foreground font-bold py-2 rounded-lg cursor-pointer">
+                  <a href={window.location.hostname.includes("repairit.cloud") ? "https://app.repairit.cloud/register" : "/register"}>
+                    Suscribirse Ahora
+                  </a>
                 </Button>
               </CardFooter>
             </Card>

@@ -5,7 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
-import { Users, Search, Trash2, Pencil, Eye, PlusCircle, ClipboardList } from "lucide-react";
+import { Users, Search, Trash2, Pencil, Eye, PlusCircle, ClipboardList, Download } from "lucide-react";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -165,6 +165,75 @@ export default function ClientsPage() {
     setShowOrdersModal(true);
   };
 
+  // 📤 Exportar cartera de clientes a Excel (.xlsx nativo)
+  const handleExportToExcel = async () => {
+    if (clients.length === 0) {
+      toast.error("No hay clientes registrados para exportar.");
+      return;
+    }
+
+    try {
+      toast.info("Generando archivo Excel de clientes...");
+      const { default: writeXlsxFile } = await import("write-excel-file/browser");
+
+      const columns = [
+        {
+          header: { value: "ID Cliente", fontWeight: "bold", backgroundColor: "#0284c7", color: "#ffffff", align: "center" },
+          cell: c => ({ type: String, value: String(c._id || "N/A"), align: "center" }),
+          width: 16
+        },
+        {
+          header: { value: "Nombre y Apellido", fontWeight: "bold", backgroundColor: "#0284c7", color: "#ffffff" },
+          cell: c => ({ type: String, value: c.name || "Sin nombre", fontWeight: "bold" }),
+          width: 28
+        },
+        {
+          header: { value: "DNI / CUIT", fontWeight: "bold", backgroundColor: "#0284c7", color: "#ffffff", align: "center" },
+          cell: c => ({ type: String, value: String(c.dni || "N/A"), align: "center" }),
+          width: 16
+        },
+        {
+          header: { value: "Teléfono", fontWeight: "bold", backgroundColor: "#0284c7", color: "#ffffff" },
+          cell: c => ({ type: String, value: c.phone || "N/A" }),
+          width: 20
+        },
+        {
+          header: { value: "Correo Electrónico", fontWeight: "bold", backgroundColor: "#0284c7", color: "#ffffff" },
+          cell: c => ({ type: String, value: c.email || "N/A" }),
+          width: 28
+        },
+        {
+          header: { value: "Órdenes Registradas", fontWeight: "bold", backgroundColor: "#0284c7", color: "#ffffff", align: "center" },
+          cell: c => {
+            const count = orders.filter(o => {
+              const oClientId = typeof o.clientId === "object" ? o.clientId?._id : o.clientId;
+              return oClientId === c._id;
+            }).length;
+            return { type: Number, value: count, align: "center" };
+          },
+          width: 20
+        },
+        {
+          header: { value: "Fecha Alta", fontWeight: "bold", backgroundColor: "#0284c7", color: "#ffffff", align: "center" },
+          cell: c => {
+            let formattedDate = "-";
+            if (c.created_at) {
+              formattedDate = new Date(c.created_at).toLocaleDateString("es-AR");
+            }
+            return { type: String, value: formattedDate, align: "center" };
+          },
+          width: 16
+        }
+      ];
+
+      await writeXlsxFile(filteredClients, { columns }).toFile(`Clientes_${new Date().toISOString().split("T")[0]}.xlsx`);
+      toast.success("Listado de clientes exportado a Excel (.xlsx).");
+    } catch (err) {
+      console.error("Error al generar Excel de clientes:", err);
+      toast.error("Error al exportar clientes a Excel.");
+    }
+  };
+
   // Filtrado de clientes
   const filteredClients = clients.filter(c => {
     const term = searchQuery.toLowerCase().trim();
@@ -219,7 +288,7 @@ export default function ClientsPage() {
         {activeTab === "control" ? (
           <Card className="bg-card/20 border-border p-6 shadow-sm space-y-4">
             
-            {/* Buscador */}
+            {/* Buscador y Exportación */}
             <div className="flex flex-col sm:flex-row gap-4 items-center justify-between border-b border-border/50 pb-4">
               <div className="relative w-full sm:max-w-xs flex items-center">
                 <Search className="w-4 h-4 text-muted-foreground absolute left-3 pointer-events-none" />
@@ -231,9 +300,20 @@ export default function ClientsPage() {
                   className="bg-background/80 border-border text-xs w-full pl-9"
                 />
               </div>
-              <span className="text-[9px] text-muted-foreground uppercase tracking-widest font-mono font-bold">
-                Total: {clients.length} Clientes
-              </span>
+              <div className="flex items-center gap-3 w-full sm:w-auto justify-between sm:justify-end">
+                <Button
+                  variant="outline"
+                  onClick={handleExportToExcel}
+                  className="h-8 border-border/80 text-xs font-semibold flex items-center gap-1.5 cursor-pointer"
+                  title="Exportar listado de clientes a Excel (.xlsx)"
+                >
+                  <Download className="w-3.5 h-3.5" />
+                  Exportar Excel
+                </Button>
+                <span className="text-[9px] text-muted-foreground uppercase tracking-widest font-mono font-bold">
+                  Total: {clients.length} Clientes
+                </span>
+              </div>
             </div>
 
             {/* Listado de Clientes */}

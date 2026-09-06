@@ -4,7 +4,6 @@ import { Card, CardTitle, CardDescription } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
-import { Checkbox } from "@/components/ui/checkbox";
 import { toast } from "sonner";
 import { api } from "@/services/api";
 import { supabase } from "@/services/supabaseClient";
@@ -14,7 +13,6 @@ export default function LoginPage() {
   document.title = "RepairIT - Iniciar Sesión";
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [rememberMe, setRememberMe] = useState(false);
   const [captchaToken, setCaptchaToken] = useState("");
   const turnstileRef = useRef(null);
   const siteKey = import.meta.env.VITE_TURNSTILE_SITE_KEY || "0x4AAAAAAEjQ5UUbknAkvYB3";
@@ -22,11 +20,6 @@ export default function LoginPage() {
 
   useEffect(() => {
     document.title = "RepairIT - Iniciar Sesión";
-    const savedEmail = localStorage.getItem("repairit_saved_email");
-    if (savedEmail) {
-      setEmail(savedEmail);
-      setRememberMe(true);
-    }
     const token = sessionStorage.getItem("repairit_token") || localStorage.getItem("repairit_token");
     if (token) {
       navigate("/dashboard");
@@ -52,13 +45,7 @@ export default function LoginPage() {
   const handleLogin = async (e) => {
     e.preventDefault();
     try {
-      if (rememberMe) {
-        localStorage.setItem("repairit_saved_email", email.trim());
-      } else {
-        localStorage.removeItem("repairit_saved_email");
-      }
-
-      const data = await api.auth.login(email, password, rememberMe, captchaToken);
+      const data = await api.auth.login(email, password, false, captchaToken);
       toast.success("¡Acceso concedido!", {
         description: `Bienvenido de vuelta, ${data.name}.`
       });
@@ -131,28 +118,13 @@ export default function LoginPage() {
             />
           </div>
 
-          {/* Recordarme y Registro en la misma fila */}
-          <div className="flex items-center justify-between pt-1 gap-2">
-            <div className="flex items-center space-x-2">
-              <Checkbox 
-                id="remember" 
-                checked={rememberMe} 
-                onCheckedChange={(checked) => setRememberMe(checked)}
-                className="border-border focus-visible:ring-primary"
-              />
-              <Label
-                htmlFor="remember"
-                className="text-xs text-muted-foreground font-light cursor-pointer select-none"
-              >
-                Recordarme
-              </Label>
-            </div>
-
+          {/* Enlace a Registro */}
+          <div className="text-center pt-1">
             <Link 
-              to="/registro"
+              to="/register"
               className="text-xs text-primary hover:underline font-medium transition-colors"
             >
-              ¿Todavía no tenés cuenta?
+              ¿Todavía no tenés cuenta? Registrate acá
             </Link>
           </div>
 

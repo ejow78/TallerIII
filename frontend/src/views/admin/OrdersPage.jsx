@@ -271,144 +271,213 @@ export default function OrdersPage() {
     }
   };
 
-  // Imprimir comprobante de recepción
+  // Imprimir comprobante de recepción profesional (A4 con QR)
   const handlePrintOrder = (order) => {
     const client = order.clientId || {};
-    const venueName = profile.name;
-    const venueAddress = profile.address;
-    const venuePhone = profile.phone;
-    const venueEmail = profile.email;
+    const venueName = profile?.name || "Taller RepairIT";
+    const venueAddress = profile?.address || "Sucursal Central";
+    const venuePhone = profile?.phone || "";
+    const venueEmail = profile?.email || "";
+    const trackingUrl = `https://tracking.repairit.cloud/seguimiento/${order.trackingCode}`;
 
-    const printWindow = window.open("", "_blank", "width=800,height=900");
+    const printWindow = window.open("", "_blank", "width=850,height=950");
     if (!printWindow) {
-      toast.error("El navegador bloqueó la ventana emergente de impresión.");
+      toast.error("El navegador bloqueó la ventana emergente de impresión. Habilitá los pop-ups.");
       return;
     }
 
     const budgetItemsHtml = order.budget?.items?.map(i => `
       <tr>
-        <td style="padding: 6px 0; border-bottom: 1px solid #f1f5f9;">${i.desc}</td>
-        <td style="padding: 6px 0; border-bottom: 1px solid #f1f5f9; text-align: right; font-weight: bold;">$${i.price.toLocaleString("es-AR")}</td>
+        <td style="padding: 6px 8px; border-bottom: 1px solid #e2e8f0;">${i.desc}</td>
+        <td style="padding: 6px 8px; border-bottom: 1px solid #e2e8f0; text-align: right; font-weight: 600;">$${Number(i.price).toLocaleString("es-AR", { minimumFractionDigits: 2 })}</td>
       </tr>
     `).join("") || "";
 
-    const totalBudget = order.budget?.items?.reduce((s, i) => s + i.price, 0) || 0;
+    const totalBudget = order.budget?.items?.reduce((s, i) => s + (Number(i.price) || 0), 0) || 0;
 
     printWindow.document.write(`
       <!DOCTYPE html>
-      <html>
+      <html lang="es">
         <head>
-          <title>Comprobante de Recepción - Orden #${order.trackingCode}</title>
+          <meta charset="UTF-8">
+          <title>Orden de Servicio #${order.trackingCode} - ${venueName}</title>
           <style>
-            body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; padding: 30px; color: #333; font-size: 13px; }
-            .header { display: flex; justify-content: space-between; align-items: flex-start; border-bottom: 2px solid #2563eb; padding-bottom: 15px; margin-bottom: 20px; }
-            .logo { font-size: 22px; font-weight: bold; color: #1e293b; }
-            .info { font-size: 11px; color: #64748b; margin-top: 2px; }
-            .order-no { font-size: 11px; font-weight: bold; color: #2563eb; text-align: right; text-transform: uppercase; }
-            .order-no-val { font-size: 20px; font-weight: bold; font-family: monospace; color: #0f172a; }
-            .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 20px; }
-            .section { border: 1px solid #e2e8f0; border-radius: 6px; padding: 15px; background: #fff; }
-            .section-title { font-size: 11px; font-weight: bold; color: #2563eb; text-transform: uppercase; border-bottom: 1px solid #f1f5f9; padding-bottom: 6px; margin-bottom: 10px; }
-            .label { font-weight: bold; font-size: 10px; color: #777; display: block; margin-top: 5px; text-transform: uppercase; }
-            .val { font-size: 13px; margin-bottom: 5px; color: #111; }
-            .full-width { grid-column: span 2; }
-            .footer { margin-top: 40px; border-top: 1px solid #eee; padding-top: 15px; }
+            @page {
+              size: A4 portrait;
+              margin: 10mm;
+            }
+            * { box-sizing: border-box; }
+            body {
+              font-family: system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+              color: #0f172a;
+              font-size: 11px;
+              line-height: 1.4;
+              margin: 0;
+              padding: 10px;
+              background: #ffffff;
+            }
+            .header-table { width: 100%; border-bottom: 2px solid #0284c7; padding-bottom: 12px; margin-bottom: 12px; }
+            .logo-text { font-size: 20px; font-weight: 900; color: #0f172a; }
+            .logo-sub { font-size: 10px; color: #64748b; font-weight: 500; }
+            .order-badge { background: #0284c7; color: #ffffff; padding: 4px 10px; font-size: 13px; font-weight: 800; border-radius: 4px; display: inline-block; }
+            .code-text { font-family: monospace; font-size: 16px; font-weight: 900; color: #0284c7; margin-top: 4px; }
+            
+            .box { border: 1px solid #cbd5e1; border-radius: 6px; padding: 10px; margin-bottom: 10px; background: #ffffff; }
+            .box-title { font-size: 10px; font-weight: 800; color: #0284c7; text-transform: uppercase; letter-spacing: 0.5px; border-bottom: 1px solid #e2e8f0; padding-bottom: 4px; margin-bottom: 8px; }
+            
+            .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+            .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; }
+            
+            .field-label { font-size: 9px; font-weight: 700; color: #64748b; text-transform: uppercase; margin-bottom: 2px; }
+            .field-val { font-size: 12px; font-weight: 600; color: #0f172a; }
+            
+            table.data-table { width: 100%; border-collapse: collapse; margin-top: 4px; }
+            table.data-table th { background: #f1f5f9; padding: 6px 8px; font-size: 10px; font-weight: 700; color: #475569; text-transform: uppercase; border-bottom: 1px solid #cbd5e1; }
+            
+            .terms { font-size: 9px; color: #64748b; line-height: 1.3; text-align: justify; margin-top: 10px; padding: 8px; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 4px; }
+            .sign-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 40px; margin-top: 30px; text-align: center; }
+            .sign-line { border-top: 1px dashed #64748b; padding-top: 5px; font-size: 10px; font-weight: 600; color: #475569; }
+            
+            .footer-info { margin-top: 15px; border-top: 1px solid #e2e8f0; padding-top: 8px; display: flex; justify-content: space-between; align-items: center; font-size: 9px; color: #94a3b8; }
+            
+            @media print {
+              body { padding: 0; }
+              .no-print { display: none; }
+            }
           </style>
         </head>
         <body>
-          <div class="header">
-            <div>
-              <div class="logo">${venueName}</div>
-              <div class="info">Dirección: ${venueAddress}</div>
-              <div class="info">Teléfono: ${venuePhone} &bull; Email: ${venueEmail}</div>
-            </div>
-            <div>
-              <div class="order-no">ORDEN DE SERVICIO</div>
-              <div class="order-no-val">N° ${order.trackingCode}</div>
-            </div>
-          </div>
-          
-          <div class="grid">
-            <div class="section full-width">
-              <div class="section-title">DATOS DEL CLIENTE</div>
-              <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 20px;">
+          <table class="header-table">
+            <tr>
+              <td style="vertical-align: top; width: 60%;">
+                <div class="logo-text">${venueName}</div>
+                <div class="logo-sub">${venueAddress}</div>
+                <div class="logo-sub">Tel: ${venuePhone || "N/A"} &bull; Email: ${venueEmail || "N/A"}</div>
+              </td>
+              <td style="vertical-align: top; text-align: right; width: 40%;">
+                <span class="order-badge">ORDEN DE SERVICIO</span>
+                <div class="code-text">N° ${order.trackingCode}</div>
+                <div style="font-size: 10px; color: #64748b; margin-top: 2px;">Fecha: ${order.date || new Date().toLocaleDateString("es-AR")} ${order.time ? `&bull; ${order.time} hs` : ""}</div>
+              </td>
+            </tr>
+          </table>
+
+          <div class="grid-2">
+            <!-- Datos del Cliente -->
+            <div class="box">
+              <div class="box-title">Datos del Cliente</div>
+              <div style="margin-bottom: 6px;">
+                <div class="field-label">Nombre / Razón Social</div>
+                <div class="field-val">${client.name || "Cliente General"}</div>
+              </div>
+              <div class="grid-2">
                 <div>
-                  <span class="label">Cliente</span>
-                  <div class="val" style="font-weight: bold; font-size: 14px;">${client.name || "N/A"}</div>
-                  <span class="label">DNI / Identificación</span>
-                  <div class="val">${client.dni || "N/A"}</div>
-                  <span class="label">Contacto</span>
-                  <div class="val">${client.phone || ""} &bull; ${client.email || ""}</div>
+                  <div class="field-label">DNI / CUIT</div>
+                  <div class="field-val">${client.dni || "N/A"}</div>
                 </div>
-                <div style="border-left: 1px solid #eee; padding-left: 20px;">
-                  <span class="label">Fecha de Ingreso</span>
-                  <div class="val">${order.date}</div>
-                  <span class="label">Hora</span>
-                  <div class="val">${order.time || "10:30"} hs</div>
+                <div>
+                  <div class="field-label">Teléfono</div>
+                  <div class="field-val">${client.phone || "N/A"}</div>
                 </div>
               </div>
             </div>
+
+            <!-- Seguimiento QR -->
+            <div class="box" style="display: flex; align-items: center; gap: 12px; background: #f8fafc;">
+              <img 
+                src="https://api.qrserver.com/v1/create-qr-code/?size=110x110&margin=0&data=${encodeURIComponent(trackingUrl)}" 
+                alt="QR Seguimiento" 
+                style="width: 75px; height: 75px; border: 1px solid #cbd5e1; border-radius: 4px; padding: 2px; background: #fff;"
+              />
+              <div style="flex: 1;">
+                <div class="field-label" style="color: #0284c7; font-weight: 800;">Seguimiento Online 24/7</div>
+                <div style="font-size: 10px; color: #334155; margin-bottom: 4px;">Escaneá con tu celular para consultar el estado y aprobar el presupuesto.</div>
+                <div style="font-size: 9px; font-family: monospace; color: #64748b; word-break: break-all;">${trackingUrl}</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Detalles del Equipo -->
+          <div class="box">
+            <div class="box-title">Detalles del Equipo Ingresado</div>
+            <div class="grid-3" style="margin-bottom: 8px;">
+              <div>
+                <div class="field-label">Tipo de Dispositivo</div>
+                <div class="field-val">${order.deviceType || "N/A"}</div>
+              </div>
+              <div>
+                <div class="field-label">Marca y Modelo</div>
+                <div class="field-val">${order.deviceModel || "N/A"}</div>
+              </div>
+              <div>
+                <div class="field-label">Accesorios Recibidos</div>
+                <div class="field-val">${order.accessories || "Ninguno"}</div>
+              </div>
+            </div>
+            <div>
+              <div class="field-label">Estado Cosmético / Observaciones Visuales</div>
+              <div class="field-val" style="font-weight: 400; font-size: 11px;">${order.cosmetic || "Sin observaciones específicas"}</div>
+            </div>
+          </div>
+
+          <!-- Falla y Diagnóstico -->
+          <div class="box">
+            <div class="box-title">Falla Declarada por el Cliente</div>
+            <div style="font-size: 11px; color: #0f172a; white-space: pre-wrap; padding: 4px 0;">${order.issue || "Sin falla detallada"}</div>
             
-            <div class="section full-width">
-              <div class="section-title">DETALLES DEL EQUIPO</div>
-              <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 10px;">
-                <div>
-                  <span class="label">Tipo de Equipo</span>
-                  <div class="val">${order.deviceType}</div>
-                </div>
-                <div>
-                  <span class="label">Marca y Modelo</span>
-                  <div class="val">${order.deviceModel}</div>
-                </div>
-              </div>
-              <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; border-top: 1px solid #f1f5f9; padding-top: 10px;">
-                <div>
-                  <span class="label">Accesorios Recibidos</span>
-                  <div class="val">${order.accessories || "Ninguno"}</div>
-                </div>
-                <div>
-                  <span class="label">Estado Cosmético</span>
-                  <div class="val">${order.cosmetic || "Sin detalles"}</div>
-                </div>
-              </div>
-            </div>
-
-            <div class="section full-width">
-              <div class="section-title">FALLA REPORTADA POR CLIENTE</div>
-              <div class="val" style="white-space: pre-wrap; background: #f8fafc; padding: 10px; border-radius: 4px; border: 1px solid #e2e8f0;">${order.issue}</div>
-            </div>
-
             ${order.diagnosis ? `
-              <div class="section full-width">
-                <div class="section-title">DIAGNÓSTICO TÉCNICO DEL TALLER</div>
-                <div class="val" style="white-space: pre-wrap; background: #eff6ff; padding: 10px; border-radius: 4px; border: 1px solid #bfdbfe; color: #1e3a8a;">${order.diagnosis}</div>
-              </div>
-            ` : ""}
-
-            ${budgetItemsHtml ? `
-              <div class="section full-width">
-                <div class="section-title">PRESUPUESTO ESTIMADO DEL SERVICIO</div>
-                <table style="width: 100%; border-collapse: collapse; margin-top: 5px;">
-                  ${budgetItemsHtml}
-                </table>
-                <div style="text-align: right; margin-top: 10px; font-size: 15px; font-weight: bold;">
-                  TOTAL PREVISTO: $${totalBudget.toLocaleString("es-AR")}
-                </div>
+              <div style="border-top: 1px dashed #cbd5e1; margin-top: 6px; padding-top: 6px;">
+                <div class="field-label" style="color: #0284c7;">Diagnóstico Técnico Preliminar</div>
+                <div style="font-size: 11px; color: #0f172a; font-weight: 600;">${order.diagnosis}</div>
               </div>
             ` : ""}
           </div>
 
-          <div class="footer">
-            <div style="border-top: 1px solid #eee; padding-top: 15px; text-align: left;">
-              <div style="font-size: 16px; font-weight: bold; color: #111;">Repair<span style="color: #2563eb;">IT</span></div>
-              <div style="font-size: 10px; color: #777;">repairit.cloud &bull; Seguimiento online disponible con su N° de orden</div>
+          <!-- Presupuesto Estimado -->
+          ${budgetItemsHtml ? `
+            <div class="box">
+              <div class="box-title">Presupuesto Estimado</div>
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th style="text-align: left;">Concepto / Repuesto</th>
+                    <th style="text-align: right; width: 120px;">Subtotal</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  ${budgetItemsHtml}
+                </tbody>
+              </table>
+              <div style="text-align: right; font-size: 13px; font-weight: 900; color: #0284c7; padding-top: 8px;">
+                TOTAL ESTIMADO: $${totalBudget.toLocaleString("es-AR", { minimumFractionDigits: 2 })}
+              </div>
+            </div>
+          ` : ""}
+
+          <!-- Términos y Condiciones Legales -->
+          <div class="terms">
+            <strong>Condiciones de Servicio:</strong> El cliente autoriza la revisión y diagnóstico del equipo. Los presupuestos tienen una validez de 15 días corridos. Las reparaciones cuentan con una garantía legal de 90 días sobre los repuestos instalados y la mano de obra realizada. Pasados los 60 días desde la notificación de finalización, los equipos no retirados se considerarán abandonados conforme a las normativas comerciales vigentes.
+          </div>
+
+          <!-- Firmas -->
+          <div class="sign-grid">
+            <div>
+              <div class="sign-line">Firma del Cliente (Conformidad de Ingreso)</div>
+            </div>
+            <div>
+              <div class="sign-line">Firma y Sello del Taller / Responsable</div>
             </div>
           </div>
-          
+
+          <div class="footer-info">
+            <span>RepairIT &bull; Software de Gestión para Servicio Técnico (repairit.cloud)</span>
+            <span>Comprobante Oficial emitido electrónicamente</span>
+          </div>
+
           <script>
             window.onload = function() {
               window.print();
-              setTimeout(function() { window.close(); }, 500);
+              setTimeout(function() { window.close(); }, 800);
             };
           </script>
         </body>

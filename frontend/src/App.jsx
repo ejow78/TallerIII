@@ -1,5 +1,5 @@
 import { useState, useEffect, lazy, Suspense } from "react";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { Toaster } from "@/components/ui/sonner";
 
 // Layouts
@@ -45,11 +45,26 @@ export default function App() {
       if (hostname.includes("repairit.cloud")) {
         const token = sessionStorage.getItem("repairit_token") || localStorage.getItem("repairit_token");
 
-        // app.repairit.cloud es ESTRICTO y EXCLUSIVO para /dashboard, /login, /registro, /recuperar-password y /reset-password
+        // app.repairit.cloud es ESTRICTO y EXCLUSIVO para /dashboard, /login, /register, /registro, /recuperar-password y /reset-password
         if (hostname === "app.repairit.cloud") {
+          // Si entra directo a la raíz de app.repairit.cloud, derivar según sesión
+          if (pathname === "/") {
+            if (token) {
+              window.location.href = "https://app.repairit.cloud/dashboard";
+            } else {
+              window.location.href = "https://app.repairit.cloud/login";
+            }
+            return;
+          }
+
+          if (pathname === "/registro") {
+            window.location.href = "https://app.repairit.cloud/register";
+            return;
+          }
+
           const hash = window.location.hash;
           const isAuthHash = hash.includes("access_token") || hash.includes("refresh_token") || hash.includes("error") || hash.includes("type=");
-          const isAllowedAuthPath = pathname === "/login" || pathname === "/registro" || pathname === "/recuperar-password" || pathname === "/olvide-password" || pathname === "/reset-password";
+          const isAllowedAuthPath = pathname === "/login" || pathname === "/register" || pathname === "/registro" || pathname === "/recuperar-password" || pathname === "/olvide-password" || pathname === "/reset-password";
 
           if ((hash && !isAuthHash) || (!isAllowedAuthPath && !pathname.startsWith("/dashboard"))) {
             const targetPath = isAllowedAuthPath ? "" : pathname;
@@ -58,8 +73,9 @@ export default function App() {
           }
         }
 
-        if (hostname !== "app.repairit.cloud" && (pathname === "/login" || pathname === "/registro")) {
-          window.location.href = `https://app.repairit.cloud${pathname}`;
+        if (hostname !== "app.repairit.cloud" && (pathname === "/login" || pathname === "/register" || pathname === "/registro")) {
+          const target = pathname === "/registro" ? "/register" : pathname;
+          window.location.href = `https://app.repairit.cloud${target}`;
           return;
         }
         if (hostname !== "app.repairit.cloud" && pathname.startsWith("/dashboard")) {
@@ -86,6 +102,7 @@ export default function App() {
     const isAuthOrDashboard = typeof window !== "undefined" && (
       window.location.pathname.startsWith("/dashboard") ||
       window.location.pathname === "/login" ||
+      window.location.pathname === "/register" ||
       window.location.pathname === "/registro" ||
       window.location.pathname.startsWith("/reset-password") ||
       window.location.hostname.startsWith("app.") ||
@@ -254,7 +271,8 @@ export default function App() {
             <Route index element={<LandingPage />} />
             <Route path="seguimiento/:id" element={<TrackingPage />} />
             <Route path="login" element={<LoginPage />} />
-            <Route path="registro" element={<RegisterPage />} />
+            <Route path="register" element={<RegisterPage />} />
+            <Route path="registro" element={<Navigate to="/register" replace />} />
             <Route path="recuperar-password" element={<ForgotPasswordPage />} />
             <Route path="olvide-password" element={<ForgotPasswordPage />} />
             <Route path="reset-password" element={<ResetPasswordPage />} />

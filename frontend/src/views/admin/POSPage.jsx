@@ -22,7 +22,8 @@ import {
   Store,
   Keyboard,
   Sparkles,
-  Receipt
+  Receipt,
+  Download
 } from "lucide-react";
 import { api } from "@/services/api";
 
@@ -272,8 +273,10 @@ export default function POSPage() {
           <title>Ticket de Venta #${saleId.substring(0, 8)}</title>
           <style>
             @page {
+              size: 80mm auto;
               margin: 0;
             }
+            * { box-sizing: border-box; }
             body {
               font-family: 'Courier New', Courier, monospace;
               width: 260px;
@@ -333,6 +336,83 @@ export default function POSPage() {
 
     printWindow.document.write(ticketHtml);
     printWindow.document.close();
+  };
+
+  // 📤 Exportar Historial de Caja / Ventas a Excel (.xlsx nativo)
+  const handleExportSalesToExcel = async () => {
+    if (sales.length === 0) {
+      toast.error("No hay ventas registradas para exportar.");
+      return;
+    }
+
+    try {
+      toast.info("Generando archivo Excel de caja...");
+      const { default: writeXlsxFile } = await import("write-excel-file/browser");
+
+      const columns = [
+        {
+          header: { value: "ID Ticket", fontWeight: "bold", backgroundColor: "#0284c7", color: "#ffffff", align: "center" },
+          cell: s => ({ type: String, value: String(s._id ? s._id.substring(0, 8).toUpperCase() : "N/A"), align: "center" }),
+          width: 16
+        },
+        {
+          header: { value: "Fecha y Hora", fontWeight: "bold", backgroundColor: "#0284c7", color: "#ffffff", align: "center" },
+          cell: s => {
+            const d = s.created_at || s.date;
+            return {
+              type: String,
+              value: d ? new Date(d).toLocaleString("es-AR") : "-",
+              align: "center"
+            };
+          },
+          width: 22
+        },
+        {
+          header: { value: "Sucursal / Taller", fontWeight: "bold", backgroundColor: "#0284c7", color: "#ffffff" },
+          cell: s => ({
+            type: String,
+            value: s.venue_id?.name || activeVenue?.name || "Sucursal Central"
+          }),
+          width: 24
+        },
+        {
+          header: { value: "Medio de Pago", fontWeight: "bold", backgroundColor: "#0284c7", color: "#ffffff", align: "center" },
+          cell: s => ({
+            type: String,
+            value: (s.payment_method || "Efectivo").toUpperCase(),
+            align: "center",
+            fontWeight: "bold"
+          }),
+          width: 18
+        },
+        {
+          header: { value: "Productos / Cantidad", fontWeight: "bold", backgroundColor: "#0284c7", color: "#ffffff" },
+          cell: s => {
+            const itemsSummary = (s.items || [])
+              .map(i => `${i.name || i.code} (x${i.quantity || 1})`)
+              .join(", ");
+            return { type: String, value: itemsSummary || "Sin detalle" };
+          },
+          width: 36
+        },
+        {
+          header: { value: "Total Cobrado", fontWeight: "bold", backgroundColor: "#0284c7", color: "#ffffff", align: "right" },
+          cell: s => ({
+            type: Number,
+            value: Number(s.total) || 0,
+            format: "$#,##0.00",
+            align: "right"
+          }),
+          width: 18
+        }
+      ];
+
+      await writeXlsxFile(sales, { columns }).toFile(`Caja_Ventas_${new Date().toISOString().split("T")[0]}.xlsx`);
+      toast.success("Historial de ventas exportado a Excel (.xlsx).");
+    } catch (err) {
+      console.error("Error al generar Excel de ventas:", err);
+      toast.error("Error al exportar ventas a Excel.");
+    }
   };
 
   const handleCheckout = async () => {
@@ -760,24 +840,35 @@ export default function POSPage() {
               <p className="text-[11px] text-muted-foreground font-light">Ventas y egresos de stock realizados en la plataforma.</p>
             </div>
 
-            {/* Dropdown de sucursales (Solo si tiene Multi-Taller Pro y es Admin) */}
-            {isMultiTaller && isAdmin && (
-              <div className="flex items-center gap-2">
-                <Store className="w-4 h-4 text-muted-foreground shrink-0" />
-                <select
-                  value={selectedVenueFilter}
-                  onChange={(e) => setSelectedVenueFilter(e.target.value)}
-                  className="h-9 bg-background/85 border border-border rounded-lg px-3 py-1 text-xs text-foreground focus:outline-none focus:ring-1 focus:ring-primary w-full sm:w-auto"
-                >
-                  <option value="todas">Todas las Sucursales</option>
-                  {venues.map((v) => (
-                    <option key={v._id} value={v._id}>
-                      {v.name}
-                    </option>
-                  ))}
-                </select>
-              </div>
-            )}
+            <div className="flex items-center gap-3 w-full sm:w-auto justify-between sm:justify-end">
+              {/* Dropdown de sucursales (Solo si tiene Multi-Taller Pro y es Admin) */}
+              {isMultiTaller && isAdmin && (
+                <div className="flex items-center gap-2">
+                  <Store className="w-4 h-4 text-muted-foreground shrink-0" />
+                  <select
+                    value={selectedVenueFilter}
+                    onChange={(e) => setSelectedVenueFilter(e.target.value)}
+                    className="h-9 bg-background/85 border border-border rounded-lg px-3 py-1 text-xs text-foreground focus:outline-none focus:ring-1 focus:ring-primary w-full sm:w-auto"
+                  >
+                    <option value="todas">Todas las Sucursales</option>
+                    {venues.map((v) => (
+                      <option key={v._id} value={v._id}>
+                        {v.name}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              )}
+              <Button
+                variant="outline"
+                onClick={handleExportSalesToExcel}
+                className="h-9 border-border/80 text-xs font-semibold flex items-center gap-1.5 cursor-pointer"
+                title="Exportar historial de caja a Excel (.xlsx)"
+              >
+                <Download className="w-3.5 h-3.5" />
+                Exportar Excel
+              </Button>
+            </div>
           </div>
 
           {/* Tabla de Historial */}

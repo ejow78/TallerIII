@@ -73,7 +73,7 @@ export default function TrackingPage() {
   // Descargar / Imprimir Ficha PDF
   const handleDownloadPdf = () => {
     if (!order) return;
-    const printWindow = window.open("", "_blank");
+    const printWindow = window.open("", "_blank", "width=850,height=950");
     if (!printWindow) {
       toast.error("No se pudo abrir la ventana de impresión. Habilitá los pop-ups.");
       return;
@@ -82,83 +82,111 @@ export default function TrackingPage() {
     const clientName = order.clientId?.name || "Cliente";
     const venueName = order.venueId?.name || "Taller RepairIT";
     const venueAddress = order.venueId?.address || "Sucursal Central";
-    const budgetTotal = order.budget?.items ? order.budget.items.reduce((s, i) => s + (i.price || 0), 0) : 0;
+    const budgetTotal = order.budget?.items ? order.budget.items.reduce((s, i) => s + (Number(i.price) || 0), 0) : 0;
+    const trackingUrl = `https://tracking.repairit.cloud/seguimiento/${order.trackingCode}`;
 
     printWindow.document.write(`
       <!DOCTYPE html>
-      <html>
+      <html lang="es">
         <head>
-          <title>Ficha de Servicio - ${order.trackingCode}</title>
+          <meta charset="UTF-8">
+          <title>Ficha de Servicio - #${order.trackingCode}</title>
           <style>
-            body { font-family: sans-serif; padding: 30px; color: #111; max-width: 800px; margin: 0 auto; }
-            .header { display: flex; justify-content: space-between; border-bottom: 2px solid #3b82f6; padding-bottom: 15px; margin-bottom: 20px; }
-            .logo { font-size: 24px; font-weight: bold; color: #3b82f6; }
-            .badge { background: #3b82f6; color: #fff; padding: 4px 12px; border-radius: 4px; font-weight: bold; font-size: 14px; text-transform: uppercase; }
-            .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 20px; }
-            .box { background: #f8fafc; border: 1px solid #e2e8f0; padding: 15px; border-radius: 8px; }
-            .title { font-size: 12px; text-transform: uppercase; color: #64748b; font-weight: bold; margin-bottom: 5px; }
-            .val { font-size: 15px; font-weight: 600; }
-            table { width: 100%; border-collapse: collapse; margin-top: 15px; }
-            th { text-align: left; background: #f1f5f9; padding: 8px; font-size: 12px; }
-            td { padding: 8px; border-bottom: 1px solid #e2e8f0; font-size: 13px; }
-            .total { font-size: 18px; font-weight: bold; color: #3b82f6; text-align: right; margin-top: 15px; }
-            .footer { margin-top: 40px; text-align: center; font-size: 11px; color: #94a3b8; border-top: 1px solid #e2e8f0; padding-top: 15px; }
+            @page {
+              size: A4 portrait;
+              margin: 12mm;
+            }
+            * { box-sizing: border-box; }
+            body {
+              font-family: system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+              color: #0f172a;
+              font-size: 11px;
+              line-height: 1.4;
+              margin: 0;
+              padding: 10px;
+              background: #ffffff;
+            }
+            .header { display: flex; justify-content: space-between; align-items: flex-start; border-bottom: 2px solid #0284c7; padding-bottom: 12px; margin-bottom: 15px; }
+            .logo { font-size: 22px; font-weight: 900; color: #0f172a; }
+            .logo-sub { font-size: 10px; color: #64748b; }
+            .badge { background: #0284c7; color: #ffffff; padding: 4px 10px; border-radius: 4px; font-weight: 800; font-size: 11px; text-transform: uppercase; }
+            .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 12px; }
+            .box { background: #ffffff; border: 1px solid #cbd5e1; padding: 12px; border-radius: 6px; }
+            .title { font-size: 9px; text-transform: uppercase; color: #0284c7; font-weight: 800; margin-bottom: 4px; border-bottom: 1px solid #e2e8f0; padding-bottom: 2px; }
+            .val { font-size: 12px; font-weight: 600; color: #0f172a; }
+            table { width: 100%; border-collapse: collapse; margin-top: 8px; }
+            th { text-align: left; background: #f1f5f9; padding: 6px 8px; font-size: 10px; font-weight: 700; color: #475569; text-transform: uppercase; border-bottom: 1px solid #cbd5e1; }
+            td { padding: 6px 8px; border-bottom: 1px solid #e2e8f0; font-size: 11px; }
+            .total { font-size: 14px; font-weight: 900; color: #0284c7; text-align: right; margin-top: 10px; }
+            .footer { margin-top: 25px; text-align: center; font-size: 9px; color: #94a3b8; border-top: 1px solid #e2e8f0; padding-top: 10px; }
+            @media print { body { padding: 0; } }
           </style>
         </head>
         <body>
           <div class="header">
             <div>
-              <div class="logo">RepairIT</div>
-              <div style="font-size: 12px; color: #64748b;">Comprobante de Servicio Técnico</div>
+              <div class="logo">Repair<span style="color: #0284c7;">IT</span></div>
+              <div class="logo-sub">Comprobante Oficial de Servicio Técnico</div>
+              <div style="font-size: 10px; color: #334155; margin-top: 2px;">${venueName} &bull; ${venueAddress}</div>
             </div>
-            <div>
+            <div style="text-align: right;">
               <span class="badge">${(order.status || "INGRESADO").replace("_", " ")}</span>
-              <div style="font-size: 14px; font-weight: bold; text-align: right; margin-top: 5px;">#${order.trackingCode}</div>
+              <div style="font-size: 15px; font-weight: 900; font-family: monospace; color: #0284c7; margin-top: 4px;">#${order.trackingCode}</div>
+              <div style="font-size: 9px; color: #64748b;">Fecha: ${order.date || new Date().toLocaleDateString("es-AR")}</div>
             </div>
           </div>
 
-          <div class="grid">
+          <div class="grid-2">
             <div class="box">
               <div class="title">Datos del Cliente</div>
               <div class="val">${clientName}</div>
+              <div style="font-size: 10px; color: #64748b; margin-top: 2px;">DNI: ${order.clientId?.dni || "N/A"}</div>
             </div>
-            <div class="box">
-              <div class="title">Sucursal de Atención</div>
-              <div class="val">${venueName}</div>
-              <div style="font-size: 12px; color: #64748b;">${venueAddress}</div>
+            <div class="box" style="display: flex; align-items: center; gap: 10px; background: #f8fafc;">
+              <img 
+                src="https://api.qrserver.com/v1/create-qr-code/?size=100x100&margin=0&data=${encodeURIComponent(trackingUrl)}" 
+                alt="QR Seguimiento" 
+                style="width: 60px; height: 60px; border: 1px solid #cbd5e1; border-radius: 4px; padding: 2px; background: #fff;"
+              />
+              <div>
+                <div style="font-size: 10px; font-weight: 700; color: #0284c7;">Seguimiento Online en Vivo</div>
+                <div style="font-size: 9px; color: #475569;">Escaneá para consultar avances en tiempo real.</div>
+              </div>
             </div>
           </div>
 
-          <div class="box" style="margin-bottom: 20px;">
-            <div class="title">Dispositivo & Falla Reportada</div>
-            <div class="val" style="margin-bottom: 5px;">${order.deviceType} - ${order.deviceModel}</div>
-            <div style="font-size: 13px; color: #334155;"><strong>Falla:</strong> ${order.issue || "Sin especificar"}</div>
-            ${order.diagnosis ? `<div style="font-size: 13px; color: #334155; margin-top: 5px;"><strong>Diagnóstico Técnico:</strong> ${order.diagnosis}</div>` : ""}
+          <div class="box" style="margin-bottom: 12px;">
+            <div class="title">Dispositivo & Falla Declarada</div>
+            <div class="val" style="margin-bottom: 4px;">${order.deviceType} - ${order.deviceModel}</div>
+            <div style="font-size: 11px; color: #334155;"><strong>Falla reportada:</strong> ${order.issue || "Sin especificar"}</div>
+            ${order.diagnosis ? `<div style="font-size: 11px; color: #0f172a; margin-top: 6px; padding-top: 6px; border-top: 1px dashed #e2e8f0;"><strong>Diagnóstico del Taller:</strong> ${order.diagnosis}</div>` : ""}
           </div>
 
           ${order.budget?.items?.length ? `
-            <div class="title">Presupuesto Detallado</div>
-            <table>
-              <thead>
-                <tr>
-                  <th>Concepto / Repuesto</th>
-                  <th style="text-align: right;">Precio</th>
-                </tr>
-              </thead>
-              <tbody>
-                ${order.budget.items.map(item => `
+            <div class="box" style="margin-bottom: 12px;">
+              <div class="title">Presupuesto Detallado</div>
+              <table>
+                <thead>
                   <tr>
-                    <td>${item.desc}</td>
-                    <td style="text-align: right;">$${Number(item.price).toLocaleString("es-AR")}</td>
+                    <th>Concepto / Repuesto</th>
+                    <th style="text-align: right; width: 120px;">Precio</th>
                   </tr>
-                `).join("")}
-              </tbody>
-            </table>
-            <div class="total">Total: $${budgetTotal.toLocaleString("es-AR")}</div>
+                </thead>
+                <tbody>
+                  ${order.budget.items.map(item => `
+                    <tr>
+                      <td>${item.desc}</td>
+                      <td style="text-align: right; font-weight: 600;">$${Number(item.price).toLocaleString("es-AR", { minimumFractionDigits: 2 })}</td>
+                    </tr>
+                  `).join("")}
+                </tbody>
+              </table>
+              <div class="total">Total Presupuestado: $${budgetTotal.toLocaleString("es-AR", { minimumFractionDigits: 2 })}</div>
+            </div>
           ` : ""}
 
           <div class="footer">
-            Documento generado digitalmente por RepairIT Cloud • https://tracking.repairit.cloud/seguimiento/${order.trackingCode}
+            Documento emitido electrónicamente por RepairIT Cloud &bull; ${trackingUrl}
           </div>
           <script>
             window.onload = function() { window.print(); };

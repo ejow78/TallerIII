@@ -276,35 +276,82 @@ export default function InventoryPage() {
     }
   };
 
-  // 📤 EXPORTAR A CSV
-  const handleExportCSV = () => {
+  // 📤 EXPORTAR A EXCEL (.xlsx nativo)
+  const handleExportToExcel = async () => {
     if (items.length === 0) {
       toast.error("No hay insumos para exportar.");
       return;
     }
 
-    const headers = ["Codigo", "Nombre", "Categoria", "Descripcion", "Stock", "StockMinimo", "PrecioVenta"];
-    const rows = items.map(item => [
-      item.code,
-      item.name,
-      item.category || "Insumos",
-      item.description || "",
-      item.quantity || 0,
-      item.min_quantity || item.minQuantity || 0,
-      item.price || 0
-    ]);
+    try {
+      toast.info("Generando archivo Excel de inventario...");
+      const { default: writeXlsxFile } = await import("write-excel-file/browser");
 
-    const csvContent = "data:text/csv;charset=utf-8,\uFEFF" 
-      + [headers.join(","), ...rows.map(e => e.map(val => `"${String(val).replace(/"/g, '""')}"`).join(","))].join("\n");
-    
-    const encodedUri = encodeURI(csvContent);
-    const link = document.createElement("a");
-    link.setAttribute("href", encodedUri);
-    link.setAttribute("download", `inventario_${new Date().toISOString().split('T')[0]}.csv`);
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-    toast.success("Inventario exportado como CSV.");
+      const columns = [
+        {
+          header: { value: "Código / SKU", fontWeight: "bold", backgroundColor: "#0284c7", color: "#ffffff", align: "center" },
+          cell: item => ({ type: String, value: String(item.code || "S/C"), align: "center" }),
+          width: 18
+        },
+        {
+          header: { value: "Insumo / Producto", fontWeight: "bold", backgroundColor: "#0284c7", color: "#ffffff" },
+          cell: item => ({ type: String, value: item.name || "Sin nombre", fontWeight: "bold" }),
+          width: 32
+        },
+        {
+          header: { value: "Categoría", fontWeight: "bold", backgroundColor: "#0284c7", color: "#ffffff" },
+          cell: item => ({ type: String, value: item.category || "General" }),
+          width: 20
+        },
+        {
+          header: { value: "Descripción", fontWeight: "bold", backgroundColor: "#0284c7", color: "#ffffff" },
+          cell: item => ({ type: String, value: item.description || "-" }),
+          width: 35
+        },
+        {
+          header: { value: "Stock Actual", fontWeight: "bold", backgroundColor: "#0284c7", color: "#ffffff", align: "center" },
+          cell: item => ({ type: Number, value: Number(item.quantity) || 0, align: "center" }),
+          width: 14
+        },
+        {
+          header: { value: "Stock Mínimo", fontWeight: "bold", backgroundColor: "#0284c7", color: "#ffffff", align: "center" },
+          cell: item => ({ type: Number, value: Number(item.min_quantity || item.minQuantity) || 0, align: "center" }),
+          width: 14
+        },
+        {
+          header: { value: "Estado Stock", fontWeight: "bold", backgroundColor: "#0284c7", color: "#ffffff", align: "center" },
+          cell: item => {
+            const qty = Number(item.quantity) || 0;
+            const minQty = Number(item.min_quantity || item.minQuantity) || 0;
+            const isLow = qty <= minQty;
+            return {
+              type: String,
+              value: isLow ? "CRÍTICO / BAJO" : "ÓPTIMO",
+              align: "center",
+              fontWeight: "bold",
+              color: isLow ? "#dc2626" : "#16a34a"
+            };
+          },
+          width: 18
+        },
+        {
+          header: { value: "Precio Venta", fontWeight: "bold", backgroundColor: "#0284c7", color: "#ffffff", align: "right" },
+          cell: item => ({
+            type: Number,
+            value: Number(item.price) || 0,
+            format: "$#,##0.00",
+            align: "right"
+          }),
+          width: 18
+        }
+      ];
+
+      await writeXlsxFile(items, { columns }).toFile(`Inventario_${new Date().toISOString().split("T")[0]}.xlsx`);
+      toast.success("Catálogo de inventario exportado a Excel (.xlsx).");
+    } catch (err) {
+      console.error("Error al generar Excel de inventario:", err);
+      toast.error("Error al exportar inventario a Excel.");
+    }
   };
 
   // 📥 IMPORTAR DESDE CSV
@@ -534,12 +581,12 @@ export default function InventoryPage() {
               </Button>
               <Button
                 variant="outline"
-                onClick={handleExportCSV}
+                onClick={handleExportToExcel}
                 className="h-9 border-border/80 text-xs font-semibold flex items-center gap-1.5 cursor-pointer w-full sm:w-auto"
-                title="Exportar catálogo a CSV"
+                title="Exportar catálogo a Excel (.xlsx)"
               >
                 <Download className="w-3.5 h-3.5" />
-                Exportar
+                Exportar Excel
               </Button>
             </div>
           </div>
