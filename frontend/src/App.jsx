@@ -87,6 +87,14 @@ export default function App() {
           window.location.href = `https://app.repairit.cloud${pathname}`;
           return;
         }
+        if (hostname !== "tracking.repairit.cloud" && (pathname === "/consulta" || pathname === "/tracking" || pathname === "/seguimiento")) {
+          window.location.href = "https://tracking.repairit.cloud/consulta";
+          return;
+        }
+        if (hostname !== "tracking.repairit.cloud" && pathname.startsWith("/seguimiento/")) {
+          window.location.href = `https://tracking.repairit.cloud${pathname}`;
+          return;
+        }
         if (hostname === "tracking.repairit.cloud" && pathname === "/") {
           window.location.href = "/consulta";
           return;

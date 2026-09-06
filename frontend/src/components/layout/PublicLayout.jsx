@@ -70,8 +70,8 @@ export default function PublicLayout() {
               Contacto
             </a>
             <a
-              href={window.location.hostname.includes("repairit.cloud") ? "https://tracking.repairit.cloud" : "/consulta"}
-              onClick={handleNavClick(window.location.hostname.includes("repairit.cloud") ? "https://tracking.repairit.cloud" : "/consulta")}
+              href={window.location.hostname.includes("repairit.cloud") ? "https://tracking.repairit.cloud/consulta" : "/consulta"}
+              onClick={handleNavClick(window.location.hostname.includes("repairit.cloud") ? "https://tracking.repairit.cloud/consulta" : "/consulta")}
               className="text-xs sm:text-sm font-semibold text-primary hover:text-primary/80 transition-colors flex items-center gap-1.5"
             >
               <Search className="w-3.5 h-3.5" />
