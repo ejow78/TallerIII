@@ -547,14 +547,22 @@ export const api = {
         };
       }
 
-      // Intentar primero función RPC segura de lectura pública
+      // 1. Invocar función RPC segura get_order_by_tracking
       try {
-        const { data: rpcData, error: rpcErr } = await supabase.rpc("get_public_order_tracking", { p_code: cleanCode });
+        const { data: rpcData, error: rpcErr } = await supabase.rpc("get_order_by_tracking", { p_tracking_code: cleanCode });
         if (!rpcErr && rpcData) {
-          return mapOrder(rpcData);
+          return {
+            ...rpcData,
+            _id: rpcData.id,
+            trackingCode: rpcData.tracking_code,
+            deviceType: rpcData.device_type,
+            deviceModel: rpcData.device_model,
+            clientId: rpcData.client,
+            venueId: rpcData.venue,
+          };
         }
       } catch (e) {
-        console.warn("RPC get_public_order_tracking no disponible, intentando consulta directa:", e);
+        console.warn("RPC get_order_by_tracking error:", e);
       }
 
       // Consulta directa de respaldo
@@ -570,9 +578,9 @@ export const api = {
       return mapOrder(data);
     },
 
-    approveBudget: async (code) => {
-      const cleanCode = (code || "").trim().toLowerCase();
-      if (cleanCode === "demo-id" || cleanCode === "demo") {
+    approveBudget: async (code, dni = null) => {
+      const cleanCode = (code || "").trim();
+      if (cleanCode.toLowerCase() === "demo-id" || cleanCode.toLowerCase() === "demo") {
         return {
           id: "demo-id-12345",
           _id: "demo-id-12345",
@@ -609,47 +617,18 @@ export const api = {
         };
       }
 
-      // Intentar primero función RPC segura de aprobación pública
-      try {
-        const { data: rpcData, error: rpcErr } = await supabase.rpc("approve_order_budget", { p_code: cleanCode });
-        if (!rpcErr && rpcData) {
-          return mapOrder(rpcData);
-        }
-      } catch (e) {
-        console.warn("RPC approve_order_budget no disponible, intentando update directo:", e);
+      // 1. Invocar función RPC segura approve_order_budget con validación de DNI
+      const { data: rpcData, error: rpcErr } = await supabase.rpc("approve_order_budget", {
+        p_tracking_code: cleanCode,
+        p_client_dni: dni ? dni.toString().trim() : null
+      });
+
+      if (rpcErr) throw new Error(rpcErr.message);
+      if (rpcData && !rpcData.success) {
+        throw new Error(rpcData.error || "No se pudo aprobar el presupuesto.");
       }
 
-      // Update directo de respaldo
-      const { data: order, error: readErr } = await supabase
-        .from("orders")
-        .select("id, budget, history")
-        .ilike("tracking_code", cleanCode)
-        .maybeSingle();
-
-      if (readErr || !order) throw new Error("No se encontró la orden de servicio.");
-
-      const budget = order.budget || {};
-      budget.approved = true;
-      budget.dateApproved = new Date().toLocaleDateString("es-AR");
-
-      const history = Array.isArray(order?.history) ? order.history : [];
-      const dateStr = new Date().toLocaleDateString("es-AR") + " " + new Date().toLocaleTimeString("es-AR", { hour: "2-digit", minute: "2-digit" });
-      
-      history.push({ date: dateStr, text: "Presupuesto aprobado online por el cliente." });
-
-      const { data, error } = await supabase
-        .from("orders")
-        .update({
-          status: "en_reparacion",
-          budget,
-          history,
-        })
-        .eq("id", order.id)
-        .select()
-        .maybeSingle();
-
-      if (error) throw new Error(error.message);
-      return mapOrder(data);
+      return rpcData;
     },
   },
 

@@ -19,6 +19,7 @@ import {
 } from "@/components/ui/alert-dialog";
 import { toast } from "sonner";
 import { api } from "@/services/api";
+import { Input } from "@/components/ui/input";
 import { 
   ArrowLeft, 
   CheckCircle2, 
@@ -45,6 +46,9 @@ export default function TrackingPage() {
   const { id } = useParams();
   const [loading, setLoading] = useState(true);
   const [order, setOrder] = useState(null);
+  const [dniInput, setDniInput] = useState("");
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [approving, setApproving] = useState(false);
 
   const loadOrder = async () => {
     try {
@@ -165,24 +169,34 @@ export default function TrackingPage() {
     printWindow.document.close();
   };
 
-  // Aprobación online del presupuesto
-  const handleApproveBudget = async () => {
+  // Aprobación online del presupuesto con validación de DNI
+  const handleApproveBudget = async (e) => {
+    if (e && e.preventDefault) e.preventDefault();
     if (!order) return;
 
+    const hasClientDni = !!(order.clientId?.dni || order.client?.dni);
+    if (hasClientDni && !dniInput.trim()) {
+      toast.error("Validación requerida", {
+        description: "Por favor, ingresá tu número de DNI para confirmar la aprobación."
+      });
+      return;
+    }
+
     try {
-      const updated = await api.orders.approveBudget(order.trackingCode);
+      setApproving(true);
+      await api.orders.approveBudget(order.trackingCode, dniInput.trim());
       toast.success("¡Presupuesto Aprobado!", {
-        description: "El taller técnico iniciará las tareas de reparación."
+        description: "El taller técnico ha sido notificado y comenzará las tareas de reparación."
       });
-      if (updated) {
-        setOrder(updated);
-      } else {
-        loadOrder();
-      }
+      setIsDialogOpen(false);
+      setDniInput("");
+      loadOrder();
     } catch (error) {
-      toast.error("Error al aprobar presupuesto", {
-        description: error.message || "Por favor, intente nuevamente."
+      toast.error("No se pudo aprobar el presupuesto", {
+        description: error.message || "Verificá que el DNI ingresado sea el correcto."
       });
+    } finally {
+      setApproving(false);
     }
   };
 
@@ -367,26 +381,51 @@ export default function TrackingPage() {
                       <span>Presupuesto Aprobado</span>
                     </div>
                   ) : (
-                    <AlertDialog>
+                    <AlertDialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
                       <AlertDialogTrigger asChild>
                         <Button className="w-full bg-primary hover:bg-primary/95 text-primary-foreground font-bold text-xs py-2.5 rounded-xl shadow-md cursor-pointer mt-1">
                           Aprobar Presupuesto
                         </Button>
                       </AlertDialogTrigger>
-                      <AlertDialogContent className="bg-card border-border shadow-2xl">
+                      <AlertDialogContent className="bg-card border-border shadow-2xl max-w-md">
                         <AlertDialogHeader>
-                          <AlertDialogTitle className="font-outfit text-base font-bold text-foreground">
-                            ¿Aprobar Presupuesto de Reparación?
+                          <AlertDialogTitle className="font-outfit text-base font-bold text-foreground flex items-center gap-2">
+                            <ShieldCheck className="w-5 h-5 text-primary" />
+                            Aprobación de Presupuesto
                           </AlertDialogTitle>
-                          <AlertDialogDescription className="text-muted-foreground text-xs font-light">
-                            Autorizas la realización del servicio por un total de <strong className="text-foreground font-bold">${order.budget.items.reduce((s, i) => s + i.price, 0).toLocaleString("es-AR")}</strong>.
+                          <AlertDialogDescription className="text-muted-foreground text-xs font-light space-y-1">
+                            <span>Autorizas la realización del servicio por un total de <strong className="text-foreground font-bold">${order.budget.items.reduce((s, i) => s + i.price, 0).toLocaleString("es-AR")}</strong>.</span>
                           </AlertDialogDescription>
                         </AlertDialogHeader>
+
+                        <div className="space-y-2 py-2 border-y border-border/40 my-2">
+                          <label className="text-xs font-semibold text-foreground block">
+                            Confirmación de identidad (DNI del titular):
+                          </label>
+                          <Input
+                            type="text"
+                            placeholder="Ingresá tu DNI sin puntos..."
+                            value={dniInput}
+                            onChange={(e) => setDniInput(e.target.value)}
+                            onKeyDown={(e) => { if (e.key === "Enter") handleApproveBudget(); }}
+                            className="bg-background/80 border-border text-xs h-9 font-mono"
+                          />
+                          <p className="text-[11px] text-muted-foreground font-light">
+                            Por seguridad, ingresá el número de DNI registrado en la orden para autorizar la reparación.
+                          </p>
+                        </div>
+
                         <AlertDialogFooter>
-                          <AlertDialogCancel className="bg-background border-border text-foreground text-xs font-bold rounded-lg">Cancelar</AlertDialogCancel>
-                          <AlertDialogAction onClick={handleApproveBudget} className="bg-primary hover:bg-primary/90 text-primary-foreground text-xs font-bold rounded-lg">
-                            Confirmar Aprobación
-                          </AlertDialogAction>
+                          <AlertDialogCancel disabled={approving} className="bg-background border-border text-foreground text-xs font-bold rounded-lg cursor-pointer">
+                            Cancelar
+                          </AlertDialogCancel>
+                          <Button
+                            onClick={handleApproveBudget}
+                            disabled={approving}
+                            className="bg-primary hover:bg-primary/90 text-primary-foreground text-xs font-bold rounded-lg cursor-pointer"
+                          >
+                            {approving ? "Verificando..." : "Confirmar Aprobación"}
+                          </Button>
                         </AlertDialogFooter>
                       </AlertDialogContent>
                     </AlertDialog>
