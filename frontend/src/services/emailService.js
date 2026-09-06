@@ -174,7 +174,7 @@ export async function sendOrderReadyEmail({
  */
 export async function sendContactEmail({ name, email, message }) {
   if (!name || !email || !message) {
-    return false;
+    return { ok: false, error: "Por favor complete todos los campos obligatorios." };
   }
 
   try {
@@ -186,13 +186,17 @@ export async function sendContactEmail({ name, email, message }) {
 
     if (error) {
       console.error("[emailService] Error al llamar a RPC send_contact_email:", error);
-      return false;
+      return { ok: false, error: error.message || "Error al procesar la solicitud en el servidor." };
     }
 
-    return data?.success === true;
+    if (data && data.success === false) {
+      return { ok: false, error: data.error || "No se pudo enviar el mensaje." };
+    }
+
+    return { ok: true };
   } catch (err) {
     console.error("[emailService] Error al enviar mensaje de contacto:", err);
-    return false;
+    return { ok: false, error: "Error de conexión al enviar el mensaje." };
   }
 }
 

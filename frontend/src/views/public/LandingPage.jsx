@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
+import { Turnstile } from "@marsidev/react-turnstile";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -88,12 +89,16 @@ export default function LandingPage() {
     }
   };
 
-  // Estado del formulario de contacto
+  // Estado del formulario de contacto y anti-spam
   const [contactName, setContactName] = useState("");
   const [contactEmail, setContactEmail] = useState("");
   const [contactMessage, setContactMessage] = useState("");
   const [acceptTerms, setAcceptTerms] = useState(false);
   const [isSendingContact, setIsSendingContact] = useState(false);
+  const [honeypot, setHoneypot] = useState("");
+  const [turnstileToken, setTurnstileToken] = useState("");
+  const turnstileRef = useRef(null);
+  const siteKey = import.meta.env.VITE_TURNSTILE_SITE_KEY || "0x4AAAAAAEjQ5UUbknAkvYB3";
 
   const handleSearch = (e) => {
     e.preventDefault();
@@ -117,6 +122,19 @@ export default function LandingPage() {
 
   const handleContactSubmit = async (e) => {
     e.preventDefault();
+
+    // 1. Trampa Honeypot para bots automáticos
+    if (honeypot.trim()) {
+      // Simular éxito para despistar al bot sin enviar nada
+      toast.success("¡Mensaje enviado con éxito!", {
+        description: "Gracias por contactarte.",
+      });
+      setContactName("");
+      setContactEmail("");
+      setContactMessage("");
+      return;
+    }
+
     if (!acceptTerms) {
       toast.error("Debe aceptar los términos de privacidad.");
       return;
@@ -126,16 +144,21 @@ export default function LandingPage() {
       return;
     }
 
+    if (siteKey && !turnstileToken) {
+      toast.error("Por favor complete la verificación de seguridad anti-robot.");
+      return;
+    }
+
     setIsSendingContact(true);
     try {
       const { sendContactEmail } = await import("@/services/emailService");
-      const ok = await sendContactEmail({
+      const res = await sendContactEmail({
         name: contactName.trim(),
         email: contactEmail.trim(),
         message: contactMessage.trim(),
       });
 
-      if (ok) {
+      if (res?.ok) {
         toast.success("¡Mensaje enviado con éxito!", {
           description: `Gracias por contactarte, ${contactName}. Te responderemos a la brevedad.`,
         });
@@ -143,12 +166,18 @@ export default function LandingPage() {
         setContactEmail("");
         setContactMessage("");
         setAcceptTerms(false);
+        setTurnstileToken("");
+        turnstileRef.current?.reset();
       } else {
-        toast.error("No se pudo enviar el mensaje. Podés escribirnos directo a contacto@repairit.cloud");
+        toast.error(res?.error || "No se pudo enviar el mensaje. Podés escribirnos directo a contacto@repairit.cloud");
+        setTurnstileToken("");
+        turnstileRef.current?.reset();
       }
     } catch (err) {
       console.error(err);
-      toast.error("Error al enviar mensaje.");
+      toast.error("Error al enviar el mensaje.");
+      setTurnstileToken("");
+      turnstileRef.current?.reset();
     } finally {
       setIsSendingContact(false);
     }
@@ -633,6 +662,36 @@ export default function LandingPage() {
                   </label>
                 </div>
               </div>
+
+              {/* Campo Honeypot invisible para humanos, trampa para bots */}
+              <div className="hidden" aria-hidden="true" style={{ display: "none" }}>
+                <label htmlFor="company_fax">Empresa o Fax</label>
+                <input
+                  id="company_fax"
+                  type="text"
+                  tabIndex={-1}
+                  autoComplete="off"
+                  value={honeypot}
+                  onChange={(e) => setHoneypot(e.target.value)}
+                />
+              </div>
+
+              {/* Cloudflare Turnstile Anti-Bot */}
+              {siteKey && (
+                <div className="flex justify-center pt-2 overflow-hidden">
+                  <Turnstile
+                    ref={turnstileRef}
+                    siteKey={siteKey}
+                    onSuccess={(token) => setTurnstileToken(token)}
+                    onError={() => setTurnstileToken("")}
+                    onExpire={() => setTurnstileToken("")}
+                    options={{
+                      theme: "dark",
+                      size: "flexible",
+                    }}
+                  />
+                </div>
+              )}
 
               <Button
                 type="submit"
