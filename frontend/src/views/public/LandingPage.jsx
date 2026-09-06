@@ -32,7 +32,7 @@ export default function LandingPage() {
   const [activePlanIndex, setActivePlanIndex] = useState(1); // 0: Inicial, 1: Pro, 2: Multi-Sucursal
 
   useEffect(() => {
-    document.title = "RepairIT";
+    document.title = "RepairIT | Software de Servicio Técnico y Gestión para Talleres";
     const handleResize = () => {
       setIsMobile(window.innerWidth < 640);
     };
@@ -564,6 +564,24 @@ export default function LandingPage() {
                 </AccordionTrigger>
                 <AccordionContent className="text-muted-foreground text-sm font-light pb-4 leading-relaxed">
                   Sí. Nuestro plan Multi-Sucursal permite gestionar múltiples sucursales con inventarios, cajas y técnicos independientes, supervisados centralmente desde un panel de administración unificado.
+                </AccordionContent>
+              </AccordionItem>
+
+              <AccordionItem value="item-7" className="border border-border/60 bg-card/45 rounded-lg px-4 hover:border-border transition-colors">
+                <AccordionTrigger className="text-base text-foreground font-semibold py-4 hover:no-underline font-outfit text-left">
+                  ¿Qué rubros de servicio técnico pueden utilizar RepairIT?
+                </AccordionTrigger>
+                <AccordionContent className="text-muted-foreground text-sm font-light pb-4 leading-relaxed">
+                  RepairIT está adaptado para talleres de reparación de celulares y smartphones, servicio técnico de notebooks y computadoras, consolas de videojuegos, electrodomésticos, audio, televisión y mecánica general. La gestión de estados y presupuestos es completamente flexible.
+                </AccordionContent>
+              </AccordionItem>
+
+              <AccordionItem value="item-8" className="border border-border/60 bg-card/45 rounded-lg px-4 hover:border-border transition-colors">
+                <AccordionTrigger className="text-base text-foreground font-semibold py-4 hover:no-underline font-outfit text-left">
+                  ¿Cómo se imprimen los comprobantes de recepción de equipos?
+                </AccordionTrigger>
+                <AccordionContent className="text-muted-foreground text-sm font-light pb-4 leading-relaxed">
+                  El sistema genera automáticamente comprobantes digitales de recepción listos para imprimir en impresoras térmicas de tickets (80mm) o formato estándar A4. Cada comprobante incluye los datos del taller, falla declarada y el código QR de seguimiento online para el cliente.
                 </AccordionContent>
               </AccordionItem>
             </Accordion>
