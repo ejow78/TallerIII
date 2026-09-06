@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -28,6 +28,8 @@ export default function LandingPage() {
   const [trackingId, setTrackingId] = useState("");
   const navigate = useNavigate();
   const [isMobile, setIsMobile] = useState(false);
+  const pricingCarouselRef = useRef(null);
+  const [activePlanIndex, setActivePlanIndex] = useState(1); // 0: Inicial, 1: Pro, 2: Multi-Sucursal
 
   useEffect(() => {
     document.title = "RepairIT";
@@ -36,8 +38,55 @@ export default function LandingPage() {
     };
     handleResize();
     window.addEventListener("resize", handleResize);
-    return () => window.removeEventListener("resize", handleResize);
+
+    // Centrar automáticamente en el Plan Pro (centro) al cargar en móvil
+    const centerProCard = () => {
+      if (pricingCarouselRef.current && window.innerWidth < 768) {
+        const el = pricingCarouselRef.current;
+        const cards = el.querySelectorAll(".pricing-card");
+        if (cards[1]) {
+          cards[1].scrollIntoView({ behavior: "instant", inline: "center", block: "nearest" });
+          setActivePlanIndex(1);
+        }
+      }
+    };
+    const timer = setTimeout(centerProCard, 150);
+
+    return () => {
+      window.removeEventListener("resize", handleResize);
+      clearTimeout(timer);
+    };
   }, []);
+
+  const scrollToPlan = (index) => {
+    if (pricingCarouselRef.current) {
+      const el = pricingCarouselRef.current;
+      const cards = el.querySelectorAll(".pricing-card");
+      if (cards[index]) {
+        cards[index].scrollIntoView({ behavior: "smooth", inline: "center", block: "nearest" });
+        setActivePlanIndex(index);
+      }
+    }
+  };
+
+  const handlePricingScroll = () => {
+    if (pricingCarouselRef.current && window.innerWidth < 768) {
+      const el = pricingCarouselRef.current;
+      const cards = el.querySelectorAll(".pricing-card");
+      const center = el.scrollLeft + el.clientWidth / 2;
+      let closestIdx = 1;
+      let minDiff = Infinity;
+      cards.forEach((card, idx) => {
+        const cardCenter = card.offsetLeft + card.clientWidth / 2;
+        const diff = Math.abs(center - cardCenter);
+        if (diff < minDiff) {
+          minDiff = diff;
+          closestIdx = idx;
+        }
+      });
+      setActivePlanIndex(closestIdx);
+    }
+  };
 
   // Estado del formulario de contacto
   const [contactName, setContactName] = useState("");
@@ -281,10 +330,15 @@ export default function LandingPage() {
             </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 pt-4 items-stretch">
+          {/* Carrusel deslizable en móvil, Grid 3 columnas en desktop */}
+          <div
+            ref={pricingCarouselRef}
+            onScroll={handlePricingScroll}
+            className="flex md:grid md:grid-cols-3 gap-6 md:gap-8 pt-6 pb-2 items-stretch overflow-x-auto md:overflow-x-visible snap-x snap-mandatory scroll-smooth -mx-6 px-6 md:mx-0 md:px-0 [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden"
+          >
 
             {/* Tier 1: Inicial */}
-            <Card className="flex flex-col justify-between min-h-[480px] overflow-visible bg-card/45 border-border/60 hover:border-border transition-all duration-200 hover:-translate-y-1">
+            <Card className="pricing-card w-[84vw] max-w-[340px] shrink-0 snap-center md:w-auto md:max-w-none md:shrink flex flex-col justify-between min-h-[480px] overflow-visible bg-card/45 border-border/60 hover:border-border transition-all duration-200 hover:-translate-y-1">
               <CardHeader className="space-y-2">
                 <CardTitle className="font-outfit text-xl font-bold text-foreground">Plan Inicial</CardTitle>
                 <CardDescription className="text-xs text-muted-foreground font-light">Ideal para técnicos independientes que comienzan.</CardDescription>
@@ -322,7 +376,7 @@ export default function LandingPage() {
             </Card>
 
             {/* Tier 2: Taller Pro (Highlighted/Popular) */}
-            <Card className="flex flex-col justify-between min-h-[480px] overflow-visible bg-card/60 border-primary/50 hover:border-primary transition-all duration-200 hover:-translate-y-1 relative ring-1 ring-primary/20">
+            <Card className="pricing-card w-[84vw] max-w-[340px] shrink-0 snap-center md:w-auto md:max-w-none md:shrink flex flex-col justify-between min-h-[480px] overflow-visible bg-card/60 border-primary/50 hover:border-primary transition-all duration-200 hover:-translate-y-1 relative ring-1 ring-primary/20 shadow-lg shadow-primary/5">
               <div className="absolute -top-3 left-1/2 -translate-x-1/2 z-10">
                 <Badge className="bg-primary hover:bg-primary text-primary-foreground font-semibold text-[10px] uppercase tracking-wider px-2.5 py-0.5">
                   Más Popular
@@ -369,7 +423,7 @@ export default function LandingPage() {
             </Card>
 
             {/* Tier 3: Multi-Sucursal */}
-            <Card className="flex flex-col justify-between min-h-[480px] overflow-visible bg-card/45 border-border/60 hover:border-border transition-all duration-200 hover:-translate-y-1">
+            <Card className="pricing-card w-[84vw] max-w-[340px] shrink-0 snap-center md:w-auto md:max-w-none md:shrink flex flex-col justify-between min-h-[480px] overflow-visible bg-card/45 border-border/60 hover:border-border transition-all duration-200 hover:-translate-y-1">
               <CardHeader className="space-y-2">
                 <CardTitle className="font-outfit text-xl font-bold text-foreground">Multi-Sucursal</CardTitle>
                 <CardDescription className="text-xs text-muted-foreground font-light">Para redes de talleres o franquicias de soporte técnico.</CardDescription>
@@ -406,6 +460,26 @@ export default function LandingPage() {
               </CardFooter>
             </Card>
 
+          </div>
+
+          {/* Indicadores de carrusel interactivos para móvil */}
+          <div className="flex md:hidden items-center justify-center gap-2 pt-2">
+            {[
+              { label: "Plan Inicial", idx: 0 },
+              { label: "Taller Pro", idx: 1 },
+              { label: "Multi-Sucursal", idx: 2 }
+            ].map(({ label, idx }) => (
+              <button
+                key={idx}
+                onClick={() => scrollToPlan(idx)}
+                className={`transition-all duration-300 rounded-full cursor-pointer h-2 ${
+                  activePlanIndex === idx
+                    ? "w-8 bg-primary"
+                    : "w-2 bg-muted-foreground/30 hover:bg-muted-foreground/60"
+                }`}
+                aria-label={`Ver ${label}`}
+              />
+            ))}
           </div>
 
         </div>
