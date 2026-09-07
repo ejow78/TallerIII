@@ -1,8 +1,9 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" fill="none">
-  <!-- Letras RIT sin fondo -->
-  <g font-family="system-ui, -apple-system, BlinkMacSystemFont, 'Outfit', 'Segoe UI', Roboto, sans-serif" font-weight="900" font-size="240" letter-spacing="-8">
-    <text x="50%" y="54%" dominant-baseline="middle" text-anchor="middle">
-      <tspan fill="#f8fafc">R</tspan><tspan fill="#4ca5ff">IT</tspan>
-    </text>
-  </g>
+<svg version="1.2" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+	<style>
+		.s0 { fill: #ffffff } 
+		.s1 { fill: #38bdf8 } 
+	</style>
+	<rect width="512" height="512" fill="#09090b"/>
+	<path id="RIT" class="s0" aria-label="RIT"  d="m181 266.4h-25.6v-20.7h21.6q7.4 0 11.1-3 3.9-3 3.9-7.9 0-5-3.9-8-3.7-3-11.1-3h-21.6v-21.6h27.4q13.2 0 23.2 4.1 10 4 15.7 11.2 5.7 7.2 5.7 16.8 0 9.6-5.9 16.8-5.7 7.2-16.1 11.3-10.3 4-24.4 4zm-18.8 42.6h-35.7v-106.8h35.7zm73.4 0h-40.5l-34.7-45.6 32.2-5.8z"/>
+	<path id="RIT" class="s1" aria-label="RIT"  d="m274.8 309h-30v-106.8h30zm-3.9 0h-30v-106.8h30zm81.4 0h-30v-106.8h30zm32.1-81.3h-94v-25.5h94zm-36 81.3h-30v-106.8h30zm32.1-81.3h-94.1v-25.5h94.1z"/>
 </svg>

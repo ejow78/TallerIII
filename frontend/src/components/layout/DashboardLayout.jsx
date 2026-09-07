@@ -248,11 +248,11 @@ export default function DashboardLayout() {
           <SidebarHeader className="p-6 border-b border-border/30">
             {/* Logo de la Empresa */}
             <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <span className="font-outfit text-xl font-black tracking-tight text-foreground">
+              <NavLink to="/dashboard" className="flex items-center gap-2 hover:opacity-90 transition-opacity">
+                <span className="font-outfit text-2xl font-black tracking-tight text-foreground">
                   Repair<span className="text-primary">IT</span>
                 </span>
-              </div>
+              </NavLink>
             </div>
           </SidebarHeader>
 
