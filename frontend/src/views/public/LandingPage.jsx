@@ -32,7 +32,7 @@ export default function LandingPage() {
   const [activePlanIndex, setActivePlanIndex] = useState(1); // 0: Inicial, 1: Pro, 2: Multi-Sucursal
 
   useEffect(() => {
-    document.title = "RepairIT";
+    document.title = "RepairIT | Software de Servicio Técnico y Gestión para Talleres";
     const handleResize = () => {
       setIsMobile(window.innerWidth < 640);
     };
