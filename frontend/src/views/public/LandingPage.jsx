@@ -1,5 +1,4 @@
 import { useState, useEffect, useRef } from "react";
-import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -16,7 +15,6 @@ import {
   Building2, 
   BarChart3, 
   Wrench, 
-  Search, 
   Check,
   CheckCircle2, 
   ShieldCheck, 
@@ -25,8 +23,6 @@ import {
 } from "lucide-react";
 
 export default function LandingPage() {
-  const [trackingId, setTrackingId] = useState("");
-  const navigate = useNavigate();
   const [isMobile, setIsMobile] = useState(false);
   const pricingCarouselRef = useRef(null);
   const [activePlanIndex, setActivePlanIndex] = useState(1); // 0: Inicial, 1: Pro, 2: Multi-Sucursal
@@ -106,26 +102,6 @@ export default function LandingPage() {
   const [isSendingContact, setIsSendingContact] = useState(false);
   const [honeypot, setHoneypot] = useState("");
 
-  const handleSearch = (e) => {
-    e.preventDefault();
-    if (trackingId.trim()) {
-      if (window.location.hostname.includes("repairit.cloud")) {
-        window.location.href = `https://tracking.repairit.cloud/seguimiento/${trackingId.trim()}`;
-      } else {
-        navigate(`/seguimiento/${trackingId.trim()}`);
-      }
-    }
-  };
-
-  const handleDemoClick = () => {
-    setTrackingId("demo-id");
-    if (window.location.hostname.includes("repairit.cloud")) {
-      window.location.href = "https://tracking.repairit.cloud/seguimiento/demo-id";
-    } else {
-      navigate("/seguimiento/demo-id");
-    }
-  };
-
   const handleContactSubmit = async (e) => {
     e.preventDefault();
 
@@ -199,34 +175,6 @@ export default function LandingPage() {
           <p className="text-muted-foreground text-base md:text-lg max-w-xl mx-auto font-light leading-relaxed">
             Controlá órdenes de servicio, repuestos e ingresos en tiempo real. Brindá seguimiento público a tus clientes y aprobá presupuestos sin fricción.
           </p>
-
-          {/* Buscador de NanoID (CTA) - Optimizado para móviles */}
-          <form
-            onSubmit={handleSearch}
-            className="max-w-md mx-auto flex flex-row gap-2 bg-card/60 p-2 rounded-xl border border-border/80 shadow-2xl backdrop-blur w-full"
-          >
-            <Input
-              type="text"
-              placeholder={isMobile ? "Código (ej. RT-2026)" : "Código de seguimiento (ej. RT-2026)"}
-              value={trackingId}
-              onChange={(e) => setTrackingId(e.target.value)}
-              className="flex-grow bg-transparent border-0 border-none px-2 sm:px-4 py-3 text-sm text-foreground placeholder-muted-foreground focus-visible:ring-0 focus-visible:ring-offset-0 min-w-0"
-              required
-            />
-            <Button
-              type="submit"
-              className="bg-primary hover:bg-primary/90 text-primary-foreground font-bold px-4 sm:px-6 py-3 cursor-pointer select-none shrink-0"
-            >
-              <span className="hidden sm:inline">Consultar Estado</span>
-              <span className="sm:hidden">Consultar</span>
-            </Button>
-          </form>
-
-          {/* Ejemplo rápido para testing */}
-          <div className="text-xs text-muted-foreground font-medium">
-            ¿Querés probar? Ingresá <span onClick={handleDemoClick} className="text-primary hover:underline cursor-pointer font-bold">demo-id</span> para ver una reparación simulada.
-          </div>
-
         </div>
       </section>
 

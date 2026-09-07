@@ -119,6 +119,26 @@ export default function TrackingPortalPage() {
               </Button>
             </form>
 
+            {/* Ejemplo rápido para testing */}
+            <div className="text-center text-xs text-muted-foreground font-medium pt-1">
+              ¿Querés probar? Ingresá{" "}
+              <button
+                type="button"
+                onClick={() => {
+                  setTrackingCode("DEMO-ID");
+                  if (window.location.hostname.includes("repairit.cloud")) {
+                    window.location.href = "https://tracking.repairit.cloud/seguimiento/demo-id";
+                  } else {
+                    navigate("/seguimiento/demo-id");
+                  }
+                }}
+                className="text-primary hover:underline cursor-pointer font-bold inline bg-transparent p-0 border-0"
+              >
+                demo-id
+              </button>{" "}
+              para ver una reparación simulada.
+            </div>
+
             {/* Ayuda: ¿Dónde está el código? */}
             <div className="rounded-xl bg-card/40 border border-border/60 p-4 space-y-2.5 text-xs text-muted-foreground mt-4">
               <div className="flex items-center gap-2 font-semibold text-foreground">

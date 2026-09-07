@@ -1,9 +1,19 @@
-import { Link, Outlet } from "react-router-dom";
+import { Link, Outlet, useLocation } from "react-router-dom";
 import { Separator } from "@/components/ui/separator";
 import { Button } from "@/components/ui/button";
 import { Search } from "lucide-react";
 
 export default function PublicLayout() {
+  const location = useLocation();
+  const isAuthPage = [
+    "/login", 
+    "/register", 
+    "/registro", 
+    "/recuperar-password", 
+    "/olvide-password", 
+    "/reset-password"
+  ].some((path) => location.pathname.startsWith(path));
+
   const handleNavClick = (targetUrl) => (e) => {
     e.preventDefault();
     if (window.location.hostname.includes("repairit.cloud")) {
@@ -32,58 +42,60 @@ export default function PublicLayout() {
             </span>
           </a>
 
-          {/* Menú de Navegación de la Landing - Optimizado para Móviles */}
-          <nav className="flex items-center gap-4 sm:gap-6">
-            <a
-              href={window.location.hostname.includes("repairit.cloud") ? "https://repairit.cloud" : "/"}
-              onClick={handleNavClick("https://repairit.cloud")}
-              className="hidden md:block text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
-            >
-              Inicio
-            </a>
-            <a
-              href={window.location.hostname.includes("repairit.cloud") ? "https://repairit.cloud/#caracteristicas" : "/#caracteristicas"}
-              onClick={handleNavClick("https://repairit.cloud/#caracteristicas")}
-              className="hidden md:block text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
-            >
-              Servicios
-            </a>
-            <a
-              href={window.location.hostname.includes("repairit.cloud") ? "https://repairit.cloud/#precios" : "/#precios"}
-              onClick={handleNavClick("https://repairit.cloud/#precios")}
-              className="hidden md:block text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
-            >
-              Precios
-            </a>
-            <a
-              href={window.location.hostname.includes("repairit.cloud") ? "https://repairit.cloud/#faq" : "/#faq"}
-              onClick={handleNavClick("https://repairit.cloud/#faq")}
-              className="hidden md:block text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
-            >
-              Preguntas
-            </a>
-            <a
-              href={window.location.hostname.includes("repairit.cloud") ? "https://repairit.cloud/#contacto" : "/#contacto"}
-              onClick={handleNavClick("https://repairit.cloud/#contacto")}
-              className="hidden md:block text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
-            >
-              Contacto
-            </a>
-            <a
-              href={window.location.hostname.includes("repairit.cloud") ? "https://tracking.repairit.cloud/consulta" : "/consulta"}
-              onClick={handleNavClick(window.location.hostname.includes("repairit.cloud") ? "https://tracking.repairit.cloud/consulta" : "/consulta")}
-              className="text-xs sm:text-sm font-semibold text-primary hover:text-primary/80 transition-colors flex items-center gap-1.5"
-            >
-              <Search className="w-3.5 h-3.5" />
-              <span>Consultar Orden</span>
-            </a>
-            <Separator orientation="vertical" className="h-4 !self-center" />
-            <Button asChild size="sm" className="bg-primary hover:bg-primary/90 text-primary-foreground font-bold transition-all duration-200">
-              <a href={window.location.hostname.includes("repairit.cloud") ? "https://app.repairit.cloud/login" : "/login"}>
-                Ingresar
+          {/* Menú de Navegación de la Landing - Oculto en vistas de acceso/autenticación para mantener la interfaz limpia */}
+          {!isAuthPage && (
+            <nav className="flex items-center gap-4 sm:gap-6">
+              <a
+                href={window.location.hostname.includes("repairit.cloud") ? "https://repairit.cloud" : "/"}
+                onClick={handleNavClick("https://repairit.cloud")}
+                className="hidden md:block text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
+              >
+                Inicio
               </a>
-            </Button>
-          </nav>
+              <a
+                href={window.location.hostname.includes("repairit.cloud") ? "https://repairit.cloud/#caracteristicas" : "/#caracteristicas"}
+                onClick={handleNavClick("https://repairit.cloud/#caracteristicas")}
+                className="hidden md:block text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
+              >
+                Servicios
+              </a>
+              <a
+                href={window.location.hostname.includes("repairit.cloud") ? "https://repairit.cloud/#precios" : "/#precios"}
+                onClick={handleNavClick("https://repairit.cloud/#precios")}
+                className="hidden md:block text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
+              >
+                Precios
+              </a>
+              <a
+                href={window.location.hostname.includes("repairit.cloud") ? "https://repairit.cloud/#faq" : "/#faq"}
+                onClick={handleNavClick("https://repairit.cloud/#faq")}
+                className="hidden md:block text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
+              >
+                Preguntas
+              </a>
+              <a
+                href={window.location.hostname.includes("repairit.cloud") ? "https://repairit.cloud/#contacto" : "/#contacto"}
+                onClick={handleNavClick("https://repairit.cloud/#contacto")}
+                className="hidden md:block text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
+              >
+                Contacto
+              </a>
+              <a
+                href={window.location.hostname.includes("repairit.cloud") ? "https://tracking.repairit.cloud/consulta" : "/consulta"}
+                onClick={handleNavClick(window.location.hostname.includes("repairit.cloud") ? "https://tracking.repairit.cloud/consulta" : "/consulta")}
+                className="text-xs sm:text-sm font-semibold text-primary hover:text-primary/80 transition-colors flex items-center gap-1.5"
+              >
+                <Search className="w-3.5 h-3.5" />
+                <span>Consultar Orden</span>
+              </a>
+              <Separator orientation="vertical" className="h-4 !self-center" />
+              <Button asChild size="sm" className="bg-primary hover:bg-primary/90 text-primary-foreground font-bold transition-all duration-200">
+                <a href={window.location.hostname.includes("repairit.cloud") ? "https://app.repairit.cloud/login" : "/login"}>
+                  Ingresar
+                </a>
+              </Button>
+            </nav>
+          )}
 
         </div>
       </header>

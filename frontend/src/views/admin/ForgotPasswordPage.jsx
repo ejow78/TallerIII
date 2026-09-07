@@ -129,14 +129,14 @@ export default function ForgotPasswordPage() {
 
           {/* Cloudflare Turnstile */}
           {siteKey && (
-            <div className="flex justify-center pt-1 overflow-hidden">
+            <div className="flex justify-center py-2 overflow-hidden min-h-[65px]">
               <Turnstile
                 ref={turnstileRef}
                 siteKey={siteKey}
                 onSuccess={(token) => setCaptchaToken(token)}
                 options={{
                   theme: "dark",
-                  size: "flexible",
+                  size: "normal",
                 }}
               />
             </div>
