@@ -3,7 +3,6 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
-import { Checkbox } from "@/components/ui/checkbox";
 import { Card, CardHeader, CardTitle, CardContent, CardDescription, CardFooter } from "@/components/ui/card";
 import { Accordion, AccordionItem, AccordionTrigger, AccordionContent } from "@/components/ui/accordion";
 import { toast } from "sonner";
@@ -607,13 +606,17 @@ export default function LandingPage() {
                 />
               </div>
 
-              {/* Checkbox de Privacidad */}
+              {/* Checkbox de Privacidad Accesible (WCAG H44/H65) */}
               <div className="flex items-start space-x-3 pt-2">
-                <Checkbox
+                <input
+                  type="checkbox"
                   id="privacy"
+                  name="privacy"
                   checked={acceptTerms}
-                  onCheckedChange={(checked) => setAcceptTerms(checked)}
-                  className="mt-0.5 border-border focus-visible:ring-primary"
+                  onChange={(e) => setAcceptTerms(e.target.checked)}
+                  required
+                  aria-required="true"
+                  className="mt-0.5 h-4 w-4 shrink-0 rounded border border-border bg-input/30 text-primary accent-primary focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 cursor-pointer transition-colors"
                 />
                 <div className="grid gap-1.5 leading-none">
                   <label

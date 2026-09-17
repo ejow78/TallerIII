@@ -27,6 +27,14 @@ export default function PublicLayout() {
   return (
     <div className="min-h-screen bg-background text-foreground flex flex-col font-sans selection:bg-primary/30 selection:text-primary relative">
 
+      {/* Enlace accesible para saltar navegación repetida (WCAG 2.4.1) */}
+      <a
+        href="#main-content"
+        className="sr-only focus:not-sr-only focus:fixed focus:top-3 focus:left-3 focus:z-[100] focus:px-4 focus:py-2 focus:bg-primary focus:text-primary-foreground focus:rounded-md focus:shadow-lg focus:font-bold focus:outline-none"
+      >
+        Saltar al contenido principal
+      </a>
+
       {/* Navbar con Efecto de Desenfoque y Vidrio (Glassmorphism) */}
       <header className="sticky top-0 z-50 bg-card/60 backdrop-blur-md border-b border-border/80">
         <div className="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
@@ -101,7 +109,7 @@ export default function PublicLayout() {
       </header>
 
       {/* Contenedor Principal (Hijo) con Efectos de Fondo Encapsulados */}
-      <main className="flex-1 flex flex-col relative z-10 overflow-hidden">
+      <main id="main-content" tabIndex="-1" className="flex-1 flex flex-col relative z-10 overflow-hidden outline-none">
         {/* Efectos de Fondo Decorativos */}
         <div className="absolute top-0 left-1/4 w-[500px] h-[500px] bg-primary/5 rounded-full blur-[120px] pointer-events-none" />
         <div className="absolute bottom-0 right-1/4 w-[500px] h-[500px] bg-primary/5 rounded-full blur-[120px] pointer-events-none" />
