@@ -15,9 +15,6 @@ import {
   Wrench,
   Check,
   Search,
-  Minus,
-  Square,
-  X,
 } from "lucide-react";
 
 export default function LandingPage() {
@@ -212,36 +209,13 @@ export default function LandingPage() {
             className="lg:col-span-7 flex items-center justify-center"
             style={{ perspective: "1300px" }}
           >
-            <div className="relative w-full max-w-[740px] rounded-xl border border-white/15 bg-[#141417] shadow-[-28px_32px_70px_rgba(0,0,0,0.75)] ring-1 ring-primary/20 transition-transform duration-500 ease-out hover:[transform:rotateY(-4deg)_rotateX(1.5deg)_scale(1.01)] lg:[transform:rotateY(-13deg)_rotateX(5deg)_rotateZ(0.5deg)] overflow-hidden select-none">
-              {/* Barra Superior Estilo Ventana Nativa */}
-              <div className="flex items-center justify-between px-4 py-2.5 border-b border-white/10 bg-[#18181c]">
-                <div className="flex items-center gap-2">
-                  <span className="font-outfit text-xs font-black tracking-widest uppercase text-foreground">
-                    REPAIR<span className="text-primary">IT</span>
-                  </span>
-                  <span className="text-[10px] font-mono text-muted-foreground/80">
-                    app.repairit.cloud
-                  </span>
-                </div>
-                <div className="flex items-center gap-2.5 text-muted-foreground/60">
-                  <Minus className="w-3 h-3" />
-                  <Square className="w-2.5 h-2.5" />
-                  <X className="w-3.5 h-3.5" />
-                </div>
-              </div>
-
-              {/* Imagen Real del Dashboard */}
-              <div className="relative bg-[#111113]">
-                <img
-                  src="/hero-dashboard.png"
-                  alt="Panel de Control de RepairIT con métricas, gráficos e inventario en vivo"
-                  className="w-full h-auto block object-cover"
-                  loading="eager"
-                />
-                {/* Sutil brillo superior y viñeta inferior */}
-                <div className="pointer-events-none absolute inset-0 ring-1 ring-inset ring-white/5" />
-                <div className="pointer-events-none absolute inset-x-0 bottom-0 h-10 bg-gradient-to-t from-[#111113]/60 to-transparent" />
-              </div>
+            <div className="relative w-full max-w-[740px] rounded-xl border border-white/15 bg-[#111113] shadow-[-28px_32px_70px_rgba(0,0,0,0.75)] ring-1 ring-primary/20 transition-transform duration-500 ease-out hover:[transform:rotateY(-4deg)_rotateX(1.5deg)_scale(1.01)] lg:[transform:rotateY(-13deg)_rotateX(5deg)_rotateZ(0.5deg)] overflow-hidden select-none">
+              <img
+                src="/hero-dashboard.png"
+                alt="Panel de Control de RepairIT con métricas, gráficos e inventario en vivo"
+                className="w-full h-auto block object-cover"
+                loading="eager"
+              />
             </div>
           </div>
         </div>
