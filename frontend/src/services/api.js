@@ -179,16 +179,20 @@ export const api = {
 
       if (venueError) throw new Error(venueError.message);
 
-      // Crear Perfil Público
+      // Crear Perfil Público (upsert por si existe trigger on_auth_user_created)
       const { error: profileError } = await supabase
         .from("profiles")
-        .insert({
-          id: data.user.id,
-          organization_id: org.id,
-          venue_id: venue.id,
-          name: registerData.name,
-          role: "admin",
-        });
+        .upsert(
+          {
+            id: data.user.id,
+            organization_id: org.id,
+            venue_id: venue.id,
+            name: registerData.name,
+            email: registerData.email,
+            role: "admin",
+          },
+          { onConflict: "id" }
+        );
 
       if (profileError) throw new Error(profileError.message);
 

@@ -17,12 +17,12 @@ import {
   EyeOff, 
   Info
 } from "lucide-react";
-import { api } from "@/services/api";
+import { api, getLocalUser, hasMultiTallerAccess } from "@/services/api";
 import { supabase } from "@/services/supabaseClient";
 
 export default function VenueAccountsPage() {
-  const user = JSON.parse(localStorage.getItem("repairit_user") || "{}");
-  const isMultiTaller = user.subscriptionPlan === "Multi-Taller Pro";
+  const user = getLocalUser();
+  const isMultiTaller = hasMultiTallerAccess(user.subscriptionPlan);
 
   const [accounts, setAccounts] = useState([]);
   const [venues, setVenues] = useState([]);
