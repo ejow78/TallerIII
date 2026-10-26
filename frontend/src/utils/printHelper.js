@@ -431,12 +431,12 @@ export function getOrderWhatsAppUrl(order, profile = {}, clientOverride = null) 
   }
 
   const message =
-    `Hola ${client.name || ""}! 👋 Te escribimos de *${venueName}*.\n\n` +
+    `Hola ${client.name || ""}! Te escribimos de *${venueName}*.\n\n` +
     `Te compartimos el código y enlace de seguimiento en tiempo real de tu equipo *${order.deviceType || ""} ${
       order.deviceModel || ""
     }* (Orden *#${order.trackingCode}*):\n\n` +
     `${statusNote}\n\n` +
-    `🔗 *Seguimiento online:* ${trackingUrl}`;
+    `*Seguimiento online:* ${trackingUrl}`;
 
   if (!phone) {
     return `https://wa.me/?text=${encodeURIComponent(message)}`;
@@ -448,7 +448,7 @@ export function getClientWhatsAppUrl(client, profile = {}) {
   if (!client) return null;
   const phone = normalizeWhatsAppPhone(client.phone);
   const venueName = profile?.name || "RepairIT Servicio Técnico";
-  const message = `Hola ${client.name || ""}! 👋 Te escribimos de *${venueName}*.`;
+  const message = `Hola ${client.name || ""}! Te escribimos de *${venueName}*.`;
   if (!phone) {
     return `https://wa.me/?text=${encodeURIComponent(message)}`;
   }

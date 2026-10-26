@@ -50,7 +50,7 @@ import {
 } from "lucide-react";
 import { toast } from "sonner";
 
-import { api } from "@/services/api";
+import { api, normalizePlan, hasPOSAccess, hasMultiTallerAccess } from "@/services/api";
 import OnboardingModal from "@/components/common/OnboardingModal";
 
 function MobileSidebarAutoClose({ pathname }) {
@@ -94,6 +94,8 @@ export default function DashboardLayout() {
   const [venues, setVenues] = useState([]);
   const [activeVenue, setActiveVenue] = useState(null);
   const [sidebarStats, setSidebarStats] = useState({ activeOrders: 0, lowStock: 0 });
+
+  const effectivePlan = normalizePlan(activeVenue?.subscriptionPlan || user.subscriptionPlan);
 
   useEffect(() => {
     if (!isSuperAdmin) {
@@ -386,18 +388,20 @@ export default function DashboardLayout() {
                         )}
                       </SidebarMenuItem>
 
-                      <SidebarMenuItem>
-                        <SidebarMenuButton
-                          asChild
-                          isActive={location.pathname === "/dashboard/caja"}
-                          className={navItemClass}
-                        >
-                          <NavLink to="/dashboard/caja" className="flex items-center gap-3 w-full">
-                            <ShoppingCart className="w-4 h-4" />
-                            <span>Caja</span>
-                          </NavLink>
-                        </SidebarMenuButton>
-                      </SidebarMenuItem>
+                      {hasPOSAccess(effectivePlan) && (
+                        <SidebarMenuItem>
+                          <SidebarMenuButton
+                            asChild
+                            isActive={location.pathname === "/dashboard/caja"}
+                            className={navItemClass}
+                          >
+                            <NavLink to="/dashboard/caja" className="flex items-center gap-3 w-full">
+                              <ShoppingCart className="w-4 h-4" />
+                              <span>Caja</span>
+                            </NavLink>
+                          </SidebarMenuButton>
+                        </SidebarMenuItem>
+                      )}
                     </SidebarMenu>
                   </SidebarGroupContent>
                 </SidebarGroup>
@@ -422,8 +426,7 @@ export default function DashboardLayout() {
                         </SidebarMenuButton>
                       </SidebarMenuItem>
 
-                      {user.role === "admin" &&
-                        (activeVenue ? activeVenue.subscriptionPlan : user.subscriptionPlan) === "Multi-Taller Pro" && (
+                      {user.role === "admin" && hasMultiTallerAccess(effectivePlan) && (
                         <SidebarMenuItem>
                           <SidebarMenuButton
                             asChild
@@ -503,7 +506,7 @@ export default function DashboardLayout() {
                   <span className="hidden sm:inline text-[10px] text-muted-foreground font-mono select-none">
                     Sucursal:
                   </span>
-                  {venues.length > 1 ? (
+                  {venues.length > 1 && hasMultiTallerAccess(effectivePlan) ? (
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>
                         <Button

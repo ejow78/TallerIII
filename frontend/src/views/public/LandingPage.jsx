@@ -357,36 +357,36 @@ export default function LandingPage() {
             onScroll={handlePricingScroll}
             className="flex md:grid md:grid-cols-3 gap-6 md:gap-8 pt-6 pb-2 items-stretch overflow-x-auto md:overflow-x-visible snap-x snap-mandatory scroll-smooth -mx-6 px-6 md:mx-0 md:px-0 [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden"
           >
-            {/* Tier 1: Inicial */}
+            {/* Tier 1: Taller Básico */}
             <Card className="pricing-card w-[84vw] max-w-[340px] shrink-0 snap-center md:w-auto md:max-w-none md:shrink flex flex-col justify-between min-h-[480px] overflow-visible bg-card/45 border-border/60 hover:border-border transition-all duration-200 hover:-translate-y-1">
               <CardHeader className="space-y-2">
-                <CardTitle className="font-outfit text-xl font-bold text-foreground">Plan Inicial</CardTitle>
+                <CardTitle className="font-outfit text-xl font-bold text-foreground">Taller Básico</CardTitle>
                 <CardDescription className="text-xs text-muted-foreground font-light">
                   Ideal para técnicos independientes que comienzan.
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-6 flex-grow">
                 <div className="flex items-baseline gap-1">
-                  <span className="text-4xl font-extrabold text-foreground font-outfit">$1</span>
-                  <span className="text-muted-foreground text-xs font-light">/ mes</span>
+                  <span className="text-4xl font-extrabold text-foreground font-outfit">Gratis</span>
+                  <span className="text-muted-foreground text-xs font-light">/ para siempre</span>
                 </div>
                 <div className="border-t border-border/40 my-4" />
                 <ul className="space-y-3 text-xs text-muted-foreground font-light">
+                  <li className="flex items-start gap-2.5">
+                    <Check className="w-4 h-4 text-primary shrink-0 mt-0.5" />
+                    <span>1 Sucursal física activa</span>
+                  </li>
                   <li className="flex items-start gap-2.5">
                     <Check className="w-4 h-4 text-primary shrink-0 mt-0.5" />
                     <span>Hasta 100 Órdenes de Servicio al mes</span>
                   </li>
                   <li className="flex items-start gap-2.5">
                     <Check className="w-4 h-4 text-primary shrink-0 mt-0.5" />
-                    <span>1 Sucursal activa</span>
+                    <span>Control de Stock e Inventario</span>
                   </li>
                   <li className="flex items-start gap-2.5">
                     <Check className="w-4 h-4 text-primary shrink-0 mt-0.5" />
-                    <span>Portal de seguimiento online para clientes</span>
-                  </li>
-                  <li className="flex items-start gap-2.5">
-                    <Check className="w-4 h-4 text-primary shrink-0 mt-0.5" />
-                    <span>Impresión de fichas físicas de recepción</span>
+                    <span>Seguimiento en línea con QR y comprobantes A4</span>
                   </li>
                 </ul>
               </CardContent>
@@ -416,30 +416,30 @@ export default function LandingPage() {
               </CardHeader>
               <CardContent className="space-y-6 flex-grow">
                 <div className="flex items-baseline gap-1">
-                  <span className="text-4xl font-extrabold text-foreground font-outfit">$1</span>
+                  <span className="text-4xl font-extrabold text-foreground font-outfit">$19</span>
                   <span className="text-muted-foreground text-xs font-light">/ mes</span>
                 </div>
                 <div className="border-t border-border/40 my-4" />
                 <ul className="space-y-3 text-xs text-muted-foreground font-light">
                   <li className="flex items-start gap-2.5">
                     <Check className="w-4 h-4 text-primary shrink-0 mt-0.5" />
-                    <span>Órdenes de Servicio ilimitadas</span>
+                    <span>Órdenes de Servicio e Inventario ilimitados</span>
                   </li>
                   <li className="flex items-start gap-2.5">
                     <Check className="w-4 h-4 text-primary shrink-0 mt-0.5" />
-                    <span>Control de Inventario y Alertas de Stock</span>
+                    <span className="font-medium text-foreground">Control de Caja y Punto de Venta (POS)</span>
                   </li>
                   <li className="flex items-start gap-2.5">
                     <Check className="w-4 h-4 text-primary shrink-0 mt-0.5" />
-                    <span>Control de Caja y Arqueos Diarios</span>
+                    <span>Aprobación de Presupuestos Online con DNI</span>
                   </li>
                   <li className="flex items-start gap-2.5">
                     <Check className="w-4 h-4 text-primary shrink-0 mt-0.5" />
-                    <span>Aprobación de Presupuestos Online</span>
+                    <span>Métricas en Tiempo Real y Exportación Excel</span>
                   </li>
                   <li className="flex items-start gap-2.5">
                     <Check className="w-4 h-4 text-primary shrink-0 mt-0.5" />
-                    <span>Exportación a Excel (.xlsx) en 1 clic</span>
+                    <span>Soporte prioritario</span>
                   </li>
                 </ul>
               </CardContent>
@@ -453,36 +453,36 @@ export default function LandingPage() {
               </CardFooter>
             </Card>
 
-            {/* Tier 3: Multi-Sucursal */}
+            {/* Tier 3: Multi-Taller Pro */}
             <Card className="pricing-card w-[84vw] max-w-[340px] shrink-0 snap-center md:w-auto md:max-w-none md:shrink flex flex-col justify-between min-h-[480px] overflow-visible bg-card/45 border-border/60 hover:border-border transition-all duration-200 hover:-translate-y-1">
               <CardHeader className="space-y-2">
-                <CardTitle className="font-outfit text-xl font-bold text-foreground">Multi-Sucursal</CardTitle>
+                <CardTitle className="font-outfit text-xl font-bold text-foreground">Multi-Taller Pro</CardTitle>
                 <CardDescription className="text-xs text-muted-foreground font-light">
-                  Para redes de talleres o franquicias de soporte técnico.
+                  Para redes de talleres o negocios con varias sucursales.
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-6 flex-grow">
                 <div className="flex items-baseline gap-1">
-                  <span className="text-4xl font-extrabold text-foreground font-outfit">$1</span>
+                  <span className="text-4xl font-extrabold text-foreground font-outfit">$39</span>
                   <span className="text-muted-foreground text-xs font-light">/ mes</span>
                 </div>
                 <div className="border-t border-border/40 my-4" />
                 <ul className="space-y-3 text-xs text-muted-foreground font-light">
                   <li className="flex items-start gap-2.5">
                     <Check className="w-4 h-4 text-primary shrink-0 mt-0.5" />
-                    <span>Todo lo incluido en el Plan Taller Pro</span>
+                    <span>Todo lo incluido en el Plan Taller Pro (incluye Caja POS)</span>
                   </li>
                   <li className="flex items-start gap-2.5">
                     <Check className="w-4 h-4 text-primary shrink-0 mt-0.5" />
-                    <span>Sucursales ilimitadas</span>
+                    <span className="font-medium text-foreground">Gestión de Múltiples Sucursales</span>
                   </li>
                   <li className="flex items-start gap-2.5">
                     <Check className="w-4 h-4 text-primary shrink-0 mt-0.5" />
-                    <span>Gestión de Perfiles (SuperAdmin / Técnico / Recepción)</span>
+                    <span>Cuentas de Acceso exclusivas para técnicos por sucursal</span>
                   </li>
                   <li className="flex items-start gap-2.5">
                     <Check className="w-4 h-4 text-primary shrink-0 mt-0.5" />
-                    <span>Soporte Técnico Prioritario 24/7</span>
+                    <span>Selector rápido de sucursal y reportes centralizados</span>
                   </li>
                 </ul>
               </CardContent>
@@ -501,9 +501,9 @@ export default function LandingPage() {
           {/* Indicadores de carrusel interactivos para móvil */}
           <div className="flex md:hidden items-center justify-center gap-2 pt-2">
             {[
-              { label: "Plan Inicial", idx: 0 },
+              { label: "Taller Básico", idx: 0 },
               { label: "Taller Pro", idx: 1 },
-              { label: "Multi-Sucursal", idx: 2 },
+              { label: "Multi-Taller Pro", idx: 2 },
             ].map(({ label, idx }) => (
               <button
                 key={idx}

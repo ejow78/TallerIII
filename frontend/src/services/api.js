@@ -6,9 +6,41 @@ const generateTrackingCode = () => {
   return "RT-" + Array.from({ length: 8 }, () => chars[Math.floor(Math.random() * chars.length)]).join("");
 };
 
-// Helper para obtener el usuario de sessionStorage
-const getLocalUser = () => {
-  return JSON.parse(sessionStorage.getItem("repairit_user") || "{}");
+// Normalizador de nombres de planes oficiales ("Taller Básico", "Taller Pro", "Multi-Taller Pro")
+export const normalizePlan = (plan) => {
+  if (!plan) return "Taller Básico";
+  const p = String(plan).trim().toLowerCase();
+  if (p.includes("multi")) return "Multi-Taller Pro";
+  if (p.includes("pro") || p.includes("premium")) return "Taller Pro";
+  return "Taller Básico";
+};
+
+export const hasPOSAccess = (plan) => {
+  const norm = normalizePlan(plan);
+  return norm === "Taller Pro" || norm === "Multi-Taller Pro";
+};
+
+export const hasMultiTallerAccess = (plan) => {
+  return normalizePlan(plan) === "Multi-Taller Pro";
+};
+
+// Helper para obtener y persistir el usuario en storage de forma consistente
+export const getLocalUser = () => {
+  return JSON.parse(
+    sessionStorage.getItem("repairit_user") ||
+      localStorage.getItem("repairit_user") ||
+      "{}"
+  );
+};
+
+export const saveLocalUser = (userObj) => {
+  const serialized = JSON.stringify(userObj);
+  sessionStorage.setItem("repairit_user", serialized);
+  if (localStorage.getItem("repairit_user") || localStorage.getItem("repairit_token")) {
+    localStorage.setItem("repairit_user", serialized);
+  } else {
+    localStorage.setItem("repairit_user", serialized);
+  }
 };
 
 const mapClient = (client) => {
@@ -97,17 +129,13 @@ export const api = {
         role: profile?.role || "admin",
         organizationId: profile?.organization_id || null,
         venueId: profile?.venue_id || null,
-        subscriptionPlan: profile?.organization?.subscription_plan || "Multi-Taller Pro",
+        subscriptionPlan: normalizePlan(profile?.organization?.subscription_plan),
         subscriptionStatus: profile?.organization?.subscription_status || "activo",
         token: data.session.access_token,
       };
 
       sessionStorage.setItem("repairit_user", JSON.stringify(userData));
-      if (rememberMe) {
-        localStorage.setItem("repairit_user", JSON.stringify(userData));
-      } else {
-        localStorage.removeItem("repairit_user");
-      }
+      localStorage.setItem("repairit_user", JSON.stringify(userData));
       return userData;
     },
 
@@ -176,49 +204,91 @@ export const api = {
     getProfile: async () => {
       let user = getLocalUser();
 
-      if (!user.venueId || user.venueId === "undefined" || !user.organizationId) {
-        try {
-          const { data: authData } = await supabase.auth.getUser();
-          if (authData?.user) {
-            const { data: profile } = await supabase
-              .from("profiles")
-              .select("*, organization:organizations(*), venue:venues(*)")
-              .eq("id", authData.user.id)
-              .maybeSingle();
+      // Siempre refrescar perfil y organización desde Supabase para mantener el plan sincronizado
+      try {
+        const { data: authData } = await supabase.auth.getUser();
+        if (authData?.user) {
+          const { data: profile } = await supabase
+            .from("profiles")
+            .select("*, organization:organizations(*), venue:venues(*)")
+            .eq("id", authData.user.id)
+            .maybeSingle();
 
-            if (profile) {
-              user = {
-                _id: profile.id,
-                name: profile.name,
-                email: authData.user.email,
-                role: profile.role,
-                subscriptionPlan: profile.organization?.subscription_plan || "Multi-Taller Pro",
-                subscriptionStatus: profile.organization?.subscription_status || "activo",
-                organizationId: profile.organization_id,
-                venueId: profile.venue_id,
-              };
-              localStorage.setItem("repairit_user", JSON.stringify(user));
-            }
+          if (profile) {
+            const normalizedPlan = normalizePlan(
+              profile.organization?.subscription_plan || user.subscriptionPlan
+            );
+            const subStatus =
+              profile.organization?.subscription_status ||
+              user.subscriptionStatus ||
+              "activo";
+
+            user = {
+              ...user,
+              _id: profile.id,
+              name: profile.name || user.name,
+              email: authData.user.email || user.email,
+              role: profile.role || user.role,
+              subscriptionPlan: normalizedPlan,
+              subscriptionStatus: subStatus,
+              organizationId: profile.organization_id || user.organizationId,
+              venueId: profile.venue_id || user.venueId,
+            };
+            saveLocalUser(user);
           }
-        } catch (e) {
-          console.error("Error al autorecuperar perfil:", e);
         }
+      } catch (e) {
+        console.error("Error al sincronizar perfil:", e);
       }
 
       if (!user.venueId || user.venueId === "undefined") {
-        return { name: "Sucursal Central", address: "Av. Sarmiento 1234, San Miguel de Tucumán", phone: "+54 381 4223344", email: "central@repairit.cloud" };
+        return {
+          name: "Sucursal Central",
+          address: "Av. Sarmiento 1234, San Miguel de Tucumán",
+          phone: "+54 381 4223344",
+          email: "central@repairit.cloud",
+          subscriptionPlan: normalizePlan(user.subscriptionPlan),
+          subscriptionStatus: user.subscriptionStatus || "activo",
+        };
       }
 
       const { data, error } = await supabase
         .from("venues")
-        .select("*")
+        .select("*, organization:organizations(id, name, subscription_plan, subscription_status)")
         .eq("id", user.venueId)
         .maybeSingle();
 
       if (error || !data) {
-        return { name: "Sucursal Central", address: "Av. Sarmiento 1234, San Miguel de Tucumán", phone: "+54 381 4223344", email: "central@repairit.cloud" };
+        return {
+          name: "Sucursal Central",
+          address: "Av. Sarmiento 1234, San Miguel de Tucumán",
+          phone: "+54 381 4223344",
+          email: "central@repairit.cloud",
+          subscriptionPlan: normalizePlan(user.subscriptionPlan),
+          subscriptionStatus: user.subscriptionStatus || "activo",
+        };
       }
-      return { ...data, _id: data.id };
+
+      const finalPlan = normalizePlan(
+        data.organization?.subscription_plan || user.subscriptionPlan
+      );
+      const finalStatus =
+        data.organization?.subscription_status || user.subscriptionStatus || "activo";
+
+      if (user.subscriptionPlan !== finalPlan || user.subscriptionStatus !== finalStatus) {
+        saveLocalUser({
+          ...user,
+          subscriptionPlan: finalPlan,
+          subscriptionStatus: finalStatus,
+        });
+      }
+
+      return {
+        ...data,
+        _id: data.id,
+        subscriptionPlan: finalPlan,
+        subscriptionStatus: finalStatus,
+      };
     },
 
     updateProfile: async (profileData) => {
@@ -807,25 +877,33 @@ export const api = {
     getOrganizations: async () => {
       const { data, error } = await supabase
         .from("organizations")
-        .select("*, venues(id), profiles(id)");
+        .select("*, venues(*), profiles(*)");
 
       if (error) throw new Error(error.message);
 
       return data.map((org) => ({
         ...org,
         _id: org.id,
-        subscriptionPlan: org.subscription_plan,
-        subscriptionStatus: org.subscription_status,
+        subscriptionPlan: normalizePlan(org.subscription_plan),
+        rawPlan: org.subscription_plan,
+        subscriptionStatus: org.subscription_status || "activo",
         createdAt: org.created_at,
+        venues: Array.isArray(org.venues)
+          ? org.venues.map((v) => ({ ...v, _id: v.id }))
+          : [],
+        profiles: Array.isArray(org.profiles)
+          ? org.profiles.map((p) => ({ ...p, _id: p.id }))
+          : [],
         venuesCount: Array.isArray(org.venues) ? org.venues.length : 0,
         usersCount: Array.isArray(org.profiles) ? org.profiles.length : 0,
       }));
     },
 
-    updateSubscription: async (id, subscriptionPlan, subscriptionStatus) => {
+    updateSubscription: async (id, subscriptionPlan, subscriptionStatus, name = null) => {
       const updateData = {};
-      if (subscriptionPlan) updateData.subscription_plan = subscriptionPlan;
+      if (subscriptionPlan) updateData.subscription_plan = normalizePlan(subscriptionPlan);
       if (subscriptionStatus) updateData.subscription_status = subscriptionStatus;
+      if (name && name.trim()) updateData.name = name.trim();
 
       const { data, error } = await supabase
         .from("organizations")
@@ -838,16 +916,33 @@ export const api = {
       return {
         ...data,
         _id: data.id,
-        subscriptionPlan: data.subscription_plan,
+        subscriptionPlan: normalizePlan(data.subscription_plan),
         subscriptionStatus: data.subscription_status,
         createdAt: data.created_at,
       };
     },
 
+    deleteOrganization: async (id) => {
+      const { error } = await supabase.from("organizations").delete().eq("id", id);
+      if (error) throw new Error(error.message);
+      return { message: "Organización eliminada correctamente." };
+    },
+
+    updateVenueAsSuper: async (venueId, venueData) => {
+      const { data, error } = await supabase
+        .from("venues")
+        .update(venueData)
+        .eq("id", venueId)
+        .select()
+        .single();
+      if (error) throw new Error(error.message);
+      return { ...data, _id: data.id };
+    },
+
     getUsers: async () => {
       const { data, error } = await supabase
         .from("profiles")
-        .select("*, organizationId:organizations(name), venueId:venues(name)");
+        .select("*, organizationId:organizations(id, name, subscription_plan, subscription_status), venueId:venues(id, name)");
 
       if (error) throw new Error(error.message);
 
@@ -855,8 +950,16 @@ export const api = {
         ...profile,
         _id: profile.id,
         createdAt: profile.created_at,
-        organizationId: profile.organizationId ? { ...profile.organizationId, _id: profile.organizationId.id } : null,
-        venueId: profile.venueId ? { ...profile.venueId, _id: profile.venueId.id } : null,
+        organizationId: profile.organizationId
+          ? {
+              ...profile.organizationId,
+              _id: profile.organizationId.id,
+              subscriptionPlan: normalizePlan(profile.organizationId.subscription_plan),
+            }
+          : null,
+        venueId: profile.venueId
+          ? { ...profile.venueId, _id: profile.venueId.id }
+          : null,
       }));
     },
 
@@ -868,6 +971,17 @@ export const api = {
         .select()
         .single();
 
+      if (error) throw new Error(error.message);
+      return { ...data, _id: data.id };
+    },
+
+    updateUserAssignment: async (id, updates) => {
+      const { data, error } = await supabase
+        .from("profiles")
+        .update(updates)
+        .eq("id", id)
+        .select()
+        .single();
       if (error) throw new Error(error.message);
       return { ...data, _id: data.id };
     },

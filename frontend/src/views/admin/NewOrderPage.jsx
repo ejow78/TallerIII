@@ -164,16 +164,8 @@ export default function NewOrderPage() {
         },
       };
 
-      const waUrl = getOrderWhatsAppUrl(hydratedOrder, profile);
-
       toast.success(`¡Orden #${order.trackingCode} registrada!`, {
         description: `${deviceType} ${deviceModel} a nombre de ${clientName}.`,
-        action: waUrl
-          ? {
-              label: "Enviar WhatsApp",
-              onClick: () => window.open(waUrl, "_blank", "noopener,noreferrer"),
-            }
-          : undefined,
       });
 
       // 3. Imprimir comprobante si está activado

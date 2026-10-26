@@ -28,13 +28,24 @@ import {
   Sparkles,
   Download,
   X,
+  Lock,
 } from "lucide-react";
-import { api } from "@/services/api";
+import { Link } from "react-router-dom";
+import {
+  api,
+  getLocalUser,
+  normalizePlan,
+  hasPOSAccess,
+  hasMultiTallerAccess,
+} from "@/services/api";
 import { printPosReceipt } from "@/utils/printHelper";
 
 export default function POSPage() {
-  const user = JSON.parse(localStorage.getItem("repairit_user") || "{}");
-  const isMultiTaller = user.subscriptionPlan === "Multi-Taller Pro";
+  const user = getLocalUser();
+  const [effectivePlan, setEffectivePlan] = useState(
+    normalizePlan(user.subscriptionPlan)
+  );
+  const isMultiTaller = hasMultiTallerAccess(effectivePlan);
   const isAdmin = user.role === "admin" || user.role === "superadmin";
 
   const [activeTab, setActiveTab] = useState("venta"); // "venta" | "historial"
@@ -67,6 +78,9 @@ export default function POSPage() {
       try {
         const venueData = await api.auth.getProfile();
         setActiveVenue(venueData);
+        if (venueData?.subscriptionPlan) {
+          setEffectivePlan(normalizePlan(venueData.subscriptionPlan));
+        }
       } catch (err) {
         console.error("Error al cargar datos del taller:", err);
       }
@@ -526,58 +540,87 @@ export default function POSPage() {
     );
   }
 
+  if (!hasPOSAccess(effectivePlan) && user.role !== "superadmin") {
+    return (
+      <div className="flex h-[70vh] items-center justify-center p-4">
+        <Card className="bg-card/40 border-border/80 max-w-md w-full p-8 text-center space-y-4 shadow-xl">
+          <div className="w-12 h-12 rounded-2xl bg-primary/10 border border-primary/20 flex items-center justify-center text-primary mx-auto">
+            <Lock className="w-6 h-6" />
+          </div>
+          <div className="space-y-1.5">
+            <h2 className="font-outfit text-xl font-bold text-foreground">
+              Control de Caja no incluido en Taller Básico
+            </h2>
+            <p className="text-xs text-muted-foreground font-light leading-relaxed">
+              El módulo de Caja y Punto de Venta (POS) está disponible a partir del plan{" "}
+              <span className="text-primary font-semibold">Taller Pro</span> y{" "}
+              <span className="text-primary font-semibold">Multi-Taller Pro</span>.
+            </p>
+          </div>
+          <div className="pt-2">
+            <Link to="/dashboard/perfil">
+              <Button className="bg-primary hover:bg-primary/90 text-primary-foreground font-bold text-xs px-6 h-10 rounded-xl cursor-pointer">
+                Ver Planes en Configuración
+              </Button>
+            </Link>
+          </div>
+        </Card>
+      </div>
+    );
+  }
+
   return (
-    <div className="space-y-5">
+    <div className="space-y-6">
       {/* Cabecera Superior */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div className="space-y-1">
           <h1 className="font-outfit text-2xl sm:text-3xl font-bold text-foreground tracking-tight flex items-center gap-2.5">
             <ShoppingCart className="w-6 h-6 sm:w-7 sm:h-7 text-primary shrink-0" />
             <span>Caja y Punto de Venta</span>
           </h1>
-          <p className="text-xs text-muted-foreground font-light">
+          <p className="text-xs sm:text-sm text-muted-foreground font-light">
             Facturación rápida de repuestos y accesorios con descuento automático de stock e impresión de ticket.
           </p>
         </div>
 
         {/* Selector de Vista: Punto de Venta vs Historial */}
-        <div className="flex items-center bg-card/80 border border-border/80 rounded-xl p-1 self-start sm:self-auto shadow-sm select-none">
+        <div className="flex items-center bg-card/80 border border-border/80 rounded-xl p-1.5 self-start sm:self-auto shadow-sm select-none">
           <button
             type="button"
             onClick={() => setActiveTab("venta")}
-            className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer ${
+            className={`flex items-center gap-2 px-4 py-2 rounded-lg text-xs font-bold transition-all cursor-pointer ${
               activeTab === "venta"
                 ? "bg-primary text-primary-foreground shadow-sm"
                 : "text-muted-foreground hover:text-foreground"
             }`}
           >
-            <ShoppingCart className="w-3.5 h-3.5" />
+            <ShoppingCart className="w-4 h-4" />
             Punto de Venta
           </button>
           <button
             type="button"
             onClick={() => setActiveTab("historial")}
-            className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer ${
+            className={`flex items-center gap-2 px-4 py-2 rounded-lg text-xs font-bold transition-all cursor-pointer ${
               activeTab === "historial"
                 ? "bg-primary text-primary-foreground shadow-sm"
                 : "text-muted-foreground hover:text-foreground"
             }`}
           >
-            <History className="w-3.5 h-3.5" />
+            <History className="w-4 h-4" />
             Historial de Ventas
           </button>
         </div>
       </div>
 
       {activeTab === "venta" ? (
-        /* VISTA DE TERMINAL POS (2 COLUMNAS BALANCEADAS) */
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 items-start">
+        /* VISTA DE TERMINAL POS (2 COLUMNAS ESPACIOSAS Y CÓMODAS) */
+        <div className="grid grid-cols-1 xl:grid-cols-12 gap-6 items-start">
           {/* Columna Izquierda (7 cols): Catálogo de Productos */}
-          <Card className="lg:col-span-7 bg-card/30 border-border/80 p-3.5 sm:p-4 shadow-sm space-y-3.5">
+          <Card className="xl:col-span-7 bg-card/30 border-border/80 p-5 sm:p-6 shadow-sm space-y-5">
             {/* Buscador + Filtros de Categoría */}
-            <div className="space-y-2.5 border-b border-border/50 pb-3">
+            <div className="space-y-3.5 border-b border-border/50 pb-4">
               <div className="relative w-full flex items-center">
-                <Search className="w-4 h-4 text-muted-foreground absolute left-3 pointer-events-none" />
+                <Search className="w-4 h-4 text-muted-foreground absolute left-3.5 pointer-events-none" />
                 <Input
                   ref={searchInputRef}
                   id="search-input"
@@ -585,26 +628,26 @@ export default function POSPage() {
                   placeholder="Buscar producto por nombre o código SKU... [F2]"
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="bg-background/85 border-border text-xs w-full pl-9 h-9 rounded-lg focus-visible:ring-1 focus-visible:ring-primary"
+                  className="bg-background/85 border-border text-xs sm:text-sm w-full pl-10 h-11 rounded-xl focus-visible:ring-1 focus-visible:ring-primary"
                 />
                 {searchQuery && (
                   <button
                     type="button"
                     onClick={() => setSearchQuery("")}
-                    className="absolute right-2.5 text-muted-foreground hover:text-foreground cursor-pointer"
+                    className="absolute right-3 text-muted-foreground hover:text-foreground cursor-pointer"
                   >
-                    <X className="w-3.5 h-3.5" />
+                    <X className="w-4 h-4" />
                   </button>
                 )}
               </div>
 
               {/* Píldoras de Categorías */}
               {categories.length > 0 && (
-                <div className="flex items-center gap-1.5 overflow-x-auto pb-0.5 no-scrollbar">
+                <div className="flex items-center gap-2 overflow-x-auto pb-1 no-scrollbar">
                   <button
                     type="button"
                     onClick={() => setCategoryFilter("todas")}
-                    className={`px-2.5 py-1 rounded-lg text-[11px] font-semibold whitespace-nowrap transition-all cursor-pointer border ${
+                    className={`px-3.5 py-1.5 rounded-xl text-xs font-semibold whitespace-nowrap transition-all cursor-pointer border ${
                       categoryFilter === "todas"
                         ? "bg-primary/15 text-primary border-primary/30 font-bold"
                         : "bg-background/60 text-muted-foreground border-border/60 hover:text-foreground"
@@ -617,7 +660,7 @@ export default function POSPage() {
                       key={cat}
                       type="button"
                       onClick={() => setCategoryFilter(cat)}
-                      className={`px-2.5 py-1 rounded-lg text-[11px] font-semibold whitespace-nowrap transition-all cursor-pointer border ${
+                      className={`px-3.5 py-1.5 rounded-xl text-xs font-semibold whitespace-nowrap transition-all cursor-pointer border ${
                         categoryFilter === cat
                           ? "bg-primary/15 text-primary border-primary/30 font-bold"
                           : "bg-background/60 text-muted-foreground border-border/60 hover:text-foreground"
@@ -632,12 +675,12 @@ export default function POSPage() {
 
             {/* Grilla de Productos */}
             {filteredItems.length === 0 ? (
-              <div className="text-center py-14 text-muted-foreground text-xs font-light space-y-2">
-                <Sparkles className="w-7 h-7 opacity-25 mx-auto text-primary" />
+              <div className="text-center py-16 text-muted-foreground text-xs sm:text-sm font-light space-y-2.5">
+                <Sparkles className="w-8 h-8 opacity-25 mx-auto text-primary" />
                 <p>No se encontraron productos disponibles con ese filtro.</p>
               </div>
             ) : (
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 max-h-[calc(100vh-270px)] overflow-y-auto pr-0.5">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5 max-h-[calc(100vh-250px)] overflow-y-auto pr-1">
                 {filteredItems.map((item) => {
                   const isOutOfStock = (item.quantity || 0) <= 0;
                   const inCartItem = cart.find((c) => c.id === item._id);
@@ -647,7 +690,7 @@ export default function POSPage() {
                     <div
                       key={item._id}
                       onClick={() => !isOutOfStock && addToCart(item)}
-                      className={`group flex justify-between items-center p-3 rounded-xl border transition-all select-none text-left ${
+                      className={`group flex justify-between items-center p-4 rounded-2xl border transition-all select-none text-left gap-3 ${
                         isOutOfStock
                           ? "opacity-45 bg-muted/10 border-border/40 cursor-not-allowed"
                           : inCartItem
@@ -655,16 +698,16 @@ export default function POSPage() {
                           : "bg-background/60 border-border/70 hover:bg-card hover:border-primary/35 cursor-pointer active:scale-[0.99]"
                       }`}
                     >
-                      <div className="space-y-1 min-w-0 pr-2">
-                        <span className="text-xs font-bold text-foreground block truncate">
+                      <div className="space-y-1.5 min-w-0 flex-1">
+                        <span className="text-sm font-bold text-foreground block truncate">
                           {item.name}
                         </span>
-                        <div className="flex items-center gap-1.5 flex-wrap">
-                          <span className="text-[10px] text-muted-foreground font-mono bg-muted/40 px-1.5 py-0.5 rounded border border-border/50">
+                        <div className="flex items-center gap-2 flex-wrap">
+                          <span className="text-[11px] text-muted-foreground font-mono bg-muted/40 px-2 py-0.5 rounded-md border border-border/50">
                             {item.code}
                           </span>
                           <span
-                            className={`text-[10px] font-semibold px-1.5 py-0.5 rounded border ${
+                            className={`text-[11px] font-semibold px-2 py-0.5 rounded-md border ${
                               isOutOfStock
                                 ? "bg-rose-500/10 text-rose-400 border-rose-500/25"
                                 : item.quantity <= minQty
@@ -677,8 +720,8 @@ export default function POSPage() {
                         </div>
                       </div>
 
-                      <div className="text-right shrink-0">
-                        <span className="text-sm font-black font-outfit text-primary font-mono block">
+                      <div className="text-right shrink-0 space-y-1">
+                        <span className="text-base font-black font-outfit text-primary font-mono block">
                           $
                           {(item.price || 0).toLocaleString("es-AR", {
                             minimumFractionDigits: 2,
@@ -686,11 +729,11 @@ export default function POSPage() {
                           })}
                         </span>
                         {inCartItem ? (
-                          <span className="inline-flex items-center gap-1 text-[10px] font-bold text-primary bg-primary/15 px-1.5 py-0.5 rounded-md mt-0.5">
+                          <span className="inline-flex items-center gap-1 text-[11px] font-bold text-primary bg-primary/15 px-2 py-0.5 rounded-md">
                             En ticket: x{inCartItem.quantity}
                           </span>
                         ) : (
-                          <span className="text-[10px] text-muted-foreground group-hover:text-primary transition-colors block mt-0.5">
+                          <span className="text-[11px] text-muted-foreground group-hover:text-primary transition-colors block">
                             + Agregar
                           </span>
                         )}
@@ -703,14 +746,14 @@ export default function POSPage() {
           </Card>
 
           {/* Columna Derecha (5 cols): Ticket / Carrito de Cobro */}
-          <Card className="lg:col-span-5 bg-card/40 border-border/80 shadow-md flex flex-col overflow-hidden">
-            <CardHeader className="border-b border-border/60 p-4 flex flex-row items-center justify-between space-y-0 bg-muted/15">
+          <Card className="xl:col-span-5 bg-card/40 border-border/80 shadow-md flex flex-col overflow-hidden">
+            <CardHeader className="border-b border-border/60 p-5 sm:p-6 flex flex-row items-center justify-between space-y-0 bg-muted/15">
               <div>
-                <CardTitle className="font-outfit text-sm sm:text-base font-bold text-foreground flex items-center gap-2">
-                  <ShoppingCart className="w-4 h-4 text-primary" />
+                <CardTitle className="font-outfit text-base sm:text-lg font-bold text-foreground flex items-center gap-2">
+                  <ShoppingCart className="w-4.5 h-4.5 text-primary" />
                   Ticket de Venta Actual
                 </CardTitle>
-                <CardDescription className="text-[11px] font-light mt-0.5">
+                <CardDescription className="text-xs font-light mt-1">
                   {cart.length === 0
                     ? "Seleccioná artículos del catálogo para cobrar"
                     : `${cart.reduce((a, b) => a + b.quantity, 0)} unidades seleccionadas`}
@@ -720,66 +763,66 @@ export default function POSPage() {
                 <button
                   type="button"
                   onClick={() => setCart([])}
-                  className="text-[11px] font-semibold text-muted-foreground hover:text-destructive transition-colors cursor-pointer"
+                  className="text-xs font-semibold text-muted-foreground hover:text-destructive transition-colors cursor-pointer px-2.5 py-1 rounded-lg hover:bg-destructive/10"
                 >
                   Vaciar
                 </button>
               )}
             </CardHeader>
 
-            <CardContent className="p-4 flex flex-col justify-between space-y-4">
+            <CardContent className="p-5 sm:p-6 flex flex-col justify-between space-y-5">
               {/* Lista de Ítems del Carrito (SIN scroll cuando está vacío) */}
               {cart.length === 0 ? (
-                <div className="flex flex-col items-center justify-center text-center text-muted-foreground space-y-1.5 py-8 border border-dashed border-border/60 rounded-xl bg-background/30">
-                  <ShoppingCart className="w-8 h-8 opacity-25 text-muted-foreground" />
-                  <p className="text-xs font-semibold text-foreground/80">
+                <div className="flex flex-col items-center justify-center text-center text-muted-foreground space-y-2 py-12 px-6 border border-dashed border-border/60 rounded-2xl bg-background/30">
+                  <ShoppingCart className="w-9 h-9 opacity-25 text-muted-foreground" />
+                  <p className="text-sm font-semibold text-foreground/80">
                     El carrito está vacío
                   </p>
-                  <p className="text-[11px] text-muted-foreground/70 max-w-[220px]">
+                  <p className="text-xs text-muted-foreground/75 max-w-[250px] leading-relaxed">
                     Tocá cualquier producto del listado izquierdo para sumarlo al ticket.
                   </p>
                 </div>
               ) : (
-                <div className="max-h-[280px] overflow-y-auto space-y-2 pr-1">
+                <div className="max-h-[340px] overflow-y-auto space-y-2.5 pr-1">
                   {cart.map((item) => (
                     <div
                       key={item.id}
-                      className="flex justify-between items-center bg-background/70 p-2.5 rounded-xl border border-border/60 text-xs gap-2"
+                      className="flex justify-between items-center bg-background/70 p-3.5 rounded-xl border border-border/60 text-xs gap-3"
                     >
-                      <div className="space-y-0.5 min-w-0 flex-1 text-left">
-                        <span className="font-semibold text-foreground block truncate leading-snug">
+                      <div className="space-y-1 min-w-0 flex-1 text-left">
+                        <span className="text-sm font-semibold text-foreground block truncate leading-snug">
                           {item.name}
                         </span>
-                        <span className="text-[11px] text-primary font-mono font-bold">
+                        <span className="text-xs text-primary font-mono font-bold block">
                           $
                           {(item.price * item.quantity).toLocaleString("es-AR", {
                             minimumFractionDigits: 2,
                             maximumFractionDigits: 2,
                           })}{" "}
-                          <span className="text-[10px] text-muted-foreground font-normal">
+                          <span className="text-[11px] text-muted-foreground font-normal">
                             (${item.price.toLocaleString("es-AR")} c/u)
                           </span>
                         </span>
                       </div>
 
-                      <div className="flex items-center gap-1.5 shrink-0">
+                      <div className="flex items-center gap-2 shrink-0">
                         <div className="flex items-center border border-border/80 rounded-lg bg-card">
                           <button
                             type="button"
                             onClick={() => updateCartQty(item.id, -1)}
-                            className="h-7 w-7 flex items-center justify-center text-muted-foreground hover:text-foreground cursor-pointer transition-colors"
+                            className="h-8 w-8 flex items-center justify-center text-muted-foreground hover:text-foreground cursor-pointer transition-colors"
                           >
-                            <Minus className="w-3 h-3" />
+                            <Minus className="w-3.5 h-3.5" />
                           </button>
-                          <span className="w-6 text-center font-bold text-foreground font-mono text-[11px]">
+                          <span className="w-7 text-center font-bold text-foreground font-mono text-xs">
                             {item.quantity}
                           </span>
                           <button
                             type="button"
                             onClick={() => updateCartQty(item.id, 1)}
-                            className="h-7 w-7 flex items-center justify-center text-muted-foreground hover:text-foreground cursor-pointer transition-colors"
+                            className="h-8 w-8 flex items-center justify-center text-muted-foreground hover:text-foreground cursor-pointer transition-colors"
                           >
-                            <Plus className="w-3 h-3" />
+                            <Plus className="w-3.5 h-3.5" />
                           </button>
                         </div>
 
@@ -787,9 +830,9 @@ export default function POSPage() {
                           variant="ghost"
                           size="icon"
                           onClick={() => removeFromCart(item.id)}
-                          className="h-7 w-7 text-muted-foreground hover:text-destructive hover:bg-destructive/10 rounded-lg cursor-pointer"
+                          className="h-8 w-8 text-muted-foreground hover:text-destructive hover:bg-destructive/10 rounded-lg cursor-pointer"
                         >
-                          <Trash2 className="w-3.5 h-3.5" />
+                          <Trash2 className="w-4 h-4" />
                         </Button>
                       </div>
                     </div>
@@ -798,16 +841,16 @@ export default function POSPage() {
               )}
 
               {/* Bloque de Pago y Total */}
-              <div className="border-t border-border/60 pt-3.5 space-y-3.5 text-left">
+              <div className="border-t border-border/60 pt-5 space-y-4 text-left">
                 {/* Selector de Medio de Pago en 4 píldoras */}
-                <div className="space-y-1.5">
-                  <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground block">
+                <div className="space-y-2">
+                  <span className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground block">
                     Medio de Pago [F4]
                   </span>
-                  <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-2 gap-2 text-xs">
+                  <div className="grid grid-cols-2 gap-2.5 text-xs sm:text-sm">
                     {[
                       { id: "efectivo", label: "Efectivo", icon: DollarSign },
-                      { id: "transferencia", label: "Transf.", icon: Smartphone },
+                      { id: "transferencia", label: "Transferencia", icon: Smartphone },
                       { id: "debito", label: "Débito", icon: CreditCard },
                       { id: "credito", label: "Crédito", icon: Wallet },
                     ].map((m) => {
@@ -818,13 +861,13 @@ export default function POSPage() {
                           key={m.id}
                           type="button"
                           onClick={() => setPaymentMethod(m.id)}
-                          className={`flex items-center gap-2 px-3 py-2 rounded-lg border text-left cursor-pointer transition-all ${
+                          className={`flex items-center gap-2.5 px-3.5 py-2.5 rounded-xl border text-left cursor-pointer transition-all ${
                             active
-                              ? "bg-primary/15 border-primary text-primary font-bold"
+                              ? "bg-primary/15 border-primary text-primary font-bold shadow-xs"
                               : "border-border/70 bg-background/60 hover:bg-muted/30 text-foreground"
                           }`}
                         >
-                          <Icon className="w-3.5 h-3.5 shrink-0 text-primary" />
+                          <Icon className="w-4 h-4 shrink-0 text-primary" />
                           <span className="truncate">{m.label}</span>
                         </button>
                       );
@@ -834,24 +877,24 @@ export default function POSPage() {
 
                 {/* Calculadora de Vuelto (Solo Efectivo y cuando hay ítems) */}
                 {paymentMethod === "efectivo" && total > 0 && (
-                  <div className="bg-background/60 border border-border/70 rounded-xl p-3 space-y-2">
+                  <div className="bg-background/60 border border-border/70 rounded-xl p-4 space-y-2.5">
                     <div className="flex items-center justify-between">
                       <Label
                         htmlFor="cash-received"
-                        className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground"
+                        className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground"
                       >
                         Abona con (Opcional)
                       </Label>
                       <button
                         type="button"
                         onClick={() => setCashReceived(total.toString())}
-                        className="text-[10px] font-bold text-primary hover:underline cursor-pointer"
+                        className="text-[11px] font-bold text-primary hover:underline cursor-pointer"
                       >
                         Pago Justo (${total.toLocaleString("es-AR")})
                       </button>
                     </div>
                     <div className="relative">
-                      <span className="absolute left-3 top-2 text-xs font-mono text-muted-foreground">
+                      <span className="absolute left-3.5 top-2.5 text-sm font-mono text-muted-foreground">
                         $
                       </span>
                       <Input
@@ -861,15 +904,15 @@ export default function POSPage() {
                         value={cashReceived}
                         onChange={(e) => setCashReceived(e.target.value)}
                         onKeyDown={handleCashKeyDown}
-                        className="pl-7 h-8 text-xs font-mono bg-background focus-visible:ring-1 focus-visible:ring-primary rounded-lg"
+                        className="pl-8 h-10 text-sm font-mono bg-background focus-visible:ring-1 focus-visible:ring-primary rounded-xl"
                       />
                     </div>
                     {cashReceived !== "" && Number(cashReceived) > total && (
-                      <div className="flex justify-between items-baseline pt-0.5">
-                        <span className="text-[11px] text-muted-foreground">
+                      <div className="flex justify-between items-baseline pt-1">
+                        <span className="text-xs text-muted-foreground">
                           Vuelto a entregar:
                         </span>
-                        <span className="text-sm font-black font-outfit text-emerald-400 font-mono">
+                        <span className="text-base font-black font-outfit text-emerald-400 font-mono">
                           $
                           {(Number(cashReceived) - total).toLocaleString("es-AR", {
                             minimumFractionDigits: 2,
@@ -881,7 +924,7 @@ export default function POSPage() {
                     {cashReceived !== "" &&
                       Number(cashReceived) > 0 &&
                       Number(cashReceived) < total && (
-                        <div className="text-[10px] text-destructive font-semibold">
+                        <div className="text-xs text-destructive font-semibold">
                           Faltan: $
                           {(total - Number(cashReceived)).toLocaleString("es-AR", {
                             minimumFractionDigits: 2,
@@ -893,11 +936,11 @@ export default function POSPage() {
                 )}
 
                 {/* Totalizador */}
-                <div className="flex justify-between items-baseline bg-primary/10 p-3.5 rounded-xl border border-primary/25">
-                  <span className="text-xs font-bold tracking-wider text-primary uppercase">
+                <div className="flex justify-between items-baseline bg-primary/10 p-4 sm:p-5 rounded-xl border border-primary/25">
+                  <span className="text-xs sm:text-sm font-bold tracking-wider text-primary uppercase">
                     TOTAL A COBRAR:
                   </span>
-                  <span className="text-2xl font-black font-outfit text-primary font-mono">
+                  <span className="text-2xl sm:text-3xl font-black font-outfit text-primary font-mono">
                     $
                     {total.toLocaleString("es-AR", {
                       minimumFractionDigits: 2,
@@ -917,15 +960,15 @@ export default function POSPage() {
                       Number(cashReceived) > 0 &&
                       Number(cashReceived) < total)
                   }
-                  className="w-full bg-primary hover:bg-primary/95 text-primary-foreground font-bold text-xs rounded-xl cursor-pointer shadow-lg shadow-primary/20 transition-all flex items-center justify-center gap-2 h-11"
+                  className="w-full bg-primary hover:bg-primary/95 text-primary-foreground font-bold text-xs sm:text-sm rounded-xl cursor-pointer shadow-lg shadow-primary/20 transition-all flex items-center justify-center gap-2.5 h-12"
                 >
-                  <Printer className="w-4 h-4" />
+                  <Printer className="w-4.5 h-4.5" />
                   {submitting
                     ? "Procesando cobro..."
                     : "Confirmar y Emitir Ticket [F8]"}
                 </Button>
 
-                <p className="hidden md:block text-[10px] text-center text-muted-foreground font-mono">
+                <p className="hidden md:block text-[11px] text-center text-muted-foreground font-mono">
                   Atajos: [F2] Buscar • [F4] Medio de Pago • [F8] Cobrar
                 </p>
               </div>

@@ -14,15 +14,21 @@ import {
   X,
   RefreshCw,
 } from "lucide-react";
-import { api } from "@/services/api";
+import { api, normalizePlan, hasMultiTallerAccess, getLocalUser, saveLocalUser } from "@/services/api";
 
 export default function ProfilePage() {
-  const user = JSON.parse(localStorage.getItem("repairit_user") || "{}");
+  const initialUser = getLocalUser();
   const [venueName, setVenueName] = useState("");
   const [address, setAddress] = useState("");
   const [phone, setPhone] = useState("");
   const [email, setEmail] = useState("");
   const [venues, setVenues] = useState([]);
+  const [subscriptionPlan, setSubscriptionPlan] = useState(
+    normalizePlan(initialUser.subscriptionPlan)
+  );
+  const [subscriptionStatus, setSubscriptionStatus] = useState(
+    initialUser.subscriptionStatus || "activo"
+  );
 
   const [showPlansModal, setShowPlansModal] = useState(false);
 
@@ -42,6 +48,12 @@ export default function ProfilePage() {
       setAddress(data.address || "");
       setPhone(data.phone || "");
       setEmail(data.email || "");
+      if (data.subscriptionPlan) {
+        setSubscriptionPlan(normalizePlan(data.subscriptionPlan));
+      }
+      if (data.subscriptionStatus) {
+        setSubscriptionStatus(data.subscriptionStatus);
+      }
 
       // Cargar todas las sucursales de la organización
       const venuesData = await api.auth.getVenues();
@@ -124,8 +136,8 @@ export default function ProfilePage() {
       const updatedUser = await api.auth.switchVenue(venueId);
       
       // Actualizar sesión guardada
-      const localUser = JSON.parse(localStorage.getItem("repairit_user") || "{}");
-      localStorage.setItem("repairit_user", JSON.stringify({ ...localUser, venueId: updatedUser.venueId }));
+      const localUser = getLocalUser();
+      saveLocalUser({ ...localUser, venueId: updatedUser.venueId });
       
       toast.success("Sucursal activa cambiada", {
         description: "El panel de control se actualizará con el contexto de la nueva sucursal."
@@ -248,7 +260,7 @@ export default function ProfilePage() {
                   Gestioná o alterná las sedes de servicio de tu negocio.
                 </CardDescription>
               </div>
-              {user.subscriptionPlan === "Multi-Taller Pro" && (
+              {hasMultiTallerAccess(subscriptionPlan) && (
                 <Button
                   onClick={handleOpenCreateModal}
                   className="bg-primary/10 border border-primary/20 hover:bg-primary/20 text-primary text-[10px] font-extrabold uppercase py-1.5 px-3 rounded flex items-center gap-1 shrink-0 cursor-pointer"
@@ -259,7 +271,7 @@ export default function ProfilePage() {
               )}
             </div>
             <CardContent className="p-0">
-              {user.subscriptionPlan !== "Multi-Taller Pro" ? (
+              {!hasMultiTallerAccess(subscriptionPlan) ? (
                 <div className="flex flex-col items-center justify-center py-8 px-4 text-center space-y-3 bg-muted/5 rounded-lg border border-dashed border-border/50">
                   <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center text-primary">
                     <Store className="w-5 h-5" />
@@ -267,7 +279,7 @@ export default function ProfilePage() {
                   <div className="space-y-2 flex flex-col items-center">
                     <h4 className="font-outfit text-sm font-bold text-foreground">Gestión de Sucursales Limitada</h4>
                     <p className="text-xs text-muted-foreground max-w-sm font-light leading-relaxed mb-1">
-                      Mejore su plan al nivel <span className="text-primary font-semibold">Multi-Taller Pro</span> para poder gestionar y cambiar entre múltiples sedes de su negocio.
+                      Mejorá tu plan al nivel <span className="text-primary font-semibold">Multi-Taller Pro</span> para poder gestionar y alternar entre múltiples sucursales de tu negocio.
                     </p>
                     <Button
                       onClick={() => setShowPlansModal(true)}
@@ -355,7 +367,7 @@ export default function ProfilePage() {
               <div className="flex items-center justify-between">
                 <span className="text-muted-foreground">Plan Licenciado</span>
                 <Badge className="bg-primary hover:bg-primary text-primary-foreground text-[10px] font-extrabold uppercase">
-                  {user.subscriptionPlan || "Sin Plan"}
+                  {subscriptionPlan || "Taller Básico"}
                 </Badge>
               </div>
               <div className="flex items-center justify-between border-t border-border/30 pt-2.5">
@@ -364,9 +376,9 @@ export default function ProfilePage() {
               </div>
               <div className="flex items-center justify-between border-t border-border/30 pt-2.5">
                 <span className="text-muted-foreground">Estado del Pago</span>
-                <span className={user.subscriptionStatus === "activo" ? "text-emerald-400 font-bold flex items-center gap-1.5" : "text-destructive font-bold flex items-center gap-1.5"}>
-                  <CheckCircle className={user.subscriptionStatus === "activo" ? "w-3.5 h-3.5 fill-emerald-400/10" : "w-3.5 h-3.5 fill-destructive/10"} />
-                  {user.subscriptionStatus === "activo" ? "Al Día" : "Inactivo"}
+                <span className={subscriptionStatus === "activo" ? "text-emerald-400 font-bold flex items-center gap-1.5" : "text-destructive font-bold flex items-center gap-1.5"}>
+                  <CheckCircle className={subscriptionStatus === "activo" ? "w-3.5 h-3.5 fill-emerald-400/10" : "w-3.5 h-3.5 fill-destructive/10"} />
+                  {subscriptionStatus === "activo" ? "Al Día" : "Inactivo"}
                 </span>
               </div>
             </div>
@@ -507,14 +519,14 @@ export default function ProfilePage() {
               
               {/* Plan Básico */}
               <div className={`border rounded-xl p-5 flex flex-col justify-between space-y-4 transition-all ${
-                user.subscriptionPlan === "Sin Plan" || user.subscriptionPlan === "Taller Básico"
+                subscriptionPlan === "Taller Básico"
                   ? "border-primary/50 bg-primary/5 ring-1 ring-primary/20"
                   : "border-border/60 bg-card/25"
               }`}>
                 <div className="space-y-3">
                   <div className="flex items-center justify-between">
                     <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Taller Básico</span>
-                    {(user.subscriptionPlan === "Sin Plan" || user.subscriptionPlan === "Taller Básico") && (
+                    {subscriptionPlan === "Taller Básico" && (
                       <Badge className="bg-primary/20 text-primary hover:bg-primary/20 text-[8px] font-bold uppercase border border-primary/30">Activo</Badge>
                     )}
                   </div>
@@ -526,22 +538,23 @@ export default function ProfilePage() {
                     <li className="flex items-center gap-2">✓ 1 Sucursal física</li>
                     <li className="flex items-center gap-2">✓ Hasta 100 órdenes / mes</li>
                     <li className="flex items-center gap-2">✓ Inventario y stock básico</li>
-                    <li className="flex items-center gap-2">✓ Consulta de tracking pública</li>
+                    <li className="flex items-center gap-2">✓ Consulta de seguimiento en línea</li>
+                    <li className="flex items-center gap-2 text-muted-foreground/60">✕ Sin Control de Caja (POS)</li>
                   </ul>
                 </div>
               </div>
 
-              {/* Plan Premium */}
+              {/* Plan Taller Pro */}
               <div className={`border rounded-xl p-5 flex flex-col justify-between space-y-4 transition-all relative overflow-hidden ${
-                user.subscriptionPlan === "Taller Premium"
+                subscriptionPlan === "Taller Pro"
                   ? "border-primary/50 bg-primary/5 ring-1 ring-primary/20"
                   : "border-border/60 bg-card/25"
               }`}>
                 <div className="absolute top-0 right-0 bg-primary text-primary-foreground text-[8px] font-black uppercase py-0.5 px-3 rounded-bl-lg tracking-wider">Popular</div>
                 <div className="space-y-3">
                   <div className="flex items-center justify-between">
-                    <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Taller Premium</span>
-                    {user.subscriptionPlan === "Taller Premium" && (
+                    <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Taller Pro</span>
+                    {subscriptionPlan === "Taller Pro" && (
                       <Badge className="bg-primary/20 text-primary hover:bg-primary/20 text-[8px] font-bold uppercase border border-primary/30">Activo</Badge>
                     )}
                   </div>
@@ -550,10 +563,10 @@ export default function ProfilePage() {
                     <span className="text-[10px] text-muted-foreground font-light"> / mes</span>
                   </div>
                   <ul className="text-[11px] text-muted-foreground font-light space-y-2 border-t border-border/40 pt-3">
+                    <li className="flex items-center gap-2 text-primary font-bold">✓ Control de Caja y Punto de Venta (POS)</li>
                     <li className="flex items-center gap-2 text-foreground font-medium">✓ 1 Sucursal física</li>
                     <li className="flex items-center gap-2">✓ Órdenes y equipos ilimitados</li>
                     <li className="flex items-center gap-2">✓ Inventario con alertas críticas</li>
-                    <li className="flex items-center gap-2">✓ Dashboard métricas avanzado</li>
                     <li className="flex items-center gap-2">✓ Soporte prioritario 24/7</li>
                   </ul>
                 </div>
@@ -561,14 +574,14 @@ export default function ProfilePage() {
 
               {/* Plan Multi-Taller Pro */}
               <div className={`border rounded-xl p-5 flex flex-col justify-between space-y-4 transition-all ${
-                user.subscriptionPlan === "Multi-Taller Pro"
+                subscriptionPlan === "Multi-Taller Pro"
                   ? "border-primary/50 bg-primary/5 ring-1 ring-primary/20"
                   : "border-border/60 bg-card/25"
               }`}>
                 <div className="space-y-3">
                   <div className="flex items-center justify-between">
                     <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Multi-Taller Pro</span>
-                    {user.subscriptionPlan === "Multi-Taller Pro" && (
+                    {subscriptionPlan === "Multi-Taller Pro" && (
                       <Badge className="bg-primary/20 text-primary hover:bg-primary/20 text-[8px] font-bold uppercase border border-primary/30">Activo</Badge>
                     )}
                   </div>
@@ -577,9 +590,9 @@ export default function ProfilePage() {
                     <span className="text-[10px] text-muted-foreground font-light"> / mes</span>
                   </div>
                   <ul className="text-[11px] text-muted-foreground font-light space-y-2 border-t border-border/40 pt-3">
-                    <li className="flex items-center gap-2 text-primary font-bold">✓ Hasta 5 Sucursales</li>
-                    <li className="flex items-center gap-2">✓ Selector rápido en barra superior</li>
-                    <li className="flex items-center gap-2">✓ 4 cuentas Técnicos + 1 Admin</li>
+                    <li className="flex items-center gap-2 text-primary font-bold">✓ Hasta 5 Sucursales + Selector rápido</li>
+                    <li className="flex items-center gap-2 text-primary font-bold">✓ Control de Caja y Punto de Venta (POS)</li>
+                    <li className="flex items-center gap-2">✓ Cuentas de Acceso por sucursal</li>
                     <li className="flex items-center gap-2">✓ Órdenes e Inventario ilimitados</li>
                     <li className="flex items-center gap-2">✓ Reportes centralizados multisede</li>
                   </ul>

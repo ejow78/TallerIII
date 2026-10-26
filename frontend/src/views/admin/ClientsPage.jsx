@@ -325,7 +325,7 @@ export default function ClientsPage() {
             <span>Directorio de Clientes</span>
           </h1>
           <p className="text-xs text-muted-foreground font-light">
-            Gestión de fichas de clientes, contacto directo por WhatsApp e historial de reparaciones.
+            Gestión de fichas de clientes e historial técnico de reparaciones asociadas.
           </p>
         </div>
 
@@ -435,15 +435,6 @@ export default function ClientsPage() {
                         <Button
                           variant="outline"
                           size="icon-sm"
-                          onClick={() => handleOpenWhatsAppClient(client)}
-                          className="h-8 w-8 text-emerald-400 hover:bg-emerald-500/10 border-emerald-500/30 rounded-lg cursor-pointer"
-                          title="Escribir por WhatsApp"
-                        >
-                          <MessageCircle className="w-4 h-4" />
-                        </Button>
-                        <Button
-                          variant="outline"
-                          size="icon-sm"
                           onClick={() => handleViewOrders(client)}
                           disabled={clientOrders.length === 0}
                           className="h-8 w-8 text-muted-foreground hover:text-primary border-border/80 disabled:opacity-30 rounded-lg cursor-pointer"
@@ -539,15 +530,6 @@ export default function ClientsPage() {
                             >
                               <PlusCircle className="w-3.5 h-3.5" />
                               Orden
-                            </Button>
-                            <Button
-                              variant="ghost"
-                              size="icon-sm"
-                              onClick={() => handleOpenWhatsAppClient(client)}
-                              className="h-8 w-8 text-emerald-400 hover:text-emerald-300 hover:bg-emerald-500/15 rounded-lg cursor-pointer"
-                              title="Escribir por WhatsApp"
-                            >
-                              <MessageCircle className="w-4 h-4" />
                             </Button>
                             <Button
                               variant="ghost"
