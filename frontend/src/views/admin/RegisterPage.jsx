@@ -110,8 +110,13 @@ export default function RegisterPage() {
       });
     } catch (err) {
       console.error("Error en registro:", err);
+      const rawMsg = err?.message && err.message !== "{}" ? err.message : null;
+      const friendlyMsg =
+        err?.name === "AuthRetryableFetchError"
+          ? "El servidor de correo o autenticación demoró en responder. Verificá tu correo o intentá nuevamente."
+          : rawMsg || "Ocurrió un problema inesperado. Intentá nuevamente.";
       toast.error("Error al registrar el taller", {
-        description: err.message || "Ocurrió un problema inesperado. Intentá nuevamente."
+        description: friendlyMsg,
       });
       if (turnstileRef.current) {
         turnstileRef.current.reset();
