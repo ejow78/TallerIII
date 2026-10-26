@@ -613,41 +613,15 @@ export default function DashboardPage() {
 
   return (
     <div className="space-y-6 sm:space-y-8 animate-fade-in">
-      {/* Cabecera con Acciones Rápidas */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-        <div className="space-y-1">
-          <h1 className="font-outfit text-2xl sm:text-3xl font-bold text-foreground tracking-tight flex items-center gap-2.5">
-            <LayoutDashboard className="w-7 h-7 text-primary shrink-0" />
-            <span>Panel de Control</span>
-          </h1>
-          <p className="text-xs text-muted-foreground font-light">
-            Métricas operativas en tiempo real, flujo de órdenes y estado de inventario de la sucursal activa.
-          </p>
-        </div>
-
-        <div className="flex items-center gap-2.5">
-          <Button
-            asChild
-            variant="outline"
-            size="sm"
-            className="h-9 text-xs font-semibold border-border/80 bg-card/60 hover:bg-card gap-1.5 rounded-lg"
-          >
-            <Link to="/dashboard/caja">
-              <ShoppingCart className="w-3.5 h-3.5 text-primary" />
-              <span>Abrir Caja (POS)</span>
-            </Link>
-          </Button>
-          <Button
-            asChild
-            size="sm"
-            className="h-9 text-xs font-bold bg-primary hover:bg-primary/90 text-primary-foreground shadow-md shadow-primary/15 gap-1.5 rounded-lg"
-          >
-            <Link to="/dashboard/nuevo-ingreso">
-              <PlusCircle className="w-3.5 h-3.5" />
-              <span>Nuevo Ingreso</span>
-            </Link>
-          </Button>
-        </div>
+      {/* Cabecera interna */}
+      <div className="space-y-1">
+        <h1 className="font-outfit text-2xl sm:text-3xl font-bold text-foreground tracking-tight flex items-center gap-2.5">
+          <LayoutDashboard className="w-7 h-7 text-primary shrink-0" />
+          <span>Panel de Control</span>
+        </h1>
+        <p className="text-xs text-muted-foreground font-light">
+          Resumen operativo del taller y control de stock de insumos técnicos de la sucursal activa.
+        </p>
       </div>
 
       {/* Grid de 4 Tarjetas de Métricas Clave */}
