@@ -14,13 +14,7 @@ import {
   Building2,
   Wrench,
   Check,
-  ClipboardList,
-  ShoppingCart,
-  Package,
   Search,
-  Sparkles,
-  CheckCircle2,
-  AlertTriangle,
   Minus,
   Square,
   X,
@@ -30,7 +24,6 @@ export default function LandingPage() {
   const [isMobile, setIsMobile] = useState(false);
   const pricingCarouselRef = useRef(null);
   const [activePlanIndex, setActivePlanIndex] = useState(1); // 0: Inicial, 1: Pro, 2: Multi-Sucursal
-  const [heroTab, setHeroTab] = useState("ordenes"); // "ordenes" | "presupuestos" | "inventario" | "caja"
 
   useEffect(() => {
     document.title = "RepairIT | Software de Servicio Técnico y Gestión para Talleres";
@@ -214,21 +207,21 @@ export default function LandingPage() {
             </div>
           </div>
 
-          {/* Columna Derecha: Ventana Interactiva en Perspectiva 3D (Estilo Entropy) */}
+          {/* Columna Derecha: Captura Real del Panel de Control en Perspectiva 3D */}
           <div
             className="lg:col-span-7 flex items-center justify-center"
             style={{ perspective: "1300px" }}
           >
-            <div
-              className="w-full max-w-[660px] rounded-xl border border-border/80 bg-[#141417]/95 backdrop-blur-xl shadow-[-25px_30px_65px_rgba(0,0,0,0.65)] transition-transform duration-500 ease-out hover:[transform:rotateY(-6deg)_rotateX(2deg)] lg:[transform:rotateY(-14deg)_rotateX(5deg)_rotateZ(0.5deg)] overflow-hidden select-none"
-            >
-              {/* Barra Superior de la Ventana */}
-              <div className="flex items-center justify-between px-4 py-3 border-b border-white/10 bg-[#18181c]">
+            <div className="relative w-full max-w-[740px] rounded-xl border border-white/15 bg-[#141417] shadow-[-28px_32px_70px_rgba(0,0,0,0.75)] ring-1 ring-primary/20 transition-transform duration-500 ease-out hover:[transform:rotateY(-4deg)_rotateX(1.5deg)_scale(1.01)] lg:[transform:rotateY(-13deg)_rotateX(5deg)_rotateZ(0.5deg)] overflow-hidden select-none">
+              {/* Barra Superior Estilo Ventana Nativa */}
+              <div className="flex items-center justify-between px-4 py-2.5 border-b border-white/10 bg-[#18181c]">
                 <div className="flex items-center gap-2">
                   <span className="font-outfit text-xs font-black tracking-widest uppercase text-foreground">
                     REPAIR<span className="text-primary">IT</span>
                   </span>
-                  <span className="text-[10px] font-mono text-primary/80 font-bold">v2.4</span>
+                  <span className="text-[10px] font-mono text-muted-foreground/80">
+                    app.repairit.cloud
+                  </span>
                 </div>
                 <div className="flex items-center gap-2.5 text-muted-foreground/60">
                   <Minus className="w-3 h-3" />
@@ -237,263 +230,17 @@ export default function LandingPage() {
                 </div>
               </div>
 
-              {/* Barra de Pestañas Superiores Interactivas */}
-              <div className="flex items-center gap-1 sm:gap-3 px-4 py-2.5 border-b border-white/10 bg-[#16161a] overflow-x-auto">
-                {[
-                  { id: "ordenes", label: "Órdenes", icon: ClipboardList },
-                  { id: "presupuestos", label: "Presupuestos", icon: Wrench },
-                  { id: "inventario", label: "Inventario", icon: Package },
-                  { id: "caja", label: "Caja POS", icon: ShoppingCart },
-                ].map((tab) => {
-                  const Icon = tab.icon;
-                  const active = heroTab === tab.id;
-                  return (
-                    <button
-                      key={tab.id}
-                      type="button"
-                      onClick={() => setHeroTab(tab.id)}
-                      className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-medium transition-all cursor-pointer shrink-0 ${
-                        active
-                          ? "bg-primary/15 text-primary border border-primary/30 font-semibold"
-                          : "text-muted-foreground hover:text-foreground hover:bg-white/5"
-                      }`}
-                    >
-                      <Icon className="w-3.5 h-3.5" />
-                      <span>{tab.label}</span>
-                    </button>
-                  );
-                })}
-              </div>
-
-              {/* Cuerpo Interior de la Ventana */}
-              <div className="grid grid-cols-12 min-h-[300px] text-left">
-                {/* Sub-menú lateral izquierdo (estilo Entropy) */}
-                <div className="hidden sm:flex sm:col-span-3 flex-col justify-between border-r border-white/10 p-3.5 bg-[#151519] text-xs">
-                  <div className="space-y-1.5">
-                    <div className="px-2.5 py-1.5 rounded bg-primary/10 text-primary font-semibold border-l-2 border-primary">
-                      {heroTab === "ordenes" && "Laboratorio"}
-                      {heroTab === "presupuestos" && "Cotizaciones"}
-                      {heroTab === "inventario" && "Catálogo Stock"}
-                      {heroTab === "caja" && "Turno Actual"}
-                    </div>
-                    <div className="px-2.5 py-1.5 text-muted-foreground/70">Recepción QR</div>
-                    <div className="px-2.5 py-1.5 text-muted-foreground/70">Notificaciones</div>
-                    <div className="px-2.5 py-1.5 text-muted-foreground/70">Historial DNI</div>
-                    <div className="px-2.5 py-1.5 text-muted-foreground/70">Exportar XLSX</div>
-                  </div>
-
-                  <div className="rounded-lg border border-white/10 bg-black/30 p-2.5 space-y-1">
-                    <span className="text-[9px] uppercase tracking-wider text-muted-foreground block">
-                      Sucursal Activa
-                    </span>
-                    <span className="text-[11px] font-bold text-foreground flex items-center gap-1.5">
-                      <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
-                      Sede Central
-                    </span>
-                  </div>
-                </div>
-
-                {/* Panel Derecho Dinámico */}
-                <div className="col-span-12 sm:col-span-9 p-4 sm:p-5 bg-[#121215]">
-                  <div className="rounded-lg border border-primary/25 bg-[#17171c] p-4 h-full flex flex-col justify-between space-y-4">
-                    {heroTab === "ordenes" && (
-                      <>
-                        <div className="flex items-center justify-between border-b border-white/10 pb-2.5">
-                          <div>
-                            <span className="text-xs font-bold text-foreground block">
-                              Trazabilidad de Equipos en Vivo
-                            </span>
-                            <span className="text-[10px] text-muted-foreground">
-                              Sincronizado con portal público QR
-                            </span>
-                          </div>
-                          <span className="px-2 py-0.5 rounded bg-primary/15 text-primary border border-primary/30 font-mono text-[10px] font-bold">
-                            12 Activas
-                          </span>
-                        </div>
-
-                        <div className="space-y-2.5">
-                          {[
-                            {
-                              code: "RT-TESIS2026",
-                              device: 'MacBook Pro 14" M2',
-                              client: "Martín Gómez",
-                              status: "Presupuestado",
-                              color: "text-purple-400 bg-purple-500/10 border-purple-500/25",
-                            },
-                            {
-                              code: "RT-8N2K5W9P",
-                              device: "HP Pavilion 15",
-                              client: "Lucía Fernández",
-                              status: "Listo p/ Retirar",
-                              color: "text-emerald-400 bg-emerald-500/10 border-emerald-500/25",
-                            },
-                            {
-                              code: "RT-2W8Q4Z7E",
-                              device: "iPhone 13 Pro 128GB",
-                              client: "Sofía Albornoz",
-                              status: "En Reparación",
-                              color: "text-sky-400 bg-sky-500/10 border-sky-500/25",
-                            },
-                          ].map((row) => (
-                            <div
-                              key={row.code}
-                              className="flex items-center justify-between p-2.5 rounded-lg bg-black/35 border border-white/5 text-xs"
-                            >
-                              <div className="space-y-0.5">
-                                <div className="flex items-center gap-2">
-                                  <span className="font-mono font-bold text-primary text-[11px]">
-                                    {row.code}
-                                  </span>
-                                  <span className="font-semibold text-foreground">{row.device}</span>
-                                </div>
-                                <span className="text-[10px] text-muted-foreground block">
-                                  Cliente: {row.client}
-                                </span>
-                              </div>
-                              <span
-                                className={`text-[9px] uppercase font-bold px-2 py-0.5 rounded border ${row.color}`}
-                              >
-                                {row.status}
-                              </span>
-                            </div>
-                          ))}
-                        </div>
-                      </>
-                    )}
-
-                    {heroTab === "presupuestos" && (
-                      <>
-                        <div className="flex items-center justify-between border-b border-white/10 pb-2.5">
-                          <div>
-                            <span className="text-xs font-bold text-foreground block">
-                              Orden #RT-TESIS2026 • MacBook Pro M2
-                            </span>
-                            <span className="text-[10px] text-muted-foreground">
-                              Aprobación digital validada con DNI del titular
-                            </span>
-                          </div>
-                          <span className="px-2 py-0.5 rounded bg-emerald-500/15 text-emerald-400 border border-emerald-500/30 font-mono text-[10px] font-bold">
-                            Aprobado
-                          </span>
-                        </div>
-
-                        <div className="space-y-2 text-xs">
-                          <div className="flex justify-between p-2 rounded bg-black/30 border border-white/5">
-                            <span className="text-muted-foreground">
-                              Reparación placa lógica PPBUS_AON
-                            </span>
-                            <span className="font-mono font-bold text-foreground">$85.000</span>
-                          </div>
-                          <div className="flex justify-between p-2 rounded bg-black/30 border border-white/5">
-                            <span className="text-muted-foreground">
-                              Controlador USB-C CD3217 + Lavado ultrasónico
-                            </span>
-                            <span className="font-mono font-bold text-foreground">$35.000</span>
-                          </div>
-                          <div className="flex justify-between items-center pt-2 border-t border-white/10">
-                            <span className="text-[11px] text-muted-foreground">
-                              Firmado con DNI 38.123.456
-                            </span>
-                            <span className="font-outfit text-base font-black text-primary">
-                              Total: $120.000
-                            </span>
-                          </div>
-                        </div>
-                      </>
-                    )}
-
-                    {heroTab === "inventario" && (
-                      <>
-                        <div className="flex items-center justify-between border-b border-white/10 pb-2.5">
-                          <div>
-                            <span className="text-xs font-bold text-foreground block">
-                              Control de Repuestos e Insumos
-                            </span>
-                            <span className="text-[10px] text-muted-foreground">
-                              Lectura con escáner de código de barras (100ms)
-                            </span>
-                          </div>
-                          <span className="px-2 py-0.5 rounded bg-amber-500/15 text-amber-400 border border-amber-500/30 font-mono text-[10px] font-bold">
-                            Alertas Activas
-                          </span>
-                        </div>
-
-                        <div className="space-y-2.5 text-xs">
-                          <div className="flex items-center justify-between p-2.5 rounded-lg bg-black/35 border border-white/5">
-                            <div>
-                              <span className="font-semibold text-foreground block">
-                                Módulo Display iPhone 13 OLED
-                              </span>
-                              <span className="text-[10px] text-muted-foreground font-mono">
-                                SKU: MOD-IP13-OR • $115.000
-                              </span>
-                            </div>
-                            <span className="text-[10px] font-mono font-bold text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded">
-                              6 en stock
-                            </span>
-                          </div>
-                          <div className="flex items-center justify-between p-2.5 rounded-lg bg-black/35 border border-destructive/30">
-                            <div>
-                              <span className="font-semibold text-foreground block">
-                                Módulo Samsung Galaxy A54 5G
-                              </span>
-                              <span className="text-[10px] text-muted-foreground font-mono">
-                                SKU: MOD-A54-SAM • Mínimo: 4 u.
-                              </span>
-                            </div>
-                            <span className="text-[10px] font-mono font-bold text-destructive bg-destructive/15 px-2 py-0.5 rounded flex items-center gap-1">
-                              <AlertTriangle className="w-3 h-3" /> 2 u.
-                            </span>
-                          </div>
-                        </div>
-                      </>
-                    )}
-
-                    {heroTab === "caja" && (
-                      <>
-                        <div className="flex items-center justify-between border-b border-white/10 pb-2.5">
-                          <div>
-                            <span className="text-xs font-bold text-foreground block">
-                              Punto de Venta & Caja Diaria
-                            </span>
-                            <span className="text-[10px] text-muted-foreground">
-                              Cobros multimedio y emisión de tickets 80mm
-                            </span>
-                          </div>
-                          <span className="px-2 py-0.5 rounded bg-primary/15 text-primary border border-primary/30 font-mono text-[10px] font-bold">
-                            Turno Abierto
-                          </span>
-                        </div>
-
-                        <div className="grid grid-cols-2 gap-2.5 text-xs">
-                          <div className="p-3 rounded-lg bg-black/35 border border-white/5">
-                            <span className="text-[10px] text-muted-foreground block">
-                              Efectivo en Caja
-                            </span>
-                            <span className="font-outfit text-lg font-black text-emerald-400">
-                              $123.500
-                            </span>
-                          </div>
-                          <div className="p-3 rounded-lg bg-black/35 border border-white/5">
-                            <span className="text-[10px] text-muted-foreground block">
-                              Transferencias / Tarjetas
-                            </span>
-                            <span className="font-outfit text-lg font-black text-sky-400">
-                              $178.000
-                            </span>
-                          </div>
-                        </div>
-                      </>
-                    )}
-
-                    {/* Barra de progreso inferior tipo slider */}
-                    <div className="pt-2 border-t border-white/10 flex items-center justify-between text-[10px] text-muted-foreground">
-                      <span>Sincronización Cloud en tiempo real</span>
-                      <span className="font-mono text-primary font-bold">SSL / RLS Activo</span>
-                    </div>
-                  </div>
-                </div>
+              {/* Imagen Real del Dashboard */}
+              <div className="relative bg-[#111113]">
+                <img
+                  src="/hero-dashboard.png"
+                  alt="Panel de Control de RepairIT con métricas, gráficos e inventario en vivo"
+                  className="w-full h-auto block object-cover"
+                  loading="eager"
+                />
+                {/* Sutil brillo superior y viñeta inferior */}
+                <div className="pointer-events-none absolute inset-0 ring-1 ring-inset ring-white/5" />
+                <div className="pointer-events-none absolute inset-x-0 bottom-0 h-10 bg-gradient-to-t from-[#111113]/60 to-transparent" />
               </div>
             </div>
           </div>
