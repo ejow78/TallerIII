@@ -144,12 +144,12 @@ export default function ProfilePage() {
     <div className="space-y-6">
       {/* Cabecera interna */}
       <div className="space-y-1">
-        <h1 className="font-outfit text-3xl font-bold text-foreground tracking-tight flex items-center gap-2.5">
-          <Store className="w-7 h-7 text-primary shrink-0" />
-          <span>Perfil de Taller</span>
+        <h1 className="font-outfit text-2xl sm:text-3xl font-bold text-foreground tracking-tight flex items-center gap-2.5">
+          <Store className="w-6 h-6 sm:w-7 sm:h-7 text-primary shrink-0" />
+          <span>Configuración de Taller</span>
         </h1>
         <p className="text-xs text-muted-foreground font-light">
-          Gestión del perfil del local y estado de la suscripción de la sucursal.
+          Gestión de los datos comerciales de la sucursal activa y estado de tu suscripción.
         </p>
       </div>
 

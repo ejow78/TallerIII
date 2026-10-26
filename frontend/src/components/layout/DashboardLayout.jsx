@@ -106,7 +106,14 @@ export default function DashboardLayout() {
             api.inventory.getAll().catch(() => []),
           ]);
 
-          if (profile) setActiveVenue(profile);
+          if (profile) {
+            setActiveVenue(profile);
+            if (profile.subscriptionPlan && profile.subscriptionPlan !== user.subscriptionPlan) {
+              const updatedLocal = { ...user, subscriptionPlan: profile.subscriptionPlan };
+              localStorage.setItem("repairit_user", JSON.stringify(updatedLocal));
+              sessionStorage.setItem("repairit_user", JSON.stringify(updatedLocal));
+            }
+          }
           if (venuesData) setVenues(venuesData);
 
           const activeOrders = (ordersData || []).filter(
@@ -415,7 +422,8 @@ export default function DashboardLayout() {
                         </SidebarMenuButton>
                       </SidebarMenuItem>
 
-                      {user.role === "admin" && user.subscriptionPlan === "Multi-Taller Pro" && (
+                      {user.role === "admin" &&
+                        (activeVenue ? activeVenue.subscriptionPlan : user.subscriptionPlan) === "Multi-Taller Pro" && (
                         <SidebarMenuItem>
                           <SidebarMenuButton
                             asChild
@@ -438,7 +446,7 @@ export default function DashboardLayout() {
 
           {/* Pie de Sidebar con Perfil y Cerrar Sesión */}
           <SidebarFooter className="p-3.5 sm:p-4 border-t border-border/85 space-y-3 sm:space-y-4 bg-card/65 shrink-0">
-            <div className="flex items-center justify-between px-2 w-full gap-2">
+            <div className="flex items-center px-2 w-full">
               <div className="flex items-center gap-3 min-w-0">
                 <div className="w-8 h-8 rounded-full bg-primary/10 border border-primary/20 flex items-center justify-center font-bold text-xs text-primary uppercase shrink-0">
                   {isSuperAdmin
@@ -463,19 +471,6 @@ export default function DashboardLayout() {
                   </span>
                 </div>
               </div>
-              {!isSuperAdmin && (
-                <Button
-                  asChild
-                  variant="ghost"
-                  size="icon"
-                  className="h-8 w-8 text-muted-foreground hover:text-foreground cursor-pointer shrink-0"
-                  title="Configuración de Taller"
-                >
-                  <NavLink to="/dashboard/perfil">
-                    <Settings className="w-4 h-4" />
-                  </NavLink>
-                </Button>
-              )}
             </div>
 
             <Button

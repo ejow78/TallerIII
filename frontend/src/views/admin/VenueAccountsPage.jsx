@@ -187,8 +187,12 @@ export default function VenueAccountsPage() {
         <div className="space-y-1 text-left">
           <p className="text-foreground font-medium">¿Cómo funcionan estas cuentas?</p>
           <p>
-            Estas credenciales están diseñadas para ser ingresadas en las computadoras fijas del taller de cada sede. 
-            El personal técnico que inicie sesión con estas cuentas **solo podrá ver, editar y registrar información correspondiente a su sucursal asociada**. No tendrán acceso a la facturación, configuración global ni a otras sedes.
+            Estas credenciales están diseñadas para ser ingresadas en las computadoras fijas del taller de cada sucursal.{" "}
+            El personal técnico que inicie sesión con estas cuentas{" "}
+            <strong className="font-semibold text-foreground">
+              solo podrá ver, editar y registrar información correspondiente a su sucursal asociada
+            </strong>
+            . No tendrán acceso a la facturación, configuración global ni a otras sucursales.
           </p>
         </div>
       </div>
