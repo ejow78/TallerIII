@@ -625,7 +625,7 @@ export default function OrdersPage() {
       </div>
 
       <div className="animate-fade-in pt-2">
-        <Card className="bg-card/20 border-border p-6 shadow-sm flex flex-col justify-between">
+        <Card className="bg-card/20 border-border p-4 sm:p-6 shadow-sm flex flex-col justify-between">
           <div className="space-y-4">
             <div className="flex items-center justify-between border-b border-border/50 pb-3">
               <CardTitle className="font-outfit text-base font-bold text-foreground/90 flex items-center gap-2 border-0 pb-0">
@@ -664,7 +664,7 @@ export default function OrdersPage() {
                 <Button
                   onClick={handleExportToExcel}
                   variant="outline"
-                  className="h-9 border-emerald-500/40 hover:bg-emerald-500/10 text-emerald-400 text-xs font-bold flex items-center gap-1.5 cursor-pointer select-none rounded-lg"
+                  className="h-9 border-emerald-500/40 hover:bg-emerald-500/10 text-emerald-400 text-xs font-bold flex items-center gap-1.5 cursor-pointer select-none rounded-lg shrink-0"
                   title="Exportar órdenes a Excel"
                 >
                   <FileSpreadsheet className="w-4 h-4" />
@@ -673,14 +673,116 @@ export default function OrdersPage() {
               </div>
             </div>
 
-            {/* Tabla de Órdenes */}
+            {/* Tabla / Tarjetas de Órdenes */}
             {loading ? (
               <div className="text-center py-16 text-xs text-muted-foreground font-light">
                 <div className="w-6 h-6 border-2 border-primary border-t-transparent rounded-full animate-spin mx-auto mb-2" />
                 Cargando órdenes de servicio...
               </div>
             ) : filteredOrders.length > 0 ? (
-              <div className="overflow-x-auto">
+              <>
+                {/* Vista Móvil (< md): Tarjetas operativas */}
+                <div className="space-y-3 md:hidden">
+                  {filteredOrders.map((o) => {
+                    const client = o.clientId || {};
+                    const hasDiag = !!o.diagnosis;
+                    const hasBudget = o.budget && Array.isArray(o.budget.items) && o.budget.items.length > 0;
+                    const totalB = hasBudget ? o.budget.items.reduce((s, i) => s + i.price, 0) : 0;
+
+                    return (
+                      <div
+                        key={o._id}
+                        className="rounded-xl border border-border/70 bg-background/50 p-3.5 space-y-3 text-left"
+                      >
+                        <div className="flex items-start justify-between gap-2">
+                          <div>
+                            <a
+                              href={window.location.hostname.includes("repairit.cloud") ? `https://tracking.repairit.cloud/seguimiento/${o.trackingCode}` : `/seguimiento/${o.trackingCode}`}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="font-mono text-xs font-bold text-primary inline-flex items-center gap-1 hover:underline"
+                            >
+                              <span>{o.trackingCode}</span>
+                              <ExternalLink className="w-3 h-3 opacity-70" />
+                            </a>
+                            <div className="text-[10px] text-muted-foreground font-mono mt-0.5">
+                              {o.date || (o.created_at ? new Date(o.created_at).toLocaleDateString("es-AR") : "")}
+                              {(o.time || o.created_at) ? ` • ${o.time || new Date(o.created_at).toLocaleTimeString("es-AR", { hour: "2-digit", minute: "2-digit" })}` : ""}
+                            </div>
+                          </div>
+                          <div className="shrink-0">{getStatusDropdown(o._id, o.status)}</div>
+                        </div>
+
+                        <div className="grid grid-cols-2 gap-2 pt-2 border-t border-border/40 text-xs">
+                          <div>
+                            <span className="text-[10px] uppercase tracking-wider text-muted-foreground block">Equipo</span>
+                            <span className="font-semibold text-foreground block leading-snug">{o.deviceModel}</span>
+                            <span className="text-[10px] text-muted-foreground">{o.deviceType}</span>
+                          </div>
+                          <div>
+                            <span className="text-[10px] uppercase tracking-wider text-muted-foreground block">Cliente</span>
+                            <span className="font-semibold text-foreground block leading-snug">{client.name || "N/A"}</span>
+                            {client.dni && <span className="text-[10px] text-muted-foreground font-mono block">DNI: {client.dni}</span>}
+                          </div>
+                        </div>
+
+                        {(hasDiag || hasBudget) && (
+                          <div className="rounded-lg bg-card/60 border border-border/40 p-2.5 space-y-1 text-xs">
+                            {hasDiag && (
+                              <p className="text-[11px] text-muted-foreground line-clamp-2 leading-snug">
+                                <strong className="text-foreground">Diag:</strong> {o.diagnosis}
+                              </p>
+                            )}
+                            {hasBudget && (
+                              <div className="flex items-center justify-between pt-1">
+                                <span className="text-xs font-mono font-bold text-emerald-400">
+                                  ${totalB.toLocaleString("es-AR")}
+                                </span>
+                                {o.budget?.approved ? (
+                                  <Badge className="text-[9px] bg-emerald-500/15 text-emerald-400 border-emerald-500/30 font-bold px-1.5 py-0">
+                                    Aprobado ✓
+                                  </Badge>
+                                ) : o.budget?.rejected ? (
+                                  <Badge className="text-[9px] bg-rose-500/15 text-rose-400 border-rose-500/30 font-bold px-1.5 py-0">
+                                    Rechazado ✕
+                                  </Badge>
+                                ) : (
+                                  <Badge className="text-[9px] bg-amber-500/15 text-amber-400 border-amber-500/30 font-semibold px-1.5 py-0">
+                                    Pendiente
+                                  </Badge>
+                                )}
+                              </div>
+                            )}
+                          </div>
+                        )}
+
+                        <div className="flex items-center gap-2 pt-1">
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => handleOpenDiagModal(o)}
+                            className="flex-1 h-8 text-xs font-bold border-primary/30 text-primary hover:bg-primary/10 rounded-lg flex items-center justify-center gap-1.5 cursor-pointer"
+                          >
+                            <Stethoscope className="w-3.5 h-3.5" />
+                            Diagnóstico y Presupuesto
+                          </Button>
+                          <Button
+                            variant="outline"
+                            size="icon-sm"
+                            onClick={() => handlePrintOrder(o)}
+                            className="h-8 w-8 text-muted-foreground hover:text-primary border-border/80 rounded-lg cursor-pointer shrink-0"
+                            title="Imprimir Comprobante"
+                          >
+                            <Printer className="w-4 h-4" />
+                          </Button>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+
+                {/* Vista Escritorio (>= md): Tabla completa */}
+                <div className="hidden md:block overflow-x-auto">
                 <table className="w-full text-left text-xs border-collapse">
                   <thead>
                     <tr className="border-b border-border/60 text-muted-foreground uppercase tracking-wider font-semibold">
@@ -798,6 +900,7 @@ export default function OrdersPage() {
                   </tbody>
                 </table>
               </div>
+              </>
             ) : (
               <div className="text-center py-16 space-y-2">
                 <p className="text-xs text-muted-foreground leading-normal font-light">

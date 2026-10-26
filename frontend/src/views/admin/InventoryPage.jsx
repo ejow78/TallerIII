@@ -525,7 +525,7 @@ export default function InventoryPage() {
       </div>
 
       {/* Barra de herramientas */}
-      <Card className="bg-card/20 border-border p-6 shadow-sm space-y-4">
+      <Card className="bg-card/20 border-border p-4 sm:p-6 shadow-sm space-y-4">
         <div className="flex flex-col md:flex-row gap-4 items-center justify-between border-b border-border/50 pb-4">
           <div className="relative w-full md:max-w-xs flex items-center">
             <Search className="w-4 h-4 text-muted-foreground absolute left-3 pointer-events-none" />
@@ -562,7 +562,7 @@ export default function InventoryPage() {
               <option value="sin">Sin Stock</option>
             </select>
 
-            <div className="flex gap-2 w-full sm:w-auto">
+            <div className="grid grid-cols-2 sm:flex gap-2 w-full sm:w-auto">
               <input
                 ref={fileInputRef}
                 type="file"
@@ -573,7 +573,7 @@ export default function InventoryPage() {
               <Button
                 variant="outline"
                 onClick={() => fileInputRef.current?.click()}
-                className="h-9 border-border/80 text-xs font-semibold flex items-center gap-1.5 cursor-pointer w-full sm:w-auto"
+                className="h-9 border-border/80 text-xs font-semibold flex items-center justify-center gap-1.5 cursor-pointer w-full sm:w-auto"
                 title="Importar catálogo desde CSV"
               >
                 <Upload className="w-3.5 h-3.5" />
@@ -582,7 +582,7 @@ export default function InventoryPage() {
               <Button
                 variant="outline"
                 onClick={handleExportToExcel}
-                className="h-9 border-border/80 text-xs font-semibold flex items-center gap-1.5 cursor-pointer w-full sm:w-auto"
+                className="h-9 border-border/80 text-xs font-semibold flex items-center justify-center gap-1.5 cursor-pointer w-full sm:w-auto"
                 title="Exportar catálogo a Excel (.xlsx)"
               >
                 <Download className="w-3.5 h-3.5" />
@@ -592,9 +592,101 @@ export default function InventoryPage() {
           </div>
         </div>
 
-        {/* Tabla de Resultados */}
+        {/* Tabla / Tarjetas de Resultados */}
         {filteredItems.length > 0 ? (
-          <div className="overflow-x-auto">
+          <>
+            {/* Vista Móvil (< md): Tarjetas de Insumos */}
+            <div className="space-y-3 md:hidden">
+              {filteredItems.map((item) => {
+                const minQty = item.min_quantity || item.minQuantity || 0;
+                const { label, colorClass } = getStockStatus(item.quantity || 0, minQty);
+                return (
+                  <div
+                    key={item._id}
+                    className="rounded-xl border border-border/70 bg-background/50 p-3.5 space-y-3 text-left"
+                  >
+                    <div className="flex items-start justify-between gap-2">
+                      <div className="min-w-0">
+                        <span className="font-bold text-foreground text-sm block leading-snug">
+                          {item.name}
+                        </span>
+                        <div className="flex items-center gap-1.5 mt-1 flex-wrap">
+                          <span className="font-mono text-[10px] text-muted-foreground bg-muted/40 px-1.5 py-0.5 rounded border border-border/50">
+                            {item.code}
+                          </span>
+                          <Badge variant="secondary" className="text-[9px] uppercase font-bold px-1.5 py-0">
+                            {item.category}
+                          </Badge>
+                        </div>
+                      </div>
+                      <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-[9px] font-bold uppercase border shrink-0 whitespace-nowrap ${colorClass}`}>
+                        {label}
+                      </span>
+                    </div>
+
+                    <div className="flex items-center justify-between pt-2 border-t border-border/40 text-xs">
+                      <div>
+                        <span className="text-[10px] uppercase tracking-wider text-muted-foreground block">Precio Venta</span>
+                        <span className="font-mono font-bold text-primary text-sm">
+                          ${(item.price || 0).toLocaleString("es-AR", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                        </span>
+                      </div>
+                      <div className="text-right">
+                        <span className="text-[10px] uppercase tracking-wider text-muted-foreground block">Stock / Mínimo</span>
+                        <span className="font-mono font-bold text-foreground text-sm">
+                          {item.quantity} <span className="text-muted-foreground text-xs font-normal">/ {minQty} u.</span>
+                        </span>
+                      </div>
+                    </div>
+
+                    <div className="flex items-center justify-between pt-1 gap-2">
+                      <div className="flex items-center gap-1.5">
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => adjustQuantity(item._id, 1)}
+                          className="h-8 px-2.5 text-emerald-500 border-emerald-500/30 hover:bg-emerald-500/10 cursor-pointer rounded-lg text-xs font-bold gap-1"
+                        >
+                          <Plus className="w-3.5 h-3.5" /> 1
+                        </Button>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => adjustQuantity(item._id, -1)}
+                          className="h-8 px-2.5 text-amber-500 border-amber-500/30 hover:bg-amber-500/10 cursor-pointer rounded-lg text-xs font-bold gap-1"
+                        >
+                          <Minus className="w-3.5 h-3.5" /> 1
+                        </Button>
+                      </div>
+
+                      <div className="flex items-center gap-1">
+                        <Button
+                          variant="ghost"
+                          size="icon-sm"
+                          onClick={() => handleOpenEditModal(item)}
+                          className="h-8 w-8 text-muted-foreground hover:text-foreground hover:bg-muted/40 cursor-pointer rounded-lg"
+                          title="Editar insumo"
+                        >
+                          <Pencil className="w-3.5 h-3.5" />
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="icon-sm"
+                          onClick={() => handleDeleteItem(item._id, item.name)}
+                          className="h-8 w-8 text-destructive hover:text-destructive hover:bg-destructive/10 cursor-pointer rounded-lg"
+                          title="Eliminar insumo"
+                        >
+                          <Trash2 className="w-3.5 h-3.5" />
+                        </Button>
+                      </div>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+
+            {/* Vista Escritorio (>= md): Tabla completa */}
+            <div className="hidden md:block overflow-x-auto">
             <table className="w-full text-left text-xs border-collapse">
               <thead>
                 <tr className="border-b border-border/60 text-muted-foreground uppercase tracking-wider font-semibold">
@@ -686,6 +778,7 @@ export default function InventoryPage() {
               </tbody>
             </table>
           </div>
+          </>
         ) : (
           <div className="text-center py-12 text-muted-foreground text-xs font-light">
             No se encontraron insumos que coincidan con la búsqueda.

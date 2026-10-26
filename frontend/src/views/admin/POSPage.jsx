@@ -801,8 +801,8 @@ export default function POSPage() {
                       {submitting ? "Confirmando..." : "Confirmar y Emitir Ticket [F8]"}
                     </Button>
 
-                    {/* Atajos de teclado informativos */}
-                    <div className="bg-muted/15 border border-border/40 rounded-xl p-3 text-[9px] text-muted-foreground space-y-1.5">
+                    {/* Atajos de teclado informativos (Solo escritorio) */}
+                    <div className="hidden md:block bg-muted/15 border border-border/40 rounded-xl p-3 text-[9px] text-muted-foreground space-y-1.5">
                       <span className="font-bold uppercase tracking-wider flex items-center gap-1.5 text-foreground/80">
                         <Keyboard className="w-3.5 h-3.5 text-primary" />
                         Atajos de Teclado Rápidos
@@ -885,7 +885,57 @@ export default function POSPage() {
                   <p>No se encontraron transacciones en esta sucursal.</p>
                 </div>
               ) : (
-                <div className="overflow-x-auto">
+                <>
+                  {/* Vista Móvil (< md): Tarjetas de Ventas */}
+                  <div className="space-y-3 p-3.5 md:hidden">
+                    {sales.map((sale) => (
+                      <div
+                        key={sale._id}
+                        className="rounded-xl border border-border/70 bg-background/50 p-3.5 space-y-2.5 text-left"
+                      >
+                        <div className="flex items-start justify-between gap-2">
+                          <div>
+                            <span className="font-mono font-bold text-xs text-primary block">
+                              #{sale._id.substring(0, 8).toUpperCase()}
+                            </span>
+                            <span className="font-mono text-[10px] text-muted-foreground block mt-0.5">
+                              {new Date(sale.created_at).toLocaleString("es-AR")}
+                            </span>
+                          </div>
+                          <Badge variant="secondary" className="text-[9px] font-bold uppercase px-2 py-0.5 shrink-0">
+                            {sale.payment_method}
+                          </Badge>
+                        </div>
+
+                        <p className="text-xs text-foreground font-light leading-snug pt-1.5 border-t border-border/40">
+                          {sale.items?.map((i) => `${i.name} (x${i.quantity})`).join(", ")}
+                        </p>
+
+                        <div className="flex items-center justify-between pt-1">
+                          <div>
+                            <span className="text-[10px] text-muted-foreground block">
+                              {sale.venueName} • {sale.cajero}
+                            </span>
+                            <span className="font-mono font-black text-base text-foreground">
+                              ${Number(sale.total).toLocaleString("es-AR", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                            </span>
+                          </div>
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => handlePrintReceipt(sale._id, sale.items, Number(sale.total), sale.payment_method, sale.created_at)}
+                            className="h-8 text-xs font-bold border-primary/30 text-primary hover:bg-primary/10 rounded-lg gap-1.5 cursor-pointer"
+                          >
+                            <Printer className="w-3.5 h-3.5" />
+                            Ticket
+                          </Button>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+
+                  {/* Vista Escritorio (>= md): Tabla completa */}
+                  <div className="hidden md:block overflow-x-auto">
                   <table className="w-full text-left text-xs border-collapse">
                     <thead>
                       <tr className="border-b border-border/60 bg-muted/15 text-muted-foreground font-medium uppercase text-[10px] tracking-wider">
@@ -944,6 +994,7 @@ export default function POSPage() {
                     </tbody>
                   </table>
                 </div>
+                </>
               )}
             </CardContent>
           </Card>

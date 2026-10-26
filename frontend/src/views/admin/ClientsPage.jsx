@@ -286,7 +286,7 @@ export default function ClientsPage() {
 
       <div className="animate-fade-in pt-2">
         {activeTab === "control" ? (
-          <Card className="bg-card/20 border-border p-6 shadow-sm space-y-4">
+          <Card className="bg-card/20 border-border p-4 sm:p-6 shadow-sm space-y-4">
             
             {/* Buscador y Exportación */}
             <div className="flex flex-col sm:flex-row gap-4 items-center justify-between border-b border-border/50 pb-4">
@@ -318,7 +318,89 @@ export default function ClientsPage() {
 
             {/* Listado de Clientes */}
             {filteredClients.length > 0 ? (
-              <div className="overflow-x-auto">
+              <>
+                {/* Vista Móvil (< md): Tarjetas de Clientes */}
+                <div className="space-y-3 md:hidden">
+                  {filteredClients.map((client) => {
+                    const clientOrders = orders.filter((o) => {
+                      const oClientId = typeof o.clientId === "object" ? o.clientId._id : o.clientId;
+                      return oClientId === client._id;
+                    });
+                    return (
+                      <div
+                        key={client._id}
+                        className="rounded-xl border border-border/70 bg-background/50 p-3.5 space-y-2.5 text-left"
+                      >
+                        <div className="flex items-start justify-between gap-2">
+                          <div>
+                            <span className="font-bold text-foreground text-sm block leading-snug">
+                              {client.name}
+                            </span>
+                            <span className="font-mono text-[11px] text-muted-foreground block mt-0.5">
+                              DNI: {client.dni} • ID: {client._id.substring(client._id.length - 6).toUpperCase()}
+                            </span>
+                          </div>
+                          <Badge
+                            variant={clientOrders.length > 0 ? "default" : "secondary"}
+                            className="text-[10px] font-bold shrink-0"
+                          >
+                            {clientOrders.length} {clientOrders.length === 1 ? "orden" : "órdenes"}
+                          </Badge>
+                        </div>
+
+                        <div className="text-xs text-muted-foreground space-y-0.5 pt-2 border-t border-border/40">
+                          {client.phone && <div className="text-foreground/90 font-medium">Tel: {client.phone}</div>}
+                          {client.email && <div className="text-[11px] truncate">{client.email}</div>}
+                        </div>
+
+                        <div className="flex items-center justify-between gap-2 pt-1">
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => navigate("/dashboard/nuevo-ingreso", { state: { client } })}
+                            className="h-8 text-xs font-bold border-emerald-500/30 text-emerald-400 hover:bg-emerald-500/10 rounded-lg flex-1 gap-1.5 cursor-pointer"
+                          >
+                            <PlusCircle className="w-3.5 h-3.5" />
+                            Nueva Orden
+                          </Button>
+                          <div className="flex items-center gap-1">
+                            <Button
+                              variant="ghost"
+                              size="icon-sm"
+                              onClick={() => handleViewOrders(client)}
+                              disabled={clientOrders.length === 0}
+                              className="h-8 w-8 text-muted-foreground hover:text-primary disabled:opacity-30 rounded-lg"
+                              title="Ver órdenes"
+                            >
+                              <Eye className="w-4 h-4" />
+                            </Button>
+                            <Button
+                              variant="ghost"
+                              size="icon-sm"
+                              onClick={() => handleEditClick(client)}
+                              className="h-8 w-8 text-muted-foreground hover:text-primary rounded-lg"
+                              title="Editar"
+                            >
+                              <Pencil className="w-4 h-4" />
+                            </Button>
+                            <Button
+                              variant="ghost"
+                              size="icon-sm"
+                              onClick={() => handleDeleteRequest(client)}
+                              className="h-8 w-8 text-muted-foreground hover:text-red-400 rounded-lg"
+                              title="Eliminar"
+                            >
+                              <Trash2 className="w-4 h-4" />
+                            </Button>
+                          </div>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+
+                {/* Vista Escritorio (>= md): Tabla completa */}
+                <div className="hidden md:block overflow-x-auto">
                 <table className="w-full text-left text-xs border-collapse">
                   <thead>
                     <tr className="border-b border-border/60 text-muted-foreground uppercase tracking-wider font-semibold">
@@ -399,6 +481,7 @@ export default function ClientsPage() {
                   </tbody>
                 </table>
               </div>
+              </>
             ) : (
               <div className="text-center py-12 text-muted-foreground text-xs font-light">
                 No se encontraron clientes con los filtros actuales.

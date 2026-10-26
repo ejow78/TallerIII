@@ -625,22 +625,22 @@ export default function DashboardPage() {
       </div>
 
       {/* Grid de 4 Tarjetas de Métricas Clave */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-5">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-5">
         {/* Card 1: Órdenes Activas */}
         <Card className="bg-card/45 border-border/80 shadow-sm hover:border-primary/30 transition-colors">
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <span className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wider">
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-1.5 sm:pb-2 px-3.5 sm:px-6 pt-3.5 sm:pt-6">
+            <span className="text-[10px] sm:text-[11px] font-semibold text-muted-foreground uppercase tracking-wider leading-tight">
               Órdenes Activas
             </span>
-            <div className="w-7 h-7 rounded-lg bg-primary/10 border border-primary/20 flex items-center justify-center">
-              <Wrench className="h-3.5 w-3.5 text-primary" />
+            <div className="w-6 h-6 sm:w-7 sm:h-7 rounded-lg bg-primary/10 border border-primary/20 flex items-center justify-center shrink-0">
+              <Wrench className="h-3 w-3 sm:h-3.5 sm:w-3.5 text-primary" />
             </div>
           </CardHeader>
-          <CardContent>
-            <span className="text-3xl font-outfit font-black text-foreground block">
+          <CardContent className="px-3.5 sm:px-6 pb-3.5 sm:pb-6">
+            <span className="text-2xl sm:text-3xl font-outfit font-black text-foreground block">
               {activeOrdersCount}
             </span>
-            <span className="text-[11px] text-primary block font-medium mt-1 truncate">
+            <span className="text-[10px] sm:text-[11px] text-primary block font-medium mt-1 leading-tight line-clamp-2">
               {activeOrdersDetail}
             </span>
           </CardContent>
@@ -648,19 +648,19 @@ export default function DashboardPage() {
 
         {/* Card 2: Equipos Entregados */}
         <Card className="bg-card/45 border-border/80 shadow-sm hover:border-emerald-500/30 transition-colors">
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <span className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wider">
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-1.5 sm:pb-2 px-3.5 sm:px-6 pt-3.5 sm:pt-6">
+            <span className="text-[10px] sm:text-[11px] font-semibold text-muted-foreground uppercase tracking-wider leading-tight">
               Equipos Entregados
             </span>
-            <div className="w-7 h-7 rounded-lg bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center">
-              <PackageCheck className="h-3.5 w-3.5 text-emerald-400" />
+            <div className="w-6 h-6 sm:w-7 sm:h-7 rounded-lg bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center shrink-0">
+              <PackageCheck className="h-3 w-3 sm:h-3.5 sm:w-3.5 text-emerald-400" />
             </div>
           </CardHeader>
-          <CardContent>
-            <span className="text-3xl font-outfit font-black text-foreground block">
+          <CardContent className="px-3.5 sm:px-6 pb-3.5 sm:pb-6">
+            <span className="text-2xl sm:text-3xl font-outfit font-black text-foreground block">
               {deliveredCount}
             </span>
-            <span className="text-[11px] text-emerald-400 block font-medium mt-1">
+            <span className="text-[10px] sm:text-[11px] text-emerald-400 block font-medium mt-1 leading-tight line-clamp-2">
               {readyToPickupCount > 0
                 ? `+ ${readyToPickupCount} listos esperando retiro`
                 : "Dispositivos retirados por clientes"}
@@ -670,19 +670,19 @@ export default function DashboardPage() {
 
         {/* Card 3: Balance Operativo (Caja + Presupuestos) */}
         <Card className="bg-card/45 border-border/80 shadow-sm hover:border-primary/30 transition-colors">
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <span className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wider">
-              Facturación Registrada
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-1.5 sm:pb-2 px-3.5 sm:px-6 pt-3.5 sm:pt-6">
+            <span className="text-[10px] sm:text-[11px] font-semibold text-muted-foreground uppercase tracking-wider leading-tight">
+              Facturación
             </span>
-            <div className="w-7 h-7 rounded-lg bg-sky-500/10 border border-sky-500/20 flex items-center justify-center">
-              <DollarSign className="h-3.5 w-3.5 text-sky-400" />
+            <div className="w-6 h-6 sm:w-7 sm:h-7 rounded-lg bg-sky-500/10 border border-sky-500/20 flex items-center justify-center shrink-0">
+              <DollarSign className="h-3 w-3 sm:h-3.5 sm:w-3.5 text-sky-400" />
             </div>
           </CardHeader>
-          <CardContent>
-            <span className="text-3xl font-outfit font-black text-foreground block tabular-nums">
+          <CardContent className="px-3.5 sm:px-6 pb-3.5 sm:pb-6">
+            <span className="text-xl sm:text-3xl font-outfit font-black text-foreground block tabular-nums truncate">
               ${totalRevenue.toLocaleString("es-AR")}
             </span>
-            <span className="text-[11px] text-muted-foreground block font-medium mt-1">
+            <span className="text-[10px] sm:text-[11px] text-muted-foreground block font-medium mt-1 leading-tight line-clamp-2">
               {sales.length} ventas POS • ${approvedBudgetsRevenue.toLocaleString("es-AR")} en órdenes
             </span>
           </CardContent>
@@ -696,30 +696,30 @@ export default function DashboardPage() {
               : "bg-card/45 border-border/80 shadow-sm"
           }
         >
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <span className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wider">
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-1.5 sm:pb-2 px-3.5 sm:px-6 pt-3.5 sm:pt-6">
+            <span className="text-[10px] sm:text-[11px] font-semibold text-muted-foreground uppercase tracking-wider leading-tight">
               Estado de Stock
             </span>
             <div
               className={
                 lowStockCount > 0
-                  ? "w-7 h-7 rounded-lg bg-destructive/15 border border-destructive/30 flex items-center justify-center"
-                  : "w-7 h-7 rounded-lg bg-muted border border-border flex items-center justify-center"
+                  ? "w-6 h-6 sm:w-7 sm:h-7 rounded-lg bg-destructive/15 border border-destructive/30 flex items-center justify-center shrink-0"
+                  : "w-6 h-6 sm:w-7 sm:h-7 rounded-lg bg-muted border border-border flex items-center justify-center shrink-0"
               }
             >
               {lowStockCount > 0 ? (
-                <AlertCircle className="h-3.5 w-3.5 text-destructive" />
+                <AlertCircle className="h-3 w-3 sm:h-3.5 sm:w-3.5 text-destructive" />
               ) : (
-                <Package className="h-3.5 w-3.5 text-muted-foreground" />
+                <Package className="h-3 w-3 sm:h-3.5 sm:w-3.5 text-muted-foreground" />
               )}
             </div>
           </CardHeader>
-          <CardContent>
+          <CardContent className="px-3.5 sm:px-6 pb-3.5 sm:pb-6">
             <span
               className={
                 lowStockCount > 0
-                  ? "text-3xl font-outfit font-black text-destructive block"
-                  : "text-3xl font-outfit font-black text-foreground block"
+                  ? "text-2xl sm:text-3xl font-outfit font-black text-destructive block"
+                  : "text-2xl sm:text-3xl font-outfit font-black text-foreground block"
               }
             >
               {lowStockCount > 0 ? `${lowStockCount} Alertas` : `${totalItemsCount} Ítems`}
@@ -727,8 +727,8 @@ export default function DashboardPage() {
             <span
               className={
                 lowStockCount > 0
-                  ? "text-[11px] text-destructive/90 block font-medium mt-1"
-                  : "text-[11px] text-muted-foreground block font-medium mt-1"
+                  ? "text-[10px] sm:text-[11px] text-destructive/90 block font-medium mt-1 leading-tight line-clamp-2"
+                  : "text-[10px] sm:text-[11px] text-muted-foreground block font-medium mt-1 leading-tight line-clamp-2"
               }
             >
               {lowStockDetail}
@@ -992,7 +992,7 @@ export default function DashboardPage() {
             {orders.length > 0 ? (
               <>
                 {/* Vista Móvil (< sm): Tarjetas apiladas */}
-                <div className="space-y-3 sm:hidden">
+                <div className="space-y-2.5 sm:hidden">
                   {orders.slice(0, 5).map((o) => {
                     const clientName =
                       o.clientId && typeof o.clientId === "object" ? o.clientId.name : "Cliente";
@@ -1003,9 +1003,9 @@ export default function DashboardPage() {
                     return (
                       <div
                         key={o._id}
-                        className="rounded-xl border border-border/60 bg-background/40 p-3 space-y-2"
+                        className="rounded-xl border border-border/60 bg-background/40 p-3.5 space-y-2"
                       >
-                        <div className="flex items-center justify-between">
+                        <div className="flex items-center justify-between gap-2">
                           <a
                             href={
                               window.location.hostname.includes("repairit.cloud")
@@ -1014,24 +1014,25 @@ export default function DashboardPage() {
                             }
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="font-mono text-xs font-bold text-primary inline-flex items-center gap-1"
+                            className="font-mono text-xs font-bold text-primary inline-flex items-center gap-1 shrink-0"
                           >
                             <span>{o.trackingCode}</span>
                             <ExternalLink className="w-3 h-3 opacity-70" />
                           </a>
                           <Badge
                             variant={stMeta.badge}
-                            className="text-[9px] uppercase font-bold py-0.5 px-2 border"
+                            className="text-[9px] uppercase font-bold py-0.5 px-2 border shrink-0 whitespace-nowrap"
                           >
                             {stMeta.label}
                           </Badge>
                         </div>
-                        <div className="flex items-center justify-between text-xs">
-                          <span className="font-semibold text-foreground truncate">
-                            {clientName}
-                          </span>
-                          <span className="text-muted-foreground truncate ml-2">
+                        <div className="space-y-0.5 text-left">
+                          <span className="text-xs font-semibold text-foreground block leading-snug">
+                            {o.deviceType ? `${o.deviceType} • ` : ""}
                             {o.deviceModel}
+                          </span>
+                          <span className="text-[11px] text-muted-foreground block">
+                            Cliente: {clientName}
                           </span>
                         </div>
                       </div>
@@ -1144,31 +1145,32 @@ export default function DashboardPage() {
               <Link to="/dashboard/inventario">Inventario</Link>
             </Button>
           </CardHeader>
-          <CardContent className="pt-5 space-y-3 flex-1">
+          <CardContent className="pt-4 space-y-2.5 flex-1">
             {lowStockItems.length > 0 ? (
               lowStockItems.slice(0, 5).map((item) => (
-                <Alert
+                <div
                   key={item._id}
-                  variant="destructive"
-                  className="bg-destructive/10 border-destructive/25 text-foreground p-3"
+                  className="rounded-xl bg-destructive/10 border border-destructive/25 text-foreground p-3.5 flex items-start gap-2.5 text-left"
                 >
-                  <AlertCircle className="h-4 w-4 stroke-destructive" />
-                  <div className="ml-2 w-full text-left">
-                    <AlertTitle className="text-xs font-bold font-outfit flex items-center justify-between gap-2">
-                      <span className="truncate">{item.name}</span>
+                  <AlertCircle className="h-4 w-4 text-destructive shrink-0 mt-0.5" />
+                  <div className="min-w-0 flex-1 space-y-1">
+                    <div className="flex items-start justify-between gap-2">
+                      <span className="text-xs font-bold font-outfit leading-snug text-foreground">
+                        {item.name}
+                      </span>
                       <Badge
                         variant="destructive"
-                        className="text-[8px] font-bold py-0.5 px-1.5 uppercase tracking-wider shrink-0 select-none"
+                        className="text-[9px] font-bold py-0.5 px-1.5 uppercase tracking-wider shrink-0 select-none whitespace-nowrap"
                       >
                         Stock: {item.quantity}
                       </Badge>
-                    </AlertTitle>
-                    <AlertDescription className="text-[10px] text-muted-foreground mt-1">
-                      Mínimo sugerido: {item.minQuantity || item.min_quantity} u. • Categoría:{" "}
+                    </div>
+                    <p className="text-[11px] text-muted-foreground leading-relaxed">
+                      Mínimo sugerido: {item.minQuantity || item.min_quantity} u. •{" "}
                       {item.category || "General"}
-                    </AlertDescription>
+                    </p>
                   </div>
-                </Alert>
+                </div>
               ))
             ) : (
               <div className="text-center py-10 flex flex-col items-center justify-center h-full">

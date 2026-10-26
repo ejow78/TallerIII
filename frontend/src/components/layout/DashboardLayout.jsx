@@ -24,6 +24,7 @@ import {
   SidebarMenuBadge,
   SidebarTrigger,
   SidebarInset,
+  useSidebar,
 } from "@/components/ui/sidebar";
 import {
   Breadcrumb,
@@ -51,6 +52,14 @@ import { toast } from "sonner";
 
 import { api } from "@/services/api";
 import OnboardingModal from "@/components/common/OnboardingModal";
+
+function MobileSidebarAutoClose({ pathname }) {
+  const { setOpenMobile } = useSidebar();
+  useEffect(() => {
+    setOpenMobile(false);
+  }, [pathname, setOpenMobile]);
+  return null;
+}
 
 export default function DashboardLayout() {
   const navigate = useNavigate();
@@ -217,11 +226,12 @@ export default function DashboardLayout() {
 
   return (
     <SidebarProvider>
+      <MobileSidebarAutoClose pathname={location.pathname} />
       <div className="flex min-h-screen w-full bg-background text-foreground font-sans selection:bg-primary/30 selection:text-primary">
         {/* Sidebar */}
         <Sidebar className="border-r border-border/70 bg-card/95 backdrop-blur-xl">
           {/* Header Limpio solo con el Logo */}
-          <SidebarHeader className="p-6 border-b border-border/30">
+          <SidebarHeader className="px-5 py-4 sm:p-6 border-b border-border/30 shrink-0">
             <div className="flex items-center justify-between">
               <NavLink
                 to="/dashboard"
@@ -235,7 +245,7 @@ export default function DashboardLayout() {
           </SidebarHeader>
 
           {/* Contenido de Navegación por Secciones */}
-          <SidebarContent className="px-2 py-4 space-y-2 flex-1">
+          <SidebarContent className="px-2 py-3 sm:py-4 space-y-1.5 sm:space-y-2 flex-1 min-h-0 overflow-y-auto">
             {isSuperAdmin ? (
               <SidebarGroup>
                 <SidebarGroupLabel className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/60 px-3 mb-1">
@@ -427,7 +437,7 @@ export default function DashboardLayout() {
           </SidebarContent>
 
           {/* Pie de Sidebar con Perfil y Cerrar Sesión */}
-          <SidebarFooter className="p-4 border-t border-border/85 space-y-4 bg-card/65">
+          <SidebarFooter className="p-3.5 sm:p-4 border-t border-border/85 space-y-3 sm:space-y-4 bg-card/65 shrink-0">
             <div className="flex items-center justify-between px-2 w-full gap-2">
               <div className="flex items-center gap-3 min-w-0">
                 <div className="w-8 h-8 rounded-full bg-primary/10 border border-primary/20 flex items-center justify-center font-bold text-xs text-primary uppercase shrink-0">
@@ -482,20 +492,20 @@ export default function DashboardLayout() {
         {/* Área Principal */}
         <SidebarInset className="flex-1 flex flex-col min-w-0 bg-background">
           {/* Cabecera Superior */}
-          <header className="h-16 border-b border-border/80 flex items-center justify-between px-4 sm:px-6 bg-card/20 backdrop-blur-sm sticky top-0 z-40">
-            <div className="flex items-center gap-4">
-              <SidebarTrigger className="text-muted-foreground hover:text-foreground cursor-pointer" />
-              <Separator orientation="vertical" className="h-4 !self-center" />
-              <Breadcrumb className="flex items-center">{getBreadcrumbs()}</Breadcrumb>
+          <header className="h-14 sm:h-16 border-b border-border/80 flex items-center justify-between px-3 sm:px-6 bg-card/20 backdrop-blur-sm sticky top-0 z-40 gap-2">
+            <div className="flex items-center gap-2 sm:gap-4 min-w-0">
+              <SidebarTrigger className="text-muted-foreground hover:text-foreground cursor-pointer shrink-0" />
+              <Separator orientation="vertical" className="h-4 !self-center shrink-0" />
+              <Breadcrumb className="flex items-center min-w-0 truncate">{getBreadcrumbs()}</Breadcrumb>
             </div>
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-2 sm:gap-3 shrink-0">
               {isSuperAdmin ? (
                 <div className="text-[10px] text-muted-foreground font-mono select-none">
                   Plataforma RepairIT • SuperAdmin
                 </div>
               ) : (
-                <div className="flex items-center gap-2">
-                  <span className="text-[10px] text-muted-foreground font-mono select-none">
+                <div className="flex items-center gap-1.5 sm:gap-2">
+                  <span className="hidden sm:inline text-[10px] text-muted-foreground font-mono select-none">
                     Sucursal:
                   </span>
                   {venues.length > 1 ? (
@@ -504,10 +514,10 @@ export default function DashboardLayout() {
                         <Button
                           variant="outline"
                           size="sm"
-                          className="h-7 border border-border/80 px-2 text-[10px] font-bold rounded flex items-center gap-1 select-none cursor-pointer"
+                          className="h-7 border border-border/80 px-2 text-[10px] font-bold rounded flex items-center gap-1 select-none cursor-pointer max-w-[140px] sm:max-w-none"
                         >
-                          {activeVenue ? activeVenue.name : "Cargando..."}
-                          <ChevronDown className="w-3 h-3 opacity-60" />
+                          <span className="truncate">{activeVenue ? activeVenue.name : "Cargando..."}</span>
+                          <ChevronDown className="w-3 h-3 opacity-60 shrink-0" />
                         </Button>
                       </DropdownMenuTrigger>
                       <DropdownMenuContent className="bg-card border-border text-foreground text-[10px]">
@@ -524,7 +534,7 @@ export default function DashboardLayout() {
                       </DropdownMenuContent>
                     </DropdownMenu>
                   ) : (
-                    <span className="text-[10px] text-foreground font-bold font-mono">
+                    <span className="text-[10px] text-foreground font-bold font-mono truncate max-w-[120px] sm:max-w-none">
                       {activeVenue ? activeVenue.name : "Cargando..."}
                     </span>
                   )}
@@ -534,7 +544,7 @@ export default function DashboardLayout() {
           </header>
 
           {/* Contenido Dinámico de las Páginas del Dashboard */}
-          <main className="flex-grow p-4 sm:p-6 md:p-8 overflow-y-auto max-w-7xl w-full mx-auto">
+          <main className="flex-grow p-3.5 sm:p-6 md:p-8 overflow-y-auto max-w-7xl w-full mx-auto">
             <Outlet />
           </main>
 

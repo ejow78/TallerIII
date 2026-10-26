@@ -129,7 +129,7 @@ export default function VenueAccountsPage() {
   // Vista cuando no tienen el plan correcto
   if (!isMultiTaller) {
     return (
-      <div className="p-6 space-y-6 max-w-4xl">
+      <div className="space-y-6 max-w-4xl">
         <div className="space-y-1">
           <h2 className="font-outfit text-2xl font-black tracking-tight text-foreground flex items-center gap-2.5">
             <KeyRound className="w-6 h-6 text-primary shrink-0" />
@@ -140,7 +140,7 @@ export default function VenueAccountsPage() {
           </p>
         </div>
 
-        <Card className="bg-card/25 border-border border-dashed p-10 text-center flex flex-col items-center justify-center space-y-4 shadow-xl">
+        <Card className="bg-card/25 border-border border-dashed p-6 sm:p-10 text-center flex flex-col items-center justify-center space-y-4 shadow-xl">
           <div className="w-14 h-14 rounded-full bg-primary/10 flex items-center justify-center text-primary shadow-inner">
             <Shield className="w-7 h-7" />
           </div>
@@ -159,7 +159,7 @@ export default function VenueAccountsPage() {
   }
 
   return (
-    <div className="p-6 space-y-6 max-w-6xl">
+    <div className="space-y-6 max-w-6xl">
       
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
@@ -184,7 +184,7 @@ export default function VenueAccountsPage() {
       {/* Info Warning */}
       <div className="bg-primary/5 border border-primary/20 rounded-lg p-4 flex gap-3 text-xs text-muted-foreground font-light leading-relaxed">
         <Info className="w-4 h-4 text-primary shrink-0 mt-0.5" />
-        <div className="space-y-1">
+        <div className="space-y-1 text-left">
           <p className="text-foreground font-medium">¿Cómo funcionan estas cuentas?</p>
           <p>
             Estas credenciales están diseñadas para ser ingresadas en las computadoras fijas del taller de cada sede. 
@@ -205,51 +205,83 @@ export default function VenueAccountsPage() {
               <p className="text-[10px] text-muted-foreground/60">Presione el botón superior para crear la primera cuenta.</p>
             </div>
           ) : (
-            <div className="overflow-x-auto">
-              <table className="w-full text-left text-xs border-collapse">
-                <thead>
-                  <tr className="border-b border-border/60 bg-muted/15 text-muted-foreground font-medium uppercase text-[10px] tracking-wider">
-                    <th className="py-4 px-5">Nombre Identificador</th>
-                    <th className="py-4 px-5">Email de Acceso</th>
-                    <th className="py-4 px-5">Sucursal Asociada</th>
-                    <th className="py-4 px-5">Rol Asignado</th>
-                    <th className="py-4 px-5">Fecha Alta</th>
-                    <th className="py-4 px-5 text-right">Acciones</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-border/40">
-                  {accounts.map((acc) => (
-                    <tr key={acc._id} className="hover:bg-muted/10 transition-colors">
-                      <td className="py-4 px-5 font-bold text-foreground">{acc.name}</td>
-                      <td className="py-4 px-5 font-mono text-muted-foreground">{acc.email}</td>
-                      <td className="py-4 px-5">
-                        <div className="flex items-center gap-1.5">
-                          <Store className="w-3.5 h-3.5 text-primary/70" />
-                          <span className="text-foreground">{acc.venueId?.name || "Desconocida"}</span>
-                        </div>
-                      </td>
-                      <td className="py-4 px-5">
-                        <Badge variant="secondary" className="text-[9px] uppercase font-bold px-1.5 py-0.5">Técnico</Badge>
-                      </td>
-                      <td className="py-4 px-5 text-muted-foreground font-mono text-[10px]">
-                        {new Date(acc.created_at).toLocaleDateString("es-AR")}
-                      </td>
-                      <td className="py-4 px-5 text-right">
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          onClick={() => handleDelete(acc._id, acc.name)}
-                          className="h-8 w-8 text-destructive hover:text-destructive hover:bg-destructive/10 cursor-pointer rounded-full"
-                          title="Eliminar cuenta"
-                        >
-                          <Trash2 className="w-3.5 h-3.5" />
-                        </Button>
-                      </td>
+            <>
+              <div className="space-y-3 p-3.5 md:hidden">
+                {accounts.map((acc) => (
+                  <div
+                    key={acc._id}
+                    className="rounded-xl border border-border/70 bg-background/50 p-3.5 flex items-center justify-between gap-3 text-left"
+                  >
+                    <div className="space-y-1 min-w-0">
+                      <div className="flex items-center gap-2">
+                        <span className="font-bold text-foreground text-sm truncate">{acc.name}</span>
+                        <Badge variant="secondary" className="text-[9px] uppercase font-bold px-1.5 py-0">Técnico</Badge>
+                      </div>
+                      <span className="font-mono text-xs text-muted-foreground block truncate">{acc.email}</span>
+                      <span className="text-[11px] text-primary font-medium flex items-center gap-1">
+                        <Store className="w-3 h-3" />
+                        {acc.venueId?.name || "Sucursal"}
+                      </span>
+                    </div>
+                    <Button
+                      variant="ghost"
+                      size="icon-sm"
+                      onClick={() => handleDelete(acc._id, acc.name)}
+                      className="h-8 w-8 text-destructive hover:text-destructive hover:bg-destructive/10 cursor-pointer rounded-lg shrink-0"
+                      title="Eliminar cuenta"
+                    >
+                      <Trash2 className="w-4 h-4" />
+                    </Button>
+                  </div>
+                ))}
+              </div>
+
+              <div className="hidden md:block overflow-x-auto">
+                <table className="w-full text-left text-xs border-collapse">
+                  <thead>
+                    <tr className="border-b border-border/60 bg-muted/15 text-muted-foreground font-medium uppercase text-[10px] tracking-wider">
+                      <th className="py-4 px-5">Nombre Identificador</th>
+                      <th className="py-4 px-5">Email de Acceso</th>
+                      <th className="py-4 px-5">Sucursal Asociada</th>
+                      <th className="py-4 px-5">Rol Asignado</th>
+                      <th className="py-4 px-5">Fecha Alta</th>
+                      <th className="py-4 px-5 text-right">Acciones</th>
                     </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
+                  </thead>
+                  <tbody className="divide-y divide-border/40">
+                    {accounts.map((acc) => (
+                      <tr key={acc._id} className="hover:bg-muted/10 transition-colors">
+                        <td className="py-4 px-5 font-bold text-foreground">{acc.name}</td>
+                        <td className="py-4 px-5 font-mono text-muted-foreground">{acc.email}</td>
+                        <td className="py-4 px-5">
+                          <div className="flex items-center gap-1.5">
+                            <Store className="w-3.5 h-3.5 text-primary/70" />
+                            <span className="text-foreground">{acc.venueId?.name || "Desconocida"}</span>
+                          </div>
+                        </td>
+                        <td className="py-4 px-5">
+                          <Badge variant="secondary" className="text-[9px] uppercase font-bold px-1.5 py-0.5">Técnico</Badge>
+                        </td>
+                        <td className="py-4 px-5 text-muted-foreground font-mono text-[10px]">
+                          {new Date(acc.created_at).toLocaleDateString("es-AR")}
+                        </td>
+                        <td className="py-4 px-5 text-right">
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            onClick={() => handleDelete(acc._id, acc.name)}
+                            className="h-8 w-8 text-destructive hover:text-destructive hover:bg-destructive/10 cursor-pointer rounded-full"
+                            title="Eliminar cuenta"
+                          >
+                            <Trash2 className="w-3.5 h-3.5" />
+                          </Button>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </>
           )}
         </CardContent>
       </Card>
