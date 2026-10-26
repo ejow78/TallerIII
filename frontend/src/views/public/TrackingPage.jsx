@@ -261,7 +261,7 @@ export default function TrackingPage() {
           </p>
         </div>
         <Button asChild variant="outline" className="text-xs font-bold rounded-xl px-5 h-9">
-          <Link to="/">Volver al Inicio</Link>
+          <Link to="/consulta">Ver otro seguimiento</Link>
         </Button>
       </div>
     );
@@ -272,14 +272,14 @@ export default function TrackingPage() {
   return (
     <div className="flex-1 max-w-4xl w-full mx-auto px-5 py-8 space-y-6 animate-fade-in">
 
-      {/* Botón de retorno simple */}
+      {/* Botón de retorno a consulta */}
       <div>
-        <a
-          href={window.location.hostname.includes("repairit.cloud") ? "https://repairit.cloud" : "/"}
+        <Link
+          to="/consulta"
           className="inline-flex items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground transition-colors font-medium cursor-pointer"
         >
-          <ArrowLeft className="w-3.5 h-3.5" /> Volver al Inicio
-        </a>
+          <ArrowLeft className="w-3.5 h-3.5" /> Ver otro seguimiento
+        </Link>
       </div>
 
       {/* Tarjeta Principal de Resumen del Dispositivo */}

@@ -7,10 +7,10 @@ import { Card, CardHeader, CardTitle, CardContent, CardDescription, CardFooter }
 import { Accordion, AccordionItem, AccordionTrigger, AccordionContent } from "@/components/ui/accordion";
 import { toast } from "sonner";
 import {
-  QrCode,
+  Activity,
+  BarChart3,
   DollarSign,
   PackageCheck,
-  Printer,
   Building2,
   Wrench,
   Check,
@@ -229,7 +229,7 @@ export default function LandingPage() {
               Todo lo que tu Taller Necesita
             </h2>
             <p className="text-muted-foreground text-sm font-light">
-              Automatizá la recepción de equipos, eliminá consultas repetitivas y llevá el control exacto de tus finanzas.
+              Automatizá la recepción de equipos, eliminá consultas repetitivas y llevá el control exacto de tu taller.
             </p>
           </div>
 
@@ -238,15 +238,15 @@ export default function LandingPage() {
             <Card className="bg-card/45 border-border/60 hover:border-primary/40 transition-colors duration-200">
               <CardHeader className="space-y-3 pb-2">
                 <div className="w-10 h-10 rounded-lg bg-primary/10 border border-primary/20 flex items-center justify-center text-primary">
-                  <QrCode className="w-5 h-5" />
+                  <Activity className="w-5 h-5" />
                 </div>
                 <CardTitle className="font-outfit text-lg font-bold text-foreground">
-                  Seguimiento con QR
+                  Seguimiento en Línea
                 </CardTitle>
               </CardHeader>
               <CardContent>
                 <p className="text-muted-foreground text-sm font-light leading-relaxed">
-                  Tus clientes escanean el QR de su ticket para ver el estado en vivo y reciben avisos automáticos por email.
+                  Tus clientes consultan el estado de su reparación en tiempo real desde la web y reciben avisos automáticos por email.
                 </p>
               </CardContent>
             </Card>
@@ -272,15 +272,15 @@ export default function LandingPage() {
             <Card className="bg-card/45 border-border/60 hover:border-primary/40 transition-colors duration-200">
               <CardHeader className="space-y-3 pb-2">
                 <div className="w-10 h-10 rounded-lg bg-primary/10 border border-primary/20 flex items-center justify-center text-primary">
-                  <Printer className="w-5 h-5" />
+                  <BarChart3 className="w-5 h-5" />
                 </div>
                 <CardTitle className="font-outfit text-lg font-bold text-foreground">
-                  Tickets Térmicos y A4
+                  Métricas en Tiempo Real
                 </CardTitle>
               </CardHeader>
               <CardContent>
                 <p className="text-muted-foreground text-sm font-light leading-relaxed">
-                  Registrá equipos en segundos y emití comprobantes de recepción en 80mm o hoja A4 listos para imprimir.
+                  Visualizá el flujo de equipos, estados del taller y facturación diaria con gráficos interactivos en tu panel.
                 </p>
               </CardContent>
             </Card>
@@ -292,7 +292,7 @@ export default function LandingPage() {
                   <PackageCheck className="w-5 h-5" />
                 </div>
                 <CardTitle className="font-outfit text-lg font-bold text-foreground">
-                  Stock e Inventario Ágil
+                  Stock e Inventario
                 </CardTitle>
               </CardHeader>
               <CardContent>

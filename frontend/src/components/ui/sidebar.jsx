@@ -152,24 +152,28 @@ function Sidebar({
 
   if (isMobile) {
     return (
-      <Sheet open={openMobile} onOpenChange={setOpenMobile} {...props}>
+      <Sheet open={openMobile} onOpenChange={setOpenMobile}>
         <SheetContent
           dir={dir}
           data-sidebar="sidebar"
           data-slot="sidebar"
           data-mobile="true"
-          className="w-(--sidebar-width) bg-sidebar p-0 text-sidebar-foreground [&>button]:hidden"
+          className={cn(
+            "w-(--sidebar-width) max-w-[82vw] h-dvh overflow-hidden bg-sidebar p-0 text-sidebar-foreground [&>button]:hidden",
+            className
+          )}
           style={
             {
-              "--sidebar-width": SIDEBAR_WIDTH_MOBILE
+              "--sidebar-width": SIDEBAR_WIDTH
             }
           }
-          side={side}>
+          side={side}
+          {...props}>
           <SheetHeader className="sr-only">
             <SheetTitle>Sidebar</SheetTitle>
             <SheetDescription>Displays the mobile sidebar.</SheetDescription>
           </SheetHeader>
-          <div className="flex h-full w-full flex-col">{children}</div>
+          <div className="flex h-full w-full flex-col overflow-hidden">{children}</div>
         </SheetContent>
       </Sheet>
     );
