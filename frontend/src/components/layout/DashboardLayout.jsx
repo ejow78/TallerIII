@@ -406,45 +406,43 @@ export default function DashboardLayout() {
                   </SidebarGroupContent>
                 </SidebarGroup>
 
-                {/* Grupo 3: Configuración y Accesos (Solo Administradores del Taller) */}
-                {user.role === "admin" && (
-                  <SidebarGroup className="py-1">
-                    <SidebarGroupLabel className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/60 px-3 mb-1">
-                      Administración
-                    </SidebarGroupLabel>
-                    <SidebarGroupContent>
-                      <SidebarMenu className="space-y-1">
+                {/* Grupo 3: Configuración y Accesos */}
+                <SidebarGroup className="py-1">
+                  <SidebarGroupLabel className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/60 px-3 mb-1">
+                    Administración
+                  </SidebarGroupLabel>
+                  <SidebarGroupContent>
+                    <SidebarMenu className="space-y-1">
+                      <SidebarMenuItem>
+                        <SidebarMenuButton
+                          asChild
+                          isActive={location.pathname === "/dashboard/perfil"}
+                          className={navItemClass}
+                        >
+                          <NavLink to="/dashboard/perfil" className="flex items-center gap-3 w-full">
+                            <Settings className="w-4 h-4" />
+                            <span>Configuración de Taller</span>
+                          </NavLink>
+                        </SidebarMenuButton>
+                      </SidebarMenuItem>
+
+                      {user.role === "admin" && hasMultiTallerAccess(effectivePlan) && (
                         <SidebarMenuItem>
                           <SidebarMenuButton
                             asChild
-                            isActive={location.pathname === "/dashboard/perfil"}
+                            isActive={location.pathname === "/dashboard/cuentas"}
                             className={navItemClass}
                           >
-                            <NavLink to="/dashboard/perfil" className="flex items-center gap-3 w-full">
-                              <Settings className="w-4 h-4" />
-                              <span>Configuración de Taller</span>
+                            <NavLink to="/dashboard/cuentas" className="flex items-center gap-3 w-full">
+                              <KeyRound className="w-4 h-4" />
+                              <span>Cuentas de Acceso</span>
                             </NavLink>
                           </SidebarMenuButton>
                         </SidebarMenuItem>
-
-                        {hasMultiTallerAccess(effectivePlan) && (
-                          <SidebarMenuItem>
-                            <SidebarMenuButton
-                              asChild
-                              isActive={location.pathname === "/dashboard/cuentas"}
-                              className={navItemClass}
-                            >
-                              <NavLink to="/dashboard/cuentas" className="flex items-center gap-3 w-full">
-                                <KeyRound className="w-4 h-4" />
-                                <span>Cuentas de Acceso</span>
-                              </NavLink>
-                            </SidebarMenuButton>
-                          </SidebarMenuItem>
-                        )}
-                      </SidebarMenu>
-                    </SidebarGroupContent>
-                  </SidebarGroup>
-                )}
+                      )}
+                    </SidebarMenu>
+                  </SidebarGroupContent>
+                </SidebarGroup>
               </>
             )}
           </SidebarContent>
@@ -508,7 +506,7 @@ export default function DashboardLayout() {
                   <span className="hidden sm:inline text-[10px] text-muted-foreground font-mono select-none">
                     Sucursal:
                   </span>
-                  {user.role === "admin" && venues.length > 1 && hasMultiTallerAccess(effectivePlan) ? (
+                  {venues.length > 1 && hasMultiTallerAccess(effectivePlan) ? (
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>
                         <Button

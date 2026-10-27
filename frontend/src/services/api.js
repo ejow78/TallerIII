@@ -188,6 +188,7 @@ export const api = {
             organization_id: org.id,
             venue_id: venue.id,
             name: registerData.name,
+            email: registerData.email,
             role: "admin",
           },
           { onConflict: "id" }
@@ -372,9 +373,6 @@ export const api = {
 
     switchVenue: async (venueId) => {
       const user = getLocalUser();
-      if (user.role === "tecnico") {
-        throw new Error("Las cuentas de sucursal están vinculadas de forma fija a su sede asignada.");
-      }
       const { error } = await supabase
         .from("profiles")
         .update({ venue_id: venueId })
