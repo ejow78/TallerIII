@@ -154,17 +154,17 @@ export default function RegisterPage() {
   // Pantalla de Confirmación de Correo Enviado (Mismo estilo exacto)
   if (registeredEmail) {
     return (
-      <div className="flex-grow flex items-center justify-center bg-background px-4 sm:px-6 py-8 sm:py-12 relative overflow-hidden">
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[400px] h-[400px] bg-primary/5 rounded-full blur-[80px] pointer-events-none" />
+      <div className="flex-grow flex items-center justify-center bg-background px-3.5 sm:px-6 py-5 sm:py-12 relative overflow-hidden">
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[320px] sm:w-[400px] h-[320px] sm:h-[400px] bg-primary/5 rounded-full blur-[80px] pointer-events-none" />
 
-        <Card className="max-w-md w-full bg-card/40 border-border p-8 rounded-2xl shadow-2xl backdrop-blur relative z-10 text-center space-y-6">
-          <div className="space-y-2">
-            <CardTitle className="font-outfit text-2xl font-bold text-foreground tracking-tight border-0 pb-0">
+        <Card className="max-w-md w-full bg-card/40 border-border p-5 sm:p-8 rounded-2xl shadow-2xl backdrop-blur relative z-10 text-center space-y-5">
+          <div className="space-y-1.5">
+            <CardTitle className="font-outfit text-xl sm:text-2xl font-bold text-foreground tracking-tight border-0 pb-0">
               ¡Revisá tu Correo!
             </CardTitle>
             <CardDescription className="text-xs text-muted-foreground font-light leading-relaxed">
               Enviamos un enlace de verificación a <br />
-              <strong className="text-foreground font-mono text-sm">{registeredEmail}</strong>
+              <strong className="text-foreground font-mono text-xs sm:text-sm break-all">{registeredEmail}</strong>
             </CardDescription>
           </div>
 
@@ -172,16 +172,16 @@ export default function RegisterPage() {
             Hacé clic en el enlace que te enviamos para activar tu taller y acceder al panel de control.
           </p>
 
-          <div className="space-y-3 pt-2">
+          <div className="space-y-2.5 pt-1">
             <Button
               variant="outline"
               onClick={handleResendEmail}
-              className="w-full border-border/80 text-xs font-semibold py-2.5 rounded-lg hover:bg-card/70 cursor-pointer"
+              className="w-full h-10 border-border/80 text-xs font-semibold rounded-lg hover:bg-card/70 cursor-pointer"
             >
               ¿No te llegó el correo? Reenviar enlace
             </Button>
 
-            <Button asChild className="w-full bg-primary hover:bg-primary/90 text-primary-foreground font-bold text-sm py-2.5 rounded-lg shadow-lg shadow-primary/15 cursor-pointer">
+            <Button asChild className="w-full h-10 bg-primary hover:bg-primary/90 text-primary-foreground font-bold text-xs sm:text-sm rounded-lg shadow-lg shadow-primary/15 cursor-pointer">
               <Link to="/login">
                 Iniciar Sesión
               </Link>
@@ -193,126 +193,138 @@ export default function RegisterPage() {
   }
 
   return (
-    <div className="flex-grow flex items-center justify-center bg-background px-4 sm:px-6 py-8 sm:py-12 relative overflow-hidden">
+    <div className="flex-grow flex items-center justify-center bg-background px-3.5 sm:px-6 py-4 sm:py-10 relative overflow-hidden">
       
       {/* Background Glow */}
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[400px] h-[400px] bg-primary/5 rounded-full blur-[80px] pointer-events-none" />
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[320px] sm:w-[400px] h-[320px] sm:h-[400px] bg-primary/5 rounded-full blur-[80px] pointer-events-none" />
 
-      <Card className="max-w-md w-full bg-card/40 border-border p-5 sm:p-7 rounded-2xl shadow-2xl backdrop-blur relative z-10 space-y-4">
+      <Card className="max-w-md w-full bg-card/40 border-border p-4 sm:p-7 rounded-2xl shadow-2xl backdrop-blur relative z-10 space-y-3 sm:space-y-4">
         
         {/* Título y descripción */}
-        <div className="text-center space-y-1.5">
-          <CardTitle className="font-outfit text-2xl font-bold text-foreground tracking-tight border-0 pb-0">
+        <div className="text-center space-y-1">
+          <CardTitle className="font-outfit text-xl sm:text-2xl font-bold text-foreground tracking-tight border-0 pb-0">
             Registrá tu Taller
           </CardTitle>
-          <CardDescription className="text-xs text-muted-foreground font-light">
+          <CardDescription className="text-[11px] sm:text-xs text-muted-foreground font-light leading-relaxed">
             Creá tu cuenta para gestionar órdenes, finanzas y clientes con seguimiento online.
           </CardDescription>
         </div>
 
         {/* Formulario */}
-        <form onSubmit={handleRegister} className="space-y-3.5">
+        <form onSubmit={handleRegister} className="space-y-2.5 sm:space-y-3.5">
           
-          <div className="space-y-1.5">
-            <Label htmlFor="reg-name" className="text-xs font-semibold text-muted-foreground uppercase tracking-wider block">
-              Tu Nombre
-            </Label>
-            <Input 
-              id="reg-name"
-              type="text" 
-              required
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              placeholder="Juan Pérez"
-              className="w-full bg-background/85 border-border rounded-lg px-4 py-2.5 text-sm text-foreground placeholder-muted-foreground/50 focus-visible:ring-1 focus-visible:ring-primary transition-all"
-            />
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 sm:gap-3">
+            <div className="space-y-1">
+              <Label htmlFor="reg-name" className="text-[11px] sm:text-xs font-semibold text-muted-foreground uppercase tracking-wider block">
+                Tu Nombre
+              </Label>
+              <Input 
+                id="reg-name"
+                type="text" 
+                autoComplete="name"
+                required
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                placeholder="Juan Pérez"
+                className="w-full h-10 bg-background/85 border-border rounded-lg px-3.5 text-base sm:text-sm text-foreground placeholder-muted-foreground/50 focus-visible:ring-1 focus-visible:ring-primary transition-all"
+              />
+            </div>
+
+            <div className="space-y-1">
+              <Label htmlFor="reg-workshop" className="text-[11px] sm:text-xs font-semibold text-muted-foreground uppercase tracking-wider block">
+                Nombre del Taller
+              </Label>
+              <Input 
+                id="reg-workshop"
+                type="text" 
+                autoComplete="organization"
+                required
+                value={workshopName}
+                onChange={(e) => setWorkshopName(e.target.value)}
+                placeholder="FixTech Electrónica"
+                className="w-full h-10 bg-background/85 border-border rounded-lg px-3.5 text-base sm:text-sm text-foreground placeholder-muted-foreground/50 focus-visible:ring-1 focus-visible:ring-primary transition-all"
+              />
+            </div>
           </div>
 
-          <div className="space-y-1.5">
-            <Label htmlFor="reg-workshop" className="text-xs font-semibold text-muted-foreground uppercase tracking-wider block">
-              Nombre del Taller
-            </Label>
-            <Input 
-              id="reg-workshop"
-              type="text" 
-              required
-              value={workshopName}
-              onChange={(e) => setWorkshopName(e.target.value)}
-              placeholder="FixTech Electrónica"
-              className="w-full bg-background/85 border-border rounded-lg px-4 py-2.5 text-sm text-foreground placeholder-muted-foreground/50 focus-visible:ring-1 focus-visible:ring-primary transition-all"
-            />
-          </div>
-
-          <div className="space-y-1.5">
-            <Label htmlFor="reg-email" className="text-xs font-semibold text-muted-foreground uppercase tracking-wider block">
+          <div className="space-y-1">
+            <Label htmlFor="reg-email" className="text-[11px] sm:text-xs font-semibold text-muted-foreground uppercase tracking-wider block">
               Correo Electrónico
             </Label>
             <Input 
               id="reg-email"
               type="email" 
+              inputMode="email"
+              autoComplete="email"
               required
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               placeholder="taller@ejemplo.com"
-              className="w-full bg-background/85 border-border rounded-lg px-4 py-2.5 text-sm text-foreground placeholder-muted-foreground/50 focus-visible:ring-1 focus-visible:ring-primary transition-all"
+              className="w-full h-10 bg-background/85 border-border rounded-lg px-3.5 text-base sm:text-sm text-foreground placeholder-muted-foreground/50 focus-visible:ring-1 focus-visible:ring-primary transition-all"
             />
           </div>
 
-          <div className="space-y-1.5">
-            <Label htmlFor="reg-pass" className="text-xs font-semibold text-muted-foreground uppercase tracking-wider block">
-              Contraseña
-            </Label>
-            <Input 
-              id="reg-pass"
-              type="password" 
-              required
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              placeholder="••••••••"
-              className="w-full bg-background/85 border-border rounded-lg px-4 py-2.5 text-sm text-foreground placeholder-muted-foreground/50 focus-visible:ring-1 focus-visible:ring-primary transition-all"
-            />
-          </div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 sm:gap-3">
+            <div className="space-y-1">
+              <Label htmlFor="reg-pass" className="text-[11px] sm:text-xs font-semibold text-muted-foreground uppercase tracking-wider block">
+                Contraseña
+              </Label>
+              <Input 
+                id="reg-pass"
+                type="password" 
+                autoComplete="new-password"
+                required
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                placeholder="••••••••"
+                className="w-full h-10 bg-background/85 border-border rounded-lg px-3.5 text-base sm:text-sm text-foreground placeholder-muted-foreground/50 focus-visible:ring-1 focus-visible:ring-primary transition-all"
+              />
+            </div>
 
-          <div className="space-y-1.5">
-            <Label htmlFor="reg-confirm" className="text-xs font-semibold text-muted-foreground uppercase tracking-wider block">
-              Confirmar Contraseña
-            </Label>
-            <Input 
-              id="reg-confirm"
-              type="password" 
-              required
-              value={confirmPassword}
-              onChange={(e) => setConfirmPassword(e.target.value)}
-              placeholder="••••••••"
-              className="w-full bg-background/85 border-border rounded-lg px-4 py-2.5 text-sm text-foreground placeholder-muted-foreground/50 focus-visible:ring-1 focus-visible:ring-primary transition-all"
-            />
+            <div className="space-y-1">
+              <Label htmlFor="reg-confirm" className="text-[11px] sm:text-xs font-semibold text-muted-foreground uppercase tracking-wider block">
+                Confirmar Contraseña
+              </Label>
+              <Input 
+                id="reg-confirm"
+                type="password" 
+                autoComplete="new-password"
+                required
+                value={confirmPassword}
+                onChange={(e) => setConfirmPassword(e.target.value)}
+                placeholder="••••••••"
+                className="w-full h-10 bg-background/85 border-border rounded-lg px-3.5 text-base sm:text-sm text-foreground placeholder-muted-foreground/50 focus-visible:ring-1 focus-visible:ring-primary transition-all"
+              />
+            </div>
           </div>
 
           {/* Cloudflare Turnstile */}
           {siteKey && (
-            <div className="flex justify-center py-2 overflow-hidden min-h-[65px]">
-              <Turnstile
-                ref={turnstileRef}
-                siteKey={siteKey}
-                onSuccess={(token) => setCaptchaToken(token)}
-                options={{
-                  theme: "dark",
-                  size: "normal",
-                }}
-              />
+            <div className="flex justify-center py-1 w-full overflow-hidden min-h-[65px]">
+              <div className="max-w-full flex justify-center scale-[0.92] xs:scale-100 origin-center">
+                <Turnstile
+                  ref={turnstileRef}
+                  siteKey={siteKey}
+                  onSuccess={(token) => setCaptchaToken(token)}
+                  options={{
+                    theme: "dark",
+                    size: "flexible",
+                  }}
+                />
+              </div>
             </div>
           )}
 
           <Button 
             type="submit" 
             disabled={loading}
-            className="w-full bg-primary hover:bg-primary/90 text-primary-foreground font-bold text-sm py-2.5 rounded-lg shadow-lg shadow-primary/15 transition-all mt-2 cursor-pointer select-none"
+            className="w-full h-10 bg-primary hover:bg-primary/90 text-primary-foreground font-bold text-xs sm:text-sm rounded-lg shadow-lg shadow-primary/15 transition-all mt-1 cursor-pointer select-none"
           >
             {loading ? "Creando taller..." : "Crear mi Cuenta de Taller"}
           </Button>
         </form>
 
-        <div className="relative flex py-1 items-center">
+        <div className="relative flex py-0.5 items-center">
           <div className="flex-grow border-t border-border/60"></div>
           <span className="flex-shrink mx-3 text-[10px] text-muted-foreground uppercase tracking-widest font-bold">O continuar con</span>
           <div className="flex-grow border-t border-border/60"></div>
@@ -322,7 +334,7 @@ export default function RegisterPage() {
           type="button"
           onClick={handleGoogleRegister}
           variant="outline"
-          className="w-full border-border/80 hover:bg-card/65 hover:text-foreground text-xs font-semibold py-2.5 rounded-lg flex items-center justify-center gap-2 transition-all cursor-pointer select-none"
+          className="w-full h-10 border-border/80 hover:bg-card/65 hover:text-foreground text-xs font-semibold rounded-lg flex items-center justify-center gap-2 transition-all cursor-pointer select-none"
         >
           <svg className="w-4 h-4 shrink-0" viewBox="0 0 24 24">
             <path

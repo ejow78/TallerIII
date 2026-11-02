@@ -61,43 +61,45 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="flex-grow flex items-center justify-center bg-background px-4 sm:px-6 py-8 sm:py-12 relative overflow-hidden">
+    <div className="flex-grow flex items-center justify-center bg-background px-3.5 sm:px-6 py-5 sm:py-12 relative overflow-hidden">
       
       {/* Background Glow */}
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[400px] h-[400px] bg-primary/5 rounded-full blur-[80px] pointer-events-none" />
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[320px] sm:w-[400px] h-[320px] sm:h-[400px] bg-primary/5 rounded-full blur-[80px] pointer-events-none" />
 
-      <Card className="max-w-md w-full bg-card/40 border-border p-5 sm:p-7 rounded-2xl shadow-2xl backdrop-blur relative z-10 space-y-4">
+      <Card className="max-w-md w-full bg-card/40 border-border p-4 sm:p-7 rounded-2xl shadow-2xl backdrop-blur relative z-10 space-y-3.5 sm:space-y-4">
         
         {/* Título y descripción */}
-        <div className="text-center space-y-1.5">
-          <CardTitle className="font-outfit text-2xl font-bold text-foreground tracking-tight border-0 pb-0">
+        <div className="text-center space-y-1 sm:space-y-1.5">
+          <CardTitle className="font-outfit text-xl sm:text-2xl font-bold text-foreground tracking-tight border-0 pb-0">
             Acceso al Panel Técnico
           </CardTitle>
-          <CardDescription className="text-xs text-muted-foreground font-light">
+          <CardDescription className="text-[11px] sm:text-xs text-muted-foreground font-light leading-relaxed">
             Ingresá tus credenciales autorizadas para gestionar las órdenes y el inventario.
           </CardDescription>
         </div>
 
         {/* Formulario */}
-        <form onSubmit={handleLogin} className="space-y-3.5">
+        <form onSubmit={handleLogin} className="space-y-3 sm:space-y-3.5">
           <div className="space-y-1.5">
-            <Label htmlFor="login-email" className="text-xs font-semibold text-muted-foreground uppercase tracking-wider block">
+            <Label htmlFor="login-email" className="text-[11px] sm:text-xs font-semibold text-muted-foreground uppercase tracking-wider block">
               Correo Electrónico
             </Label>
             <Input 
               id="login-email"
               type="email" 
+              inputMode="email"
+              autoComplete="email"
               required
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               placeholder="tecnico@repairit.cloud"
-              className="w-full bg-background/85 border-border rounded-lg px-4 py-2.5 text-sm text-foreground placeholder-muted-foreground/50 focus-visible:ring-1 focus-visible:ring-primary transition-all"
+              className="w-full h-10 bg-background/85 border-border rounded-lg px-3.5 text-base sm:text-sm text-foreground placeholder-muted-foreground/50 focus-visible:ring-1 focus-visible:ring-primary transition-all"
             />
           </div>
 
           <div className="space-y-1.5">
-            <div className="flex items-center justify-between">
-              <Label htmlFor="login-password" className="text-xs font-semibold text-muted-foreground uppercase tracking-wider block">
+            <div className="flex items-center justify-between gap-2">
+              <Label htmlFor="login-password" className="text-[11px] sm:text-xs font-semibold text-muted-foreground uppercase tracking-wider block">
                 Contraseña
               </Label>
               <Link 
@@ -110,16 +112,17 @@ export default function LoginPage() {
             <Input 
               id="login-password"
               type="password" 
+              autoComplete="current-password"
               required
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               placeholder="••••••••"
-              className="w-full bg-background/85 border-border rounded-lg px-4 py-2.5 text-sm text-foreground placeholder-muted-foreground/50 focus-visible:ring-1 focus-visible:ring-primary transition-all"
+              className="w-full h-10 bg-background/85 border-border rounded-lg px-3.5 text-base sm:text-sm text-foreground placeholder-muted-foreground/50 focus-visible:ring-1 focus-visible:ring-primary transition-all"
             />
           </div>
 
           {/* Enlace a Registro */}
-          <div className="text-center pt-1">
+          <div className="text-center pt-0.5">
             <Link 
               to="/register"
               className="text-xs text-primary hover:underline font-medium transition-colors"
@@ -130,28 +133,30 @@ export default function LoginPage() {
 
           {/* Cloudflare Turnstile */}
           {siteKey && (
-            <div className="flex justify-center py-2 overflow-hidden min-h-[65px]">
-              <Turnstile
-                ref={turnstileRef}
-                siteKey={siteKey}
-                onSuccess={(token) => setCaptchaToken(token)}
-                options={{
-                  theme: "dark",
-                  size: "normal",
-                }}
-              />
+            <div className="flex justify-center py-1 w-full overflow-hidden min-h-[65px]">
+              <div className="max-w-full flex justify-center scale-[0.92] xs:scale-100 origin-center">
+                <Turnstile
+                  ref={turnstileRef}
+                  siteKey={siteKey}
+                  onSuccess={(token) => setCaptchaToken(token)}
+                  options={{
+                    theme: "dark",
+                    size: "flexible",
+                  }}
+                />
+              </div>
             </div>
           )}
 
           <Button 
             type="submit" 
-            className="w-full bg-primary hover:bg-primary/90 text-primary-foreground font-bold text-sm py-2.5 rounded-lg shadow-lg shadow-primary/15 transition-all mt-2 cursor-pointer select-none"
+            className="w-full h-10 bg-primary hover:bg-primary/90 text-primary-foreground font-bold text-xs sm:text-sm rounded-lg shadow-lg shadow-primary/15 transition-all mt-1 cursor-pointer select-none"
           >
             Iniciar Sesión
           </Button>
         </form>
 
-        <div className="relative flex py-1 items-center">
+        <div className="relative flex py-0.5 items-center">
           <div className="flex-grow border-t border-border/60"></div>
           <span className="flex-shrink mx-3 text-[10px] text-muted-foreground uppercase tracking-widest font-bold">O continuar con</span>
           <div className="flex-grow border-t border-border/60"></div>
@@ -161,7 +166,7 @@ export default function LoginPage() {
           type="button"
           onClick={handleGoogleLogin}
           variant="outline"
-          className="w-full border-border/80 hover:bg-card/65 hover:text-foreground text-xs font-semibold py-2.5 rounded-lg flex items-center justify-center gap-2 transition-all cursor-pointer select-none"
+          className="w-full h-10 border-border/80 hover:bg-card/65 hover:text-foreground text-xs font-semibold rounded-lg flex items-center justify-center gap-2 transition-all cursor-pointer select-none"
         >
           <svg className="w-4 h-4 shrink-0" viewBox="0 0 24 24">
             <path
