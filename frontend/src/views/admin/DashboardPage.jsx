@@ -1404,19 +1404,22 @@ export default function DashboardPage() {
   const isBasicPlan = !hasPOSAccess(activePlan);
   const nowDate = new Date();
   const monthlyOrdersCount = orders.filter((o) => {
-    const d = o.createdAt ? new Date(o.createdAt) : null;
+    const rawDate = o.created_at || o.createdAt;
+    const d = rawDate ? new Date(rawDate) : null;
     return d && d.getMonth() === nowDate.getMonth() && d.getFullYear() === nowDate.getFullYear();
   }).length;
 
   const totalItemsCount = inventory.length;
   const categoriesCount = new Set(inventory.map((item) => item.category).filter(Boolean)).size;
 
-  const lowStockItems = inventory.filter(
-    (item) => item.quantity <= (item.minQuantity || item.min_quantity || 0)
-  );
+  const lowStockItems = isBasicPlan
+    ? []
+    : inventory.filter(
+        (item) => item.quantity <= (item.minQuantity || item.min_quantity || 0)
+      );
   const lowStockCount = lowStockItems.length;
   const lowStockDetail =
-    lowStockCount > 0
+    !isBasicPlan && lowStockCount > 0
       ? `${lowStockCount} repuestos requieren reposición`
       : `${totalItemsCount} insumos en ${categoriesCount} categorías`;
 
@@ -1995,7 +1998,21 @@ export default function DashboardPage() {
             </Button>
           </CardHeader>
           <CardContent className="pt-4 space-y-2.5 flex-1">
-            {lowStockItems.length > 0 ? (
+            {isBasicPlan ? (
+              <div className="text-center py-8 flex flex-col items-center justify-center h-full space-y-2.5">
+                <div className="w-10 h-10 rounded-full bg-primary/10 border border-primary/20 flex items-center justify-center">
+                  <Package className="w-5 h-5 text-primary" />
+                </div>
+                <div className="space-y-1 max-w-[240px]">
+                  <p className="text-xs font-semibold text-foreground">
+                    Alertas de Stock Mínimo (Plan Pro)
+                  </p>
+                  <p className="text-[11px] text-muted-foreground font-light leading-relaxed">
+                    Tenés <strong className="text-foreground">{totalItemsCount} insumos</strong> en catálogo. Activá alertas automáticas de reposición actualizando a <strong className="text-primary font-semibold">Taller Pro</strong>.
+                  </p>
+                </div>
+              </div>
+            ) : lowStockItems.length > 0 ? (
               lowStockItems.slice(0, 5).map((item) => (
                 <div
                   key={item._id}

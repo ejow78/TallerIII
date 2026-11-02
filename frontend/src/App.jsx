@@ -123,15 +123,14 @@ export default function App() {
         const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
           if (session) {
             sessionStorage.setItem("repairit_token", session.access_token);
-            localStorage.setItem("repairit_token", session.access_token);
+            localStorage.removeItem("repairit_token");
             
             const localUser = JSON.parse(sessionStorage.getItem("repairit_user") || localStorage.getItem("repairit_user") || "{}");
             if (
               !localUser._id ||
               !localUser.venueId ||
               localUser.venueId === "undefined" ||
-              localUser._id !== session.user.id ||
-              localUser.token !== session.access_token
+              localUser._id !== session.user.id
             ) {
               try {
                 let { data: profile } = await supabase
@@ -149,7 +148,7 @@ export default function App() {
 
                     const { data: newOrg } = await supabase
                       .from("organizations")
-                      .insert({ name: workshopTitle, subscription_plan: "Multi-Taller Pro", subscription_status: "activo" })
+                      .insert({ name: workshopTitle, subscription_plan: "Taller Básico", subscription_status: "activo" })
                       .select()
                       .single();
 
@@ -190,7 +189,7 @@ export default function App() {
                   }
                 }
 
-                let subPlan = "Multi-Taller Pro";
+                let subPlan = "Taller Básico";
                 let subStatus = "activo";
 
                 if (profile?.organization_id) {
@@ -201,7 +200,7 @@ export default function App() {
                       .eq("id", profile.organization_id)
                       .maybeSingle();
                     if (org) {
-                      subPlan = org.subscription_plan || "Multi-Taller Pro";
+                      subPlan = org.subscription_plan || "Taller Básico";
                       subStatus = org.subscription_status || "activo";
                     }
                   } catch (orgErr) {
@@ -219,10 +218,9 @@ export default function App() {
                     subscriptionStatus: subStatus,
                     organizationId: profile.organization_id,
                     venueId: profile.venue_id,
-                    token: session.access_token,
                   };
                   sessionStorage.setItem("repairit_user", JSON.stringify(userData));
-                  localStorage.setItem("repairit_user", JSON.stringify(userData));
+                  localStorage.removeItem("repairit_user");
                   
                   if (event === "SIGNED_IN") {
                     if (window.location.hostname.includes("repairit.cloud")) {

@@ -29,6 +29,12 @@ import {
   Smartphone,
   History,
   PlusCircle,
+  Package,
+  Pencil,
+  Trash2,
+  ShoppingCart,
+  CreditCard,
+  Wallet,
 } from "lucide-react";
 import {
   DropdownMenu,
@@ -37,9 +43,9 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 
-import { api } from "@/services/api";
+import { api, getLocalUser, normalizePlan, hasPOSAccess } from "@/services/api";
 import { sendBudgetReadyEmail, sendOrderReadyEmail } from "@/services/emailService";
-import { printOrderReceipt, getOrderWhatsAppUrl } from "@/utils/printHelper";
+import { printOrderReceipt, printPosReceipt, getOrderWhatsAppUrl } from "@/utils/printHelper";
 
 const STATUS_FILTERS = [
   { key: "todos", label: "Todas" },
@@ -53,7 +59,15 @@ const STATUS_FILTERS = [
 
 export default function OrdersPage() {
   const navigate = useNavigate();
+  const currentUser = getLocalUser();
+  const isTechnician = currentUser?.role === "tecnico";
+  const [effectivePlan, setEffectivePlan] = useState(
+    normalizePlan(currentUser?.subscriptionPlan)
+  );
+  const canUsePOS = hasPOSAccess(effectivePlan);
+
   const [orders, setOrders] = useState([]);
+  const [inventoryItems, setInventoryItems] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState("todos");
@@ -76,12 +90,35 @@ export default function OrdersPage() {
   const [diagText, setDiagText] = useState("");
   const [diagStatus, setDiagStatus] = useState("diagnostico");
   const [budgetItems, setBudgetItems] = useState([{ desc: "", price: "" }]);
+  const [deductStockOnSave, setDeductStockOnSave] = useState(true);
+  const [selectedInventoryId, setSelectedInventoryId] = useState("");
   const [savingDiag, setSavingDiag] = useState(false);
+
+  // Modal Editar Recepción (Feature 3)
+  const [showEditReceptionModal, setShowEditReceptionModal] = useState(false);
+  const [editReceptionOrder, setEditReceptionOrder] = useState(null);
+  const [editDeviceType, setEditDeviceType] = useState("Celular");
+  const [editDeviceModel, setEditDeviceModel] = useState("");
+  const [editAccessories, setEditAccessories] = useState("");
+  const [editCosmetic, setEditCosmetic] = useState("");
+  const [editIssue, setEditIssue] = useState("");
+  const [savingReception, setSavingReception] = useState(false);
+
+  // Modal Cobro en Caja POS (Feature 2)
+  const [showChargePosModal, setShowChargePosModal] = useState(false);
+  const [chargeOrder, setChargeOrder] = useState(null);
+  const [chargeMethod, setChargeMethod] = useState("efectivo");
+  const [chargePrintTicket, setChargePrintTicket] = useState(true);
+  const [submittingCharge, setSubmittingCharge] = useState(false);
 
   const loadData = async () => {
     try {
       setLoading(true);
-      const ordersData = await api.orders.getAll();
+      const [ordersData, invData] = await Promise.all([
+        api.orders.getAll(),
+        api.inventory.getAll().catch(() => []),
+      ]);
+      setInventoryItems(Array.isArray(invData) ? invData : []);
 
       // Ordenamiento cronológico estable por fecha de creación (los más recientes primero)
       const sortedOrders = (ordersData || []).sort((a, b) => {
@@ -107,6 +144,9 @@ export default function OrdersPage() {
           phone: profileData.phone || "+54 381 4223344",
           email: profileData.email || "central@repairit.cloud",
         });
+        if (profileData?.subscriptionPlan) {
+          setEffectivePlan(normalizePlan(profileData.subscriptionPlan));
+        }
       } catch (err) {
         console.error("Error al cargar perfil del taller:", err);
       }
@@ -134,20 +174,56 @@ export default function OrdersPage() {
     setDiagOrder(order);
     setDiagText(order.diagnosis || "");
     setDiagStatus(order.status === "en_reparacion" ? "reparacion" : order.status || "diagnostico");
+    setSelectedInventoryId("");
+    setDeductStockOnSave(true);
 
     if (order.budget && Array.isArray(order.budget.items) && order.budget.items.length > 0) {
       setBudgetItems(
-        order.budget.items.map((i) => ({ desc: i.desc, price: i.price?.toString() || "" }))
+        order.budget.items.map((i) => ({
+          desc: i.desc,
+          price: i.price?.toString() || "",
+          inventoryId: i.inventoryId || null,
+          stockDeducted: Boolean(i.stockDeducted),
+        }))
       );
     } else {
-      setBudgetItems([{ desc: "", price: "" }]);
+      setBudgetItems([{ desc: "", price: "", inventoryId: null, stockDeducted: false }]);
     }
 
     setShowDiagModal(true);
   };
 
   const handleAddBudgetItem = () => {
-    setBudgetItems([...budgetItems, { desc: "", price: "" }]);
+    setBudgetItems([
+      ...budgetItems,
+      { desc: "", price: "", inventoryId: null, stockDeducted: false },
+    ]);
+  };
+
+  const handleAddInventoryBudgetItem = (invId) => {
+    if (!invId) return;
+    const invItem = inventoryItems.find((i) => i._id === invId);
+    if (!invItem) return;
+
+    const newItem = {
+      desc: `${invItem.name}${invItem.code ? ` (${invItem.code})` : ""}`,
+      price: String(Math.max(0, Number(invItem.price) || 0)),
+      inventoryId: invItem._id,
+      stockDeducted: false,
+    };
+
+    // Si el único ítem está vacío, reemplazarlo; si no, agregar al final
+    if (
+      budgetItems.length === 1 &&
+      !budgetItems[0].desc.trim() &&
+      !budgetItems[0].price
+    ) {
+      setBudgetItems([newItem]);
+    } else {
+      setBudgetItems([...budgetItems, newItem]);
+    }
+    setSelectedInventoryId("");
+    toast.info(`Repuesto agregado al presupuesto: ${invItem.name}`);
   };
 
   const handleRemoveBudgetItem = (index) => {
@@ -167,10 +243,30 @@ export default function OrdersPage() {
     try {
       setSavingDiag(true);
 
-      const validBudgetItems = budgetItems
-        .filter((i) => i.desc.trim() !== "")
-        .map((i) => ({ desc: i.desc.trim(), price: Number(i.price) || 0 }));
+      // Descontar del inventario los repuestos recién vinculados si el check está activo
+      const processedItems = [];
+      for (const i of budgetItems) {
+        if (!i.desc || i.desc.trim() === "") continue;
+        const cleanPrice = Math.max(0, Number(i.price) || 0);
+        let deducted = Boolean(i.stockDeducted);
 
+        if (i.inventoryId && !deducted && deductStockOnSave) {
+          try {
+            await api.inventory.adjustStock(i.inventoryId, -1);
+            deducted = true;
+          } catch (stockErr) {
+            console.warn("No se pudo descontar stock del repuesto:", stockErr);
+          }
+        }
+
+        processedItems.push({
+          desc: i.desc.trim(),
+          price: cleanPrice,
+          ...(i.inventoryId ? { inventoryId: i.inventoryId, stockDeducted: deducted } : {}),
+        });
+      }
+
+      const validBudgetItems = processedItems;
       const totalBudget = validBudgetItems.reduce((acc, i) => acc + i.price, 0);
 
       const budgetData =
@@ -223,6 +319,169 @@ export default function OrdersPage() {
       });
     } finally {
       setSavingDiag(false);
+    }
+  };
+
+  // Feature 3: Editar datos de recepción de la orden
+  const handleOpenEditReceptionModal = (order) => {
+    setEditReceptionOrder(order);
+    setEditDeviceType(order.deviceType || "Celular");
+    setEditDeviceModel(order.deviceModel || "");
+    setEditAccessories(order.accessories || "Ninguno");
+    setEditCosmetic(order.cosmetic || "Sin detalles");
+    setEditIssue(order.issue || "");
+    setShowEditReceptionModal(true);
+  };
+
+  const handleSaveReceptionEdit = async (e) => {
+    e.preventDefault();
+    if (!editReceptionOrder) return;
+    if (!editDeviceModel.trim() || !editIssue.trim()) {
+      toast.error("Completá el modelo del equipo y la falla reportada.");
+      return;
+    }
+
+    try {
+      setSavingReception(true);
+      const currentHistory = Array.isArray(editReceptionOrder.history)
+        ? editReceptionOrder.history
+        : [];
+      const updatedHistory = [
+        ...currentHistory,
+        {
+          date: new Date().toLocaleDateString("es-AR"),
+          text: `Datos de recepción editados (${editDeviceType} ${editDeviceModel.trim()})`,
+        },
+      ];
+
+      await api.orders.update(editReceptionOrder._id, {
+        device_type: editDeviceType,
+        device_model: editDeviceModel.trim(),
+        accessories: editAccessories.trim() || "Ninguno",
+        cosmetic: editCosmetic.trim() || "Sin detalles",
+        issue: editIssue.trim(),
+        history: updatedHistory,
+      });
+
+      toast.success("Datos de recepción actualizados", {
+        description: `Se modificó la ficha de la orden ${editReceptionOrder.trackingCode}.`,
+      });
+      setShowEditReceptionModal(false);
+      loadData();
+    } catch (error) {
+      toast.error("Error al editar recepción", {
+        description: error.message || "Intente nuevamente.",
+      });
+    } finally {
+      setSavingReception(false);
+    }
+  };
+
+  // Feature 3: Eliminar orden mal cargada (Exclusivo Admin / Superadmin)
+  const handleDeleteOrder = async (order) => {
+    if (isTechnician) {
+      toast.error("Permiso denegado", {
+        description: "Solo el administrador del taller puede eliminar órdenes.",
+      });
+      return;
+    }
+    if (
+      !window.confirm(
+        `¿Estás seguro de que deseás eliminar permanentemente la orden #${order.trackingCode} (${order.deviceModel})? Esta acción no se puede deshacer.`
+      )
+    ) {
+      return;
+    }
+
+    try {
+      await api.orders.delete(order._id);
+      toast.success("Orden eliminada", {
+        description: `La orden #${order.trackingCode} fue eliminada del sistema.`,
+      });
+      if (detailOrder?._id === order._id) {
+        setShowDetailModal(false);
+        setDetailOrder(null);
+      }
+      loadData();
+    } catch (error) {
+      toast.error("Error al eliminar orden", {
+        description: error.message || "Intente nuevamente.",
+      });
+    }
+  };
+
+  // Feature 2: Registrar cobro de orden directamente en Caja POS
+  const handleOpenChargePosModal = (order) => {
+    setChargeOrder(order);
+    setChargeMethod("efectivo");
+    setChargePrintTicket(true);
+    setShowChargePosModal(true);
+  };
+
+  const handleConfirmChargePos = async (e) => {
+    e.preventDefault();
+    if (!chargeOrder) return;
+
+    const totalBudget =
+      chargeOrder.budget?.items?.reduce((s, i) => s + (Number(i.price) || 0), 0) ||
+      Number(chargeOrder.budget?.total) ||
+      0;
+
+    if (totalBudget <= 0) {
+      toast.error("La orden no posee un monto presupuestado mayor a $0 para cobrar en Caja.");
+      return;
+    }
+
+    try {
+      setSubmittingCharge(true);
+      const saleItems = [
+        {
+          id: `order-${chargeOrder._id}`,
+          name: `Orden #${chargeOrder.trackingCode} - ${chargeOrder.deviceType || ""} ${chargeOrder.deviceModel || ""}`.trim(),
+          code: chargeOrder.trackingCode,
+          price: totalBudget,
+          quantity: 1,
+          isServiceOrder: true,
+        },
+      ];
+
+      const createdSale = await api.sales.create({
+        items: saleItems,
+        total: totalBudget,
+        paymentMethod: chargeMethod,
+      });
+
+      // Marcar orden como entregada y dejar constancia en la bitácora
+      await api.orders.updateStatus(
+        chargeOrder._id,
+        "entregado",
+        `Equipo entregado y cobrado en Caja POS ($${totalBudget.toLocaleString("es-AR")} - ${chargeMethod.toUpperCase()})`
+      );
+
+      if (chargePrintTicket) {
+        printPosReceipt(
+          {
+            id: createdSale._id,
+            items: saleItems,
+            total: totalBudget,
+            payment_method: chargeMethod,
+            created_at: createdSale.created_at || new Date().toISOString(),
+          },
+          profile || {}
+        );
+      }
+
+      toast.success("¡Cobro registrado en Caja POS!", {
+        description: `Orden #${chargeOrder.trackingCode} marcada como Entregada ($${totalBudget.toLocaleString("es-AR")}).`,
+      });
+      setShowChargePosModal(false);
+      loadData();
+    } catch (error) {
+      toast.error("Error al registrar cobro en Caja", {
+        description: error.message || "Intente nuevamente.",
+      });
+    } finally {
+      setSubmittingCharge(false);
     }
   };
 
@@ -748,6 +1007,37 @@ export default function OrdersPage() {
                       >
                         <Printer className="w-4 h-4" />
                       </Button>
+                      <Button
+                        variant="outline"
+                        size="icon-sm"
+                        onClick={() => handleOpenEditReceptionModal(o)}
+                        className="h-8 w-8 text-muted-foreground hover:text-primary border-border/80 rounded-lg cursor-pointer shrink-0"
+                        title="Editar recepción"
+                      >
+                        <Pencil className="w-3.5 h-3.5" />
+                      </Button>
+                      {canUsePOS && totalB > 0 && o.status !== "entregado" && (
+                        <Button
+                          variant="outline"
+                          size="icon-sm"
+                          onClick={() => handleOpenChargePosModal(o)}
+                          className="h-8 w-8 text-emerald-400 hover:bg-emerald-500/10 border-emerald-500/30 rounded-lg cursor-pointer shrink-0"
+                          title="Cobrar orden en Caja POS"
+                        >
+                          <ShoppingCart className="w-3.5 h-3.5" />
+                        </Button>
+                      )}
+                      {!isTechnician && (
+                        <Button
+                          variant="outline"
+                          size="icon-sm"
+                          onClick={() => handleDeleteOrder(o)}
+                          className="h-8 w-8 text-destructive hover:bg-destructive/10 border-destructive/30 rounded-lg cursor-pointer shrink-0"
+                          title="Eliminar orden"
+                        >
+                          <Trash2 className="w-3.5 h-3.5" />
+                        </Button>
+                      )}
                     </div>
                   </div>
                 );
@@ -916,6 +1206,40 @@ export default function OrdersPage() {
                             >
                               <Printer className="w-4 h-4" />
                             </Button>
+
+                            <Button
+                              variant="ghost"
+                              size="icon-sm"
+                              onClick={() => handleOpenEditReceptionModal(o)}
+                              className="h-8 w-8 text-muted-foreground hover:text-primary hover:bg-primary/10 rounded-lg cursor-pointer"
+                              title="Editar datos de recepción"
+                            >
+                              <Pencil className="w-3.5 h-3.5" />
+                            </Button>
+
+                            {canUsePOS && totalB > 0 && o.status !== "entregado" && (
+                              <Button
+                                variant="ghost"
+                                size="icon-sm"
+                                onClick={() => handleOpenChargePosModal(o)}
+                                className="h-8 w-8 text-emerald-400 hover:text-emerald-300 hover:bg-emerald-500/15 rounded-lg cursor-pointer"
+                                title="Cobrar presupuesto en Caja POS y marcar entregado"
+                              >
+                                <ShoppingCart className="w-4 h-4" />
+                              </Button>
+                            )}
+
+                            {!isTechnician && (
+                              <Button
+                                variant="ghost"
+                                size="icon-sm"
+                                onClick={() => handleDeleteOrder(o)}
+                                className="h-8 w-8 text-muted-foreground hover:text-destructive hover:bg-destructive/10 rounded-lg cursor-pointer"
+                                title="Eliminar orden"
+                              >
+                                <Trash2 className="w-3.5 h-3.5" />
+                              </Button>
+                            )}
                           </div>
                         </td>
                       </tr>
@@ -1008,10 +1332,23 @@ export default function OrdersPage() {
 
                 {/* Datos del Dispositivo */}
                 <div className="rounded-xl border border-border/70 bg-background/50 p-3.5 space-y-2">
-                  <span className="text-[10px] font-bold uppercase tracking-wider text-primary flex items-center gap-1.5">
-                    <Smartphone className="w-3.5 h-3.5" />
-                    Equipo Recibido
-                  </span>
+                  <div className="flex items-center justify-between">
+                    <span className="text-[10px] font-bold uppercase tracking-wider text-primary flex items-center gap-1.5">
+                      <Smartphone className="w-3.5 h-3.5" />
+                      Equipo Recibido
+                    </span>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setShowDetailModal(false);
+                        handleOpenEditReceptionModal(detailOrder);
+                      }}
+                      className="text-[10px] font-bold text-primary hover:underline inline-flex items-center gap-1 cursor-pointer"
+                    >
+                      <Pencil className="w-3 h-3" />
+                      Editar Recepción
+                    </button>
+                  </div>
                   <div className="space-y-1">
                     <p className="text-sm font-bold text-foreground">
                       {detailOrder.deviceModel || "Sin modelo"}
@@ -1126,7 +1463,7 @@ export default function OrdersPage() {
 
             {/* Pie del Modal con Acciones Rápidas */}
             <div className="border-t border-border/70 p-3.5 sm:p-4 bg-muted/15 flex flex-wrap items-center justify-between gap-2 shrink-0">
-              <div className="flex items-center gap-2">
+              <div className="flex flex-wrap items-center gap-2">
                 <Button
                   type="button"
                   variant="outline"
@@ -1135,7 +1472,7 @@ export default function OrdersPage() {
                   className="h-8 text-xs font-bold border-emerald-500/40 text-emerald-400 hover:bg-emerald-500/10 rounded-lg flex items-center gap-1.5 cursor-pointer"
                 >
                   <MessageCircle className="w-3.5 h-3.5" />
-                  Enviar por WhatsApp
+                  WhatsApp
                 </Button>
                 <Button
                   type="button"
@@ -1147,6 +1484,35 @@ export default function OrdersPage() {
                   <Printer className="w-3.5 h-3.5" />
                   Imprimir
                 </Button>
+                {canUsePOS &&
+                  detailOrder.budget?.items?.length > 0 &&
+                  detailOrder.status !== "entregado" && (
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      onClick={() => {
+                        setShowDetailModal(false);
+                        handleOpenChargePosModal(detailOrder);
+                      }}
+                      className="h-8 text-xs font-bold border-emerald-500/40 text-emerald-400 hover:bg-emerald-500/10 rounded-lg flex items-center gap-1.5 cursor-pointer"
+                    >
+                      <ShoppingCart className="w-3.5 h-3.5" />
+                      Cobrar en Caja
+                    </Button>
+                  )}
+                {!isTechnician && (
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    onClick={() => handleDeleteOrder(detailOrder)}
+                    className="h-8 text-xs font-semibold border-destructive/30 text-destructive hover:bg-destructive/10 rounded-lg flex items-center gap-1.5 cursor-pointer"
+                  >
+                    <Trash2 className="w-3.5 h-3.5" />
+                    Eliminar
+                  </Button>
+                )}
               </div>
 
               <div className="flex items-center gap-2">
@@ -1277,21 +1643,42 @@ export default function OrdersPage() {
 
               {/* Presupuesto de Mano de Obra y Repuestos */}
               <div className="space-y-3 border-t border-border/60 pt-4">
-                <div className="flex items-center justify-between">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
                   <Label className="text-xs font-bold uppercase tracking-wider text-muted-foreground flex items-center gap-1.5">
                     <DollarSign className="w-3.5 h-3.5 text-primary" />
                     Ítems del Presupuesto (Mano de obra y repuestos)
                   </Label>
-                  <Button
-                    type="button"
-                    variant="outline"
-                    size="sm"
-                    onClick={handleAddBudgetItem}
-                    className="h-7 text-[10px] font-bold border-primary/40 text-primary hover:bg-primary/10 rounded-lg flex items-center gap-1 cursor-pointer"
-                  >
-                    <Plus className="w-3 h-3" />
-                    Agregar Ítem
-                  </Button>
+                  <div className="flex items-center gap-2">
+                    {inventoryItems.filter((inv) => inv.quantity > 0).length > 0 && (
+                      <div className="relative">
+                        <select
+                          value={selectedInventoryId}
+                          onChange={(e) => handleAddInventoryBudgetItem(e.target.value)}
+                          className="h-7 bg-background border border-primary/40 text-primary rounded-lg px-2 text-[10px] font-bold focus:outline-none focus:ring-1 focus:ring-primary cursor-pointer"
+                        >
+                          <option value="">+ Cargar repuesto de Stock</option>
+                          {inventoryItems
+                            .filter((inv) => inv.quantity > 0)
+                            .map((inv) => (
+                              <option key={inv._id} value={inv._id}>
+                                {inv.name} (${Number(inv.price || 0).toLocaleString("es-AR")} •{" "}
+                                {inv.quantity} u.)
+                              </option>
+                            ))}
+                        </select>
+                      </div>
+                    )}
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      onClick={handleAddBudgetItem}
+                      className="h-7 text-[10px] font-bold border-primary/40 text-primary hover:bg-primary/10 rounded-lg flex items-center gap-1 cursor-pointer shrink-0"
+                    >
+                      <Plus className="w-3 h-3" />
+                      Agregar Ítem
+                    </Button>
+                  </div>
                 </div>
 
                 <div className="space-y-2 max-h-48 overflow-y-auto pr-1">
@@ -1300,19 +1687,31 @@ export default function OrdersPage() {
                       key={idx}
                       className="flex gap-2 items-center bg-muted/20 p-2 rounded-xl border border-border/50"
                     >
-                      <Input
-                        type="text"
-                        placeholder="Descripción (ej: Reemplazo de módulo pantalla)"
-                        value={item.desc}
-                        onChange={(e) => handleBudgetItemChange(idx, "desc", e.target.value)}
-                        className="bg-background text-xs h-8 flex-grow rounded-lg"
-                      />
+                      <div className="flex-grow min-w-0">
+                        <Input
+                          type="text"
+                          placeholder="Descripción (ej: Reemplazo de módulo pantalla)"
+                          value={item.desc}
+                          onChange={(e) => handleBudgetItemChange(idx, "desc", e.target.value)}
+                          className="bg-background text-xs h-8 w-full rounded-lg"
+                        />
+                        {item.inventoryId && (
+                          <span className="text-[10px] text-primary font-semibold inline-flex items-center gap-1 mt-1">
+                            <Package className="w-3 h-3" />
+                            Vinculado a Inventario{" "}
+                            {item.stockDeducted ? "(Stock ya descontado ✓)" : "(Restará 1 u.)"}
+                          </span>
+                        )}
+                      </div>
                       <div className="relative w-28 sm:w-32 shrink-0">
                         <span className="absolute left-2.5 top-2 text-xs font-mono text-muted-foreground">
                           $
                         </span>
                         <Input
                           type="number"
+                          min="0"
+                          step="any"
+                          inputMode="decimal"
                           placeholder="Monto"
                           value={item.price}
                           onChange={(e) => handleBudgetItemChange(idx, "price", e.target.value)}
@@ -1334,6 +1733,20 @@ export default function OrdersPage() {
                   ))}
                 </div>
 
+                {budgetItems.some((i) => i.inventoryId && !i.stockDeducted) && (
+                  <label className="flex items-center gap-2 text-xs text-muted-foreground cursor-pointer select-none pt-1">
+                    <input
+                      type="checkbox"
+                      checked={deductStockOnSave}
+                      onChange={(e) => setDeductStockOnSave(e.target.checked)}
+                      className="rounded border-border text-primary focus:ring-primary h-3.5 w-3.5"
+                    />
+                    <span>
+                      Descontar automáticamente 1 unidad del stock de inventario al guardar
+                    </span>
+                  </label>
+                )}
+
                 {/* Total calculado */}
                 <div className="flex justify-between items-baseline bg-primary/5 p-3 rounded-xl border border-primary/20 mt-2">
                   <span className="text-xs font-bold text-muted-foreground uppercase">
@@ -1342,7 +1755,7 @@ export default function OrdersPage() {
                   <span className="text-xl font-black font-outfit text-primary font-mono">
                     $
                     {budgetItems
-                      .reduce((acc, i) => acc + (Number(i.price) || 0), 0)
+                      .reduce((acc, i) => acc + Math.max(0, Number(i.price) || 0), 0)
                       .toLocaleString("es-AR", { minimumFractionDigits: 2 })}
                   </span>
                 </div>
@@ -1388,6 +1801,241 @@ export default function OrdersPage() {
                 >
                   <Save className="w-3.5 h-3.5" />
                   {savingDiag ? "Guardando..." : "Guardar Diagnóstico"}
+                </Button>
+              </div>
+            </form>
+          </Card>
+        </div>
+      )}
+
+      {/* MODAL EDITAR DATOS DE RECEPCIÓN (FEATURE 3) */}
+      {showEditReceptionModal && editReceptionOrder && (
+        <div className="fixed inset-0 z-50 bg-background/80 backdrop-blur-sm flex items-center justify-center p-3 sm:p-4">
+          <Card className="bg-card border-border/80 shadow-2xl w-full max-w-lg max-h-[92vh] overflow-y-auto animate-in zoom-in-95 duration-150">
+            <CardHeader className="border-b border-border pb-4 flex flex-row items-center justify-between">
+              <div>
+                <CardTitle className="font-outfit text-lg font-bold text-foreground flex items-center gap-2">
+                  <Pencil className="w-4 h-4 text-primary" />
+                  Editar Recepción del Equipo
+                </CardTitle>
+                <span className="text-xs text-muted-foreground">
+                  Orden N°{" "}
+                  <strong className="font-mono text-foreground">
+                    {editReceptionOrder.trackingCode}
+                  </strong>
+                </span>
+              </div>
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={() => setShowEditReceptionModal(false)}
+                className="h-8 w-8 text-muted-foreground hover:text-foreground rounded-full cursor-pointer"
+              >
+                <X className="w-4 h-4" />
+              </Button>
+            </CardHeader>
+
+            <form onSubmit={handleSaveReceptionEdit} className="p-4 sm:p-6 space-y-4 text-left">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div className="space-y-1.5">
+                  <Label className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
+                    Categoría de Equipo
+                  </Label>
+                  <select
+                    value={editDeviceType}
+                    onChange={(e) => setEditDeviceType(e.target.value)}
+                    className="w-full h-9 rounded-lg border border-border bg-background px-3 text-xs text-foreground focus:outline-none focus:ring-1 focus:ring-primary"
+                  >
+                    {["Celular", "Notebook / PC", "Tablet", "Consola", "Smartwatch", "Otro"].map(
+                      (t) => (
+                        <option key={t} value={t}>
+                          {t}
+                        </option>
+                      )
+                    )}
+                  </select>
+                </div>
+
+                <div className="space-y-1.5">
+                  <Label className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
+                    Marca y Modelo
+                  </Label>
+                  <Input
+                    type="text"
+                    required
+                    value={editDeviceModel}
+                    onChange={(e) => setEditDeviceModel(e.target.value)}
+                    placeholder="Ej. Samsung S23 Ultra"
+                    className="h-9 text-xs bg-background rounded-lg"
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div className="space-y-1.5">
+                  <Label className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
+                    Accesorios Entregados
+                  </Label>
+                  <Input
+                    type="text"
+                    value={editAccessories}
+                    onChange={(e) => setEditAccessories(e.target.value)}
+                    placeholder="Funda, cargador, bandeja SIM..."
+                    className="h-9 text-xs bg-background rounded-lg"
+                  />
+                </div>
+
+                <div className="space-y-1.5">
+                  <Label className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
+                    Estado Estético
+                  </Label>
+                  <Input
+                    type="text"
+                    value={editCosmetic}
+                    onChange={(e) => setEditCosmetic(e.target.value)}
+                    placeholder="Rayones en tapa trasera..."
+                    className="h-9 text-xs bg-background rounded-lg"
+                  />
+                </div>
+              </div>
+
+              <div className="space-y-1.5">
+                <Label className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
+                  Falla Declarada por el Cliente
+                </Label>
+                <Textarea
+                  rows={3}
+                  required
+                  value={editIssue}
+                  onChange={(e) => setEditIssue(e.target.value)}
+                  className="text-xs bg-background rounded-lg"
+                />
+              </div>
+
+              <div className="flex justify-end gap-2.5 border-t border-border/60 pt-4">
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => setShowEditReceptionModal(false)}
+                  className="h-9 text-xs font-semibold rounded-lg cursor-pointer"
+                >
+                  Cancelar
+                </Button>
+                <Button
+                  type="submit"
+                  disabled={savingReception}
+                  className="h-9 bg-primary hover:bg-primary/90 text-primary-foreground font-bold text-xs px-5 rounded-lg cursor-pointer flex items-center gap-1.5"
+                >
+                  <Save className="w-3.5 h-3.5" />
+                  {savingReception ? "Guardando..." : "Guardar Cambios"}
+                </Button>
+              </div>
+            </form>
+          </Card>
+        </div>
+      )}
+
+      {/* MODAL REGISTRAR COBRO DE ORDEN EN CAJA POS (FEATURE 2) */}
+      {showChargePosModal && chargeOrder && (
+        <div className="fixed inset-0 z-50 bg-background/80 backdrop-blur-sm flex items-center justify-center p-3 sm:p-4">
+          <Card className="bg-card border-border/80 shadow-2xl w-full max-w-md overflow-hidden animate-in zoom-in-95 duration-150">
+            <CardHeader className="border-b border-border pb-4 flex flex-row items-center justify-between">
+              <div>
+                <CardTitle className="font-outfit text-base sm:text-lg font-bold text-foreground flex items-center gap-2">
+                  <ShoppingCart className="w-5 h-5 text-emerald-400" />
+                  Cobrar Orden en Caja POS
+                </CardTitle>
+                <span className="text-xs text-muted-foreground">
+                  Orden <strong className="font-mono text-foreground">#{chargeOrder.trackingCode}</strong>{" "}
+                  &bull; {chargeOrder.deviceModel}
+                </span>
+              </div>
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={() => setShowChargePosModal(false)}
+                className="h-8 w-8 text-muted-foreground hover:text-foreground rounded-full cursor-pointer"
+              >
+                <X className="w-4 h-4" />
+              </Button>
+            </CardHeader>
+
+            <form onSubmit={handleConfirmChargePos} className="p-4 sm:p-6 space-y-4 text-left">
+              <div className="bg-primary/10 border border-primary/25 rounded-xl p-4 flex items-baseline justify-between">
+                <span className="text-xs font-bold uppercase tracking-wider text-primary">
+                  Monto a Cobrar
+                </span>
+                <span className="text-2xl font-black font-outfit text-primary font-mono">
+                  $
+                  {(
+                    chargeOrder.budget?.items?.reduce(
+                      (s, i) => s + (Number(i.price) || 0),
+                      0
+                    ) ||
+                    Number(chargeOrder.budget?.total) ||
+                    0
+                  ).toLocaleString("es-AR", { minimumFractionDigits: 2 })}
+                </span>
+              </div>
+
+              <div className="space-y-2">
+                <Label className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground block">
+                  Seleccioná el Medio de Pago
+                </Label>
+                <div className="grid grid-cols-2 gap-2.5 text-xs">
+                  {[
+                    { id: "efectivo", label: "Efectivo", icon: DollarSign },
+                    { id: "transferencia", label: "Transferencia", icon: Smartphone },
+                    { id: "debito", label: "Débito", icon: CreditCard },
+                    { id: "credito", label: "Crédito", icon: Wallet },
+                  ].map((m) => {
+                    const Icon = m.icon;
+                    const active = chargeMethod === m.id;
+                    return (
+                      <button
+                        key={m.id}
+                        type="button"
+                        onClick={() => setChargeMethod(m.id)}
+                        className={`flex items-center gap-2 px-3 py-2.5 rounded-xl border text-left cursor-pointer transition-all ${
+                          active
+                            ? "bg-primary/15 border-primary text-primary font-bold"
+                            : "border-border/70 bg-background/60 hover:bg-muted/30 text-foreground"
+                        }`}
+                      >
+                        <Icon className="w-4 h-4 shrink-0 text-primary" />
+                        <span>{m.label}</span>
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+
+              <label className="flex items-center gap-2 text-xs text-muted-foreground cursor-pointer select-none pt-1">
+                <input
+                  type="checkbox"
+                  checked={chargePrintTicket}
+                  onChange={(e) => setChargePrintTicket(e.target.checked)}
+                  className="rounded border-border text-primary focus:ring-primary h-3.5 w-3.5"
+                />
+                <span>Imprimir ticket de venta y marcar orden como Entregada</span>
+              </label>
+
+              <div className="flex justify-end gap-2.5 border-t border-border/60 pt-4">
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => setShowChargePosModal(false)}
+                  className="h-9 text-xs font-semibold rounded-lg cursor-pointer"
+                >
+                  Cancelar
+                </Button>
+                <Button
+                  type="submit"
+                  disabled={submittingCharge}
+                  className="h-9 bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs px-5 rounded-lg cursor-pointer flex items-center gap-1.5"
+                >
+                  <CheckCircle className="w-3.5 h-3.5" />
+                  {submittingCharge ? "Registrando..." : "Confirmar Cobro y Entrega"}
                 </Button>
               </div>
             </form>

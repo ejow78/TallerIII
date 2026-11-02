@@ -59,7 +59,8 @@ export default function NewOrderPage() {
         if (Array.isArray(oList)) {
           const now = new Date();
           const mCount = oList.filter((o) => {
-            const d = o.createdAt ? new Date(o.createdAt) : null;
+            const rawDate = o.created_at || o.createdAt;
+            const d = rawDate ? new Date(rawDate) : null;
             return d && d.getMonth() === now.getMonth() && d.getFullYear() === now.getFullYear();
           }).length;
           setMonthlyOrdersCount(mCount);

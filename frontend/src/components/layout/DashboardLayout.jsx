@@ -91,6 +91,14 @@ export default function DashboardLayout() {
   const user = JSON.parse(sessionStorage.getItem("repairit_user") || localStorage.getItem("repairit_user") || "{}");
   const isSuperAdmin = user.role === "superadmin";
 
+  // Guard de Roles por Ruta (RBAC)
+  if (user.role === "tecnico" && (currentPath === "/dashboard/perfil" || currentPath === "/dashboard/cuentas" || currentPath === "/dashboard/usuarios")) {
+    return <Navigate to="/dashboard" replace />;
+  }
+  if (!isSuperAdmin && currentPath === "/dashboard/usuarios") {
+    return <Navigate to="/dashboard" replace />;
+  }
+
   const [venues, setVenues] = useState([]);
   const [activeVenue, setActiveVenue] = useState(null);
   const [sidebarStats, setSidebarStats] = useState({ activeOrders: 0, lowStock: 0 });
@@ -377,7 +385,7 @@ export default function DashboardLayout() {
                             <span>Inventario de Insumos</span>
                           </NavLink>
                         </SidebarMenuButton>
-                        {sidebarStats.lowStock > 0 && (
+                        {hasPOSAccess(effectivePlan) && sidebarStats.lowStock > 0 && (
                           <SidebarMenuBadge
                             title={`${sidebarStats.lowStock} ítems con bajo stock`}
                             className="bg-destructive/15 text-destructive border border-destructive/30 rounded-md text-[10px] font-mono font-bold px-1.5 flex items-center gap-0.5"

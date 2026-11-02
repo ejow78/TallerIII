@@ -19,6 +19,7 @@ import {
 } from "@/components/ui/alert-dialog";
 import { toast } from "sonner";
 import { api } from "@/services/api";
+import { escapeHtml, printHtml } from "@/utils/printHelper";
 import { Input } from "@/components/ui/input";
 import { 
   ArrowLeft, 
@@ -73,24 +74,27 @@ export default function TrackingPage() {
   // Descargar / Imprimir Ficha PDF
   const handleDownloadPdf = () => {
     if (!order) return;
-    const printWindow = window.open("", "_blank", "width=850,height=950");
-    if (!printWindow) {
-      toast.error("No se pudo abrir la ventana de impresión. Habilitá los pop-ups.");
-      return;
-    }
 
-    const clientName = order.clientId?.name || "Cliente";
-    const venueName = order.venueId?.name || "Taller RepairIT";
-    const venueAddress = order.venueId?.address || "Sucursal Central";
+    const clientName = escapeHtml(order.clientId?.name || "Cliente");
+    const venueName = escapeHtml(order.venueId?.name || "Taller RepairIT");
+    const venueAddress = escapeHtml(order.venueId?.address || "Sucursal Central");
+    const safeTrackingCode = escapeHtml(order.trackingCode || "");
+    const safeStatus = escapeHtml((order.status || "INGRESADO").replace("_", " "));
+    const safeDate = escapeHtml(order.date || new Date().toLocaleDateString("es-AR"));
+    const safeDeviceType = escapeHtml(order.deviceType || "");
+    const safeDeviceModel = escapeHtml(order.deviceModel || "");
+    const safeIssue = escapeHtml(order.issue || "Sin especificar");
+    const safeDiagnosis = order.diagnosis ? escapeHtml(order.diagnosis) : "";
     const budgetTotal = order.budget?.items ? order.budget.items.reduce((s, i) => s + (Number(i.price) || 0), 0) : 0;
-    const trackingUrl = `https://tracking.repairit.cloud/seguimiento/${order.trackingCode}`;
+    const rawTrackingUrl = `https://tracking.repairit.cloud/seguimiento/${encodeURIComponent(order.trackingCode || "")}`;
+    const trackingUrl = escapeHtml(rawTrackingUrl);
 
-    printWindow.document.write(`
+    const html = `
       <!DOCTYPE html>
       <html lang="es">
         <head>
           <meta charset="UTF-8">
-          <title>Ficha de Servicio - #${order.trackingCode}</title>
+          <title>Ficha de Servicio - #${safeTrackingCode}</title>
           <style>
             @page {
               size: A4 portrait;
@@ -130,9 +134,9 @@ export default function TrackingPage() {
               <div style="font-size: 10px; color: #334155; margin-top: 2px;">${venueName} &bull; ${venueAddress}</div>
             </div>
             <div style="text-align: right;">
-              <span class="badge">${(order.status || "INGRESADO").replace("_", " ")}</span>
-              <div style="font-size: 15px; font-weight: 900; font-family: monospace; color: #0284c7; margin-top: 4px;">#${order.trackingCode}</div>
-              <div style="font-size: 9px; color: #64748b;">Fecha: ${order.date || new Date().toLocaleDateString("es-AR")}</div>
+              <span class="badge">${safeStatus}</span>
+              <div style="font-size: 15px; font-weight: 900; font-family: monospace; color: #0284c7; margin-top: 4px;">#${safeTrackingCode}</div>
+              <div style="font-size: 9px; color: #64748b;">Fecha: ${safeDate}</div>
             </div>
           </div>
 
@@ -140,11 +144,11 @@ export default function TrackingPage() {
             <div class="box">
               <div class="title">Datos del Cliente</div>
               <div class="val">${clientName}</div>
-              <div style="font-size: 10px; color: #64748b; margin-top: 2px;">DNI: ${order.clientId?.dni || "N/A"}</div>
+              <div style="font-size: 10px; color: #64748b; margin-top: 2px;">Orden registrada #${safeTrackingCode}</div>
             </div>
             <div class="box" style="display: flex; align-items: center; gap: 10px; background: #f8fafc;">
               <img 
-                src="https://api.qrserver.com/v1/create-qr-code/?size=100x100&margin=0&data=${encodeURIComponent(trackingUrl)}" 
+                src="https://api.qrserver.com/v1/create-qr-code/?size=100x100&margin=0&data=${encodeURIComponent(rawTrackingUrl)}" 
                 alt="QR Seguimiento" 
                 style="width: 60px; height: 60px; border: 1px solid #cbd5e1; border-radius: 4px; padding: 2px; background: #fff;"
               />
@@ -156,10 +160,10 @@ export default function TrackingPage() {
           </div>
 
           <div class="box" style="margin-bottom: 12px;">
-            <div class="title">Dispositivo & Falla Declarada</div>
-            <div class="val" style="margin-bottom: 4px;">${order.deviceType} - ${order.deviceModel}</div>
-            <div style="font-size: 11px; color: #334155;"><strong>Falla reportada:</strong> ${order.issue || "Sin especificar"}</div>
-            ${order.diagnosis ? `<div style="font-size: 11px; color: #0f172a; margin-top: 6px; padding-top: 6px; border-top: 1px dashed #e2e8f0;"><strong>Diagnóstico del Taller:</strong> ${order.diagnosis}</div>` : ""}
+            <div class="title">Dispositivo &amp; Falla Declarada</div>
+            <div class="val" style="margin-bottom: 4px;">${safeDeviceType} - ${safeDeviceModel}</div>
+            <div style="font-size: 11px; color: #334155;"><strong>Falla reportada:</strong> ${safeIssue}</div>
+            ${safeDiagnosis ? `<div style="font-size: 11px; color: #0f172a; margin-top: 6px; padding-top: 6px; border-top: 1px dashed #e2e8f0;"><strong>Diagnóstico del Taller:</strong> ${safeDiagnosis}</div>` : ""}
           </div>
 
           ${order.budget?.items?.length ? `
@@ -175,8 +179,8 @@ export default function TrackingPage() {
                 <tbody>
                   ${order.budget.items.map(item => `
                     <tr>
-                      <td>${item.desc}</td>
-                      <td style="text-align: right; font-weight: 600;">$${Number(item.price).toLocaleString("es-AR", { minimumFractionDigits: 2 })}</td>
+                      <td>${escapeHtml(item.desc)}</td>
+                      <td style="text-align: right; font-weight: 600;">$${Number(item.price || 0).toLocaleString("es-AR", { minimumFractionDigits: 2 })}</td>
                     </tr>
                   `).join("")}
                 </tbody>
@@ -188,13 +192,10 @@ export default function TrackingPage() {
           <div class="footer">
             Documento emitido electrónicamente por RepairIT Cloud &bull; ${trackingUrl}
           </div>
-          <script>
-            window.onload = function() { window.print(); };
-          </script>
         </body>
       </html>
-    `);
-    printWindow.document.close();
+    `;
+    printHtml(html);
   };
 
   // Aprobación online del presupuesto con validación de DNI
@@ -202,7 +203,7 @@ export default function TrackingPage() {
     if (e && e.preventDefault) e.preventDefault();
     if (!order) return;
 
-    const hasClientDni = !!(order.clientId?.dni || order.client?.dni);
+    const hasClientDni = Boolean(order.hasClientDni ?? order.clientId?.dni ?? order.client?.dni ?? true);
     if (hasClientDni && !dniInput.trim()) {
       toast.error("Validación requerida", {
         description: "Por favor, ingresá tu número de DNI para confirmar la aprobación."
@@ -431,7 +432,6 @@ export default function TrackingPage() {
                             Confirmación de identidad (DNI del titular):
                           </label>
                           <Input
-                            type="text"
                             type="text"
                             inputMode="numeric"
                             pattern="[0-9]*"

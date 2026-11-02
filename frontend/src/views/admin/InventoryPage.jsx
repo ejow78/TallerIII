@@ -201,9 +201,9 @@ export default function InventoryPage() {
           name: itemName,
           category: itemCategory,
           description: itemDesc,
-          quantity: Number(itemQty),
-          minQuantity: Number(itemMinQty),
-          price: Number(itemPrice),
+          quantity: Math.max(0, Number(itemQty) || 0),
+          minQuantity: Math.max(0, Number(itemMinQty) || 0),
+          price: Math.max(0, Number(itemPrice) || 0),
           code: finalCode,
         });
         toast.success("¡Insumo Actualizado!", {
@@ -214,9 +214,9 @@ export default function InventoryPage() {
           name: itemName,
           category: itemCategory,
           description: itemDesc,
-          quantity: Number(itemQty),
-          minQuantity: Number(itemMinQty),
-          price: Number(itemPrice),
+          quantity: Math.max(0, Number(itemQty) || 0),
+          minQuantity: Math.max(0, Number(itemMinQty) || 0),
+          price: Math.max(0, Number(itemPrice) || 0),
           code: finalCode,
         });
         toast.success("¡Insumo Registrado!", {
@@ -446,7 +446,7 @@ export default function InventoryPage() {
           throw new Error("El archivo CSV no contiene registros válidos.");
         }
 
-        const user = JSON.parse(localStorage.getItem("repairit_user") || "{}");
+        const user = getLocalUser();
         if (
           !user.organizationId ||
           !user.venueId ||
@@ -466,9 +466,9 @@ export default function InventoryPage() {
           const name = row[1];
           const category = row[2] || "Insumos";
           const description = row[3] || "";
-          const quantity = Number(row[4]) || 0;
-          const minQuantity = Number(row[5]) || 0;
-          const price = Number(row[6]) || 0;
+          const quantity = Math.max(0, Math.floor(Number(row[4]) || 0));
+          const minQuantity = Math.max(0, Math.floor(Number(row[5]) || 0));
+          const price = Math.max(0, Number(row[6]) || 0);
 
           if (!name) continue;
 

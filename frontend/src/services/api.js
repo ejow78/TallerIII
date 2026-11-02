@@ -34,12 +34,14 @@ export const getLocalUser = () => {
 };
 
 export const saveLocalUser = (userObj) => {
-  const serialized = JSON.stringify(userObj);
+  const cleanUser = { ...userObj };
+  delete cleanUser.token;
+  const serialized = JSON.stringify(cleanUser);
   sessionStorage.setItem("repairit_user", serialized);
-  if (localStorage.getItem("repairit_user") || localStorage.getItem("repairit_token")) {
+  if (localStorage.getItem("repairit_token")) {
     localStorage.setItem("repairit_user", serialized);
   } else {
-    localStorage.setItem("repairit_user", serialized);
+    localStorage.removeItem("repairit_user");
   }
 };
 
@@ -70,6 +72,7 @@ const mapOrder = (order) => {
   return {
     ...order,
     _id: order.id,
+    createdAt: order.created_at,
     venueId: mapVenue(order.venueId || order.venue_id),
     clientId: mapClient(order.clientId || order.client_id),
     trackingCode: order.tracking_code,
@@ -131,11 +134,9 @@ export const api = {
         venueId: profile?.venue_id || null,
         subscriptionPlan: normalizePlan(profile?.organization?.subscription_plan),
         subscriptionStatus: profile?.organization?.subscription_status || "activo",
-        token: data.session.access_token,
       };
 
-      sessionStorage.setItem("repairit_user", JSON.stringify(userData));
-      localStorage.setItem("repairit_user", JSON.stringify(userData));
+      saveLocalUser(userData);
       return userData;
     },
 
@@ -297,6 +298,9 @@ export const api = {
 
     updateProfile: async (profileData) => {
       const user = getLocalUser();
+      if (user.role === "tecnico") {
+        throw new Error("Los técnicos no tienen permisos para modificar la configuración del taller.");
+      }
       if (!user.venueId || user.venueId === "undefined") {
         throw new Error("No hay sucursal activa en sesión.");
       }
@@ -304,6 +308,7 @@ export const api = {
         .from("venues")
         .update(profileData)
         .eq("id", user.venueId)
+        .eq("organization_id", user.organizationId)
         .select()
         .single();
 
@@ -344,6 +349,12 @@ export const api = {
 
     createVenue: async (venueData) => {
       const user = getLocalUser();
+      if (user.role === "tecnico") {
+        throw new Error("Los técnicos no tienen permisos para crear sucursales.");
+      }
+      if (!hasMultiTallerAccess(user.subscriptionPlan)) {
+        throw new Error("La creación de múltiples sucursales requiere el plan Multi-Taller Pro.");
+      }
       const { data, error } = await supabase
         .from("venues")
         .insert({
@@ -359,6 +370,9 @@ export const api = {
 
     updateVenue: async (id, venueData) => {
       const user = getLocalUser();
+      if (user.role === "tecnico") {
+        throw new Error("Los técnicos no tienen permisos para editar sucursales.");
+      }
       const { data, error } = await supabase
         .from("venues")
         .update(venueData)
@@ -376,6 +390,17 @@ export const api = {
       if (user.role === "tecnico") {
         throw new Error("Los técnicos no tienen permisos para cambiar de sucursal.");
       }
+      const { data: targetVenue, error: venueErr } = await supabase
+        .from("venues")
+        .select("id")
+        .eq("id", venueId)
+        .eq("organization_id", user.organizationId)
+        .maybeSingle();
+
+      if (venueErr || !targetVenue) {
+        throw new Error("La sucursal seleccionada no pertenece a tu organización.");
+      }
+
       const { error } = await supabase
         .from("profiles")
         .update({ venue_id: venueId })
@@ -506,7 +531,11 @@ export const api = {
           .eq("venue_id", user.venueId)
           .gte("created_at", startOfMonth.toISOString());
 
-        if (!countError && count !== null && count >= 100) {
+        if (countError) {
+          throw new Error("No se pudo verificar el cupo mensual de órdenes.");
+        }
+
+        if (count !== null && count >= 100) {
           throw new Error(
             "Alcanzaste el límite de 100 órdenes mensuales del Plan Taller Básico. Actualizá a Taller Pro para registrar órdenes ilimitadas."
           );
@@ -538,6 +567,7 @@ export const api = {
     },
 
     update: async (id, orderData) => {
+      const user = getLocalUser();
       const payload = { ...orderData };
       if (payload.status === "reparacion") {
         payload.status = "en_reparacion";
@@ -547,6 +577,7 @@ export const api = {
         .from("orders")
         .update(payload)
         .eq("id", id)
+        .eq("venue_id", user.venueId)
         .select()
         .single();
 
@@ -554,7 +585,23 @@ export const api = {
       return mapOrder(data);
     },
 
+    delete: async (id) => {
+      const user = getLocalUser();
+      if (user.role === "tecnico") {
+        throw new Error("Los técnicos no tienen permisos para eliminar órdenes de servicio.");
+      }
+      const { error } = await supabase
+        .from("orders")
+        .delete()
+        .eq("id", id)
+        .eq("venue_id", user.venueId);
+
+      if (error) throw new Error(error.message);
+      return { message: "Orden eliminada correctamente." };
+    },
+
     updateStatus: async (id, status, text) => {
+      const user = getLocalUser();
       const dbStatus = status === "reparacion" ? "en_reparacion" : status;
 
       // Obtener orden actual para leer su historial
@@ -562,6 +609,7 @@ export const api = {
         .from("orders")
         .select("history")
         .eq("id", id)
+        .eq("venue_id", user.venueId)
         .single();
 
       const history = Array.isArray(order?.history) ? order.history : [];
@@ -573,6 +621,7 @@ export const api = {
         .from("orders")
         .update({ status: dbStatus, history })
         .eq("id", id)
+        .eq("venue_id", user.venueId)
         .select()
         .single();
 
@@ -581,10 +630,12 @@ export const api = {
     },
 
     updateDiagnosisAndBudget: async (id, { diagnosis, budget, status }) => {
+      const user = getLocalUser();
       const { data: order } = await supabase
         .from("orders")
         .select("history")
         .eq("id", id)
+        .eq("venue_id", user.venueId)
         .single();
 
       const history = Array.isArray(order?.history) ? order.history : [];
@@ -602,6 +653,7 @@ export const api = {
         .from("orders")
         .update(updateData)
         .eq("id", id)
+        .eq("venue_id", user.venueId)
         .select()
         .single();
 
@@ -647,35 +699,28 @@ export const api = {
         };
       }
 
-      // 1. Invocar función RPC segura get_order_by_tracking
-      try {
-        const { data: rpcData, error: rpcErr } = await supabase.rpc("get_order_by_tracking", { p_tracking_code: cleanCode });
-        if (!rpcErr && rpcData) {
-          return {
-            ...rpcData,
-            _id: rpcData.id,
-            trackingCode: rpcData.tracking_code,
-            deviceType: rpcData.device_type,
-            deviceModel: rpcData.device_model,
-            clientId: rpcData.client,
-            venueId: rpcData.venue,
-          };
-        }
-      } catch (e) {
-        console.warn("RPC get_order_by_tracking error:", e);
+      // 1. Invocar función RPC segura get_order_by_tracking (sin exponer DNI ni datos sensibles del cliente)
+      const { data: rpcData, error: rpcErr } = await supabase.rpc("get_order_by_tracking", { p_tracking_code: cleanCode });
+      if (rpcErr) {
+        throw new Error(rpcErr.message || "Error al consultar la orden de servicio.");
+      }
+      if (!rpcData) {
+        throw new Error("Orden de servicio no encontrada.");
       }
 
-      // Consulta directa de respaldo
-      const { data, error } = await supabase
-        .from("orders")
-        .select("*, venueId:venues(*), clientId:clients(*)")
-        .ilike("tracking_code", cleanCode)
-        .maybeSingle();
-
-      if (error) throw new Error(error.message);
-      if (!data) throw new Error("Orden de servicio no encontrada.");
-
-      return mapOrder(data);
+      const rawClient = rpcData.client || {};
+      return {
+        ...rpcData,
+        _id: rpcData.id,
+        trackingCode: rpcData.tracking_code,
+        deviceType: rpcData.device_type,
+        deviceModel: rpcData.device_model,
+        hasClientDni: Boolean(rawClient.dni || (rpcData.has_client_dni ?? true)),
+        clientId: {
+          name: rawClient.name || "Cliente",
+        },
+        venueId: rpcData.venue,
+      };
     },
 
     approveBudget: async (code, dni = null) => {
@@ -748,6 +793,9 @@ export const api = {
 
     create: async (itemData) => {
       const user = getLocalUser();
+      const safeQty = Math.max(0, Math.floor(Number(itemData.quantity) || 0));
+      const safeMinQty = Math.max(0, Math.floor(Number(itemData.minQuantity) || 0));
+      const safePrice = Math.max(0, Number(itemData.price) || 0);
       const { data, error } = await supabase
         .from("inventory")
         .insert({
@@ -757,9 +805,9 @@ export const api = {
           name: itemData.name,
           description: itemData.description,
           category: itemData.category,
-          quantity: itemData.quantity,
-          min_quantity: itemData.minQuantity,
-          price: itemData.price,
+          quantity: safeQty,
+          min_quantity: safeMinQty,
+          price: safePrice,
         })
         .select()
         .single();
@@ -770,6 +818,9 @@ export const api = {
 
     update: async (id, itemData) => {
       const user = getLocalUser();
+      const safeQty = Math.max(0, Math.floor(Number(itemData.quantity) || 0));
+      const safeMinQty = Math.max(0, Math.floor(Number(itemData.minQuantity) || 0));
+      const safePrice = Math.max(0, Number(itemData.price) || 0);
       const { data, error } = await supabase
         .from("inventory")
         .update({
@@ -777,9 +828,9 @@ export const api = {
           name: itemData.name,
           description: itemData.description,
           category: itemData.category,
-          quantity: itemData.quantity,
-          min_quantity: itemData.minQuantity,
-          price: itemData.price,
+          quantity: safeQty,
+          min_quantity: safeMinQty,
+          price: safePrice,
         })
         .eq("id", id)
         .eq("venue_id", user.venueId)
@@ -829,9 +880,18 @@ export const api = {
     },
 
     bulkUpsert: async (itemsArray) => {
+      const user = getLocalUser();
+      const sanitized = (itemsArray || []).map((item) => ({
+        ...item,
+        organization_id: user.organizationId,
+        venue_id: user.venueId,
+        quantity: Math.max(0, Math.floor(Number(item.quantity) || 0)),
+        min_quantity: Math.max(0, Math.floor(Number(item.min_quantity ?? item.minQuantity) || 0)),
+        price: Math.max(0, Number(item.price) || 0),
+      }));
       const { data, error } = await supabase
         .from("inventory")
-        .upsert(itemsArray, { onConflict: "venue_id, code" });
+        .upsert(sanitized, { onConflict: "venue_id, code" });
 
       if (error) throw new Error(error.message);
       return data;
@@ -869,15 +929,26 @@ export const api = {
 
     create: async (saleData) => {
       const user = getLocalUser();
+      if (!hasPOSAccess(user.subscriptionPlan)) {
+        throw new Error("El módulo de Control de Caja (POS) requiere el plan Taller Pro o Multi-Taller Pro.");
+      }
+
+      const validItems = (saleData.items || []).map((item) => {
+        const qty = Math.max(1, Math.floor(Number(item.quantity) || 1));
+        const price = Math.max(0, Number(item.price) || 0);
+        return { ...item, quantity: qty, price };
+      });
+
+      const computedTotal = validItems.reduce((acc, i) => acc + i.price * i.quantity, 0);
       
       const { data: sale, error: saleErr } = await supabase
         .from("sales")
         .insert({
           organization_id: user.organizationId,
           venue_id: user.venueId,
-          total: saleData.total,
+          total: computedTotal,
           payment_method: saleData.paymentMethod,
-          items: saleData.items,
+          items: validItems,
           created_by: user._id || user.id,
         })
         .select()
@@ -885,20 +956,26 @@ export const api = {
 
       if (saleErr) throw new Error(saleErr.message);
 
-      // Descontar stock para cada producto
-      for (const item of saleData.items) {
+      // Descontar stock para cada insumo físico (omitir cobros de órdenes de servicio)
+      for (const item of validItems) {
+        if (item.isServiceOrder || !item.id || String(item.id).startsWith("order-")) {
+          continue;
+        }
         const { data: currentItem } = await supabase
           .from("inventory")
           .select("quantity")
           .eq("id", item.id)
-          .single();
+          .eq("venue_id", user.venueId)
+          .maybeSingle();
 
-        const newQty = Math.max(0, (currentItem?.quantity || 0) - item.quantity);
-        
-        await supabase
-          .from("inventory")
-          .update({ quantity: newQty })
-          .eq("id", item.id);
+        if (currentItem) {
+          const newQty = Math.max(0, (currentItem.quantity || 0) - item.quantity);
+          await supabase
+            .from("inventory")
+            .update({ quantity: newQty })
+            .eq("id", item.id)
+            .eq("venue_id", user.venueId);
+        }
       }
 
       return { ...sale, _id: sale.id };
@@ -908,6 +985,9 @@ export const api = {
   // SuperAdmin
   super: {
     getOrganizations: async () => {
+      if (getLocalUser().role !== "superadmin") {
+        throw new Error("Permiso denegado: se requiere rol SuperAdmin.");
+      }
       const { data, error } = await supabase
         .from("organizations")
         .select("*, venues(*), profiles(*)");
@@ -933,6 +1013,9 @@ export const api = {
     },
 
     updateSubscription: async (id, subscriptionPlan, subscriptionStatus, name = null) => {
+      if (getLocalUser().role !== "superadmin") {
+        throw new Error("Permiso denegado: se requiere rol SuperAdmin.");
+      }
       const updateData = {};
       if (subscriptionPlan) updateData.subscription_plan = normalizePlan(subscriptionPlan);
       if (subscriptionStatus) updateData.subscription_status = subscriptionStatus;
@@ -956,12 +1039,18 @@ export const api = {
     },
 
     deleteOrganization: async (id) => {
+      if (getLocalUser().role !== "superadmin") {
+        throw new Error("Permiso denegado: se requiere rol SuperAdmin.");
+      }
       const { error } = await supabase.from("organizations").delete().eq("id", id);
       if (error) throw new Error(error.message);
       return { message: "Organización eliminada correctamente." };
     },
 
     updateVenueAsSuper: async (venueId, venueData) => {
+      if (getLocalUser().role !== "superadmin") {
+        throw new Error("Permiso denegado: se requiere rol SuperAdmin.");
+      }
       const { data, error } = await supabase
         .from("venues")
         .update(venueData)
@@ -973,6 +1062,9 @@ export const api = {
     },
 
     getUsers: async () => {
+      if (getLocalUser().role !== "superadmin") {
+        throw new Error("Permiso denegado: se requiere rol SuperAdmin.");
+      }
       const { data, error } = await supabase
         .from("profiles")
         .select("*, organizationId:organizations(id, name, subscription_plan, subscription_status), venueId:venues(id, name)");
@@ -997,6 +1089,9 @@ export const api = {
     },
 
     updateUserRole: async (id, role) => {
+      if (getLocalUser().role !== "superadmin") {
+        throw new Error("Permiso denegado: se requiere rol SuperAdmin.");
+      }
       const { data, error } = await supabase
         .from("profiles")
         .update({ role })
@@ -1009,6 +1104,9 @@ export const api = {
     },
 
     updateUserAssignment: async (id, updates) => {
+      if (getLocalUser().role !== "superadmin") {
+        throw new Error("Permiso denegado: se requiere rol SuperAdmin.");
+      }
       const { data, error } = await supabase
         .from("profiles")
         .update(updates)
@@ -1020,6 +1118,9 @@ export const api = {
     },
 
     manageUser: async (userId, name, email, role, password = null) => {
+      if (getLocalUser().role !== "superadmin") {
+        throw new Error("Permiso denegado: se requiere rol SuperAdmin.");
+      }
       const { error } = await supabase.rpc("super_admin_manage_user", {
         p_user_id: userId,
         p_new_name: name,
@@ -1033,6 +1134,9 @@ export const api = {
     },
 
     deleteUser: async (userId) => {
+      if (getLocalUser().role !== "superadmin") {
+        throw new Error("Permiso denegado: se requiere rol SuperAdmin.");
+      }
       const { error } = await supabase.rpc("super_admin_delete_user", {
         p_user_id: userId,
       });
@@ -1046,6 +1150,9 @@ export const api = {
   venueAccounts: {
     getAll: async () => {
       const user = getLocalUser();
+      if (user.role === "tecnico") {
+        throw new Error("Los técnicos no tienen permisos para gestionar cuentas de acceso.");
+      }
       if (!user.organizationId || user.organizationId === "undefined") return [];
       const { data, error } = await supabase
         .from("profiles")
@@ -1062,6 +1169,10 @@ export const api = {
     },
 
     create: async (accountData) => {
+      const user = getLocalUser();
+      if (user.role === "tecnico") {
+        throw new Error("Los técnicos no tienen permisos para crear cuentas de acceso.");
+      }
       const { data, error } = await supabase.rpc("create_venue_account", {
         p_email: accountData.email,
         p_password: accountData.password,
@@ -1074,6 +1185,10 @@ export const api = {
     },
 
     delete: async (accountId) => {
+      const user = getLocalUser();
+      if (user.role === "tecnico") {
+        throw new Error("Los técnicos no tienen permisos para eliminar cuentas de acceso.");
+      }
       const { error } = await supabase.rpc("delete_venue_account", {
         p_user_id: accountId,
       });

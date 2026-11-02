@@ -1,10 +1,27 @@
 import { supabase } from "./supabaseClient";
 
-const RESEND_API_KEY = import.meta.env.VITE_RESEND_API_KEY;
-const SENDER_EMAIL = "RepairIT <notificaciones@repairit.cloud>";
+function escapeHtml(value) {
+  return String(value ?? "").replace(/[&<>"']/g, (char) => {
+    switch (char) {
+      case "&":
+        return "&amp;";
+      case "<":
+        return "&lt;";
+      case ">":
+        return "&gt;";
+      case '"':
+        return "&quot;";
+      case "'":
+        return "&#39;";
+      default:
+        return char;
+    }
+  });
+}
 
 /**
  * Función base para despachar correos usando plantillas nativas de Resend
+ * exclusivamente a través de la función RPC segura en el servidor de Supabase.
  */
 async function sendResendTemplate({ to, templateId, variables }) {
   if (!to || !to.includes("@")) {
@@ -12,7 +29,6 @@ async function sendResendTemplate({ to, templateId, variables }) {
     return false;
   }
 
-  // 1. Despachar a través de Supabase RPC (servidor)
   try {
     const { data: rpcData, error: rpcErr } = await supabase.rpc("send_resend_template_email", {
       p_to: to,
@@ -24,36 +40,11 @@ async function sendResendTemplate({ to, templateId, variables }) {
       console.log(`[emailService] Plantilla "${templateId}" enviada con éxito a:`, to);
       return true;
     }
-  } catch (err) {
-    console.warn("[emailService] RPC de template no disponible, intentando fetch directo:", err);
-  }
 
-  // 2. Fallback fetch directo a Resend API
-  try {
-    const res = await fetch("https://api.resend.com/emails", {
-      method: "POST",
-      headers: {
-        "Authorization": `Bearer ${RESEND_API_KEY}`,
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify({
-        from: SENDER_EMAIL,
-        to: [to],
-        template: {
-          id: templateId,
-          variables: variables
-        }
-      })
-    });
-
-    const data = await res.json();
-    if (!res.ok) {
-      console.error("[emailService] Error de Resend:", data);
-      return false;
+    if (rpcErr) {
+      console.warn("[emailService] Error en RPC send_resend_template_email:", rpcErr.message);
     }
-
-    console.log(`[emailService] Plantilla "${templateId}" enviada a:`, to, data.id);
-    return true;
+    return false;
   } catch (err) {
     console.error("[emailService] Error al enviar plantilla:", err);
     return false;
@@ -111,7 +102,7 @@ export async function sendBudgetReadyEmail({
   if (Array.isArray(budgetItems) && budgetItems.length > 0) {
     const rows = budgetItems.map(item => `
       <tr>
-        <td style="padding: 6px 0; color: #374151; font-size: 13px; border-bottom: 1px solid #f3f4f6;">${item.desc}</td>
+        <td style="padding: 6px 0; color: #374151; font-size: 13px; border-bottom: 1px solid #f3f4f6;">${escapeHtml(item.desc)}</td>
         <td align="right" style="padding: 6px 0; font-weight: 600; color: #111827; font-size: 13px; border-bottom: 1px solid #f3f4f6; font-family: monospace;">$${Number(item.price || 0).toLocaleString("es-AR")}</td>
       </tr>
     `).join("");

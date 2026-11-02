@@ -1,5 +1,24 @@
 // Utilidades centralizadas de Impresión Directa (sin bloqueo de pop-ups) y WhatsApp
 
+export function escapeHtml(value) {
+  return String(value ?? "").replace(/[&<>"']/g, (char) => {
+    switch (char) {
+      case "&":
+        return "&amp;";
+      case "<":
+        return "&lt;";
+      case ">":
+        return "&gt;";
+      case '"':
+        return "&quot;";
+      case "'":
+        return "&#39;";
+      default:
+        return char;
+    }
+  });
+}
+
 export function printHtml(htmlContent) {
   try {
     const existingFrame = document.getElementById("repairit-print-frame");
@@ -67,20 +86,24 @@ export function printHtml(htmlContent) {
 export function printOrderReceipt(order, profile = {}, clientOverride = null) {
   if (!order) return;
   const client = clientOverride || order.clientId || {};
-  const venueName = profile?.name || "Taller RepairIT";
-  const venueAddress = profile?.address || "Sucursal Central";
-  const venuePhone = profile?.phone || "";
-  const venueEmail = profile?.email || "";
-  const trackingUrl = `https://tracking.repairit.cloud/seguimiento/${order.trackingCode}`;
+  const venueName = escapeHtml(profile?.name || "Taller RepairIT");
+  const venueAddress = escapeHtml(profile?.address || "Sucursal Central");
+  const venuePhone = escapeHtml(profile?.phone || "");
+  const venueEmail = escapeHtml(profile?.email || "");
+  const safeTrackingCode = escapeHtml(order.trackingCode || "");
+  const rawTrackingUrl = `https://tracking.repairit.cloud/seguimiento/${encodeURIComponent(
+    order.trackingCode || ""
+  )}`;
+  const trackingUrl = escapeHtml(rawTrackingUrl);
 
   const budgetItemsHtml =
     order.budget?.items
       ?.map(
         (i) => `
       <tr>
-        <td style="padding: 6px 8px; border-bottom: 1px solid #e2e8f0;">${i.desc}</td>
+        <td style="padding: 6px 8px; border-bottom: 1px solid #e2e8f0;">${escapeHtml(i.desc)}</td>
         <td style="padding: 6px 8px; border-bottom: 1px solid #e2e8f0; text-align: right; font-weight: 600;">$${Number(
-          i.price
+          i.price || 0
         ).toLocaleString("es-AR", { minimumFractionDigits: 2 })}</td>
       </tr>
     `
@@ -95,7 +118,7 @@ export function printOrderReceipt(order, profile = {}, clientOverride = null) {
     <html lang="es">
       <head>
         <meta charset="UTF-8">
-        <title>Orden de Servicio #${order.trackingCode} - ${venueName}</title>
+        <title>Orden de Servicio #${safeTrackingCode} - ${venueName}</title>
         <style>
           @page {
             size: A4 portrait;
@@ -151,10 +174,10 @@ export function printOrderReceipt(order, profile = {}, clientOverride = null) {
             </td>
             <td style="vertical-align: top; text-align: right; width: 40%;">
               <span class="order-badge">ORDEN DE SERVICIO</span>
-              <div class="code-text">N° ${order.trackingCode}</div>
-              <div style="font-size: 10px; color: #64748b; margin-top: 2px;">Fecha: ${
+              <div class="code-text">N° ${safeTrackingCode}</div>
+              <div style="font-size: 10px; color: #64748b; margin-top: 2px;">Fecha: ${escapeHtml(
                 order.date || new Date().toLocaleDateString("es-AR")
-              } ${order.time ? `&bull; ${order.time} hs` : ""}</div>
+              )} ${order.time ? `&bull; ${escapeHtml(order.time)} hs` : ""}</div>
             </td>
           </tr>
         </table>
@@ -164,16 +187,16 @@ export function printOrderReceipt(order, profile = {}, clientOverride = null) {
             <div class="box-title">Datos del Cliente</div>
             <div style="margin-bottom: 6px;">
               <div class="field-label">Nombre / Razón Social</div>
-              <div class="field-val">${client.name || "Cliente General"}</div>
+              <div class="field-val">${escapeHtml(client.name || "Cliente General")}</div>
             </div>
             <div class="grid-2">
               <div>
                 <div class="field-label">DNI / CUIT</div>
-                <div class="field-val">${client.dni || "N/A"}</div>
+                <div class="field-val">${escapeHtml(client.dni || "N/A")}</div>
               </div>
               <div>
                 <div class="field-label">Teléfono</div>
-                <div class="field-val">${client.phone || "N/A"}</div>
+                <div class="field-val">${escapeHtml(client.phone || "N/A")}</div>
               </div>
             </div>
           </div>
@@ -181,7 +204,7 @@ export function printOrderReceipt(order, profile = {}, clientOverride = null) {
           <div class="box" style="display: flex; align-items: center; gap: 12px; background: #f8fafc;">
             <img 
               src="https://api.qrserver.com/v1/create-qr-code/?size=110x110&margin=0&data=${encodeURIComponent(
-                trackingUrl
+                rawTrackingUrl
               )}" 
               alt="QR Seguimiento" 
               style="width: 75px; height: 75px; border: 1px solid #cbd5e1; border-radius: 4px; padding: 2px; background: #fff;"
@@ -199,37 +222,39 @@ export function printOrderReceipt(order, profile = {}, clientOverride = null) {
           <div class="grid-3" style="margin-bottom: 8px;">
             <div>
               <div class="field-label">Tipo de Dispositivo</div>
-              <div class="field-val">${order.deviceType || "N/A"}</div>
+              <div class="field-val">${escapeHtml(order.deviceType || "N/A")}</div>
             </div>
             <div>
               <div class="field-label">Marca y Modelo</div>
-              <div class="field-val">${order.deviceModel || "N/A"}</div>
+              <div class="field-val">${escapeHtml(order.deviceModel || "N/A")}</div>
             </div>
             <div>
               <div class="field-label">Accesorios Recibidos</div>
-              <div class="field-val">${order.accessories || "Ninguno"}</div>
+              <div class="field-val">${escapeHtml(order.accessories || "Ninguno")}</div>
             </div>
           </div>
           <div>
             <div class="field-label">Estado Cosmético / Observaciones Visuales</div>
-            <div class="field-val" style="font-weight: 400; font-size: 11px;">${
+            <div class="field-val" style="font-weight: 400; font-size: 11px;">${escapeHtml(
               order.cosmetic || "Sin observaciones específicas"
-            }</div>
+            )}</div>
           </div>
         </div>
 
         <div class="box">
           <div class="box-title">Falla Declarada por el Cliente</div>
-          <div style="font-size: 11px; color: #0f172a; white-space: pre-wrap; padding: 4px 0;">${
+          <div style="font-size: 11px; color: #0f172a; white-space: pre-wrap; padding: 4px 0;">${escapeHtml(
             order.issue || "Sin falla detallada"
-          }</div>
+          )}</div>
           
           ${
             order.diagnosis
               ? `
             <div style="border-top: 1px dashed #cbd5e1; margin-top: 6px; padding-top: 6px;">
               <div class="field-label" style="color: #0284c7;">Diagnóstico Técnico</div>
-              <div style="font-size: 11px; color: #0f172a; font-weight: 600;">${order.diagnosis}</div>
+              <div style="font-size: 11px; color: #0f172a; font-weight: 600;">${escapeHtml(
+                order.diagnosis
+              )}</div>
             </div>
           `
               : ""
@@ -288,18 +313,21 @@ export function printOrderReceipt(order, profile = {}, clientOverride = null) {
 
 export function printPosReceipt(sale, profile = {}) {
   if (!sale) return;
-  const venueName = profile?.name || "RepairIT Taller";
-  const venueAddress = profile?.address || "Sucursal Activa";
-  const venuePhone = profile?.phone || "";
-  const dateStr = new Date(sale.created_at || Date.now()).toLocaleString("es-AR");
+  const venueName = escapeHtml(profile?.name || "RepairIT Taller");
+  const venueAddress = escapeHtml(profile?.address || "Sucursal Activa");
+  const venuePhone = escapeHtml(profile?.phone || "");
+  const dateStr = escapeHtml(new Date(sale.created_at || Date.now()).toLocaleString("es-AR"));
+  const safePaymentMethod = escapeHtml((sale.payment_method || "efectivo").toUpperCase());
 
   const itemsHtml = (sale.items || [])
     .map(
       (i) => `
     <tr>
-      <td style="padding: 4px 0; text-align: left;">${i.quantity}x ${i.name}</td>
+      <td style="padding: 4px 0; text-align: left;">${Number(i.quantity) || 1}x ${escapeHtml(
+        i.name
+      )}</td>
       <td style="padding: 4px 0; text-align: right;">$${(
-        Number(i.price) * Number(i.quantity)
+        Number(i.price || 0) * (Number(i.quantity) || 1)
       ).toLocaleString("es-AR", { minimumFractionDigits: 2 })}</td>
     </tr>
   `
@@ -338,8 +366,8 @@ export function printPosReceipt(sale, profile = {}) {
         <div class="divider"></div>
         <div><strong>COMPROBANTE DE VENTA</strong></div>
         <div>Fecha: ${dateStr}</div>
-        <div>Pago: ${(sale.payment_method || "efectivo").toUpperCase()}</div>
-        ${sale.id ? `<div>Ref: #${String(sale.id).slice(0, 8).toUpperCase()}</div>` : ""}
+        <div>Pago: ${safePaymentMethod}</div>
+        ${sale.id ? `<div>Ref: #${escapeHtml(String(sale.id).slice(0, 8).toUpperCase())}</div>` : ""}
         <div class="divider"></div>
         <table>
           <thead>

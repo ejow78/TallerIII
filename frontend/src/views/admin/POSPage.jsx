@@ -65,6 +65,7 @@ export default function POSPage() {
   const [sales, setSales] = useState([]);
   const [venues, setVenues] = useState([]);
   const [selectedVenueFilter, setSelectedVenueFilter] = useState("todas");
+  const [dateRangeFilter, setDateRangeFilter] = useState("hoy"); // "hoy" | "7d" | "mes" | "todo"
   const [salesLoading, setSalesLoading] = useState(false);
 
   const searchInputRef = useRef(null);
@@ -292,6 +293,50 @@ export default function POSPage() {
 
   const total = cart.reduce((acc, item) => acc + item.price * item.quantity, 0);
 
+  // Filtrado por período y desglose de arqueo de caja (Feature 5)
+  const filteredSales = useMemo(() => {
+    const now = new Date();
+    const startOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate()).getTime();
+    const sevenDaysAgo = startOfToday - 6 * 24 * 60 * 60 * 1000;
+    const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1).getTime();
+
+    return sales.filter((s) => {
+      if (dateRangeFilter === "todo") return true;
+      const raw = s.created_at || s.date;
+      if (!raw) return false;
+      const ts = new Date(raw).getTime();
+      if (isNaN(ts)) return false;
+      if (dateRangeFilter === "hoy") return ts >= startOfToday;
+      if (dateRangeFilter === "7d") return ts >= sevenDaysAgo;
+      if (dateRangeFilter === "mes") return ts >= startOfMonth;
+      return true;
+    });
+  }, [sales, dateRangeFilter]);
+
+  const salesBreakdown = useMemo(() => {
+    let totalAmount = 0;
+    let cashAmount = 0;
+    let digitalAmount = 0;
+
+    for (const s of filteredSales) {
+      const amt = Number(s.total) || 0;
+      totalAmount += amt;
+      const method = (s.payment_method || "efectivo").toLowerCase();
+      if (method === "efectivo") {
+        cashAmount += amt;
+      } else {
+        digitalAmount += amt;
+      }
+    }
+
+    return {
+      totalAmount,
+      cashAmount,
+      digitalAmount,
+      count: filteredSales.length,
+    };
+  }, [filteredSales]);
+
   // Impresión directa sin bloqueo de pop-ups
   const handlePrintReceipt = (
     saleId,
@@ -315,8 +360,8 @@ export default function POSPage() {
   };
 
   const handleExportSalesToExcel = async () => {
-    if (sales.length === 0) {
-      toast.error("No hay ventas registradas para exportar.");
+    if (filteredSales.length === 0) {
+      toast.error("No hay ventas en el período seleccionado para exportar.");
       return;
     }
 
@@ -423,7 +468,7 @@ export default function POSPage() {
         },
       ];
 
-      await writeXlsxFile(sales, { columns }).toFile(
+      await writeXlsxFile(filteredSales, { columns }).toFile(
         `Caja_Ventas_${new Date().toISOString().split("T")[0]}.xlsx`
       );
       toast.success("Historial de ventas exportado a Excel (.xlsx).");
@@ -982,44 +1027,127 @@ export default function POSPage() {
         /* VISTA DE HISTORIAL DE VENTAS */
         <div className="space-y-4">
           {/* Barra de Filtros del Historial */}
-          <Card className="bg-card/30 border-border/80 p-4 shadow-sm flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
-            <div className="space-y-0.5 text-left">
-              <h3 className="text-sm font-bold text-foreground flex items-center gap-2">
-                <History className="w-4 h-4 text-primary" />
-                Registro de Caja y Tickets Emitidos
-              </h3>
-              <p className="text-[11px] text-muted-foreground font-light">
-                Consultá cobros anteriores y re-imprimí cualquier ticket en un clic.
-              </p>
+          <Card className="bg-card/30 border-border/80 p-4 shadow-sm space-y-4">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+              <div className="space-y-0.5 text-left">
+                <h3 className="text-sm font-bold text-foreground flex items-center gap-2">
+                  <History className="w-4 h-4 text-primary" />
+                  Registro de Caja y Arqueo de Cobros
+                </h3>
+                <p className="text-[11px] text-muted-foreground font-light">
+                  Filtrá por período para realizar tu cierre de caja o re-imprimí cualquier ticket en un clic.
+                </p>
+              </div>
+
+              <div className="flex flex-wrap items-center gap-2 self-start sm:self-auto">
+                {/* Píldoras de Rango de Fecha (Feature 5) */}
+                <div className="inline-flex rounded-lg border border-border/80 bg-background/60 p-0.5">
+                  {[
+                    { id: "hoy", label: "Hoy" },
+                    { id: "7d", label: "7 Días" },
+                    { id: "mes", label: "Este Mes" },
+                    { id: "todo", label: "Todo" },
+                  ].map((r) => (
+                    <button
+                      key={r.id}
+                      type="button"
+                      onClick={() => setDateRangeFilter(r.id)}
+                      className={`px-2.5 py-1 text-[11px] font-semibold rounded-md transition-colors cursor-pointer ${
+                        dateRangeFilter === r.id
+                          ? "bg-primary text-primary-foreground font-bold"
+                          : "text-muted-foreground hover:text-foreground"
+                      }`}
+                    >
+                      {r.label}
+                    </button>
+                  ))}
+                </div>
+
+                {isMultiTaller && isAdmin && (
+                  <div className="flex items-center gap-2">
+                    <Store className="w-4 h-4 text-muted-foreground shrink-0" />
+                    <select
+                      value={selectedVenueFilter}
+                      onChange={(e) => setSelectedVenueFilter(e.target.value)}
+                      className="h-8 bg-background/85 border border-border rounded-lg px-2.5 text-xs text-foreground focus:outline-none focus:ring-1 focus:ring-primary"
+                    >
+                      <option value="todas">Todas las Sucursales</option>
+                      {venues.map((v) => (
+                        <option key={v._id} value={v._id}>
+                          {v.name}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                )}
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={handleExportSalesToExcel}
+                  className="h-8 border-border/80 text-xs font-semibold flex items-center gap-1.5 cursor-pointer rounded-lg"
+                  title="Exportar historial filtrado a Excel (.xlsx)"
+                >
+                  <Download className="w-3.5 h-3.5 text-emerald-400" />
+                  Exportar Excel
+                </Button>
+              </div>
             </div>
 
-            <div className="flex items-center gap-2.5 self-start sm:self-auto">
-              {isMultiTaller && isAdmin && (
-                <div className="flex items-center gap-2">
-                  <Store className="w-4 h-4 text-muted-foreground shrink-0" />
-                  <select
-                    value={selectedVenueFilter}
-                    onChange={(e) => setSelectedVenueFilter(e.target.value)}
-                    className="h-9 bg-background/85 border border-border rounded-lg px-3 py-1 text-xs text-foreground focus:outline-none focus:ring-1 focus:ring-primary"
-                  >
-                    <option value="todas">Todas las Sucursales</option>
-                    {venues.map((v) => (
-                      <option key={v._id} value={v._id}>
-                        {v.name}
-                      </option>
-                    ))}
-                  </select>
+            {/* Tarjetas de Desglose / Arqueo de Caja (Feature 5) */}
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-2 border-t border-border/50 text-left">
+              <div className="rounded-xl border border-primary/25 bg-primary/5 p-3.5 flex items-center justify-between">
+                <div>
+                  <span className="text-[10px] font-bold uppercase tracking-wider text-primary block">
+                    Total del Período ({salesBreakdown.count} ops)
+                  </span>
+                  <span className="text-xl font-black font-outfit text-foreground font-mono mt-0.5 block">
+                    $
+                    {salesBreakdown.totalAmount.toLocaleString("es-AR", {
+                      minimumFractionDigits: 2,
+                      maximumFractionDigits: 2,
+                    })}
+                  </span>
                 </div>
-              )}
-              <Button
-                variant="outline"
-                onClick={handleExportSalesToExcel}
-                className="h-9 border-border/80 text-xs font-semibold flex items-center gap-1.5 cursor-pointer rounded-lg"
-                title="Exportar historial de caja a Excel (.xlsx)"
-              >
-                <Download className="w-3.5 h-3.5 text-emerald-400" />
-                Exportar Excel
-              </Button>
+                <div className="w-9 h-9 rounded-lg bg-primary/15 border border-primary/30 flex items-center justify-center text-primary shrink-0">
+                  <DollarSign className="w-4 h-4" />
+                </div>
+              </div>
+
+              <div className="rounded-xl border border-emerald-500/25 bg-emerald-500/5 p-3.5 flex items-center justify-between">
+                <div>
+                  <span className="text-[10px] font-bold uppercase tracking-wider text-emerald-400 block">
+                    Efectivo en Caja
+                  </span>
+                  <span className="text-xl font-black font-outfit text-emerald-400 font-mono mt-0.5 block">
+                    $
+                    {salesBreakdown.cashAmount.toLocaleString("es-AR", {
+                      minimumFractionDigits: 2,
+                      maximumFractionDigits: 2,
+                    })}
+                  </span>
+                </div>
+                <div className="w-9 h-9 rounded-lg bg-emerald-500/15 border border-emerald-500/30 flex items-center justify-center text-emerald-400 shrink-0">
+                  <Wallet className="w-4 h-4" />
+                </div>
+              </div>
+
+              <div className="rounded-xl border border-sky-500/25 bg-sky-500/5 p-3.5 flex items-center justify-between">
+                <div>
+                  <span className="text-[10px] font-bold uppercase tracking-wider text-sky-400 block">
+                    Transferencia / Tarjetas
+                  </span>
+                  <span className="text-xl font-black font-outfit text-sky-400 font-mono mt-0.5 block">
+                    $
+                    {salesBreakdown.digitalAmount.toLocaleString("es-AR", {
+                      minimumFractionDigits: 2,
+                      maximumFractionDigits: 2,
+                    })}
+                  </span>
+                </div>
+                <div className="w-9 h-9 rounded-lg bg-sky-500/15 border border-sky-500/30 flex items-center justify-center text-sky-400 shrink-0">
+                  <CreditCard className="w-4 h-4" />
+                </div>
+              </div>
             </div>
           </Card>
 
@@ -1031,16 +1159,16 @@ export default function POSPage() {
                   <div className="w-6 h-6 border-2 border-primary border-t-transparent rounded-full animate-spin mx-auto mb-2" />
                   Cargando transacciones de caja...
                 </div>
-              ) : sales.length === 0 ? (
+              ) : filteredSales.length === 0 ? (
                 <div className="text-center py-16 text-muted-foreground text-xs font-light space-y-1">
                   <AlertCircle className="w-8 h-8 opacity-30 mx-auto text-muted-foreground mb-1" />
-                  <p>No se encontraron transacciones registradas.</p>
+                  <p>No se encontraron transacciones registradas en este período.</p>
                 </div>
               ) : (
                 <>
                   {/* Vista Móvil (< md): Tarjetas de Ventas */}
                   <div className="space-y-3 p-3.5 md:hidden">
-                    {sales.map((sale) => (
+                    {filteredSales.map((sale) => (
                       <div
                         key={sale._id}
                         className="rounded-xl border border-border/70 bg-background/50 p-3.5 space-y-2.5 text-left"
@@ -1123,7 +1251,7 @@ export default function POSPage() {
                         </tr>
                       </thead>
                       <tbody className="divide-y divide-border/40">
-                        {sales.map((sale) => (
+                        {filteredSales.map((sale) => (
                           <tr
                             key={sale._id}
                             className="hover:bg-card/40 transition-colors"
