@@ -1601,7 +1601,7 @@ export default function DashboardPage() {
       ) : (
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Gráfico 1: Shadcn Interactive Area Chart (2 columnas) */}
-        <Card className="lg:col-span-2 bg-card/30 border-border/80 shadow-sm flex flex-col">
+        <Card className="lg:col-span-2 bg-card/30 border-border/80 shadow-sm flex flex-col min-w-0 overflow-hidden">
           <CardHeader className="border-b border-border/50 pb-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
             <div className="space-y-1">
               <CardTitle className="font-outfit text-base font-bold text-foreground flex items-center gap-2">
@@ -1750,7 +1750,7 @@ export default function DashboardPage() {
         </Card>
 
         {/* Gráfico 2: Distribución por Estado de Laboratorio / Equipos */}
-        <Card className="bg-card/30 border-border/80 shadow-sm flex flex-col">
+        <Card className="bg-card/30 border-border/80 shadow-sm flex flex-col min-w-0 overflow-hidden">
           <CardHeader className="border-b border-border/50 pb-4 flex flex-row items-center justify-between gap-2">
             <div className="space-y-1">
               <CardTitle className="font-outfit text-base font-bold text-foreground">
@@ -1828,7 +1828,7 @@ export default function DashboardPage() {
       {/* Fila Inferior: Órdenes Recientes y Alertas de Stock */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Tabla / Tarjetas de Órdenes Recientes */}
-        <Card className="lg:col-span-2 bg-card/25 border-border/80 shadow-sm">
+        <Card className="lg:col-span-2 bg-card/25 border-border/80 shadow-sm min-w-0 overflow-hidden">
           <CardHeader className="border-b border-border/50 py-4 flex flex-row items-center justify-between">
             <div>
               <CardTitle className="font-outfit text-base font-bold text-foreground/90">
@@ -1988,7 +1988,7 @@ export default function DashboardPage() {
         </Card>
 
         {/* Alertas de Stock Detalladas */}
-        <Card className="bg-card/25 border-border/80 shadow-sm flex flex-col">
+        <Card className="bg-card/25 border-border/80 shadow-sm flex flex-col min-w-0 overflow-hidden">
           <CardHeader className="border-b border-border/50 py-4 flex flex-row items-center justify-between">
             <div>
               <CardTitle className="font-outfit text-base font-bold text-foreground/90">

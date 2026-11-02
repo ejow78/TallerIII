@@ -266,16 +266,16 @@ export default function DashboardLayout() {
   };
 
   const navItemClass =
-    "h-9 px-3 rounded-lg text-xs font-medium text-muted-foreground hover:text-foreground hover:bg-muted/60 data-[active=true]:bg-primary/15 data-[active=true]:text-primary data-[active=true]:font-semibold data-[active=true]:border data-[active=true]:border-primary/25 transition-all";
+    "h-8 sm:h-9 px-3 rounded-lg text-xs font-medium text-muted-foreground hover:text-foreground hover:bg-muted/60 data-[active=true]:bg-primary/15 data-[active=true]:text-primary data-[active=true]:font-semibold data-[active=true]:border data-[active=true]:border-primary/25 transition-all";
 
   return (
-    <SidebarProvider>
+    <SidebarProvider className="h-dvh max-h-dvh overflow-hidden">
       <MobileSidebarAutoClose pathname={location.pathname} />
-      <div className="flex min-h-screen w-full bg-background text-foreground font-sans selection:bg-primary/30 selection:text-primary">
+      <div className="flex h-dvh max-h-dvh w-full max-w-[100vw] overflow-hidden bg-background text-foreground font-sans selection:bg-primary/30 selection:text-primary">
         {/* Sidebar */}
         <Sidebar className="border-r border-border/70 bg-card/95 backdrop-blur-xl">
           {/* Header Limpio solo con el Logo */}
-          <SidebarHeader className="px-5 py-4 sm:p-6 border-b border-border/30 shrink-0">
+          <SidebarHeader className="px-4 py-3 sm:p-6 border-b border-border/30 shrink-0">
             <div className="flex items-center justify-between">
               <NavLink
                 to="/dashboard"
@@ -289,7 +289,7 @@ export default function DashboardLayout() {
           </SidebarHeader>
 
           {/* Contenido de Navegación por Secciones */}
-          <SidebarContent className="px-2 py-3 sm:py-4 space-y-1.5 sm:space-y-2 flex-1 min-h-0 overflow-y-auto">
+          <SidebarContent className="px-2 py-2 sm:py-4 space-y-1 sm:space-y-2 flex-1 min-h-0 overflow-y-auto">
             {isSuperAdmin ? (
               <SidebarGroup>
                 <SidebarGroupLabel className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/60 px-3 mb-1">
@@ -503,7 +503,7 @@ export default function DashboardLayout() {
           </SidebarContent>
 
           {/* Pie de Sidebar con Perfil y Cerrar Sesión */}
-          <SidebarFooter className="p-3.5 sm:p-4 pb-24 md:pb-4 border-t border-border/85 space-y-3 sm:space-y-4 bg-card/65 shrink-0">
+          <SidebarFooter className="p-3 sm:p-4 border-t border-border/85 space-y-2.5 sm:space-y-4 bg-card/65 shrink-0">
             <div className="flex items-center px-2 w-full">
               <div className="flex items-center gap-3 min-w-0">
                 <div className="w-8 h-8 rounded-full bg-primary/10 border border-primary/20 flex items-center justify-center font-bold text-xs text-primary uppercase shrink-0">
@@ -543,10 +543,10 @@ export default function DashboardLayout() {
         </Sidebar>
 
         {/* Área Principal */}
-        <SidebarInset className="flex-1 flex flex-col min-w-0 bg-background">
+        <SidebarInset className="flex-1 flex flex-col min-w-0 h-dvh max-h-dvh overflow-hidden bg-background">
           {/* Cabecera Superior */}
-          <header className="h-14 sm:h-16 border-b border-border/80 flex items-center justify-between px-3 sm:px-6 bg-card/20 backdrop-blur-sm sticky top-0 z-40 gap-2">
-            <div className="flex items-center gap-2 sm:gap-4 min-w-0">
+          <header className="h-14 sm:h-16 border-b border-border/80 flex items-center justify-between px-3 sm:px-6 bg-card/20 backdrop-blur-sm shrink-0 z-40 gap-2">
+            <div className="flex items-center gap-2 sm:gap-4 min-w-0 flex-1">
               <SidebarTrigger className="text-muted-foreground hover:text-foreground cursor-pointer shrink-0" />
               <Separator orientation="vertical" className="h-4 !self-center shrink-0" />
               <Breadcrumb className="flex items-center min-w-0 truncate">{getBreadcrumbs()}</Breadcrumb>
@@ -554,7 +554,8 @@ export default function DashboardLayout() {
             <div className="flex items-center gap-2 sm:gap-3 shrink-0">
               {isSuperAdmin ? (
                 <div className="text-[10px] text-muted-foreground font-mono select-none">
-                  Plataforma RepairIT • SuperAdmin
+                  <span className="hidden sm:inline">Plataforma RepairIT • </span>
+                  <span>SuperAdmin</span>
                 </div>
               ) : (
                 <div className="flex items-center gap-1.5 sm:gap-2">
@@ -597,7 +598,7 @@ export default function DashboardLayout() {
           </header>
 
           {/* Contenido Dinámico de las Páginas del Dashboard */}
-          <main className="flex-grow p-3.5 sm:p-6 md:p-8 pb-24 sm:pb-10 overflow-y-auto max-w-7xl w-full mx-auto">
+          <main className="flex-1 min-h-0 p-3.5 sm:p-6 md:p-8 pb-8 sm:pb-10 overflow-y-auto overflow-x-hidden max-w-7xl w-full mx-auto">
             <Outlet />
           </main>
 

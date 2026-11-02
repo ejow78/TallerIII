@@ -159,7 +159,7 @@ function Sidebar({
           data-slot="sidebar"
           data-mobile="true"
           className={cn(
-            "w-(--sidebar-width) max-w-[82vw] h-dvh overflow-hidden bg-sidebar p-0 text-sidebar-foreground [&>button]:hidden",
+            "w-(--sidebar-width) max-w-[82vw] h-dvh max-h-dvh data-[side=left]:h-dvh data-[side=left]:max-h-dvh top-0! bottom-0! flex flex-col gap-0 overflow-hidden bg-sidebar p-0 text-sidebar-foreground [&>button]:hidden",
             className
           )}
           style={
