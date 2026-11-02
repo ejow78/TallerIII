@@ -1010,12 +1010,12 @@ export default function OrdersPage() {
                       </div>
                     )}
 
-                    <div className="flex items-center gap-1.5 pt-1">
+                    <div className="flex items-center gap-1 pt-1 overflow-x-auto no-scrollbar">
                       <Button
                         variant="outline"
                         size="sm"
                         onClick={() => handleOpenDiagModal(o)}
-                        className="flex-1 h-8 text-xs font-bold border-primary/30 text-primary hover:bg-primary/10 rounded-lg flex items-center justify-center gap-1.5 cursor-pointer"
+                        className="flex-1 min-w-[100px] h-8 px-2 text-xs font-bold border-primary/30 text-primary hover:bg-primary/10 rounded-lg flex items-center justify-center gap-1 cursor-pointer shrink-0"
                       >
                         <Stethoscope className="w-3.5 h-3.5" />
                         Diagnóstico
@@ -1024,7 +1024,7 @@ export default function OrdersPage() {
                         variant="outline"
                         size="icon-sm"
                         onClick={() => handleOpenDetailModal(o)}
-                        className="h-8 w-8 text-foreground hover:text-primary border-border/80 rounded-lg cursor-pointer shrink-0"
+                        className="h-8 w-8 min-w-[32px] text-foreground hover:text-primary border-border/80 rounded-lg cursor-pointer shrink-0"
                         title="Ver detalle completo de la orden"
                       >
                         <Eye className="w-4 h-4" />
@@ -1033,7 +1033,7 @@ export default function OrdersPage() {
                         variant="outline"
                         size="icon-sm"
                         onClick={() => handleSendWhatsApp(o)}
-                        className="h-8 w-8 text-emerald-400 hover:bg-emerald-500/10 border-emerald-500/30 rounded-lg cursor-pointer shrink-0"
+                        className="h-8 w-8 min-w-[32px] text-emerald-400 hover:bg-emerald-500/10 border-emerald-500/30 rounded-lg cursor-pointer shrink-0"
                         title="Enviar enlace de seguimiento por WhatsApp"
                       >
                         <MessageCircle className="w-4 h-4" />
@@ -1042,7 +1042,7 @@ export default function OrdersPage() {
                         variant="outline"
                         size="icon-sm"
                         onClick={() => handlePrintOrder(o)}
-                        className="h-8 w-8 text-muted-foreground hover:text-primary border-border/80 rounded-lg cursor-pointer shrink-0"
+                        className="h-8 w-8 min-w-[32px] text-muted-foreground hover:text-primary border-border/80 rounded-lg cursor-pointer shrink-0"
                         title="Imprimir Comprobante"
                       >
                         <Printer className="w-4 h-4" />
@@ -1051,20 +1051,25 @@ export default function OrdersPage() {
                         variant="outline"
                         size="icon-sm"
                         onClick={() => handleOpenEditReceptionModal(o)}
-                        className="h-8 w-8 text-muted-foreground hover:text-primary border-border/80 rounded-lg cursor-pointer shrink-0"
+                        className="h-8 w-8 min-w-[32px] text-muted-foreground hover:text-primary border-border/80 rounded-lg cursor-pointer shrink-0"
                         title="Editar recepción"
                       >
                         <Pencil className="w-3.5 h-3.5" />
                       </Button>
-                      {canUsePOS && totalB > 0 && o.status !== "entregado" && (
+                      {canUsePOS && (
                         <Button
                           variant="outline"
                           size="icon-sm"
+                          disabled={!(totalB > 0 && o.status !== "entregado")}
                           onClick={() => handleOpenChargePosModal(o)}
-                          className="h-8 w-8 text-emerald-400 hover:bg-emerald-500/10 border-emerald-500/30 rounded-lg cursor-pointer shrink-0"
-                          title="Cobrar orden en Caja POS"
+                          className="h-8 w-8 min-w-[32px] text-emerald-400 hover:bg-emerald-500/10 border-emerald-500/30 disabled:opacity-20 disabled:pointer-events-none rounded-lg cursor-pointer shrink-0"
+                          title={
+                            totalB > 0 && o.status !== "entregado"
+                              ? "Cobrar orden en Caja POS"
+                              : "Requiere presupuesto mayor a $0 y orden no entregada"
+                          }
                         >
-                          <ShoppingCart className="w-3.5 h-3.5" />
+                          <ShoppingCart className="w-4 h-4" />
                         </Button>
                       )}
                       {!isTechnician && (
@@ -1072,7 +1077,7 @@ export default function OrdersPage() {
                           variant="outline"
                           size="icon-sm"
                           onClick={() => handleDeleteOrder(o)}
-                          className="h-8 w-8 text-destructive hover:bg-destructive/10 border-destructive/30 rounded-lg cursor-pointer shrink-0"
+                          className="h-8 w-8 min-w-[32px] text-destructive hover:bg-destructive/10 border-destructive/30 rounded-lg cursor-pointer shrink-0"
                           title="Eliminar orden"
                         >
                           <Trash2 className="w-3.5 h-3.5" />
