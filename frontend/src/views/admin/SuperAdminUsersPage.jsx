@@ -27,15 +27,21 @@ import {
   Building2,
   Store,
   RefreshCw,
+  Mail,
+  MessageSquare,
+  Calendar,
 } from "lucide-react";
 import { api, normalizePlan, getLocalUser } from "@/services/api";
 import { toast } from "sonner";
 
 export default function SuperAdminUsersPage() {
   const [loading, setLoading] = useState(true);
+  const [activeTab, setActiveTab] = useState("usuarios"); // "usuarios" | "consultas"
   const [users, setUsers] = useState([]);
   const [organizations, setOrganizations] = useState([]);
+  const [contactMessages, setContactMessages] = useState([]);
   const [searchQuery, setSearchQuery] = useState("");
+  const [messageSearchQuery, setMessageSearchQuery] = useState("");
   const [roleFilter, setRoleFilter] = useState("todos");
   const [orgFilter, setOrgFilter] = useState("todas");
 
@@ -53,14 +59,16 @@ export default function SuperAdminUsersPage() {
   const loadData = async () => {
     try {
       setLoading(true);
-      const [usersData, orgsData] = await Promise.all([
+      const [usersData, orgsData, msgsData] = await Promise.all([
         api.super.getUsers(),
         api.super.getOrganizations().catch(() => []),
+        api.super.getContactMessages().catch(() => []),
       ]);
       setUsers(usersData || []);
       setOrganizations(orgsData || []);
+      setContactMessages(msgsData || []);
     } catch (err) {
-      toast.error("Error al cargar usuarios de la plataforma", {
+      toast.error("Error al cargar datos de la plataforma", {
         description: err.message || "Por favor, intente de nuevo.",
       });
     } finally {
@@ -170,6 +178,39 @@ export default function SuperAdminUsersPage() {
     }
   };
 
+  const handleDeleteContactMessage = async (msgId, senderName) => {
+    if (
+      !window.confirm(
+        `¿Estás seguro de que deseás eliminar la consulta enviada por "${senderName}"?`
+      )
+    ) {
+      return;
+    }
+
+    try {
+      await api.super.deleteContactMessage(msgId);
+      setContactMessages((prev) => prev.filter((m) => m._id !== msgId));
+      toast.success("Consulta eliminada", {
+        description: `Se eliminó el mensaje de ${senderName}.`,
+      });
+    } catch (err) {
+      toast.error("Error al eliminar consulta", {
+        description: err.message || "No se pudo eliminar el mensaje.",
+      });
+    }
+  };
+
+  const filteredContactMessages = useMemo(() => {
+    const q = messageSearchQuery.toLowerCase().trim();
+    if (!q) return contactMessages;
+    return contactMessages.filter(
+      (m) =>
+        (m.name && m.name.toLowerCase().includes(q)) ||
+        (m.email && m.email.toLowerCase().includes(q)) ||
+        (m.message && m.message.toLowerCase().includes(q))
+    );
+  }, [contactMessages, messageSearchQuery]);
+
   const filteredUsers = users.filter((u) => {
     const q = searchQuery.toLowerCase().trim();
     const matchesSearch =
@@ -215,22 +256,62 @@ export default function SuperAdminUsersPage() {
         <div className="space-y-1">
           <h1 className="font-outfit text-2xl sm:text-3xl font-bold text-foreground tracking-tight flex items-center gap-2.5">
             <Users className="w-7 h-7 text-primary shrink-0" />
-            <span>Gestión de Usuarios</span>
+            <span>Gestión de Usuarios y Consultas</span>
           </h1>
           <p className="text-xs sm:text-sm text-muted-foreground font-light">
-            Administración centralizada de cuentas de administradores, técnicos de sucursal y credenciales de acceso.
+            Administración centralizada de cuentas de usuarios y bandeja de mensajes de contacto de la Landing Page.
           </p>
         </div>
 
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={loadData}
-          className="h-9 border-border/80 text-xs font-semibold rounded-xl flex items-center gap-1.5 self-start sm:self-auto cursor-pointer"
-        >
-          <RefreshCw className="w-3.5 h-3.5" />
-          Actualizar Listado
-        </Button>
+        <div className="flex flex-wrap items-center gap-2 self-start sm:self-auto">
+          <div className="inline-flex rounded-xl border border-border/80 bg-background/60 p-1">
+            <button
+              type="button"
+              onClick={() => setActiveTab("usuarios")}
+              className={`px-3 py-1.5 text-xs font-semibold rounded-lg transition-colors cursor-pointer flex items-center gap-1.5 ${
+                activeTab === "usuarios"
+                  ? "bg-primary text-primary-foreground font-bold shadow-xs"
+                  : "text-muted-foreground hover:text-foreground"
+              }`}
+            >
+              <Users className="w-3.5 h-3.5" />
+              <span>Usuarios ({users.length})</span>
+            </button>
+            <button
+              type="button"
+              onClick={() => setActiveTab("consultas")}
+              className={`px-3 py-1.5 text-xs font-semibold rounded-lg transition-colors cursor-pointer flex items-center gap-1.5 ${
+                activeTab === "consultas"
+                  ? "bg-primary text-primary-foreground font-bold shadow-xs"
+                  : "text-muted-foreground hover:text-foreground"
+              }`}
+            >
+              <MessageSquare className="w-3.5 h-3.5" />
+              <span>Consultas Web</span>
+              {contactMessages.length > 0 && (
+                <span
+                  className={`text-[10px] font-mono px-1.5 py-0.2 rounded-full ${
+                    activeTab === "consultas"
+                      ? "bg-primary-foreground/20 text-primary-foreground"
+                      : "bg-primary/15 text-primary font-bold"
+                  }`}
+                >
+                  {contactMessages.length}
+                </span>
+              )}
+            </button>
+          </div>
+
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={loadData}
+            className="h-9 border-border/80 text-xs font-semibold rounded-xl flex items-center gap-1.5 cursor-pointer"
+          >
+            <RefreshCw className="w-3.5 h-3.5" />
+            Actualizar
+          </Button>
+        </div>
       </div>
 
       {/* 4 Tarjetas KPI de Usuarios */}
@@ -304,6 +385,8 @@ export default function SuperAdminUsersPage() {
         </Card>
       </div>
 
+      {activeTab === "usuarios" ? (
+        <>
       {/* Directorio General */}
       <Card className="bg-card/30 border-border/80 p-4 sm:p-6 shadow-sm space-y-5">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between border-b border-border/50 pb-4 gap-3">
@@ -625,6 +708,131 @@ export default function SuperAdminUsersPage() {
           </div>
         )}
       </Card>
+        </>
+      ) : (
+        /* BANDEJA DE CONSULTAS WEB (contact_messages) */
+        <Card className="bg-card/30 border-border/80 p-4 sm:p-6 shadow-sm space-y-5">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between border-b border-border/50 pb-4 gap-3">
+            <div className="text-left">
+              <CardTitle className="font-outfit text-base sm:text-lg font-bold text-foreground flex items-center gap-2 border-0 pb-0">
+                <MessageSquare className="w-4.5 h-4.5 text-primary" />
+                Bandeja de Consultas Web (Formulario de Contacto)
+              </CardTitle>
+              <p className="text-xs text-muted-foreground font-light mt-0.5">
+                Mensajes enviados por potenciales clientes y talleres desde la Landing Page de RepairIT.
+              </p>
+            </div>
+            <Badge
+              variant="secondary"
+              className="text-[10px] font-mono uppercase tracking-wider px-2.5 py-1 self-start sm:self-auto"
+            >
+              {filteredContactMessages.length} consultas
+            </Badge>
+          </div>
+
+          {/* Buscador de Consultas */}
+          <div className="relative w-full sm:max-w-sm flex items-center">
+            <Search className="w-4 h-4 text-muted-foreground absolute left-3.5 pointer-events-none" />
+            <Input
+              type="text"
+              placeholder="Buscar por nombre, correo o contenido..."
+              value={messageSearchQuery}
+              onChange={(e) => setMessageSearchQuery(e.target.value)}
+              className="bg-background/85 border-border text-xs w-full pl-10 h-10 rounded-xl"
+            />
+            {messageSearchQuery && (
+              <button
+                type="button"
+                onClick={() => setMessageSearchQuery("")}
+                className="absolute right-3 text-muted-foreground hover:text-foreground cursor-pointer"
+              >
+                <X className="w-3.5 h-3.5" />
+              </button>
+            )}
+          </div>
+
+          {filteredContactMessages.length > 0 ? (
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {filteredContactMessages.map((msg) => (
+                <div
+                  key={msg._id}
+                  className="rounded-2xl border border-border/70 bg-background/50 p-4 sm:p-5 flex flex-col justify-between gap-4 text-left hover:border-primary/30 transition-colors"
+                >
+                  <div className="space-y-3">
+                    <div className="flex items-start justify-between gap-2">
+                      <div className="min-w-0">
+                        <h4 className="font-outfit font-bold text-sm text-foreground truncate">
+                          {msg.name || "Remitente sin nombre"}
+                        </h4>
+                        <a
+                          href={`mailto:${msg.email}`}
+                          className="text-xs font-mono text-primary hover:underline inline-flex items-center gap-1 mt-0.5 truncate"
+                        >
+                          <Mail className="w-3 h-3 shrink-0" />
+                          <span>{msg.email}</span>
+                        </a>
+                      </div>
+                      <span className="text-[10px] font-mono text-muted-foreground inline-flex items-center gap-1 shrink-0 bg-muted/40 px-2 py-0.5 rounded-md border border-border/50">
+                        <Calendar className="w-3 h-3 text-primary/70" />
+                        {msg.createdAt
+                          ? new Date(msg.createdAt).toLocaleString("es-AR", {
+                              day: "2-digit",
+                              month: "2-digit",
+                              year: "numeric",
+                              hour: "2-digit",
+                              minute: "2-digit",
+                            })
+                          : "Sin fecha"}
+                      </span>
+                    </div>
+
+                    <div className="rounded-xl bg-card/70 border border-border/50 p-3 text-xs text-foreground leading-relaxed whitespace-pre-wrap">
+                      {msg.message}
+                    </div>
+                  </div>
+
+                  <div className="flex items-center justify-end gap-2 pt-2 border-t border-border/40">
+                    <Button
+                      asChild
+                      variant="outline"
+                      size="sm"
+                      className="h-8 text-xs font-bold border-primary/30 text-primary hover:bg-primary/10 rounded-lg gap-1.5 cursor-pointer"
+                    >
+                      <a
+                        href={`mailto:${encodeURIComponent(msg.email || "")}?subject=${encodeURIComponent(
+                          "Respuesta a tu consulta en RepairIT"
+                        )}&body=${encodeURIComponent(
+                          `Hola ${msg.name || ""},\n\nGracias por comunicarte con RepairIT.\n\nRespecto a tu consulta:\n"${msg.message || ""}"\n\n`
+                        )}`}
+                      >
+                        <Mail className="w-3.5 h-3.5" />
+                        Responder por Correo
+                      </a>
+                    </Button>
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="icon"
+                      onClick={() => handleDeleteContactMessage(msg._id, msg.name || msg.email)}
+                      className="h-8 w-8 text-destructive hover:text-destructive hover:bg-destructive/10 rounded-lg cursor-pointer"
+                      title="Eliminar consulta"
+                    >
+                      <Trash2 className="w-3.5 h-3.5" />
+                    </Button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <div className="text-center py-14 space-y-2 text-muted-foreground">
+              <MessageSquare className="w-8 h-8 opacity-30 mx-auto text-muted-foreground mb-1" />
+              <p className="text-xs font-light">
+                No hay consultas web registradas en este momento.
+              </p>
+            </div>
+          )}
+        </Card>
+      )}
 
       {/* MODAL DE EDICIÓN Y GESTIÓN (Para SuperAdmin) */}
       {showManageModal && selectedUser && (

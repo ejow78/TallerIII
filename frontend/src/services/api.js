@@ -1144,6 +1144,36 @@ export const api = {
       if (error) throw new Error(error.message);
       return { message: "Usuario eliminado correctamente." };
     },
+
+    getContactMessages: async () => {
+      if (getLocalUser().role !== "superadmin") {
+        throw new Error("Permiso denegado: se requiere rol SuperAdmin.");
+      }
+      const { data, error } = await supabase
+        .from("contact_messages")
+        .select("*")
+        .order("created_at", { ascending: false });
+
+      if (error) throw new Error(error.message);
+      return (data || []).map((m) => ({
+        ...m,
+        _id: m.id,
+        createdAt: m.created_at,
+      }));
+    },
+
+    deleteContactMessage: async (messageId) => {
+      if (getLocalUser().role !== "superadmin") {
+        throw new Error("Permiso denegado: se requiere rol SuperAdmin.");
+      }
+      const { error } = await supabase
+        .from("contact_messages")
+        .delete()
+        .eq("id", messageId);
+
+      if (error) throw new Error(error.message);
+      return { message: "Consulta eliminada correctamente." };
+    },
   },
 
   // Cuentas de Acceso de Venue (Para Administradores)
