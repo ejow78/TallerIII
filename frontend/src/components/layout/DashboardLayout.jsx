@@ -450,7 +450,7 @@ export default function DashboardLayout() {
           </SidebarContent>
 
           {/* Pie de Sidebar con Perfil y Cerrar Sesión */}
-          <SidebarFooter className="p-3.5 sm:p-4 border-t border-border/85 space-y-3 sm:space-y-4 bg-card/65 shrink-0">
+          <SidebarFooter className="p-3.5 sm:p-4 pb-24 md:pb-4 border-t border-border/85 space-y-3 sm:space-y-4 bg-card/65 shrink-0">
             <div className="flex items-center px-2 w-full">
               <div className="flex items-center gap-3 min-w-0">
                 <div className="w-8 h-8 rounded-full bg-primary/10 border border-primary/20 flex items-center justify-center font-bold text-xs text-primary uppercase shrink-0">
@@ -544,7 +544,7 @@ export default function DashboardLayout() {
           </header>
 
           {/* Contenido Dinámico de las Páginas del Dashboard */}
-          <main className="flex-grow p-3.5 sm:p-6 md:p-8 overflow-y-auto max-w-7xl w-full mx-auto">
+          <main className="flex-grow p-3.5 sm:p-6 md:p-8 pb-24 sm:pb-10 overflow-y-auto max-w-7xl w-full mx-auto">
             <Outlet />
           </main>
 

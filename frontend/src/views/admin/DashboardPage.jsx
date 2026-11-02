@@ -812,7 +812,7 @@ export default function DashboardPage() {
                                   }
                                   className="text-xs transition-colors cursor-pointer font-medium"
                                 >
-                                  Taller Básico (Sin Caja POS)
+                                  Taller Básico
                                 </DropdownMenuItem>
                                 <DropdownMenuItem
                                   onClick={() =>
@@ -820,7 +820,7 @@ export default function DashboardPage() {
                                   }
                                   className="text-xs transition-colors cursor-pointer font-semibold text-sky-400"
                                 >
-                                  Taller Pro (Con Caja POS)
+                                  Taller Pro
                                 </DropdownMenuItem>
                                 <DropdownMenuItem
                                   onClick={() =>
@@ -828,7 +828,7 @@ export default function DashboardPage() {
                                   }
                                   className="text-xs transition-colors cursor-pointer font-bold text-primary"
                                 >
-                                  Multi-Taller Pro (Multisede + POS)
+                                  Multi-Taller Pro
                                 </DropdownMenuItem>
                               </DropdownMenuContent>
                             </DropdownMenu>
@@ -1288,15 +1288,9 @@ export default function DashboardPage() {
                     onChange={(e) => setEditOrgPlan(e.target.value)}
                     className="w-full h-10 rounded-xl border border-border bg-background/85 px-3 text-xs font-semibold text-foreground focus:outline-none focus:ring-1 focus:ring-primary"
                   >
-                    <option value="Taller Básico">
-                      Taller Básico (Sin Control de Caja POS)
-                    </option>
-                    <option value="Taller Pro">
-                      Taller Pro (Con Control de Caja POS - 1 Sede)
-                    </option>
-                    <option value="Multi-Taller Pro">
-                      Multi-Taller Pro (Multisede + Caja POS + Cuentas)
-                    </option>
+                    <option value="Taller Básico">Taller Básico</option>
+                    <option value="Taller Pro">Taller Pro</option>
+                    <option value="Multi-Taller Pro">Multi-Taller Pro</option>
                   </select>
                 </div>
 
@@ -1315,12 +1309,12 @@ export default function DashboardPage() {
                   </select>
                 </div>
 
-                <div className="flex items-center justify-between pt-3 border-t border-border/50">
+                <div className="flex flex-col-reverse sm:flex-row sm:justify-between items-stretch sm:items-center gap-2 pt-3 border-t border-border/50">
                   <Button
                     type="button"
-                    variant="ghost"
+                    variant="outline"
                     onClick={() => handleDeleteOrg(editingOrg)}
-                    className="text-xs text-destructive hover:bg-destructive/10 cursor-pointer gap-1"
+                    className="text-xs text-destructive hover:bg-destructive/10 border-destructive/30 cursor-pointer flex items-center justify-center gap-1.5 order-last sm:order-first"
                   >
                     <Trash2 className="w-3.5 h-3.5" />
                     Eliminar Taller
@@ -1330,14 +1324,14 @@ export default function DashboardPage() {
                       type="button"
                       variant="outline"
                       onClick={() => setEditingOrg(null)}
-                      className="text-xs cursor-pointer"
+                      className="text-xs flex-1 sm:flex-none cursor-pointer"
                     >
                       Cancelar
                     </Button>
                     <Button
                       type="submit"
                       disabled={submittingSuper}
-                      className="bg-primary hover:bg-primary/90 text-primary-foreground text-xs font-bold cursor-pointer gap-1.5"
+                      className="bg-primary hover:bg-primary/90 text-primary-foreground text-xs font-bold flex-1 sm:flex-none cursor-pointer flex items-center justify-center gap-1.5"
                     >
                       <Save className="w-3.5 h-3.5" />
                       {submittingSuper ? "Guardando..." : "Guardar Cambios"}

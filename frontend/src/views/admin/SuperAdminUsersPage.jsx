@@ -763,36 +763,36 @@ export default function SuperAdminUsersPage() {
                 </div>
               </div>
 
-              <div className="flex justify-between items-center pt-3 border-t border-border/40">
+              <div className="flex flex-col-reverse sm:flex-row sm:justify-between items-stretch sm:items-center gap-2 pt-3 border-t border-border/40">
                 {selectedUser.role !== "superadmin" ? (
                   <Button
                     type="button"
-                    variant="ghost"
+                    variant="outline"
                     onClick={() =>
                       handleDeleteUser(selectedUser._id, selectedUser.name)
                     }
-                    className="text-xs text-destructive hover:text-destructive hover:bg-destructive/10 cursor-pointer flex items-center gap-1"
+                    className="text-xs text-destructive hover:bg-destructive/10 border-destructive/30 cursor-pointer flex items-center justify-center gap-1.5 order-last sm:order-first"
                   >
                     <Trash2 className="w-3.5 h-3.5" />
-                    Eliminar
+                    Eliminar Usuario
                   </Button>
                 ) : (
                   <div />
                 )}
 
-                <div className="flex gap-2">
+                <div className="flex items-center gap-2">
                   <Button
                     type="button"
                     variant="outline"
                     onClick={() => setShowManageModal(false)}
-                    className="text-xs border-border/80 text-muted-foreground hover:text-foreground cursor-pointer"
+                    className="text-xs flex-1 sm:flex-none border-border/80 text-muted-foreground hover:text-foreground cursor-pointer"
                   >
                     Cancelar
                   </Button>
                   <Button
                     type="submit"
                     disabled={submitting}
-                    className="bg-primary hover:bg-primary/90 text-primary-foreground font-bold text-xs py-2 px-5 rounded-xl cursor-pointer flex items-center gap-1.5"
+                    className="bg-primary hover:bg-primary/90 text-primary-foreground text-xs font-bold flex-1 sm:flex-none cursor-pointer flex items-center justify-center gap-1.5"
                   >
                     <Save className="w-3.5 h-3.5" />
                     {submitting ? "Guardando..." : "Guardar Cambios"}
