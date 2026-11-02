@@ -349,7 +349,20 @@ export default function OrdersPage() {
       const updatedHistory = [
         ...currentHistory,
         {
-          date: new Date().toLocaleDateString("es-AR"),
+          date:
+            new Date().toLocaleDateString("es-AR", {
+              timeZone: "America/Argentina/Buenos_Aires",
+              day: "2-digit",
+              month: "2-digit",
+              year: "numeric",
+            }) +
+            " " +
+            new Date().toLocaleTimeString("es-AR", {
+              timeZone: "America/Argentina/Buenos_Aires",
+              hour: "2-digit",
+              minute: "2-digit",
+              hour12: false,
+            }),
           text: `Datos de recepción editados (${editDeviceType} ${editDeviceModel.trim()})`,
         },
       ];
@@ -587,8 +600,28 @@ export default function OrdersPage() {
           },
           cell: (o) => {
             let formattedDate = o.date || "";
-            if (o.date && !isNaN(new Date(o.date).getTime())) {
-              formattedDate = new Date(o.date).toLocaleDateString("es-AR");
+            if (o.created_at) {
+              formattedDate =
+                new Date(o.created_at).toLocaleDateString("es-AR", {
+                  timeZone: "America/Argentina/Buenos_Aires",
+                  day: "2-digit",
+                  month: "2-digit",
+                  year: "numeric",
+                }) +
+                " " +
+                new Date(o.created_at).toLocaleTimeString("es-AR", {
+                  timeZone: "America/Argentina/Buenos_Aires",
+                  hour: "2-digit",
+                  minute: "2-digit",
+                  hour12: false,
+                });
+            } else if (o.date && !isNaN(new Date(o.date).getTime())) {
+              formattedDate = new Date(o.date).toLocaleDateString("es-AR", {
+                timeZone: "America/Argentina/Buenos_Aires",
+                day: "2-digit",
+                month: "2-digit",
+                year: "numeric",
+              });
             }
             return { type: String, value: formattedDate, align: "center" };
           },
@@ -897,18 +930,25 @@ export default function OrdersPage() {
                           <span>{o.trackingCode}</span>
                         </button>
                         <div className="text-[10px] text-muted-foreground font-mono mt-0.5">
-                          {o.date ||
-                            (o.created_at
-                              ? new Date(o.created_at).toLocaleDateString("es-AR")
-                              : "")}
-                          {o.time || o.created_at
+                          {o.created_at
+                            ? new Date(o.created_at).toLocaleDateString("es-AR", {
+                                timeZone: "America/Argentina/Buenos_Aires",
+                                day: "2-digit",
+                                month: "2-digit",
+                                year: "numeric",
+                              })
+                            : o.date || ""}
+                          {o.created_at || o.time
                             ? ` • ${
-                                o.time ||
-                                new Date(o.created_at).toLocaleTimeString("es-AR", {
-                                  hour: "2-digit",
-                                  minute: "2-digit",
-                                })
-                              }`
+                                o.created_at
+                                  ? new Date(o.created_at).toLocaleTimeString("es-AR", {
+                                      timeZone: "America/Argentina/Buenos_Aires",
+                                      hour: "2-digit",
+                                      minute: "2-digit",
+                                      hour12: false,
+                                    })
+                                  : o.time
+                              } hs`
                             : ""}
                         </div>
                       </div>
@@ -1092,20 +1132,28 @@ export default function OrdersPage() {
                           </div>
                           <div className="text-[10px] text-muted-foreground font-mono flex items-center gap-1 mt-0.5 whitespace-nowrap">
                             <span>
-                              {o.date ||
-                                (o.created_at
-                                  ? new Date(o.created_at).toLocaleDateString("es-AR")
-                                  : "")}
+                              {o.created_at
+                                ? new Date(o.created_at).toLocaleDateString("es-AR", {
+                                    timeZone: "America/Argentina/Buenos_Aires",
+                                    day: "2-digit",
+                                    month: "2-digit",
+                                    year: "numeric",
+                                  })
+                                : o.date || ""}
                             </span>
-                            {(o.time || o.created_at) && (
+                            {(o.created_at || o.time) && (
                               <>
                                 <span className="opacity-40">•</span>
                                 <span>
-                                  {o.time ||
-                                    new Date(o.created_at).toLocaleTimeString("es-AR", {
-                                      hour: "2-digit",
-                                      minute: "2-digit",
-                                    })}
+                                  {o.created_at
+                                    ? new Date(o.created_at).toLocaleTimeString("es-AR", {
+                                        timeZone: "America/Argentina/Buenos_Aires",
+                                        hour: "2-digit",
+                                        minute: "2-digit",
+                                        hour12: false,
+                                      })
+                                    : o.time}{" "}
+                                  hs
                                 </span>
                               </>
                             )}
@@ -1279,12 +1327,27 @@ export default function OrdersPage() {
                 <p className="text-xs text-muted-foreground">
                   Ingresado el{" "}
                   <strong className="text-foreground">
-                    {detailOrder.date ||
-                      (detailOrder.created_at
-                        ? new Date(detailOrder.created_at).toLocaleDateString("es-AR")
-                        : "N/A")}
+                    {detailOrder.created_at
+                      ? new Date(detailOrder.created_at).toLocaleDateString("es-AR", {
+                          timeZone: "America/Argentina/Buenos_Aires",
+                          day: "2-digit",
+                          month: "2-digit",
+                          year: "numeric",
+                        })
+                      : detailOrder.date || "N/A"}
                   </strong>
-                  {detailOrder.time ? ` a las ${detailOrder.time} hs` : ""}
+                  {detailOrder.created_at || detailOrder.time
+                    ? ` a las ${
+                        detailOrder.created_at
+                          ? new Date(detailOrder.created_at).toLocaleTimeString("es-AR", {
+                              timeZone: "America/Argentina/Buenos_Aires",
+                              hour: "2-digit",
+                              minute: "2-digit",
+                              hour12: false,
+                            })
+                          : detailOrder.time
+                      } hs`
+                    : ""}
                 </p>
               </div>
               <Button

@@ -145,10 +145,17 @@ export default function NewOrderPage() {
         email: clientEmail,
       });
 
-      const dateStr = new Date().toLocaleDateString("es-AR");
+      const dateStr = new Date().toLocaleDateString("es-AR", {
+        timeZone: "America/Argentina/Buenos_Aires",
+        day: "2-digit",
+        month: "2-digit",
+        year: "numeric",
+      });
       const timeStr = new Date().toLocaleTimeString("es-AR", {
+        timeZone: "America/Argentina/Buenos_Aires",
         hour: "2-digit",
         minute: "2-digit",
+        hour12: false,
       });
 
       // 2. Crear la orden de servicio vinculada

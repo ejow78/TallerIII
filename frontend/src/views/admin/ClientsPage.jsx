@@ -295,7 +295,12 @@ export default function ClientsPage() {
           cell: (c) => {
             let formattedDate = "-";
             if (c.created_at) {
-              formattedDate = new Date(c.created_at).toLocaleDateString("es-AR");
+              formattedDate = new Date(c.created_at).toLocaleDateString("es-AR", {
+                timeZone: "America/Argentina/Buenos_Aires",
+                day: "2-digit",
+                month: "2-digit",
+                year: "numeric",
+              });
             }
             return { type: String, value: formattedDate, align: "center" };
           },

@@ -80,7 +80,27 @@ export default function TrackingPage() {
     const venueAddress = escapeHtml(order.venueId?.address || "Sucursal Central");
     const safeTrackingCode = escapeHtml(order.trackingCode || "");
     const safeStatus = escapeHtml((order.status || "INGRESADO").replace("_", " "));
-    const safeDate = escapeHtml(order.date || new Date().toLocaleDateString("es-AR"));
+    const safeDate = escapeHtml(
+      order.created_at
+        ? `${new Date(order.created_at).toLocaleDateString("es-AR", {
+            timeZone: "America/Argentina/Buenos_Aires",
+            day: "2-digit",
+            month: "2-digit",
+            year: "numeric",
+          })} ${new Date(order.created_at).toLocaleTimeString("es-AR", {
+            timeZone: "America/Argentina/Buenos_Aires",
+            hour: "2-digit",
+            minute: "2-digit",
+            hour12: false,
+          })} hs`
+        : order.date ||
+            new Date().toLocaleDateString("es-AR", {
+              timeZone: "America/Argentina/Buenos_Aires",
+              day: "2-digit",
+              month: "2-digit",
+              year: "numeric",
+            })
+    );
     const safeDeviceType = escapeHtml(order.deviceType || "");
     const safeDeviceModel = escapeHtml(order.deviceModel || "");
     const safeIssue = escapeHtml(order.issue || "Sin especificar");

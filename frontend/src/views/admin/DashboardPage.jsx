@@ -287,7 +287,11 @@ export default function DashboardPage() {
       const d = new Date(now);
       d.setDate(now.getDate() - i);
       const key = d.toISOString().split("T")[0];
-      const label = d.toLocaleDateString("es-AR", { day: "2-digit", month: "short" });
+      const label = d.toLocaleDateString("es-AR", {
+        timeZone: "America/Argentina/Buenos_Aires",
+        day: "2-digit",
+        month: "short",
+      });
       daysMap.set(key, {
         dateKey: key,
         label,
@@ -886,7 +890,13 @@ export default function DashboardPage() {
                           <td className="py-3.5 px-3 text-muted-foreground font-mono text-[11px]">
                             {org.createdAt
                               ? new Date(org.createdAt).toLocaleDateString(
-                                  "es-AR"
+                                  "es-AR",
+                                  {
+                                    timeZone: "America/Argentina/Buenos_Aires",
+                                    day: "2-digit",
+                                    month: "2-digit",
+                                    year: "numeric",
+                                  }
                                 )
                               : "N/A"}
                           </td>

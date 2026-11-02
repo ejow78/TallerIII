@@ -267,7 +267,12 @@ export default function VenueAccountsPage() {
                           <Badge variant="secondary" className="text-[9px] uppercase font-bold px-1.5 py-0.5">Técnico</Badge>
                         </td>
                         <td className="py-4 px-5 text-muted-foreground font-mono text-[10px]">
-                          {new Date(acc.created_at).toLocaleDateString("es-AR")}
+                          {new Date(acc.created_at).toLocaleDateString("es-AR", {
+                            timeZone: "America/Argentina/Buenos_Aires",
+                            day: "2-digit",
+                            month: "2-digit",
+                            year: "numeric",
+                          })}
                         </td>
                         <td className="py-4 px-5 text-right">
                           <Button

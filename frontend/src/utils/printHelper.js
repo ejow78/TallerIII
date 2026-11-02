@@ -176,8 +176,34 @@ export function printOrderReceipt(order, profile = {}, clientOverride = null) {
               <span class="order-badge">ORDEN DE SERVICIO</span>
               <div class="code-text">N° ${safeTrackingCode}</div>
               <div style="font-size: 10px; color: #64748b; margin-top: 2px;">Fecha: ${escapeHtml(
-                order.date || new Date().toLocaleDateString("es-AR")
-              )} ${order.time ? `&bull; ${escapeHtml(order.time)} hs` : ""}</div>
+                order.created_at
+                  ? new Date(order.created_at).toLocaleDateString("es-AR", {
+                      timeZone: "America/Argentina/Buenos_Aires",
+                      day: "2-digit",
+                      month: "2-digit",
+                      year: "numeric",
+                    })
+                  : order.date ||
+                      new Date().toLocaleDateString("es-AR", {
+                        timeZone: "America/Argentina/Buenos_Aires",
+                        day: "2-digit",
+                        month: "2-digit",
+                        year: "numeric",
+                      })
+              )} ${
+                order.created_at || order.time
+                  ? `&bull; ${escapeHtml(
+                      order.created_at
+                        ? new Date(order.created_at).toLocaleTimeString("es-AR", {
+                            timeZone: "America/Argentina/Buenos_Aires",
+                            hour: "2-digit",
+                            minute: "2-digit",
+                            hour12: false,
+                          })
+                        : order.time
+                    )} hs`
+                  : ""
+              }</div>
             </td>
           </tr>
         </table>
@@ -316,7 +342,20 @@ export function printPosReceipt(sale, profile = {}) {
   const venueName = escapeHtml(profile?.name || "RepairIT Taller");
   const venueAddress = escapeHtml(profile?.address || "Sucursal Activa");
   const venuePhone = escapeHtml(profile?.phone || "");
-  const dateStr = escapeHtml(new Date(sale.created_at || Date.now()).toLocaleString("es-AR"));
+  const saleDateObj = new Date(sale.created_at || Date.now());
+  const dateStr = escapeHtml(
+    `${saleDateObj.toLocaleDateString("es-AR", {
+      timeZone: "America/Argentina/Buenos_Aires",
+      day: "2-digit",
+      month: "2-digit",
+      year: "numeric",
+    })} ${saleDateObj.toLocaleTimeString("es-AR", {
+      timeZone: "America/Argentina/Buenos_Aires",
+      hour: "2-digit",
+      minute: "2-digit",
+      hour12: false,
+    })} hs`
+  );
   const safePaymentMethod = escapeHtml((sale.payment_method || "efectivo").toUpperCase());
 
   const itemsHtml = (sale.items || [])

@@ -644,7 +644,13 @@ export default function SuperAdminUsersPage() {
                         <td className="py-3.5 px-3 text-muted-foreground font-mono text-[11px]">
                           {item.createdAt
                             ? new Date(item.createdAt).toLocaleDateString(
-                                "es-AR"
+                                "es-AR",
+                                {
+                                  timeZone: "America/Argentina/Buenos_Aires",
+                                  day: "2-digit",
+                                  month: "2-digit",
+                                  year: "numeric",
+                                }
                               )
                             : "N/A"}
                         </td>
@@ -696,11 +702,8 @@ export default function SuperAdminUsersPage() {
             <div className="text-left">
               <CardTitle className="font-outfit text-base sm:text-lg font-bold text-foreground flex items-center gap-2 border-0 pb-0">
                 <MessageSquare className="w-4.5 h-4.5 text-primary" />
-                Bandeja de Consultas Web (Formulario de Contacto)
+                Bandeja de Consultas Web
               </CardTitle>
-              <p className="text-xs text-muted-foreground font-light mt-0.5">
-                Mensajes enviados por potenciales clientes y talleres desde la Landing Page de RepairIT.
-              </p>
             </div>
             <Badge
               variant="secondary"
@@ -755,13 +758,17 @@ export default function SuperAdminUsersPage() {
                       <span className="text-[10px] font-mono text-muted-foreground inline-flex items-center gap-1 shrink-0 bg-muted/40 px-2 py-0.5 rounded-md border border-border/50">
                         <Calendar className="w-3 h-3 text-primary/70" />
                         {msg.createdAt
-                          ? new Date(msg.createdAt).toLocaleString("es-AR", {
+                          ? `${new Date(msg.createdAt).toLocaleDateString("es-AR", {
+                              timeZone: "America/Argentina/Buenos_Aires",
                               day: "2-digit",
                               month: "2-digit",
                               year: "numeric",
+                            })} ${new Date(msg.createdAt).toLocaleTimeString("es-AR", {
+                              timeZone: "America/Argentina/Buenos_Aires",
                               hour: "2-digit",
                               minute: "2-digit",
-                            })
+                              hour12: false,
+                            })} hs`
                           : "Sin fecha"}
                       </span>
                     </div>

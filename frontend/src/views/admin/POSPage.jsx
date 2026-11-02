@@ -399,7 +399,19 @@ export default function POSPage() {
             const d = s.created_at || s.date;
             return {
               type: String,
-              value: d ? new Date(d).toLocaleString("es-AR") : "-",
+              value: d
+                ? `${new Date(d).toLocaleDateString("es-AR", {
+                    timeZone: "America/Argentina/Buenos_Aires",
+                    day: "2-digit",
+                    month: "2-digit",
+                    year: "numeric",
+                  })} ${new Date(d).toLocaleTimeString("es-AR", {
+                    timeZone: "America/Argentina/Buenos_Aires",
+                    hour: "2-digit",
+                    minute: "2-digit",
+                    hour12: false,
+                  })} hs`
+                : "-",
               align: "center",
             };
           },
@@ -1179,7 +1191,17 @@ export default function POSPage() {
                               #{sale._id.substring(0, 8).toUpperCase()}
                             </span>
                             <span className="font-mono text-[10px] text-muted-foreground block mt-0.5">
-                              {new Date(sale.created_at).toLocaleString("es-AR")}
+                              {`${new Date(sale.created_at).toLocaleDateString("es-AR", {
+                                timeZone: "America/Argentina/Buenos_Aires",
+                                day: "2-digit",
+                                month: "2-digit",
+                                year: "numeric",
+                              })} • ${new Date(sale.created_at).toLocaleTimeString("es-AR", {
+                                timeZone: "America/Argentina/Buenos_Aires",
+                                hour: "2-digit",
+                                minute: "2-digit",
+                                hour12: false,
+                              })} hs`}
                             </span>
                           </div>
                           <Badge
@@ -1260,7 +1282,17 @@ export default function POSPage() {
                               #{sale._id.substring(0, 8).toUpperCase()}
                             </td>
                             <td className="py-3.5 px-4 text-muted-foreground font-mono text-[10px]">
-                              {new Date(sale.created_at).toLocaleString("es-AR")}
+                              {`${new Date(sale.created_at).toLocaleDateString("es-AR", {
+                                timeZone: "America/Argentina/Buenos_Aires",
+                                day: "2-digit",
+                                month: "2-digit",
+                                year: "numeric",
+                              })} • ${new Date(sale.created_at).toLocaleTimeString("es-AR", {
+                                timeZone: "America/Argentina/Buenos_Aires",
+                                hour: "2-digit",
+                                minute: "2-digit",
+                                hour12: false,
+                              })} hs`}
                             </td>
                             <td className="py-3.5 px-4">
                               <div className="flex items-center gap-1.5">

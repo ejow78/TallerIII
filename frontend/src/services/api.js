@@ -613,7 +613,20 @@ export const api = {
         .single();
 
       const history = Array.isArray(order?.history) ? order.history : [];
-      const dateStr = new Date().toLocaleDateString("es-AR") + " " + new Date().toLocaleTimeString("es-AR", { hour: "2-digit", minute: "2-digit" });
+      const dateStr =
+        new Date().toLocaleDateString("es-AR", {
+          timeZone: "America/Argentina/Buenos_Aires",
+          day: "2-digit",
+          month: "2-digit",
+          year: "numeric",
+        }) +
+        " " +
+        new Date().toLocaleTimeString("es-AR", {
+          timeZone: "America/Argentina/Buenos_Aires",
+          hour: "2-digit",
+          minute: "2-digit",
+          hour12: false,
+        });
       
       history.push({ date: dateStr, text });
 
@@ -639,7 +652,20 @@ export const api = {
         .single();
 
       const history = Array.isArray(order?.history) ? order.history : [];
-      const dateStr = new Date().toLocaleDateString("es-AR") + " " + new Date().toLocaleTimeString("es-AR", { hour: "2-digit", minute: "2-digit" });
+      const dateStr =
+        new Date().toLocaleDateString("es-AR", {
+          timeZone: "America/Argentina/Buenos_Aires",
+          day: "2-digit",
+          month: "2-digit",
+          year: "numeric",
+        }) +
+        " " +
+        new Date().toLocaleTimeString("es-AR", {
+          timeZone: "America/Argentina/Buenos_Aires",
+          hour: "2-digit",
+          minute: "2-digit",
+          hour12: false,
+        });
       
       const statusText = status ? status.toUpperCase() : "ACTUALIZADO";
       history.push({ date: dateStr, text: `Diagnóstico / Presupuesto cargado (${statusText})` });
@@ -751,13 +777,34 @@ export const api = {
               { desc: "Mantenimiento térmico y limpieza de placa madre", price: 6500 }
             ],
             approved: true,
-            dateApproved: new Date().toLocaleDateString("es-AR")
+            dateApproved: new Date().toLocaleDateString("es-AR", {
+              timeZone: "America/Argentina/Buenos_Aires",
+              day: "2-digit",
+              month: "2-digit",
+              year: "numeric",
+            })
           },
           history: [
             { date: "24/07/2026 09:30", text: "Equipo ingresado en recepción." },
             { date: "24/07/2026 11:15", text: "Diagnóstico finalizado por el equipo técnico." },
             { date: "24/07/2026 11:30", text: "Presupuesto detallado generado y disponible online." },
-            { date: new Date().toLocaleDateString("es-AR") + " " + new Date().toLocaleTimeString("es-AR", { hour: "2-digit", minute: "2-digit" }), text: "Presupuesto aprobado online por el cliente (Demo)." }
+            {
+              date:
+                new Date().toLocaleDateString("es-AR", {
+                  timeZone: "America/Argentina/Buenos_Aires",
+                  day: "2-digit",
+                  month: "2-digit",
+                  year: "numeric",
+                }) +
+                " " +
+                new Date().toLocaleTimeString("es-AR", {
+                  timeZone: "America/Argentina/Buenos_Aires",
+                  hour: "2-digit",
+                  minute: "2-digit",
+                  hour12: false,
+                }),
+              text: "Presupuesto aprobado online por el cliente (Demo).",
+            }
           ]
         };
       }
