@@ -162,15 +162,15 @@ export default function LandingPage() {
   return (
     <div className="flex-grow flex flex-col">
       {/* Sección Hero Split con Ventana en Perspectiva 3D */}
-      <section className="relative pt-12 pb-20 md:py-24 px-6 flex items-center justify-center overflow-hidden min-h-[82vh]">
+      <section className="relative py-12 lg:py-16 px-6 flex items-center justify-center overflow-hidden min-h-[calc(100vh-4rem)]">
         {/* Glow Ambiental */}
         <div className="absolute top-1/2 left-1/3 -translate-x-1/2 -translate-y-1/2 w-[550px] h-[350px] bg-primary/10 rounded-full blur-[120px] pointer-events-none" />
         <div className="absolute top-1/2 right-1/4 translate-x-1/3 -translate-y-1/2 w-[480px] h-[380px] bg-primary/15 rounded-full blur-[130px] pointer-events-none" />
 
-        <div className="relative z-10 max-w-7xl w-full mx-auto grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-8 items-center">
+        <div className="relative z-10 max-w-[1380px] w-full mx-auto grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-10 items-center">
           {/* Columna Izquierda: Propuesta de Valor & CTA */}
           <div className="lg:col-span-5 text-center lg:text-left space-y-6">
-            <h1 className="font-outfit text-4xl sm:text-5xl lg:text-[54px] font-extrabold text-foreground tracking-tight leading-[1.08]">
+            <h1 className="font-outfit text-4xl sm:text-5xl lg:text-[58px] xl:text-[62px] font-extrabold text-foreground tracking-tight leading-[1.06]">
               Tu taller técnico, más{" "}
               <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-sky-400">
                 transparente
@@ -198,7 +198,7 @@ export default function LandingPage() {
               >
                 <a href={trackingUrl}>
                   <Search className="w-4 h-4 text-primary" />
-                  <span>Seguimiento de Equipo</span>
+                  <span>Seguir mi Equipo</span>
                 </a>
               </Button>
             </div>
@@ -209,7 +209,7 @@ export default function LandingPage() {
             className="lg:col-span-7 flex items-center justify-center"
             style={{ perspective: "1300px" }}
           >
-            <div className="relative w-full max-w-[740px] rounded-xl border border-white/15 bg-[#111113] shadow-[-28px_32px_70px_rgba(0,0,0,0.75)] ring-1 ring-primary/20 transition-transform duration-500 ease-out hover:[transform:rotateY(-4deg)_rotateX(1.5deg)_scale(1.01)] lg:[transform:rotateY(-13deg)_rotateX(5deg)_rotateZ(0.5deg)] overflow-hidden select-none">
+            <div className="relative w-full max-w-[820px] rounded-xl border border-white/15 bg-[#111113] shadow-[-28px_32px_70px_rgba(0,0,0,0.75)] ring-1 ring-primary/20 transition-transform duration-500 ease-out hover:[transform:rotateY(-4deg)_rotateX(1.5deg)_scale(1.01)] lg:[transform:rotateY(-13deg)_rotateX(5deg)_rotateZ(0.5deg)] overflow-hidden select-none">
               <img
                 src="/hero-dashboard.png"
                 alt="Panel de Control de RepairIT con métricas, gráficos e inventario en vivo"
@@ -374,19 +374,23 @@ export default function LandingPage() {
                 <ul className="space-y-3 text-xs text-muted-foreground font-light">
                   <li className="flex items-start gap-2.5">
                     <Check className="w-4 h-4 text-primary shrink-0 mt-0.5" />
-                    <span>1 Sucursal física activa</span>
+                    <span>Hasta <strong>100 órdenes de servicio</strong> al mes</span>
                   </li>
                   <li className="flex items-start gap-2.5">
                     <Check className="w-4 h-4 text-primary shrink-0 mt-0.5" />
-                    <span>Hasta 100 Órdenes de Servicio al mes</span>
+                    <span>Gestión de clientes y catálogo de repuestos</span>
                   </li>
                   <li className="flex items-start gap-2.5">
                     <Check className="w-4 h-4 text-primary shrink-0 mt-0.5" />
-                    <span>Control de Stock e Inventario</span>
+                    <span>Comprobantes A4 imprimibles con código QR</span>
                   </li>
                   <li className="flex items-start gap-2.5">
                     <Check className="w-4 h-4 text-primary shrink-0 mt-0.5" />
-                    <span>Seguimiento en línea con QR y comprobantes A4</span>
+                    <span>Portal web para que el cliente consulte su equipo</span>
+                  </li>
+                  <li className="flex items-start gap-2.5">
+                    <Check className="w-4 h-4 text-primary shrink-0 mt-0.5" />
+                    <span>Avisos por correo electrónico y WhatsApp</span>
                   </li>
                 </ul>
               </CardContent>
@@ -415,31 +419,31 @@ export default function LandingPage() {
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-6 flex-grow">
-                <div className="flex items-baseline gap-1">
-                  <span className="text-4xl font-extrabold text-foreground font-outfit">$19</span>
-                  <span className="text-muted-foreground text-xs font-light">/ mes</span>
+                <div className="flex items-baseline gap-1.5">
+                  <span className="text-4xl font-extrabold text-foreground font-outfit">$14.900</span>
+                  <span className="text-muted-foreground text-xs font-light">ARS / mes</span>
                 </div>
                 <div className="border-t border-border/40 my-4" />
                 <ul className="space-y-3 text-xs text-muted-foreground font-light">
                   <li className="flex items-start gap-2.5">
                     <Check className="w-4 h-4 text-primary shrink-0 mt-0.5" />
-                    <span>Órdenes de Servicio e Inventario ilimitados</span>
+                    <span className="font-medium text-foreground">Órdenes de servicio e inventario ilimitados</span>
                   </li>
                   <li className="flex items-start gap-2.5">
                     <Check className="w-4 h-4 text-primary shrink-0 mt-0.5" />
-                    <span className="font-medium text-foreground">Control de Caja y Punto de Venta (POS)</span>
+                    <span className="font-medium text-foreground">Módulo de Caja y Punto de Venta (POS)</span>
                   </li>
                   <li className="flex items-start gap-2.5">
                     <Check className="w-4 h-4 text-primary shrink-0 mt-0.5" />
-                    <span>Aprobación de Presupuestos Online con DNI</span>
+                    <span className="font-medium text-foreground">Panel de métricas y gráficos financieros</span>
                   </li>
                   <li className="flex items-start gap-2.5">
                     <Check className="w-4 h-4 text-primary shrink-0 mt-0.5" />
-                    <span>Métricas en Tiempo Real y Exportación Excel</span>
+                    <span>Alertas de stock crítico y exportación a Excel</span>
                   </li>
                   <li className="flex items-start gap-2.5">
                     <Check className="w-4 h-4 text-primary shrink-0 mt-0.5" />
-                    <span>Soporte prioritario</span>
+                    <span>Aprobación digital de presupuestos con DNI</span>
                   </li>
                 </ul>
               </CardContent>
@@ -462,27 +466,31 @@ export default function LandingPage() {
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-6 flex-grow">
-                <div className="flex items-baseline gap-1">
-                  <span className="text-4xl font-extrabold text-foreground font-outfit">$39</span>
-                  <span className="text-muted-foreground text-xs font-light">/ mes</span>
+                <div className="flex items-baseline gap-1.5">
+                  <span className="text-4xl font-extrabold text-foreground font-outfit">$29.900</span>
+                  <span className="text-muted-foreground text-xs font-light">ARS / mes</span>
                 </div>
                 <div className="border-t border-border/40 my-4" />
                 <ul className="space-y-3 text-xs text-muted-foreground font-light">
                   <li className="flex items-start gap-2.5">
                     <Check className="w-4 h-4 text-primary shrink-0 mt-0.5" />
-                    <span>Todo lo incluido en el Plan Taller Pro (incluye Caja POS)</span>
+                    <span>Todo lo incluido en <strong>Taller Pro</strong> (Caja POS + Métricas)</span>
                   </li>
                   <li className="flex items-start gap-2.5">
                     <Check className="w-4 h-4 text-primary shrink-0 mt-0.5" />
-                    <span className="font-medium text-foreground">Gestión de Múltiples Sucursales</span>
+                    <span className="font-medium text-foreground">Administración de múltiples sucursales</span>
                   </li>
                   <li className="flex items-start gap-2.5">
                     <Check className="w-4 h-4 text-primary shrink-0 mt-0.5" />
-                    <span>Cuentas de Acceso exclusivas para técnicos por sucursal</span>
+                    <span className="font-medium text-foreground">Cuentas de acceso para técnicos por sucursal</span>
                   </li>
                   <li className="flex items-start gap-2.5">
                     <Check className="w-4 h-4 text-primary shrink-0 mt-0.5" />
-                    <span>Selector rápido de sucursal y reportes centralizados</span>
+                    <span>Cambio rápido de sede desde el panel admin</span>
+                  </li>
+                  <li className="flex items-start gap-2.5">
+                    <Check className="w-4 h-4 text-primary shrink-0 mt-0.5" />
+                    <span>Soporte prioritario y asistencia dedicada</span>
                   </li>
                 </ul>
               </CardContent>

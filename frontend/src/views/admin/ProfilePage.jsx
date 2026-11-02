@@ -541,11 +541,11 @@ export default function ProfilePage() {
                     <span className="text-[10px] text-muted-foreground font-light"> / para siempre</span>
                   </div>
                   <ul className="text-[11px] text-muted-foreground font-light space-y-2 border-t border-border/40 pt-3">
-                    <li className="flex items-center gap-2">✓ 1 Sucursal física</li>
-                    <li className="flex items-center gap-2">✓ Hasta 100 órdenes / mes</li>
-                    <li className="flex items-center gap-2">✓ Inventario y stock básico</li>
-                    <li className="flex items-center gap-2">✓ Consulta de seguimiento en línea</li>
+                    <li className="flex items-center gap-2">✓ 1 Sucursal operativa</li>
+                    <li className="flex items-center gap-2">✓ Hasta 100 órdenes al mes</li>
+                    <li className="flex items-center gap-2">✓ Clientes, stock y comprobantes QR</li>
                     <li className="flex items-center gap-2 text-muted-foreground/60">✕ Sin Control de Caja (POS)</li>
+                    <li className="flex items-center gap-2 text-muted-foreground/60">✕ Sin Métricas ni Gráficos</li>
                   </ul>
                 </div>
               </div>
@@ -565,15 +565,15 @@ export default function ProfilePage() {
                     )}
                   </div>
                   <div>
-                    <span className="font-outfit text-2xl font-black text-foreground">$19</span>
-                    <span className="text-[10px] text-muted-foreground font-light"> / mes</span>
+                    <span className="font-outfit text-2xl font-black text-foreground">$14.900</span>
+                    <span className="text-[10px] text-muted-foreground font-light"> ARS / mes</span>
                   </div>
                   <ul className="text-[11px] text-muted-foreground font-light space-y-2 border-t border-border/40 pt-3">
+                    <li className="flex items-center gap-2 text-primary font-bold">✓ Órdenes e inventario ilimitados</li>
                     <li className="flex items-center gap-2 text-primary font-bold">✓ Control de Caja y Punto de Venta (POS)</li>
-                    <li className="flex items-center gap-2 text-foreground font-medium">✓ 1 Sucursal física</li>
-                    <li className="flex items-center gap-2">✓ Órdenes y equipos ilimitados</li>
-                    <li className="flex items-center gap-2">✓ Inventario con alertas críticas</li>
-                    <li className="flex items-center gap-2">✓ Soporte prioritario 24/7</li>
+                    <li className="flex items-center gap-2 text-foreground font-medium">✓ Métricas y gráficos financieros</li>
+                    <li className="flex items-center gap-2">✓ Alertas de stock y exportación CSV</li>
+                    <li className="flex items-center gap-2">✓ 1 Sucursal operativa completa</li>
                   </ul>
                 </div>
               </div>
@@ -592,15 +592,15 @@ export default function ProfilePage() {
                     )}
                   </div>
                   <div>
-                    <span className="font-outfit text-2xl font-black text-foreground">$39</span>
-                    <span className="text-[10px] text-muted-foreground font-light"> / mes</span>
+                    <span className="font-outfit text-2xl font-black text-foreground">$29.900</span>
+                    <span className="text-[10px] text-muted-foreground font-light"> ARS / mes</span>
                   </div>
                   <ul className="text-[11px] text-muted-foreground font-light space-y-2 border-t border-border/40 pt-3">
-                    <li className="flex items-center gap-2 text-primary font-bold">✓ Hasta 5 Sucursales + Selector rápido</li>
-                    <li className="flex items-center gap-2 text-primary font-bold">✓ Control de Caja y Punto de Venta (POS)</li>
-                    <li className="flex items-center gap-2">✓ Cuentas de Acceso por sucursal</li>
-                    <li className="flex items-center gap-2">✓ Órdenes e Inventario ilimitados</li>
-                    <li className="flex items-center gap-2">✓ Reportes centralizados multisede</li>
+                    <li className="flex items-center gap-2 text-primary font-bold">✓ Gestión de múltiples sucursales</li>
+                    <li className="flex items-center gap-2 text-primary font-bold">✓ Cuentas de acceso para técnicos</li>
+                    <li className="flex items-center gap-2 text-foreground font-medium">✓ Incluye Caja POS y Métricas Pro</li>
+                    <li className="flex items-center gap-2">✓ Órdenes e inventario ilimitados</li>
+                    <li className="flex items-center gap-2">✓ Selector rápido de sede y soporte</li>
                   </ul>
                 </div>
               </div>

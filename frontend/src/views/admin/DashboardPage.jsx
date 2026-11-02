@@ -60,7 +60,7 @@ import {
   Mail,
 } from "lucide-react";
 import { Link } from "react-router-dom";
-import { api, normalizePlan } from "@/services/api";
+import { api, normalizePlan, hasPOSAccess } from "@/services/api";
 import { toast } from "sonner";
 import { Label } from "@/components/ui/label";
 
@@ -123,6 +123,7 @@ export default function DashboardPage() {
   const [orders, setOrders] = useState([]);
   const [inventory, setInventory] = useState([]);
   const [sales, setSales] = useState([]);
+  const [activePlan, setActivePlan] = useState(() => normalizePlan(user.subscriptionPlan));
 
   // Controles de Gráficos Interactivos
   const [timeRange, setTimeRange] = useState("14d");
@@ -146,11 +147,15 @@ export default function DashboardPage() {
   const loadWorkshopData = async () => {
     try {
       setLoading(true);
-      const [ordersData, inventoryData, salesData] = await Promise.all([
+      const [ordersData, inventoryData, salesData, profileData] = await Promise.all([
         api.orders.getAll().catch(() => []),
         api.inventory.getAll().catch(() => []),
         api.sales.getAll().catch(() => []),
+        api.auth.getProfile().catch(() => null),
       ]);
+      if (profileData?.subscriptionPlan) {
+        setActivePlan(normalizePlan(profileData.subscriptionPlan));
+      }
       setOrders(ordersData || []);
       setInventory(inventoryData || []);
       setSales(salesData || []);
@@ -1396,6 +1401,12 @@ export default function DashboardPage() {
     return acc;
   }, 0);
   const totalRevenue = totalSalesRevenue + approvedBudgetsRevenue;
+  const isBasicPlan = !hasPOSAccess(activePlan);
+  const nowDate = new Date();
+  const monthlyOrdersCount = orders.filter((o) => {
+    const d = o.createdAt ? new Date(o.createdAt) : null;
+    return d && d.getMonth() === nowDate.getMonth() && d.getFullYear() === nowDate.getFullYear();
+  }).length;
 
   const totalItemsCount = inventory.length;
   const categoriesCount = new Set(inventory.map((item) => item.category).filter(Boolean)).size;
@@ -1466,23 +1477,40 @@ export default function DashboardPage() {
           </CardContent>
         </Card>
 
-        {/* Card 3: Balance Operativo (Caja + Presupuestos) */}
+        {/* Card 3: Balance Operativo (Pro/Multi) o Cupo Mensual (Básico) */}
         <Card className="bg-card/45 border-border/80 shadow-sm hover:border-primary/30 transition-colors">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-1.5 sm:pb-2 px-3.5 sm:px-6 pt-3.5 sm:pt-6">
             <span className="text-[10px] sm:text-[11px] font-semibold text-muted-foreground uppercase tracking-wider leading-tight">
-              Facturación
+              {isBasicPlan ? "Cupo Mensual" : "Facturación"}
             </span>
             <div className="w-6 h-6 sm:w-7 sm:h-7 rounded-lg bg-sky-500/10 border border-sky-500/20 flex items-center justify-center shrink-0">
-              <DollarSign className="h-3 w-3 sm:h-3.5 sm:w-3.5 text-sky-400" />
+              {isBasicPlan ? (
+                <Clock className="h-3 w-3 sm:h-3.5 sm:w-3.5 text-sky-400" />
+              ) : (
+                <DollarSign className="h-3 w-3 sm:h-3.5 sm:w-3.5 text-sky-400" />
+              )}
             </div>
           </CardHeader>
           <CardContent className="px-3.5 sm:px-6 pb-3.5 sm:pb-6">
-            <span className="text-xl sm:text-3xl font-outfit font-black text-foreground block tabular-nums truncate">
-              ${totalRevenue.toLocaleString("es-AR")}
-            </span>
-            <span className="text-[10px] sm:text-[11px] text-muted-foreground block font-medium mt-1 leading-tight line-clamp-2">
-              {sales.length} ventas POS • ${approvedBudgetsRevenue.toLocaleString("es-AR")} en órdenes
-            </span>
+            {isBasicPlan ? (
+              <>
+                <span className="text-2xl sm:text-3xl font-outfit font-black text-foreground block tabular-nums">
+                  {monthlyOrdersCount} <span className="text-sm font-normal text-muted-foreground">/ 100</span>
+                </span>
+                <span className="text-[10px] sm:text-[11px] text-muted-foreground block font-medium mt-1 leading-tight line-clamp-2">
+                  Órdenes registradas este mes (Plan Básico)
+                </span>
+              </>
+            ) : (
+              <>
+                <span className="text-xl sm:text-3xl font-outfit font-black text-foreground block tabular-nums truncate">
+                  ${totalRevenue.toLocaleString("es-AR")}
+                </span>
+                <span className="text-[10px] sm:text-[11px] text-muted-foreground block font-medium mt-1 leading-tight line-clamp-2">
+                  {sales.length} ventas POS • ${approvedBudgetsRevenue.toLocaleString("es-AR")} en órdenes
+                </span>
+              </>
+            )}
           </CardContent>
         </Card>
 
@@ -1535,7 +1563,29 @@ export default function DashboardPage() {
         </Card>
       </div>
 
-      {/* Sección de Gráficos Interactivos (Shadcn Charts) */}
+      {/* Sección de Gráficos Interactivos (Exclusivo Taller Pro y Multi-Taller Pro) */}
+      {isBasicPlan ? (
+        <Card className="bg-card/25 border-border/80 border-dashed p-6 sm:p-8 text-center space-y-3">
+          <div className="w-10 h-10 rounded-xl bg-primary/10 border border-primary/20 flex items-center justify-center text-primary mx-auto">
+            <TrendingUp className="w-5 h-5" />
+          </div>
+          <div className="space-y-1 max-w-lg mx-auto">
+            <h3 className="font-outfit text-base sm:text-lg font-bold text-foreground">
+              Métricas en Tiempo Real y Gráficos Financieros
+            </h3>
+            <p className="text-xs text-muted-foreground font-light leading-relaxed">
+              Visualizá curvas de flujo de equipos, evolución de facturación diaria y estadísticas por tipo de dispositivo actualizando al plan <strong className="text-primary font-semibold">Taller Pro</strong>.
+            </p>
+          </div>
+          {user.role === "admin" && (
+            <div className="pt-1">
+              <Button asChild size="sm" variant="outline" className="text-xs font-bold border-primary/30 text-primary hover:bg-primary/10 cursor-pointer">
+                <Link to="/dashboard/perfil">Ver Planes Disponibles</Link>
+              </Button>
+            </div>
+          )}
+        </Card>
+      ) : (
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Gráfico 1: Shadcn Interactive Area Chart (2 columnas) */}
         <Card className="lg:col-span-2 bg-card/30 border-border/80 shadow-sm flex flex-col">
@@ -1760,6 +1810,7 @@ export default function DashboardPage() {
           </CardContent>
         </Card>
       </div>
+      )}
 
       {/* Fila Inferior: Órdenes Recientes y Alertas de Stock */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">

@@ -1,4 +1,3 @@
-import { useEffect } from "react";
 import { Link } from "react-router-dom";
 import { Separator } from "@/components/ui/separator";
 
@@ -8,14 +7,17 @@ export default function PrivacyPage() {
   return (
     <div className="flex-1 max-w-3xl w-full mx-auto px-6 py-16 space-y-8 animate-fade-in">
       <div className="space-y-3">
-        <Link to="/" className="text-muted-foreground hover:text-foreground transition-colors text-xs font-semibold uppercase tracking-wider">
+        <Link
+          to="/"
+          className="text-muted-foreground hover:text-foreground transition-colors text-xs font-semibold uppercase tracking-wider"
+        >
           &larr; Volver al Inicio
         </Link>
         <h1 className="font-outfit text-4xl font-black text-foreground tracking-tight leading-none pt-2">
           Políticas de Privacidad
         </h1>
         <p className="text-xs text-muted-foreground font-mono">
-          Última actualización: 6 de Septiembre de 2026
+          Última actualización: 2 de Noviembre de 2026
         </p>
       </div>
 
@@ -23,7 +25,7 @@ export default function PrivacyPage() {
 
       <article className="prose prose-slate dark:prose-invert text-sm text-muted-foreground leading-relaxed space-y-6">
         <p>
-          En <strong>RepairIT</strong> priorizamos la privacidad, confidencialidad y protección de los datos de nuestros usuarios, talleres asociados y sus clientes finales. Esta política describe de forma transparente la información que se gestiona en la plataforma, su finalidad y las medidas de protección implementadas.
+          En <strong>RepairIT</strong> priorizamos la privacidad, confidencialidad y protección de los datos de nuestros usuarios, talleres asociados y sus clientes finales. Esta política describe de forma transparente la información que se gestiona en la plataforma, el uso de permisos del dispositivo y las medidas de seguridad implementadas.
         </p>
 
         <div className="space-y-3">
@@ -31,13 +33,21 @@ export default function PrivacyPage() {
             1. Información que se Gestiona en la Plataforma
           </h2>
           <p>
-            Para brindar el servicio integral de gestión de talleres y seguimiento de reparaciones, la plataforma procesa:
+            Para brindar el servicio integral de gestión de talleres y trazabilidad de reparaciones, la plataforma procesa:
           </p>
           <ul className="list-disc pl-5 space-y-1">
-            <li><strong>Datos de Talleres y Cuentas de Acceso:</strong> Nombre o razón social, correo electrónico, teléfono de contacto y configuración de sucursales y personal técnico.</li>
-            <li><strong>Datos de Clientes del Taller:</strong> Nombre, DNI/Identificación, teléfono y correo electrónico ingresados por el taller al momento de recepcionar un equipo.</li>
-            <li><strong>Información Técnica de Reparación:</strong> Tipo de equipo, marca, modelo, accesorios recibidos, fallas declaradas, diagnósticos técnicos y presupuestos.</li>
-            <li><strong>Registros Operativos:</strong> Ventas de mostrador, insumos y catálogo de repuestos ingresados por el taller.</li>
+            <li>
+              <strong>Datos de Talleres y Cuentas de Acceso:</strong> Nombre comercial, correo electrónico, teléfono de contacto, dirección de sucursales y cuentas de personal técnico asignado.
+            </li>
+            <li>
+              <strong>Datos de Clientes del Taller:</strong> Nombre completo, DNI/Identificación, teléfono y correo electrónico registrados por el taller al recepcionar un equipo.
+            </li>
+            <li>
+              <strong>Información Técnica de Reparación:</strong> Tipo de dispositivo, marca, modelo, estado estético, accesorios recibidos, fallas declaradas, diagnósticos técnicos, historial de estados y presupuestos.
+            </li>
+            <li>
+              <strong>Registros Operativos y Comerciales:</strong> Catálogo de repuestos, control de stock e historial de cobros y ventas de mostrador (POS).
+            </li>
           </ul>
         </div>
 
@@ -46,49 +56,68 @@ export default function PrivacyPage() {
             2. Finalidad del Uso de la Información
           </h2>
           <p>
-            La información cargada en el sistema se utiliza exclusivamente con fines operativos y de servicio:
+            La información cargada en el sistema se utiliza exclusivamente con fines operativos y de prestación del servicio:
           </p>
           <ul className="list-disc pl-5 space-y-1">
-            <li>Permitir a los clientes consultar en tiempo real el avance de su reparación mediante código único o escaneo de código QR.</li>
-            <li>Enviar notificaciones automáticas por correo electrónico al cliente cuando su equipo ingresa, cuando se genera un presupuesto o cuando el dispositivo está listo para ser retirado.</li>
-            <li>Facilitar a los talleres el registro organizado de sus servicios técnicos, stock de repuestos y comprobantes de recepción.</li>
-            <li>Autenticación y control de accesos seguro para administradores y técnicos.</li>
+            <li>
+              Permitir a los clientes consultar en tiempo real el progreso de su reparación mediante su código único de orden o escaneo de código QR.
+            </li>
+            <li>
+              Habilitar la aprobación digital de presupuestos en línea validando la identidad del titular mediante su número de DNI.
+            </li>
+            <li>
+              Enviar notificaciones automáticas por correo electrónico y facilitar avisos directos por WhatsApp cuando un equipo ingresa, cuando se emite un presupuesto o cuando está listo para retirar.
+            </li>
+            <li>
+              Brindar a los talleres control sobre sus órdenes de servicio, stock de insumos, caja diaria y métricas de rendimiento según su plan contratado.
+            </li>
           </ul>
         </div>
 
         <div className="space-y-3">
           <h2 className="font-outfit text-xl font-bold text-foreground">
-            3. Propiedad y No Comercialización de Datos
+            3. Uso de la Cámara para Escaneo de Código QR
           </h2>
           <p>
-            <strong>RepairIT no vende, no alquila ni comparte bajo ningún concepto la base de datos de clientes o talleres con terceros, empresas de publicidad o intermediarios.</strong> La información de clientes cargada por cada taller es de propiedad exclusiva del titular de la cuenta y se utiliza únicamente para el funcionamiento del servicio contratado.
+            En el portal público de consulta de seguimiento (<code>tracking.repairit.cloud/consulta</code>), el usuario puede optar por utilizar la función <strong>Escanear QR con Cámara</strong> para leer el código impreso en su comprobante de ingreso.
+          </p>
+          <ul className="list-disc pl-5 space-y-1">
+            <li>
+              <strong>Acceso bajo consentimiento:</strong> La cámara del dispositivo solo se activa cuando el usuario presiona voluntariamente el botón de escaneo y otorga el permiso en su navegador.
+            </li>
+            <li>
+              <strong>Procesamiento 100% local:</strong> La lectura del código QR se realiza íntegramente en la memoria local del navegador del usuario. <strong>RepairIT no graba, no almacena, no captura fotografías ni transmite imágenes o flujo de video de la cámara a ningún servidor propio ni de terceros.</strong>
+            </li>
+            <li>
+              <strong>Cierre inmediato:</strong> Una vez detectado el código de la orden o cerrado el lector, la transmisión de la cámara se detiene y libera de forma automática.
+            </li>
+          </ul>
+        </div>
+
+        <div className="space-y-3">
+          <h2 className="font-outfit text-xl font-bold text-foreground">
+            4. Propiedad y No Comercialización de Datos
+          </h2>
+          <p>
+            <strong>RepairIT no vende, no alquila ni comparte bajo ningún concepto la base de datos de clientes o talleres con terceros, anunciantes ni intermediarios.</strong> La información operativa cargada por cada taller es de propiedad exclusiva del titular de la cuenta.
           </p>
         </div>
 
         <div className="space-y-3">
           <h2 className="font-outfit text-xl font-bold text-foreground">
-            4. Seguridad y Aislamiento de la Información
+            5. Seguridad, Aislamiento por Sucursal y Roles
           </h2>
           <p>
-            Toda la información viaja y se almacena de forma cifrada y segura en la nube. La plataforma implementa un estricto esquema de aislamiento de datos por taller, lo que garantiza que ninguna cuenta pueda visualizar, consultar o modificar datos pertenecientes a otro taller o sucursal.
+            Toda la información se transmite mediante conexiones cifradas (HTTPS/TLS) y se resguarda con políticas de seguridad a nivel de fila (Row Level Security). La plataforma garantiza un estricto aislamiento multisede: cada taller únicamente puede acceder a su propia información, y las cuentas de rol técnico quedan restringidas exclusivamente a la sucursal que les fue asignada sin permisos de eliminación de clientes ni catálogo.
           </p>
         </div>
 
         <div className="space-y-3">
           <h2 className="font-outfit text-xl font-bold text-foreground">
-            5. Portabilidad y Exportación de Datos
+            6. Portabilidad y Exportación de Datos
           </h2>
           <p>
-            Reconocemos el derecho de cada taller a disponer de su propia información. Los administradores pueden exportar en cualquier momento sus listados de órdenes, cartera de clientes e inventario de insumos a archivos de hoja de cálculo estándar (.xlsx) y comprobantes imprimibles.
-          </p>
-        </div>
-
-        <div className="space-y-3">
-          <h2 className="font-outfit text-xl font-bold text-foreground">
-            6. Sesiones y Almacenamiento Local
-          </h2>
-          <p>
-            Para garantizar la seguridad en computadoras y terminales compartidas de taller, los tokens de acceso del personal se gestionan de forma segura y se destruyen al cerrar la sesión o cerrar el navegador, impidiendo accesos no autorizados.
+            Los administradores del taller pueden exportar en cualquier momento sus órdenes de servicio, cartera de clientes e inventario de repuestos en formatos estándar compatibles con hojas de cálculo (.csv / Excel), así como emitir comprobantes A4 imprimibles.
           </p>
         </div>
 
@@ -97,7 +126,7 @@ export default function PrivacyPage() {
             7. Contacto y Consultas de Privacidad
           </h2>
           <p>
-            Para consultas relacionadas con la privacidad, actualización o baja de cuentas, podés comunicarte directamente con nuestro equipo a través de <code>contacto@repairit.cloud</code>.
+            Para consultas relacionadas con la privacidad, ejercicio de derechos de acceso, rectificación o baja de cuentas, podés comunicarte directamente con nuestro equipo a través de <code>contacto@repairit.cloud</code>.
           </p>
         </div>
       </article>

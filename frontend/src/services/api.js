@@ -493,6 +493,26 @@ export const api = {
 
     create: async (orderData) => {
       const user = getLocalUser();
+      const effectivePlan = normalizePlan(user.subscriptionPlan);
+
+      if (effectivePlan === "Taller Básico") {
+        const startOfMonth = new Date();
+        startOfMonth.setDate(1);
+        startOfMonth.setHours(0, 0, 0, 0);
+
+        const { count, error: countError } = await supabase
+          .from("orders")
+          .select("id", { count: "exact", head: true })
+          .eq("venue_id", user.venueId)
+          .gte("created_at", startOfMonth.toISOString());
+
+        if (!countError && count !== null && count >= 100) {
+          throw new Error(
+            "Alcanzaste el límite de 100 órdenes mensuales del Plan Taller Básico. Actualizá a Taller Pro para registrar órdenes ilimitadas."
+          );
+        }
+      }
+
       const trackingCode = generateTrackingCode();
 
       const { data, error } = await supabase

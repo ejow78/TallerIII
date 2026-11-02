@@ -6,7 +6,7 @@ import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Textarea } from "@/components/ui/textarea";
-import { api } from "@/services/api";
+import { api, normalizePlan } from "@/services/api";
 import { toast } from "sonner";
 import {
   PlusCircle,
@@ -44,16 +44,26 @@ export default function NewOrderPage() {
   const [autoPrint, setAutoPrint] = useState(true);
   const [submitting, setSubmitting] = useState(false);
   const [profile, setProfile] = useState(null);
+  const [monthlyOrdersCount, setMonthlyOrdersCount] = useState(0);
 
   useEffect(() => {
     const loadInitial = async () => {
       try {
-        const [p, cList] = await Promise.all([
+        const [p, cList, oList] = await Promise.all([
           api.auth.getProfile().catch(() => null),
           api.clients.getAll().catch(() => []),
+          api.orders.getAll().catch(() => []),
         ]);
         if (p) setProfile(p);
         if (Array.isArray(cList)) setExistingClients(cList);
+        if (Array.isArray(oList)) {
+          const now = new Date();
+          const mCount = oList.filter((o) => {
+            const d = o.createdAt ? new Date(o.createdAt) : null;
+            return d && d.getMonth() === now.getMonth() && d.getFullYear() === now.getFullYear();
+          }).length;
+          setMonthlyOrdersCount(mCount);
+        }
       } catch (err) {
         console.error("Error al cargar datos en NewOrderPage:", err);
       }
@@ -216,15 +226,26 @@ export default function NewOrderPage() {
           </p>
         </div>
 
-        <Button
-          type="button"
-          variant="outline"
-          onClick={() => navigate("/dashboard/ordenes")}
-          className="h-9 text-xs font-semibold border-border/80 rounded-lg flex items-center gap-1.5 self-start sm:self-auto cursor-pointer"
-        >
-          <ArrowLeft className="w-3.5 h-3.5" />
-          Ver Órdenes
-        </Button>
+        <div className="flex flex-wrap items-center gap-2 self-start sm:self-auto">
+          {normalizePlan(profile?.subscriptionPlan) === "Taller Básico" && (
+            <span className={`text-[11px] font-mono font-bold px-2.5 py-1.5 rounded-lg border ${
+              monthlyOrdersCount >= 100
+                ? "bg-destructive/15 text-destructive border-destructive/30"
+                : "bg-primary/10 text-primary border-primary/25"
+            }`}>
+              Cupo Plan Básico: {monthlyOrdersCount} / 100 órdenes este mes
+            </span>
+          )}
+          <Button
+            type="button"
+            variant="outline"
+            onClick={() => navigate("/dashboard/ordenes")}
+            className="h-9 text-xs font-semibold border-border/80 rounded-lg flex items-center gap-1.5 cursor-pointer"
+          >
+            <ArrowLeft className="w-3.5 h-3.5" />
+            Ver Órdenes
+          </Button>
+        </div>
       </div>
 
       <form onSubmit={handleRegisterOrder} className="space-y-5">
@@ -550,7 +571,7 @@ export default function NewOrderPage() {
             <div className="pt-1 flex flex-col sm:flex-row justify-end gap-2.5">
               <Button
                 type="submit"
-                disabled={submitting}
+                disabled={submitting || (normalizePlan(profile?.subscriptionPlan) === "Taller Básico" && monthlyOrdersCount >= 100)}
                 className="w-full sm:w-auto bg-primary hover:bg-primary/95 text-primary-foreground font-bold text-xs py-2.5 px-6 rounded-lg transition-all cursor-pointer shadow-lg shadow-primary/15 flex items-center justify-center gap-2"
               >
                 <PlusCircle className="w-4 h-4" />

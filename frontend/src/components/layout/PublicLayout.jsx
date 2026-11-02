@@ -136,7 +136,7 @@ export default function PublicLayout() {
               </a>
             </div>
             <Separator orientation="vertical" className="hidden sm:block h-4" />
-            <p className="text-muted-foreground/85 text-center sm:text-left">&copy; 2026 RepairIT. Edgar Javier Ortiz.</p>
+            <p className="text-muted-foreground/85 text-center sm:text-left">&copy; 2026 RepairIT. Todos los derechos reservados.</p>
           </div>
         </div>
       </footer>
