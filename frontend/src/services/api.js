@@ -373,6 +373,9 @@ export const api = {
 
     switchVenue: async (venueId) => {
       const user = getLocalUser();
+      if (user.role === "tecnico") {
+        throw new Error("Los técnicos no tienen permisos para cambiar de sucursal.");
+      }
       const { error } = await supabase
         .from("profiles")
         .update({ venue_id: venueId })
