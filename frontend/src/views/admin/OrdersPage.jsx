@@ -423,8 +423,12 @@ export default function OrdersPage() {
     }
   };
 
-  // Feature 2: Registrar cobro de orden directamente en Caja POS
+  // Feature 2: Registrar cobro de orden directamente en Caja POS (solo cuando está Lista)
   const handleOpenChargePosModal = (order) => {
+    if (order?.status !== "listo") {
+      toast.error("La orden debe estar en estado 'Listo' para cobrarse en Caja POS.");
+      return;
+    }
     setChargeOrder(order);
     setChargeMethod("efectivo");
     setChargePrintTicket(true);
@@ -854,7 +858,7 @@ export default function OrdersPage() {
       </div>
 
       {/* Contenedor Principal */}
-      <Card className="bg-card/30 border-border/80 p-3.5 sm:p-5 shadow-sm space-y-4">
+      <Card className="bg-card/30 border-border/80 p-2.5 sm:p-5 shadow-sm space-y-4 overflow-hidden">
         {/* Barra de Búsqueda + Píldoras de Estado */}
         <div className="flex flex-col lg:flex-row gap-3 lg:items-center justify-between border-b border-border/50 pb-3.5">
           <div className="relative w-full lg:max-w-xs flex items-center">
@@ -918,7 +922,7 @@ export default function OrdersPage() {
                 return (
                   <div
                     key={o._id}
-                    className="rounded-xl border border-border/70 bg-background/50 p-3.5 space-y-3 text-left"
+                    className="rounded-xl border border-border/70 bg-background/50 p-3 sm:p-3.5 space-y-3 text-left overflow-hidden"
                   >
                     <div className="flex items-start justify-between gap-2">
                       <div>
@@ -1010,48 +1014,48 @@ export default function OrdersPage() {
                       </div>
                     )}
 
-                    <div className="flex items-center gap-1 pt-1 overflow-x-auto no-scrollbar">
+                    <div className="flex items-center gap-1 pt-1 w-full">
                       <Button
                         variant="outline"
                         size="sm"
                         onClick={() => handleOpenDiagModal(o)}
-                        className="flex-1 min-w-[100px] h-8 px-2 text-xs font-bold border-primary/30 text-primary hover:bg-primary/10 rounded-lg flex items-center justify-center gap-1 cursor-pointer shrink-0"
+                        className="flex-1 min-w-0 h-7 sm:h-8 px-2 text-[11px] sm:text-xs font-bold border-primary/30 text-primary hover:bg-primary/10 rounded-lg flex items-center justify-center gap-1 cursor-pointer"
                       >
-                        <Stethoscope className="w-3.5 h-3.5" />
-                        Diagnóstico
+                        <Stethoscope className="w-3.5 h-3.5 shrink-0" />
+                        <span className="truncate">Diagnóstico</span>
                       </Button>
                       <Button
                         variant="outline"
                         size="icon-sm"
                         onClick={() => handleOpenDetailModal(o)}
-                        className="h-8 w-8 min-w-[32px] text-foreground hover:text-primary border-border/80 rounded-lg cursor-pointer shrink-0"
+                        className="h-7 w-7 sm:h-8 sm:w-8 text-foreground hover:text-primary border-border/80 rounded-lg cursor-pointer shrink-0"
                         title="Ver detalle completo de la orden"
                       >
-                        <Eye className="w-4 h-4" />
+                        <Eye className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
                       </Button>
                       <Button
                         variant="outline"
                         size="icon-sm"
                         onClick={() => handleSendWhatsApp(o)}
-                        className="h-8 w-8 min-w-[32px] text-emerald-400 hover:bg-emerald-500/10 border-emerald-500/30 rounded-lg cursor-pointer shrink-0"
+                        className="h-7 w-7 sm:h-8 sm:w-8 text-emerald-400 hover:bg-emerald-500/10 border-emerald-500/30 rounded-lg cursor-pointer shrink-0"
                         title="Enviar enlace de seguimiento por WhatsApp"
                       >
-                        <MessageCircle className="w-4 h-4" />
+                        <MessageCircle className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
                       </Button>
                       <Button
                         variant="outline"
                         size="icon-sm"
                         onClick={() => handlePrintOrder(o)}
-                        className="h-8 w-8 min-w-[32px] text-muted-foreground hover:text-primary border-border/80 rounded-lg cursor-pointer shrink-0"
+                        className="h-7 w-7 sm:h-8 sm:w-8 text-muted-foreground hover:text-primary border-border/80 rounded-lg cursor-pointer shrink-0"
                         title="Imprimir Comprobante"
                       >
-                        <Printer className="w-4 h-4" />
+                        <Printer className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
                       </Button>
                       <Button
                         variant="outline"
                         size="icon-sm"
                         onClick={() => handleOpenEditReceptionModal(o)}
-                        className="h-8 w-8 min-w-[32px] text-muted-foreground hover:text-primary border-border/80 rounded-lg cursor-pointer shrink-0"
+                        className="h-7 w-7 sm:h-8 sm:w-8 text-muted-foreground hover:text-primary border-border/80 rounded-lg cursor-pointer shrink-0"
                         title="Editar recepción"
                       >
                         <Pencil className="w-3.5 h-3.5" />
@@ -1060,16 +1064,16 @@ export default function OrdersPage() {
                         <Button
                           variant="outline"
                           size="icon-sm"
-                          disabled={!(totalB > 0 && o.status !== "entregado")}
+                          disabled={!(totalB > 0 && o.status === "listo")}
                           onClick={() => handleOpenChargePosModal(o)}
-                          className="h-8 w-8 min-w-[32px] text-emerald-400 hover:bg-emerald-500/10 border-emerald-500/30 disabled:opacity-20 disabled:pointer-events-none rounded-lg cursor-pointer shrink-0"
+                          className="h-7 w-7 sm:h-8 sm:w-8 text-emerald-400 hover:bg-emerald-500/10 border-emerald-500/30 disabled:opacity-20 disabled:pointer-events-none rounded-lg cursor-pointer shrink-0"
                           title={
-                            totalB > 0 && o.status !== "entregado"
-                              ? "Cobrar orden en Caja POS"
-                              : "Requiere presupuesto mayor a $0 y orden no entregada"
+                            totalB > 0 && o.status === "listo"
+                              ? "Cobrar orden en Caja POS y marcar entregado"
+                              : "Disponible cuando la orden esté en estado Listo y tenga presupuesto mayor a $0"
                           }
                         >
-                          <ShoppingCart className="w-4 h-4" />
+                          <ShoppingCart className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
                         </Button>
                       )}
                       {!isTechnician && (
@@ -1077,7 +1081,7 @@ export default function OrdersPage() {
                           variant="outline"
                           size="icon-sm"
                           onClick={() => handleDeleteOrder(o)}
-                          className="h-8 w-8 min-w-[32px] text-destructive hover:bg-destructive/10 border-destructive/30 rounded-lg cursor-pointer shrink-0"
+                          className="h-7 w-7 sm:h-8 sm:w-8 text-destructive hover:bg-destructive/10 border-destructive/30 rounded-lg cursor-pointer shrink-0"
                           title="Eliminar orden"
                         >
                           <Trash2 className="w-3.5 h-3.5" />
@@ -1274,13 +1278,13 @@ export default function OrdersPage() {
                                <Button
                                  variant="ghost"
                                  size="icon-sm"
-                                 disabled={!(totalB > 0 && o.status !== "entregado")}
+                                 disabled={!(totalB > 0 && o.status === "listo")}
                                  onClick={() => handleOpenChargePosModal(o)}
                                  className="h-8 w-8 text-emerald-400 hover:text-emerald-300 hover:bg-emerald-500/15 disabled:opacity-20 disabled:pointer-events-none rounded-lg cursor-pointer shrink-0"
                                  title={
-                                   totalB > 0 && o.status !== "entregado"
+                                   totalB > 0 && o.status === "listo"
                                      ? "Cobrar presupuesto en Caja POS y marcar entregado"
-                                     : "Requiere presupuesto mayor a $0 y orden no entregada"
+                                     : "Disponible cuando la orden esté en estado Listo y tenga presupuesto mayor a $0"
                                  }
                                >
                                  <ShoppingCart className="w-4 h-4" />
@@ -1557,23 +1561,32 @@ export default function OrdersPage() {
                   <Printer className="w-3.5 h-3.5" />
                   Imprimir
                 </Button>
-                {canUsePOS &&
-                  detailOrder.budget?.items?.length > 0 &&
-                  detailOrder.status !== "entregado" && (
-                    <Button
-                      type="button"
-                      variant="outline"
-                      size="sm"
-                      onClick={() => {
-                        setShowDetailModal(false);
-                        handleOpenChargePosModal(detailOrder);
-                      }}
-                      className="h-8 text-xs font-bold border-emerald-500/40 text-emerald-400 hover:bg-emerald-500/10 rounded-lg flex items-center gap-1.5 cursor-pointer"
-                    >
-                      <ShoppingCart className="w-3.5 h-3.5" />
-                      Cobrar en Caja
-                    </Button>
-                  )}
+                {canUsePOS && (
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    disabled={
+                      !(
+                        detailOrder.status === "listo" &&
+                        (detailOrder.budget?.items?.reduce((s, i) => s + (Number(i.price) || 0), 0) || 0) > 0
+                      )
+                    }
+                    onClick={() => {
+                      setShowDetailModal(false);
+                      handleOpenChargePosModal(detailOrder);
+                    }}
+                    className="h-8 text-xs font-bold border-emerald-500/40 text-emerald-400 hover:bg-emerald-500/10 disabled:opacity-25 disabled:pointer-events-none rounded-lg flex items-center gap-1.5 cursor-pointer"
+                    title={
+                      detailOrder.status === "listo"
+                        ? "Cobrar presupuesto en Caja POS y marcar entregado"
+                        : "Disponible cuando la orden esté en estado Listo y tenga presupuesto mayor a $0"
+                    }
+                  >
+                    <ShoppingCart className="w-3.5 h-3.5" />
+                    Cobrar en Caja
+                  </Button>
+                )}
                 {!isTechnician && (
                   <Button
                     type="button"
