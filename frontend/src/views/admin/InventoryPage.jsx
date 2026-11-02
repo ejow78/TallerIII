@@ -21,7 +21,7 @@ import {
   Save,
   DollarSign,
 } from "lucide-react";
-import { api } from "@/services/api";
+import { api, getLocalUser } from "@/services/api";
 
 const DEFAULT_CATEGORIES = [
   "Insumos",
@@ -35,6 +35,8 @@ const DEFAULT_CATEGORIES = [
 ];
 
 export default function InventoryPage() {
+  const currentUser = getLocalUser();
+  const isTechnician = currentUser?.role === "tecnico";
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(true);
 
@@ -263,6 +265,10 @@ export default function InventoryPage() {
   };
 
   const handleDeleteItem = async (id, name) => {
+    if (isTechnician) {
+      toast.error("Permiso denegado", { description: "Solo los administradores pueden eliminar insumos." });
+      return;
+    }
     if (
       !window.confirm(
         `¿Estás seguro de que deseás eliminar permanentemente el insumo "${name}"?`
@@ -838,15 +844,17 @@ export default function InventoryPage() {
                         <Pencil className="w-3.5 h-3.5" />
                         Editar
                       </Button>
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => handleDeleteItem(item._id, item.name)}
-                        className="h-7 text-xs text-destructive hover:text-destructive hover:bg-destructive/10 cursor-pointer rounded-lg gap-1"
-                      >
-                        <Trash2 className="w-3.5 h-3.5" />
-                        Eliminar
-                      </Button>
+                      {!isTechnician && (
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => handleDeleteItem(item._id, item.name)}
+                          className="h-7 text-xs text-destructive hover:text-destructive hover:bg-destructive/10 cursor-pointer rounded-lg gap-1"
+                        >
+                          <Trash2 className="w-3.5 h-3.5" />
+                          Eliminar
+                        </Button>
+                      )}
                     </div>
                   </div>
                 );
@@ -953,15 +961,17 @@ export default function InventoryPage() {
                             >
                               <Pencil className="w-3.5 h-3.5" />
                             </Button>
-                            <Button
-                              variant="ghost"
-                              size="icon-sm"
-                              onClick={() => handleDeleteItem(item._id, item.name)}
-                              className="h-8 w-8 text-muted-foreground hover:text-destructive hover:bg-destructive/10 cursor-pointer rounded-lg"
-                              title="Eliminar insumo"
-                            >
-                              <Trash2 className="w-3.5 h-3.5" />
-                            </Button>
+                            {!isTechnician && (
+                              <Button
+                                variant="ghost"
+                                size="icon-sm"
+                                onClick={() => handleDeleteItem(item._id, item.name)}
+                                className="h-8 w-8 text-muted-foreground hover:text-destructive hover:bg-destructive/10 cursor-pointer rounded-lg"
+                                title="Eliminar insumo"
+                              >
+                                <Trash2 className="w-3.5 h-3.5" />
+                              </Button>
+                            )}
                           </div>
                         </td>
                       </tr>
@@ -1072,6 +1082,8 @@ export default function InventoryPage() {
                     id="item-qty"
                     type="number"
                     min="0"
+                    step="1"
+                    inputMode="numeric"
                     required
                     value={itemQty}
                     onChange={(e) => setItemQty(e.target.value)}
@@ -1090,6 +1102,8 @@ export default function InventoryPage() {
                     id="item-min"
                     type="number"
                     min="0"
+                    step="1"
+                    inputMode="numeric"
                     required
                     value={itemMinQty}
                     onChange={(e) => setItemMinQty(e.target.value)}
@@ -1108,7 +1122,8 @@ export default function InventoryPage() {
                     id="item-price"
                     type="number"
                     min="0"
-                    step="0.01"
+                    step="any"
+                    inputMode="decimal"
                     required
                     value={itemPrice}
                     onChange={(e) => setItemPrice(e.target.value)}

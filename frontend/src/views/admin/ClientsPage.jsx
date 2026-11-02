@@ -30,7 +30,7 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 
-import { api } from "@/services/api";
+import { api, getLocalUser } from "@/services/api";
 import { useNavigate } from "react-router-dom";
 import {
   getClientWhatsAppUrl,
@@ -39,6 +39,8 @@ import {
 } from "@/utils/printHelper";
 
 export default function ClientsPage() {
+  const currentUser = getLocalUser();
+  const isTechnician = currentUser?.role === "tecnico";
   const navigate = useNavigate();
   const [clients, setClients] = useState([]);
   const [orders, setOrders] = useState([]);
@@ -158,6 +160,10 @@ export default function ClientsPage() {
   };
 
   const handleDeleteRequest = (client) => {
+    if (isTechnician) {
+      toast.error("Permiso denegado", { description: "Solo los administradores pueden eliminar clientes." });
+      return;
+    }
     setClientToDelete(client);
     setShowDeleteAlert(true);
   };
@@ -451,15 +457,17 @@ export default function ClientsPage() {
                         >
                           <Pencil className="w-4 h-4" />
                         </Button>
-                        <Button
-                          variant="outline"
-                          size="icon-sm"
-                          onClick={() => handleDeleteRequest(client)}
-                          className="h-8 w-8 text-muted-foreground hover:text-red-400 border-border/80 rounded-lg cursor-pointer"
-                          title="Eliminar"
-                        >
-                          <Trash2 className="w-4 h-4" />
-                        </Button>
+                        {!isTechnician && (
+                          <Button
+                            variant="outline"
+                            size="icon-sm"
+                            onClick={() => handleDeleteRequest(client)}
+                            className="h-8 w-8 text-muted-foreground hover:text-red-400 border-border/80 rounded-lg cursor-pointer"
+                            title="Eliminar"
+                          >
+                            <Trash2 className="w-4 h-4" />
+                          </Button>
+                        )}
                       </div>
                     </div>
                   </div>
@@ -550,15 +558,17 @@ export default function ClientsPage() {
                             >
                               <Pencil className="w-4 h-4" />
                             </Button>
-                            <Button
-                              variant="ghost"
-                              size="icon-sm"
-                              onClick={() => handleDeleteRequest(client)}
-                              className="h-8 w-8 text-muted-foreground hover:text-red-400 hover:bg-red-950/15 rounded-lg cursor-pointer"
-                              title="Eliminar cliente"
-                            >
-                              <Trash2 className="w-4 h-4" />
-                            </Button>
+                            {!isTechnician && (
+                              <Button
+                                variant="ghost"
+                                size="icon-sm"
+                                onClick={() => handleDeleteRequest(client)}
+                                className="h-8 w-8 text-muted-foreground hover:text-red-400 hover:bg-red-950/15 rounded-lg cursor-pointer"
+                                title="Eliminar cliente"
+                              >
+                                <Trash2 className="w-4 h-4" />
+                              </Button>
+                            )}
                           </div>
                         </td>
                       </tr>
@@ -632,6 +642,8 @@ export default function ClientsPage() {
                   <Input
                     id="c-dni"
                     type="text"
+                    inputMode="numeric"
+                    pattern="[0-9]*"
                     required
                     disabled={editingId !== null}
                     value={clientDni}
@@ -649,7 +661,8 @@ export default function ClientsPage() {
                   </Label>
                   <Input
                     id="c-phone"
-                    type="text"
+                    type="tel"
+                    inputMode="tel"
                     required
                     value={clientPhone}
                     onChange={(e) => setClientPhone(e.target.value)}
@@ -669,6 +682,8 @@ export default function ClientsPage() {
                 <Input
                   id="c-email"
                   type="email"
+                  inputMode="email"
+                  autoCapitalize="none"
                   required
                   value={clientEmail}
                   onChange={(e) => setClientEmail(e.target.value)}

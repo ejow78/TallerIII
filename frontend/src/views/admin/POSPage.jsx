@@ -900,6 +900,9 @@ export default function POSPage() {
                       <Input
                         id="cash-received"
                         type="number"
+                        min="0"
+                        step="any"
+                        inputMode="decimal"
                         placeholder={total.toString()}
                         value={cashReceived}
                         onChange={(e) => setCashReceived(e.target.value)}

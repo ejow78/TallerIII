@@ -432,6 +432,9 @@ export default function TrackingPage() {
                           </label>
                           <Input
                             type="text"
+                            type="text"
+                            inputMode="numeric"
+                            pattern="[0-9]*"
                             placeholder="Ingresá tu DNI sin puntos..."
                             value={dniInput}
                             onChange={(e) => setDniInput(e.target.value)}

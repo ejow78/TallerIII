@@ -460,6 +460,9 @@ export const api = {
 
     delete: async (id) => {
       const user = getLocalUser();
+      if (user.role === "tecnico") {
+        throw new Error("Los técnicos no tienen permisos para eliminar clientes.");
+      }
       const { error } = await supabase
         .from("clients")
         .delete()
@@ -769,6 +772,9 @@ export const api = {
 
     delete: async (id) => {
       const user = getLocalUser();
+      if (user.role === "tecnico") {
+        throw new Error("Los técnicos no tienen permisos para eliminar insumos del inventario.");
+      }
       const { error } = await supabase
         .from("inventory")
         .delete()

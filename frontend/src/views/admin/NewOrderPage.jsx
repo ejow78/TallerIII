@@ -335,6 +335,8 @@ export default function NewOrderPage() {
                   <Input
                     id="client-dni"
                     type="text"
+                    inputMode="numeric"
+                    pattern="[0-9]*"
                     required
                     value={clientDni}
                     onChange={(e) => setClientDni(e.target.value)}
@@ -351,7 +353,8 @@ export default function NewOrderPage() {
                   </Label>
                   <Input
                     id="client-phone"
-                    type="text"
+                    type="tel"
+                    inputMode="tel"
                     required
                     value={clientPhone}
                     onChange={(e) => setClientPhone(e.target.value)}
@@ -387,6 +390,8 @@ export default function NewOrderPage() {
                 <Input
                   id="client-email"
                   type="email"
+                  inputMode="email"
+                  autoCapitalize="none"
                   required
                   value={clientEmail}
                   onChange={(e) => setClientEmail(e.target.value)}
@@ -522,19 +527,22 @@ export default function NewOrderPage() {
                 </Label>
               </div>
 
-              <div className="flex items-center space-x-2.5 bg-primary/5 p-3 rounded-lg border border-primary/20">
+              <div className="flex items-start sm:items-center space-x-3 bg-primary/5 p-3 rounded-xl border border-primary/20">
                 <Checkbox
                   id="auto-print"
                   checked={autoPrint}
                   onCheckedChange={(checked) => setAutoPrint(checked === true)}
-                  className="data-[state=checked]:bg-primary data-[state=checked]:border-primary"
+                  className="mt-0.5 sm:mt-0 shrink-0 data-[state=checked]:bg-primary data-[state=checked]:border-primary"
                 />
                 <Label
                   htmlFor="auto-print"
-                  className="text-xs font-semibold text-foreground leading-snug cursor-pointer select-none flex items-center gap-1.5"
+                  className="text-xs font-semibold text-foreground leading-snug cursor-pointer select-none flex-1 min-w-0"
                 >
-                  <Printer className="w-3.5 h-3.5 text-primary" />
-                  Abrir ventana para imprimir comprobante A4 con QR automáticamente al registrar
+                  <span className="inline-flex items-center gap-1.5 text-primary mr-1 font-bold">
+                    <Printer className="w-3.5 h-3.5 shrink-0 inline" />
+                    Imprimir Comprobante QR:
+                  </span>
+                  Abrir ventana de comprobante A4 automáticamente al registrar
                 </Label>
               </div>
             </div>

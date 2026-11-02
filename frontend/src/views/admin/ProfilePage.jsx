@@ -200,6 +200,8 @@ export default function ProfilePage() {
                     <Input
                       id="venue-email"
                       type="email"
+                      inputMode="email"
+                      autoCapitalize="none"
                       required
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
@@ -214,7 +216,8 @@ export default function ProfilePage() {
                     <Label htmlFor="venue-phone" className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider block">Teléfono Comercial</Label>
                     <Input
                       id="venue-phone"
-                      type="text"
+                      type="tel"
+                      inputMode="tel"
                       required
                       value={phone}
                       onChange={(e) => setPhone(e.target.value)}
@@ -449,7 +452,8 @@ export default function ProfilePage() {
                   <Label htmlFor="modal-phone" className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider block">Teléfono de Contacto</Label>
                   <Input
                     id="modal-phone"
-                    type="text"
+                    type="tel"
+                    inputMode="tel"
                     required
                     value={modalPhone}
                     onChange={(e) => setModalPhone(e.target.value)}
@@ -462,6 +466,8 @@ export default function ProfilePage() {
                   <Input
                     id="modal-email"
                     type="email"
+                    inputMode="email"
+                    autoCapitalize="none"
                     required
                     value={modalEmail}
                     onChange={(e) => setModalEmail(e.target.value)}
