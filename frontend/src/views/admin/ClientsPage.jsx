@@ -215,8 +215,12 @@ export default function ClientsPage() {
             color: "#ffffff",
             align: "center",
           },
-          cell: (c) => ({ type: String, value: String(c._id || "N/A"), align: "center" }),
-          width: 16,
+          cell: (c) => ({
+            type: String,
+            value: c._id ? c._id.substring(c._id.length - 6).toUpperCase() : "N/A",
+            align: "center",
+          }),
+          width: 14,
         },
         {
           header: {

@@ -47,6 +47,7 @@ import {
   KeyRound,
   ShoppingCart,
   AlertTriangle,
+  MessageSquare,
 } from "lucide-react";
 import { toast } from "sonner";
 
@@ -84,6 +85,7 @@ export default function DashboardLayout() {
   else if (currentPath === "/dashboard/inventario") document.title = "RepairIT - Inventario de Insumos";
   else if (currentPath === "/dashboard/caja") document.title = "RepairIT - Control de Caja";
   else if (currentPath === "/dashboard/usuarios") document.title = "RepairIT - Gestión de Usuarios";
+  else if (currentPath === "/dashboard/consultas") document.title = "RepairIT - Consultas Web";
   else if (currentPath === "/dashboard/cuentas") document.title = "RepairIT - Cuentas de Acceso";
   else if (currentPath === "/dashboard/perfil") document.title = "RepairIT - Configuración de Taller";
   else document.title = "RepairIT - Panel de Control";
@@ -92,21 +94,31 @@ export default function DashboardLayout() {
   const isSuperAdmin = user.role === "superadmin";
 
   // Guard de Roles por Ruta (RBAC)
-  if (user.role === "tecnico" && (currentPath === "/dashboard/perfil" || currentPath === "/dashboard/cuentas" || currentPath === "/dashboard/usuarios")) {
+  if (user.role === "tecnico" && (currentPath === "/dashboard/perfil" || currentPath === "/dashboard/cuentas" || currentPath === "/dashboard/usuarios" || currentPath === "/dashboard/consultas")) {
     return <Navigate to="/dashboard" replace />;
   }
-  if (!isSuperAdmin && currentPath === "/dashboard/usuarios") {
+  if (!isSuperAdmin && (currentPath === "/dashboard/usuarios" || currentPath === "/dashboard/consultas")) {
     return <Navigate to="/dashboard" replace />;
   }
 
   const [venues, setVenues] = useState([]);
   const [activeVenue, setActiveVenue] = useState(null);
-  const [sidebarStats, setSidebarStats] = useState({ activeOrders: 0, lowStock: 0 });
+  const [sidebarStats, setSidebarStats] = useState({ activeOrders: 0, lowStock: 0, contactMessagesCount: 0 });
 
   const effectivePlan = normalizePlan(activeVenue?.subscriptionPlan || user.subscriptionPlan);
 
   useEffect(() => {
-    if (!isSuperAdmin) {
+    if (isSuperAdmin) {
+      api.super
+        .getContactMessages()
+        .then((msgs) => {
+          setSidebarStats((prev) => ({
+            ...prev,
+            contactMessagesCount: Array.isArray(msgs) ? msgs.length : 0,
+          }));
+        })
+        .catch(() => {});
+    } else {
       const loadSidebarData = async () => {
         try {
           const [profile, venuesData, ordersData, inventoryData] = await Promise.all([
@@ -190,6 +202,21 @@ export default function DashboardLayout() {
             <BreadcrumbSeparator />
             <BreadcrumbItem>
               <BreadcrumbPage>Gestión de Usuarios</BreadcrumbPage>
+            </BreadcrumbItem>
+          </BreadcrumbList>
+        );
+      }
+      if (path === "/dashboard/consultas") {
+        return (
+          <BreadcrumbList>
+            <BreadcrumbItem>
+              <BreadcrumbLink asChild>
+                <NavLink to="/dashboard">Panel</NavLink>
+              </BreadcrumbLink>
+            </BreadcrumbItem>
+            <BreadcrumbSeparator />
+            <BreadcrumbItem>
+              <BreadcrumbPage>Consultas Web</BreadcrumbPage>
             </BreadcrumbItem>
           </BreadcrumbList>
         );
@@ -294,6 +321,24 @@ export default function DashboardLayout() {
                           <span>Usuarios</span>
                         </NavLink>
                       </SidebarMenuButton>
+                    </SidebarMenuItem>
+
+                    <SidebarMenuItem>
+                      <SidebarMenuButton
+                        asChild
+                        isActive={location.pathname === "/dashboard/consultas"}
+                        className={navItemClass}
+                      >
+                        <NavLink to="/dashboard/consultas" className="flex items-center gap-3 w-full">
+                          <MessageSquare className="w-4 h-4" />
+                          <span>Consultas Web</span>
+                        </NavLink>
+                      </SidebarMenuButton>
+                      {sidebarStats.contactMessagesCount > 0 && (
+                        <SidebarMenuBadge className="bg-primary/15 text-primary border border-primary/25 rounded-md text-[10px] font-mono font-bold px-1.5">
+                          {sidebarStats.contactMessagesCount}
+                        </SidebarMenuBadge>
+                      )}
                     </SidebarMenuItem>
                   </SidebarMenu>
                 </SidebarGroupContent>

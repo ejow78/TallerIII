@@ -1164,84 +1164,89 @@ export default function OrdersPage() {
                           </div>
                         </td>
                         <td className="py-3.5 px-2.5">{getStatusDropdown(o._id, o.status)}</td>
-                        <td className="py-3.5 px-2.5 text-right">
-                          <div className="flex items-center justify-end gap-1">
-                            <Button
-                              variant="outline"
-                              size="sm"
-                              onClick={() => handleOpenDiagModal(o)}
-                              className="h-8 px-2.5 text-xs font-bold border-primary/30 text-primary hover:bg-primary/10 rounded-lg flex items-center gap-1 cursor-pointer"
-                              title="Cargar o editar diagnóstico y presupuesto"
-                            >
-                              <Stethoscope className="w-3.5 h-3.5" />
-                              Diagnóstico
-                            </Button>
+                         <td className="py-3.5 px-2.5 text-right">
+                           <div className="inline-flex items-center justify-start gap-1">
+                             <Button
+                               variant="outline"
+                               size="sm"
+                               onClick={() => handleOpenDiagModal(o)}
+                               className="h-8 px-2.5 text-xs font-bold border-primary/30 text-primary hover:bg-primary/10 rounded-lg flex items-center gap-1 cursor-pointer shrink-0"
+                               title="Cargar o editar diagnóstico y presupuesto"
+                             >
+                               <Stethoscope className="w-3.5 h-3.5" />
+                               Diagnóstico
+                             </Button>
 
-                            <Button
-                              variant="ghost"
-                              size="icon-sm"
-                              onClick={() => handleOpenDetailModal(o)}
-                              className="h-8 w-8 text-muted-foreground hover:text-foreground hover:bg-muted/50 rounded-lg cursor-pointer"
-                              title="Ver detalle completo de la orden"
-                            >
-                              <Eye className="w-4 h-4" />
-                            </Button>
+                             <Button
+                               variant="ghost"
+                               size="icon-sm"
+                               onClick={() => handleOpenDetailModal(o)}
+                               className="h-8 w-8 text-muted-foreground hover:text-foreground hover:bg-muted/50 rounded-lg cursor-pointer shrink-0"
+                               title="Ver detalle completo de la orden"
+                             >
+                               <Eye className="w-4 h-4" />
+                             </Button>
 
-                            <Button
-                              variant="ghost"
-                              size="icon-sm"
-                              onClick={() => handleSendWhatsApp(o)}
-                              className="h-8 w-8 text-emerald-400 hover:text-emerald-300 hover:bg-emerald-500/15 rounded-lg cursor-pointer"
-                              title="Enviar link de seguimiento por WhatsApp"
-                            >
-                              <MessageCircle className="w-4 h-4" />
-                            </Button>
+                             <Button
+                               variant="ghost"
+                               size="icon-sm"
+                               onClick={() => handleSendWhatsApp(o)}
+                               className="h-8 w-8 text-emerald-400 hover:text-emerald-300 hover:bg-emerald-500/15 rounded-lg cursor-pointer shrink-0"
+                               title="Enviar link de seguimiento por WhatsApp"
+                             >
+                               <MessageCircle className="w-4 h-4" />
+                             </Button>
 
-                            <Button
-                              variant="ghost"
-                              size="icon-sm"
-                              onClick={() => handlePrintOrder(o)}
-                              className="h-8 w-8 text-muted-foreground hover:text-primary hover:bg-primary/10 rounded-lg cursor-pointer"
-                              title="Imprimir Comprobante de Recepción"
-                            >
-                              <Printer className="w-4 h-4" />
-                            </Button>
+                             <Button
+                               variant="ghost"
+                               size="icon-sm"
+                               onClick={() => handlePrintOrder(o)}
+                               className="h-8 w-8 text-muted-foreground hover:text-primary hover:bg-primary/10 rounded-lg cursor-pointer shrink-0"
+                               title="Imprimir Comprobante de Recepción"
+                             >
+                               <Printer className="w-4 h-4" />
+                             </Button>
 
-                            <Button
-                              variant="ghost"
-                              size="icon-sm"
-                              onClick={() => handleOpenEditReceptionModal(o)}
-                              className="h-8 w-8 text-muted-foreground hover:text-primary hover:bg-primary/10 rounded-lg cursor-pointer"
-                              title="Editar datos de recepción"
-                            >
-                              <Pencil className="w-3.5 h-3.5" />
-                            </Button>
+                             <Button
+                               variant="ghost"
+                               size="icon-sm"
+                               onClick={() => handleOpenEditReceptionModal(o)}
+                               className="h-8 w-8 text-muted-foreground hover:text-primary hover:bg-primary/10 rounded-lg cursor-pointer shrink-0"
+                               title="Editar datos de recepción"
+                             >
+                               <Pencil className="w-3.5 h-3.5" />
+                             </Button>
 
-                            {canUsePOS && totalB > 0 && o.status !== "entregado" && (
-                              <Button
-                                variant="ghost"
-                                size="icon-sm"
-                                onClick={() => handleOpenChargePosModal(o)}
-                                className="h-8 w-8 text-emerald-400 hover:text-emerald-300 hover:bg-emerald-500/15 rounded-lg cursor-pointer"
-                                title="Cobrar presupuesto en Caja POS y marcar entregado"
-                              >
-                                <ShoppingCart className="w-4 h-4" />
-                              </Button>
-                            )}
+                             {canUsePOS && (
+                               <Button
+                                 variant="ghost"
+                                 size="icon-sm"
+                                 disabled={!(totalB > 0 && o.status !== "entregado")}
+                                 onClick={() => handleOpenChargePosModal(o)}
+                                 className="h-8 w-8 text-emerald-400 hover:text-emerald-300 hover:bg-emerald-500/15 disabled:opacity-20 disabled:pointer-events-none rounded-lg cursor-pointer shrink-0"
+                                 title={
+                                   totalB > 0 && o.status !== "entregado"
+                                     ? "Cobrar presupuesto en Caja POS y marcar entregado"
+                                     : "Requiere presupuesto mayor a $0 y orden no entregada"
+                                 }
+                               >
+                                 <ShoppingCart className="w-4 h-4" />
+                               </Button>
+                             )}
 
-                            {!isTechnician && (
-                              <Button
-                                variant="ghost"
-                                size="icon-sm"
-                                onClick={() => handleDeleteOrder(o)}
-                                className="h-8 w-8 text-muted-foreground hover:text-destructive hover:bg-destructive/10 rounded-lg cursor-pointer"
-                                title="Eliminar orden"
-                              >
-                                <Trash2 className="w-3.5 h-3.5" />
-                              </Button>
-                            )}
-                          </div>
-                        </td>
+                             {!isTechnician && (
+                               <Button
+                                 variant="ghost"
+                                 size="icon-sm"
+                                 onClick={() => handleDeleteOrder(o)}
+                                 className="h-8 w-8 text-muted-foreground hover:text-destructive hover:bg-destructive/10 rounded-lg cursor-pointer shrink-0"
+                                 title="Eliminar orden"
+                               >
+                                 <Trash2 className="w-3.5 h-3.5" />
+                               </Button>
+                             )}
+                           </div>
+                         </td>
                       </tr>
                     );
                   })}

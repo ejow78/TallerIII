@@ -1,4 +1,5 @@
 import { useState, useEffect, useMemo } from "react";
+import { useLocation } from "react-router-dom";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -35,8 +36,10 @@ import { api, normalizePlan, getLocalUser } from "@/services/api";
 import { toast } from "sonner";
 
 export default function SuperAdminUsersPage() {
+  const location = useLocation();
+  const isConsultasRoute = location.pathname === "/dashboard/consultas";
   const [loading, setLoading] = useState(true);
-  const [activeTab, setActiveTab] = useState("usuarios"); // "usuarios" | "consultas"
+  const [activeTab, setActiveTab] = useState(isConsultasRoute ? "consultas" : "usuarios"); // "usuarios" | "consultas"
   const [users, setUsers] = useState([]);
   const [organizations, setOrganizations] = useState([]);
   const [contactMessages, setContactMessages] = useState([]);
@@ -75,6 +78,10 @@ export default function SuperAdminUsersPage() {
       setLoading(false);
     }
   };
+
+  useEffect(() => {
+    setActiveTab(location.pathname === "/dashboard/consultas" ? "consultas" : "usuarios");
+  }, [location.pathname]);
 
   useEffect(() => {
     loadData();
@@ -255,66 +262,38 @@ export default function SuperAdminUsersPage() {
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div className="space-y-1">
           <h1 className="font-outfit text-2xl sm:text-3xl font-bold text-foreground tracking-tight flex items-center gap-2.5">
-            <Users className="w-7 h-7 text-primary shrink-0" />
-            <span>Gestión de Usuarios y Consultas</span>
+            {activeTab === "consultas" ? (
+              <>
+                <MessageSquare className="w-7 h-7 text-primary shrink-0" />
+                <span>Consultas Web</span>
+              </>
+            ) : (
+              <>
+                <Users className="w-7 h-7 text-primary shrink-0" />
+                <span>Gestión de Usuarios</span>
+              </>
+            )}
           </h1>
           <p className="text-xs sm:text-sm text-muted-foreground font-light">
-            Administración centralizada de cuentas de usuarios y bandeja de mensajes de contacto de la Landing Page.
+            {activeTab === "consultas"
+              ? "Bandeja de mensajes y consultas enviadas desde el formulario de contacto de la Landing Page."
+              : "Administración centralizada de cuentas de administradores, técnicos de sucursal y credenciales de acceso."}
           </p>
         </div>
 
-        <div className="flex flex-wrap items-center gap-2 self-start sm:self-auto">
-          <div className="inline-flex rounded-xl border border-border/80 bg-background/60 p-1">
-            <button
-              type="button"
-              onClick={() => setActiveTab("usuarios")}
-              className={`px-3 py-1.5 text-xs font-semibold rounded-lg transition-colors cursor-pointer flex items-center gap-1.5 ${
-                activeTab === "usuarios"
-                  ? "bg-primary text-primary-foreground font-bold shadow-xs"
-                  : "text-muted-foreground hover:text-foreground"
-              }`}
-            >
-              <Users className="w-3.5 h-3.5" />
-              <span>Usuarios ({users.length})</span>
-            </button>
-            <button
-              type="button"
-              onClick={() => setActiveTab("consultas")}
-              className={`px-3 py-1.5 text-xs font-semibold rounded-lg transition-colors cursor-pointer flex items-center gap-1.5 ${
-                activeTab === "consultas"
-                  ? "bg-primary text-primary-foreground font-bold shadow-xs"
-                  : "text-muted-foreground hover:text-foreground"
-              }`}
-            >
-              <MessageSquare className="w-3.5 h-3.5" />
-              <span>Consultas Web</span>
-              {contactMessages.length > 0 && (
-                <span
-                  className={`text-[10px] font-mono px-1.5 py-0.2 rounded-full ${
-                    activeTab === "consultas"
-                      ? "bg-primary-foreground/20 text-primary-foreground"
-                      : "bg-primary/15 text-primary font-bold"
-                  }`}
-                >
-                  {contactMessages.length}
-                </span>
-              )}
-            </button>
-          </div>
-
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={loadData}
-            className="h-9 border-border/80 text-xs font-semibold rounded-xl flex items-center gap-1.5 cursor-pointer"
-          >
-            <RefreshCw className="w-3.5 h-3.5" />
-            Actualizar
-          </Button>
-        </div>
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={loadData}
+          className="h-9 border-border/80 text-xs font-semibold rounded-xl flex items-center gap-1.5 self-start sm:self-auto cursor-pointer"
+        >
+          <RefreshCw className="w-3.5 h-3.5" />
+          Actualizar Listado
+        </Button>
       </div>
 
-      {/* 4 Tarjetas KPI de Usuarios */}
+      {activeTab === "usuarios" && (
+      /* 4 Tarjetas KPI de Usuarios */
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3.5 sm:gap-5">
         <Card className="bg-card/45 border-border/80 shadow-sm">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-1.5 px-4 sm:px-6 pt-4 sm:pt-5">
@@ -353,7 +332,7 @@ export default function SuperAdminUsersPage() {
         <Card className="bg-card/45 border-border/80 shadow-sm">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-1.5 px-4 sm:px-6 pt-4 sm:pt-5">
             <span className="text-[10px] sm:text-[11px] font-semibold text-sky-400 uppercase tracking-wider">
-              Técnicos de Sede
+              Técnicos de Sucursal
             </span>
             <UserCheck className="h-4 w-4 text-sky-400" />
           </CardHeader>
@@ -384,6 +363,7 @@ export default function SuperAdminUsersPage() {
           </CardContent>
         </Card>
       </div>
+      )}
 
       {activeTab === "usuarios" ? (
         <>

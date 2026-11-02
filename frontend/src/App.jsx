@@ -299,6 +299,7 @@ export default function App() {
             <Route path="inventario" element={<InventoryPage />} />
             <Route path="perfil" element={<ProfilePage />} />
             <Route path="usuarios" element={<SuperAdminUsersPage />} />
+            <Route path="consultas" element={<SuperAdminUsersPage />} />
             <Route path="cuentas" element={<VenueAccountsPage />} />
             <Route path="caja" element={<POSPage />} />
           </Route>
