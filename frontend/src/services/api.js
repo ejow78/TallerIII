@@ -1089,6 +1089,14 @@ export const api = {
       if (getLocalUser().role !== "superadmin") {
         throw new Error("Permiso denegado: se requiere rol SuperAdmin.");
       }
+      // Desvincular cualquier cuenta SuperAdmin de esta organización/sucursal antes de borrarla
+      // para evitar que ON DELETE CASCADE elimine el perfil del SuperAdmin
+      await supabase
+        .from("profiles")
+        .update({ organization_id: null, venue_id: null })
+        .eq("organization_id", id)
+        .eq("role", "superadmin");
+
       const { error } = await supabase.from("organizations").delete().eq("id", id);
       if (error) throw new Error(error.message);
       return { message: "Organización eliminada correctamente." };
