@@ -125,15 +125,30 @@ export const api = {
         console.error("No se pudo cargar el perfil detallado:", pErr);
       }
 
+      const subStatus = profile?.organization?.subscription_status || "activo";
+      const userRole = profile?.role || "admin";
+
+      // Control de acceso por estado de suscripción/licencia (excepto SuperAdmin)
+      if (userRole !== "superadmin") {
+        if (subStatus === "suspendido") {
+          await supabase.auth.signOut();
+          throw new Error("Tu cuenta de taller se encuentra suspendida. Contactá al soporte de RepairIT.");
+        }
+        if (subStatus === "vencido") {
+          await supabase.auth.signOut();
+          throw new Error("La licencia de tu taller está vencida. Requiere renovación para ingresar.");
+        }
+      }
+
       const userData = {
         _id: profile?.id || data.user.id,
         name: profile?.name || data.user.email.split("@")[0],
         email: data.user.email,
-        role: profile?.role || "admin",
+        role: userRole,
         organizationId: profile?.organization_id || null,
         venueId: profile?.venue_id || null,
         subscriptionPlan: normalizePlan(profile?.organization?.subscription_plan),
-        subscriptionStatus: profile?.organization?.subscription_status || "activo",
+        subscriptionStatus: subStatus,
       };
 
       saveLocalUser(userData);
@@ -279,6 +294,22 @@ export const api = {
       );
       const finalStatus =
         data.organization?.subscription_status || user.subscriptionStatus || "activo";
+
+      if (user.role !== "superadmin" && (finalStatus === "suspendido" || finalStatus === "vencido")) {
+        await supabase.auth.signOut();
+        sessionStorage.clear();
+        localStorage.clear();
+        window.location.href = "/login?error=" + encodeURIComponent(
+          finalStatus === "suspendido"
+            ? "Tu cuenta de taller se encuentra suspendida."
+            : "La licencia de tu taller está vencida. Requiere renovación para operar."
+        );
+        throw new Error(
+          finalStatus === "suspendido"
+            ? "Tu cuenta de taller se encuentra suspendida."
+            : "La licencia de tu taller está vencida. Requiere renovación."
+        );
+      }
 
       if (user.subscriptionPlan !== finalPlan || user.subscriptionStatus !== finalStatus) {
         saveLocalUser({
