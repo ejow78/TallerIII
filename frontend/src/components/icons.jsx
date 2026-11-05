@@ -1,168 +1,177 @@
 /**
- * Set de íconos propio de RepairIT.
- * Basado en Phosphor (peso "duotone") para tener un estilo coherente y distinto
- * al set por defecto de shadcn. Mantiene los mismos nombres que usaba la app
- * para no tocar la lógica de cada vista.
+ * Catálogo centralizado de íconos de RepairIT basado en Tabler Icons.
+ * Proporciona un estilo vectorial geométrico, nítido (trazo 1.5px) y profesional
+ * específico para software de gestión técnica y dashboards.
  */
 import { forwardRef } from "react";
 import {
-  WarningCircle,
-  Warning,
-  ArrowLeft as PArrowLeft,
-  ArrowRight as PArrowRight,
-  ArrowUpRight as PArrowUpRight,
-  Prohibit,
-  Buildings,
-  CalendarBlank,
-  Camera as PCamera,
-  CheckCircle as PCheckCircle,
-  Check as PCheck,
-  CaretDown,
-  CaretRight,
-  ClipboardText,
-  Clock as PClock,
-  CreditCard as PCreditCard,
-  CurrencyDollar,
-  DownloadSimple,
-  PencilSimpleLine,
-  ArrowSquareOut,
-  Eye as PEye,
-  EyeSlash,
-  FileXls,
-  FileText as PFileText,
-  Question,
-  ClockCounterClockwise,
-  Info as PInfo,
-  Key,
-  Laptop as PLaptop,
-  SquaresFour,
-  SpinnerGap,
-  Lock as PLock,
-  SignOut,
-  EnvelopeSimple,
-  MapPin as PMapPin,
-  WhatsappLogo,
-  ChatsCircle,
-  Minus as PMinus,
-  DotsThree,
-  XCircle as PXCircle,
-  Package as PPackage,
-  SidebarSimple,
-  PencilSimple,
-  Phone as PPhone,
-  Plus as PPlus,
-  PlusCircle as PPlusCircle,
-  Printer as PPrinter,
-  QrCode as PQrCode,
-  ArrowsClockwise,
-  FloppyDisk,
-  MagnifyingGlass,
-  GearSix,
-  Shield as PShield,
-  ShieldCheck as PShieldCheck,
-  ShoppingCartSimple,
-  DeviceMobile,
-  Sparkle,
-  Stethoscope as PStethoscope,
-  Storefront,
-  Trash,
-  TrendUp,
-  UploadSimple,
-  User as PUser,
-  UserCheck as PUserCheck,
-  UserGear,
-  UserPlus as PUserPlus,
-  Users as PUsers,
-  Wallet as PWallet,
-  Wrench as PWrench,
-  X as PX,
-} from "@phosphor-icons/react";
+  IconAlertCircle,
+  IconAlertTriangle,
+  IconArrowLeft,
+  IconArrowRight,
+  IconArrowUpRight,
+  IconBan,
+  IconBuilding,
+  IconCalendar,
+  IconCamera,
+  IconCircleCheck,
+  IconCheck,
+  IconChevronDown,
+  IconChevronRight,
+  IconClipboardList,
+  IconClock,
+  IconCreditCard,
+  IconCurrencyDollar,
+  IconDownload,
+  IconEdit,
+  IconExternalLink,
+  IconEye,
+  IconEyeOff,
+  IconFileSpreadsheet,
+  IconFileText,
+  IconHelpCircle,
+  IconHistory,
+  IconInfoCircle,
+  IconKey,
+  IconDeviceLaptop,
+  IconLayoutDashboard,
+  IconLoader2,
+  IconLock,
+  IconLogout,
+  IconMail,
+  IconMapPin,
+  IconBrandWhatsapp,
+  IconMessage,
+  IconMinus,
+  IconDots,
+  IconCircleX,
+  IconPackage,
+  IconLayoutSidebar,
+  IconPencil,
+  IconPhone,
+  IconPlus,
+  IconCirclePlus,
+  IconPrinter,
+  IconQrcode,
+  IconRefresh,
+  IconDeviceFloppy,
+  IconSearch,
+  IconSettings,
+  IconShield,
+  IconShieldCheck,
+  IconShoppingCart,
+  IconDeviceMobile,
+  IconSparkles,
+  IconStethoscope,
+  IconBuildingStore,
+  IconTrash,
+  IconTrendingUp,
+  IconUpload,
+  IconUser,
+  IconUserCheck,
+  IconUserCog,
+  IconUserPlus,
+  IconUsers,
+  IconWallet,
+  IconTool,
+  IconX,
+} from "@tabler/icons-react";
 
-const make = (Comp, defaultWeight = "regular") => {
-  const Icon = forwardRef(({ strokeWidth: _sw, ...props }, ref) => (
-    <Comp ref={ref} weight={defaultWeight} {...props} />
+/**
+ * Adaptador para Tabler Icons:
+ * Soporta strokeWidth de shadcn / Tailwind, defaults a 1.5px para máxima nitidez técnica.
+ */
+const make = (Comp) => {
+  const Icon = forwardRef(({ size, strokeWidth, stroke, className, ...props }, ref) => (
+    <Comp
+      ref={ref}
+      size={size}
+      stroke={stroke || strokeWidth || 1.5}
+      className={className}
+      {...props}
+    />
   ));
-  Icon.displayName = Comp.displayName || "Icon";
+  Icon.displayName = Comp.displayName || "TablerIcon";
   return Icon;
 };
 
-// Íconos de interfaz (chevrons, cerrar, check): trazo simple, sin relleno
-const ui = (Comp) => make(Comp, "regular");
-
-export const AlertCircle = make(WarningCircle);
-export const AlertTriangle = make(Warning);
-export const TriangleAlertIcon = make(Warning);
-export const ArrowLeft = ui(PArrowLeft);
-export const ArrowRight = ui(PArrowRight);
-export const ArrowUpRight = ui(PArrowUpRight);
-export const Ban = make(Prohibit);
-export const Building2 = make(Buildings);
-export const Calendar = make(CalendarBlank);
-export const Camera = make(PCamera);
-export const CheckCircle = make(PCheckCircle);
-export const CheckCircle2 = make(PCheckCircle);
-export const CircleCheckIcon = make(PCheckCircle);
-export const CheckIcon = ui(PCheck);
-export const ChevronDown = ui(CaretDown);
-export const ChevronRightIcon = ui(CaretRight);
-export const ClipboardList = make(ClipboardText);
-export const Clock = make(PClock);
-export const CreditCard = make(PCreditCard);
-export const DollarSign = make(CurrencyDollar);
-export const Download = make(DownloadSimple);
-export const Edit = make(PencilSimpleLine);
-export const ExternalLink = ui(ArrowSquareOut);
-export const Eye = make(PEye);
-export const EyeOff = make(EyeSlash);
-export const FileSpreadsheet = make(FileXls);
-export const FileText = make(PFileText);
-export const HelpCircle = make(Question);
-export const History = make(ClockCounterClockwise);
-export const Info = make(PInfo);
-export const InfoIcon = make(PInfo);
-export const KeyRound = make(Key);
-export const Laptop = make(PLaptop);
-export const LayoutDashboard = make(SquaresFour);
-export const Loader2Icon = ui(SpinnerGap);
-export const Lock = make(PLock);
-export const LogOut = make(SignOut);
-export const Mail = make(EnvelopeSimple);
-export const MapPin = make(PMapPin);
-export const MessageCircle = make(WhatsappLogo);
-export const MessageSquare = make(ChatsCircle);
-export const Minus = ui(PMinus);
-export const MoreHorizontalIcon = ui(DotsThree);
-export const OctagonXIcon = make(PXCircle);
-export const XCircle = make(PXCircle);
-export const Package = make(PPackage);
-export const PackageCheck = make(PPackage);
-export const PanelLeftIcon = make(SidebarSimple);
-export const Pencil = make(PencilSimple);
-export const Phone = make(PPhone);
-export const Plus = ui(PPlus);
-export const PlusCircle = make(PPlusCircle);
-export const Printer = make(PPrinter);
-export const QrCode = make(PQrCode);
-export const RefreshCw = ui(ArrowsClockwise);
-export const Save = make(FloppyDisk);
-export const Search = ui(MagnifyingGlass);
-export const Settings = make(GearSix);
-export const Shield = make(PShield);
-export const ShieldCheck = make(PShieldCheck);
-export const ShoppingCart = make(ShoppingCartSimple);
-export const Smartphone = make(DeviceMobile);
-export const Sparkles = make(Sparkle);
-export const Stethoscope = make(PStethoscope);
-export const Store = make(Storefront);
-export const Trash2 = make(Trash);
-export const TrendingUp = ui(TrendUp);
-export const Upload = make(UploadSimple);
-export const User = make(PUser);
-export const UserCheck = make(PUserCheck);
-export const UserCog = make(UserGear);
-export const UserPlus = make(PUserPlus);
-export const Users = make(PUsers);
-export const Wallet = make(PWallet);
-export const Wrench = make(PWrench);
-export const X = ui(PX);
-export const XIcon = ui(PX);
+// ============================================================================
+// Exportaciones de compatibilidad para toda la aplicación
+// ============================================================================
+export const AlertCircle = make(IconAlertCircle);
+export const AlertTriangle = make(IconAlertTriangle);
+export const TriangleAlertIcon = make(IconAlertTriangle);
+export const ArrowLeft = make(IconArrowLeft);
+export const ArrowRight = make(IconArrowRight);
+export const ArrowUpRight = make(IconArrowUpRight);
+export const Ban = make(IconBan);
+export const Building2 = make(IconBuilding);
+export const Calendar = make(IconCalendar);
+export const Camera = make(IconCamera);
+export const CheckCircle = make(IconCircleCheck);
+export const CheckCircle2 = make(IconCircleCheck);
+export const CircleCheckIcon = make(IconCircleCheck);
+export const CheckIcon = make(IconCheck);
+export const ChevronDown = make(IconChevronDown);
+export const ChevronRightIcon = make(IconChevronRight);
+export const ClipboardList = make(IconClipboardList);
+export const Clock = make(IconClock);
+export const CreditCard = make(IconCreditCard);
+export const DollarSign = make(IconCurrencyDollar);
+export const Download = make(IconDownload);
+export const Edit = make(IconEdit);
+export const ExternalLink = make(IconExternalLink);
+export const Eye = make(IconEye);
+export const EyeOff = make(IconEyeOff);
+export const FileSpreadsheet = make(IconFileSpreadsheet);
+export const FileText = make(IconFileText);
+export const HelpCircle = make(IconHelpCircle);
+export const History = make(IconHistory);
+export const Info = make(IconInfoCircle);
+export const InfoIcon = make(IconInfoCircle);
+export const KeyRound = make(IconKey);
+export const Laptop = make(IconDeviceLaptop);
+export const LayoutDashboard = make(IconLayoutDashboard);
+export const Loader2Icon = make(IconLoader2);
+export const Lock = make(IconLock);
+export const LogOut = make(IconLogout);
+export const Mail = make(IconMail);
+export const MapPin = make(IconMapPin);
+export const MessageCircle = make(IconBrandWhatsapp);
+export const MessageSquare = make(IconMessage);
+export const Minus = make(IconMinus);
+export const MoreHorizontalIcon = make(IconDots);
+export const OctagonXIcon = make(IconCircleX);
+export const XCircle = make(IconCircleX);
+export const Package = make(IconPackage);
+export const PackageCheck = make(IconPackage);
+export const PanelLeftIcon = make(IconLayoutSidebar);
+export const Pencil = make(IconPencil);
+export const Phone = make(IconPhone);
+export const Plus = make(IconPlus);
+export const PlusCircle = make(IconCirclePlus);
+export const Printer = make(IconPrinter);
+export const QrCode = make(IconQrcode);
+export const RefreshCw = make(IconRefresh);
+export const Save = make(IconDeviceFloppy);
+export const Search = make(IconSearch);
+export const Settings = make(IconSettings);
+export const Shield = make(IconShield);
+export const ShieldCheck = make(IconShieldCheck);
+export const ShoppingCart = make(IconShoppingCart);
+export const Smartphone = make(IconDeviceMobile);
+export const Sparkles = make(IconSparkles);
+export const Stethoscope = make(IconStethoscope);
+export const Store = make(IconBuildingStore);
+export const Trash2 = make(IconTrash);
+export const TrendingUp = make(IconTrendingUp);
+export const Upload = make(IconUpload);
+export const User = make(IconUser);
+export const UserCheck = make(IconUserCheck);
+export const UserCog = make(IconUserCog);
+export const UserPlus = make(IconUserPlus);
+export const Users = make(IconUsers);
+export const Wallet = make(IconWallet);
+export const Wrench = make(IconTool);
+export const X = make(IconX);
+export const XIcon = make(IconX);
