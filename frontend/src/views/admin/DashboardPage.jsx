@@ -1446,15 +1446,27 @@ export default function DashboardPage() {
   const totalItemsCount = inventory.length;
   const categoriesCount = new Set(inventory.map((item) => item.category).filter(Boolean)).size;
 
+  const outOfStockItems = isBasicPlan
+    ? []
+    : inventory.filter((item) => (item.quantity || 0) <= 0);
+  const outOfStockCount = outOfStockItems.length;
+
   const lowStockItems = isBasicPlan
     ? []
     : inventory.filter(
-        (item) => item.quantity <= (item.minQuantity || item.min_quantity || 0)
+        (item) =>
+          (item.quantity || 0) > 0 &&
+          (item.quantity || 0) <= (item.minQuantity || item.min_quantity || 0)
       );
   const lowStockCount = lowStockItems.length;
+  const stockHasAlert = outOfStockCount > 0 || lowStockCount > 0;
+  const isCriticalNoStock = outOfStockCount > 0;
+
   const lowStockDetail =
-    !isBasicPlan && lowStockCount > 0
-      ? `${lowStockCount} repuestos requieren reposición`
+    !isBasicPlan && stockHasAlert
+      ? isCriticalNoStock
+        ? `${outOfStockCount} sin stock • ${lowStockCount} por reponer`
+        : `${lowStockCount} repuestos requieren reposición`
       : `${totalItemsCount} insumos en ${categoriesCount} categorías`;
 
   return (
@@ -1554,8 +1566,10 @@ export default function DashboardPage() {
         {/* Card 4: Stock & Alertas */}
         <Card
           className={
-            lowStockCount > 0
+            isCriticalNoStock
               ? "bg-destructive/5 border-destructive/25 shadow-sm"
+              : lowStockCount > 0
+              ? "bg-amber-500/5 border-amber-500/25 shadow-sm"
               : "bg-card/45 border-border/80 shadow-sm"
           }
         >
@@ -1565,13 +1579,17 @@ export default function DashboardPage() {
             </span>
             <div
               className={
-                lowStockCount > 0
+                isCriticalNoStock
                   ? "w-6 h-6 sm:w-7 sm:h-7 rounded-lg bg-destructive/15 border border-destructive/30 flex items-center justify-center shrink-0"
+                  : lowStockCount > 0
+                  ? "w-6 h-6 sm:w-7 sm:h-7 rounded-lg bg-amber-500/15 border border-amber-500/30 flex items-center justify-center shrink-0"
                   : "w-6 h-6 sm:w-7 sm:h-7 rounded-lg bg-muted border border-border flex items-center justify-center shrink-0"
               }
             >
-              {lowStockCount > 0 ? (
+              {isCriticalNoStock ? (
                 <AlertCircle className="h-3 w-3 sm:h-3.5 sm:w-3.5 text-destructive" />
+              ) : lowStockCount > 0 ? (
+                <AlertTriangle className="h-3 w-3 sm:h-3.5 sm:w-3.5 text-amber-400" />
               ) : (
                 <Package className="h-3 w-3 sm:h-3.5 sm:w-3.5 text-muted-foreground" />
               )}
@@ -1580,17 +1598,25 @@ export default function DashboardPage() {
           <CardContent className="px-3.5 sm:px-6 pb-3.5 sm:pb-6">
             <span
               className={
-                lowStockCount > 0
+                isCriticalNoStock
                   ? "text-2xl sm:text-3xl font-outfit font-black text-destructive block"
+                  : lowStockCount > 0
+                  ? "text-2xl sm:text-3xl font-outfit font-black text-amber-400 block"
                   : "text-2xl sm:text-3xl font-outfit font-black text-foreground block"
               }
             >
-              {lowStockCount > 0 ? `${lowStockCount} Alertas` : `${totalItemsCount} Ítems`}
+              {stockHasAlert
+                ? isCriticalNoStock
+                  ? `${outOfStockCount + lowStockCount} Alertas`
+                  : `${lowStockCount} Por Reponer`
+                : `${totalItemsCount} Ítems`}
             </span>
             <span
               className={
-                lowStockCount > 0
+                isCriticalNoStock
                   ? "text-[10px] sm:text-[11px] text-destructive/90 block font-medium mt-1 leading-tight line-clamp-2"
+                  : lowStockCount > 0
+                  ? "text-[10px] sm:text-[11px] text-amber-400/90 block font-medium mt-1 leading-tight line-clamp-2"
                   : "text-[10px] sm:text-[11px] text-muted-foreground block font-medium mt-1 leading-tight line-clamp-2"
               }
             >

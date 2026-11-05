@@ -54,7 +54,7 @@ export default function LinearDashboardShowcase() {
   // Tab de filtro para Inventario
   const [inventoryCategory, setInventoryCategory] = useState("todos");
 
-  // Estado del Carrito en Caja (interactivo y arrancando limpio)
+  // Estado del Carrito en Caja (interactivo y limpio de fábrica)
   const [cart, setCart] = useState([]);
   const [posPaymentMethod, setPosPaymentMethod] = useState("efectivo");
 
@@ -90,7 +90,7 @@ export default function LinearDashboardShowcase() {
     "ordenes": "Órdenes de Servicio",
     "clientes": "Directorio de Clientes",
     "inventario": "Inventario de Insumos",
-    "caja": "Control de Caja (POS)",
+    "caja": "Caja",
   };
 
   // Datos simulados 1:1 de Órdenes
@@ -288,7 +288,7 @@ export default function LinearDashboardShowcase() {
             </button>
           </div>
 
-          {/* Grupo 2: Gestión y Caja */}
+          {/* Grupo 2: Gestión y Stock */}
           <div className="space-y-1">
             <div className="text-[9px] font-bold uppercase tracking-widest text-muted-foreground/60 px-2.5 mb-1.5">
               Gestión y Stock
@@ -307,7 +307,7 @@ export default function LinearDashboardShowcase() {
               <span className="text-xs">Inventario</span>
             </button>
 
-            {/* Caja / POS */}
+            {/* Caja */}
             <button
               onClick={() => setActiveNav("caja")}
               className={`w-full flex items-center gap-2.5 px-2.5 py-2 rounded-lg font-medium transition-all text-left cursor-pointer ${
@@ -317,7 +317,7 @@ export default function LinearDashboardShowcase() {
               }`}
             >
               <ShoppingCart className="w-4 h-4 shrink-0" />
-              <span className="text-xs">Caja y POS</span>
+              <span className="text-xs">Caja</span>
             </button>
           </div>
 
@@ -387,11 +387,11 @@ export default function LinearDashboardShowcase() {
         </header>
 
         {/* ===================================================================== */}
-        {/* VISTA 1: INICIO (PANEL DE CONTROL REAL) */}
+        {/* VISTA 1: INICIO (PANEL DE CONTROL REAL 1:1) */}
         {/* ===================================================================== */}
         {activeNav === "inicio" && (
           <div className="flex-1 p-4 sm:p-6 space-y-5 overflow-y-auto no-scrollbar">
-            {/* KPI Cards Superiores */}
+            {/* KPI Cards Superiores idénticas a DashboardPage.jsx */}
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3.5">
               {/* Card 1: Órdenes Activas */}
               <div className="rounded-xl border border-border/70 bg-[#151821] p-4 flex flex-col justify-between space-y-3">
@@ -447,104 +447,164 @@ export default function LinearDashboardShowcase() {
                   <div className="text-2xl sm:text-3xl font-extrabold font-outfit text-foreground tracking-tight">
                     $1.450.000
                   </div>
-                  <div className="text-[11px] text-emerald-400 font-medium mt-0.5 flex items-center gap-1">
-                    <TrendingUp className="w-3 h-3" />
-                    <span>+24.5% vs. período anterior</span>
+                  <div className="text-[11px] text-muted-foreground mt-0.5 truncate">
+                    8 ventas POS • $914.000 en órdenes
                   </div>
                 </div>
               </div>
 
-              {/* Card 4: Ticket Promedio */}
-              <div className="rounded-xl border border-border/70 bg-[#151821] p-4 flex flex-col justify-between space-y-3">
+              {/* Card 4: Estado de Stock (Aviso en Amarillo cuando hay reposición) */}
+              <div className="rounded-xl border border-amber-500/25 bg-amber-500/5 p-4 flex flex-col justify-between space-y-3">
                 <div className="flex items-center justify-between">
                   <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/80">
-                    Ticket Promedio
+                    Estado de Stock
                   </span>
-                  <div className="w-7 h-7 rounded-lg bg-primary/10 border border-primary/20 flex items-center justify-center text-primary">
-                    <ArrowUpRight className="w-3.5 h-3.5" />
+                  <div className="w-7 h-7 rounded-lg bg-amber-500/15 border border-amber-500/30 flex items-center justify-center text-amber-400">
+                    <AlertTriangle className="w-3.5 h-3.5" />
                   </div>
                 </div>
                 <div>
-                  <div className="text-2xl sm:text-3xl font-extrabold font-outfit text-foreground tracking-tight">
-                    $131.818
+                  <div className="text-2xl sm:text-3xl font-extrabold font-outfit text-amber-400 tracking-tight">
+                    3 Por Reponer
                   </div>
-                  <div className="text-[11px] text-muted-foreground mt-0.5 truncate">
-                    Basado en 11 reparaciones
+                  <div className="text-[11px] text-amber-400/90 mt-0.5 truncate">
+                    3 repuestos requieren reposición
                   </div>
                 </div>
               </div>
             </div>
 
-            {/* Fila Central: Gráfico de Métricas + Estado del Taller */}
+            {/* Fila Central: Gráficos de Métricas 1:1 con DashboardPage.jsx */}
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-5">
-              {/* Gráfico Principal */}
+              {/* Gráfico 1: Flujo de Equipos / Facturación */}
               <div className="lg:col-span-8 rounded-xl border border-border/70 bg-[#151821] p-4 sm:p-5 space-y-4">
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-border/50 pb-3">
-                  <div className="flex items-center gap-1 bg-[#10131a] p-1 rounded-lg border border-border/70">
-                    <button
-                      onClick={() => setMetricTab("ordenes")}
-                      className={`px-3 py-1 rounded-md text-xs font-semibold transition-all cursor-pointer ${
-                        metricTab === "ordenes"
-                          ? "bg-primary text-primary-foreground shadow-sm"
-                          : "text-muted-foreground hover:text-foreground"
-                      }`}
-                    >
-                      Órdenes Registradas
-                    </button>
-                    <button
-                      onClick={() => setMetricTab("facturacion")}
-                      className={`px-3 py-1 rounded-md text-xs font-semibold transition-all cursor-pointer ${
-                        metricTab === "facturacion"
-                          ? "bg-primary text-primary-foreground shadow-sm"
-                          : "text-muted-foreground hover:text-foreground"
-                      }`}
-                    >
-                      Facturación ($)
-                    </button>
+                  <div className="space-y-0.5">
+                    <h4 className="font-outfit text-sm font-bold text-foreground flex items-center gap-2">
+                      <TrendingUp className="w-4 h-4 text-primary" />
+                      <span>
+                        {metricTab === "ordenes"
+                          ? "Flujo de Equipos: Ingresados vs. Entregados"
+                          : "Evolución de Facturación Diaria ($)"}
+                      </span>
+                    </h4>
+                    <p className="text-[10px] text-muted-foreground">
+                      {metricTab === "ordenes"
+                        ? "Comparativa diaria de órdenes recibidas y equipos completados"
+                        : "Ingresos consolidados por cobros en Caja POS y presupuestos aprobados"}
+                    </p>
                   </div>
 
-                  <div className="flex items-center gap-1 bg-[#10131a] p-1 rounded-lg border border-border/70 self-start sm:self-auto">
-                    {["7d", "14d", "30d"].map((r) => (
+                  <div className="flex flex-wrap items-center gap-1.5 self-start sm:self-auto">
+                    <div className="flex items-center gap-1 bg-[#10131a] p-1 rounded-lg border border-border/70">
                       <button
-                        key={r}
-                        onClick={() => setRangeTab(r)}
-                        className={`px-2.5 py-1 rounded-md text-[11px] font-semibold transition-all uppercase cursor-pointer ${
-                          rangeTab === r
+                        onClick={() => setMetricTab("ordenes")}
+                        className={`px-2.5 py-1 rounded-md text-[11px] font-semibold transition-all cursor-pointer ${
+                          metricTab === "ordenes"
                             ? "bg-primary text-primary-foreground shadow-sm"
                             : "text-muted-foreground hover:text-foreground"
                         }`}
                       >
-                        {r}
+                        Órdenes
                       </button>
-                    ))}
+                      <button
+                        onClick={() => setMetricTab("facturacion")}
+                        className={`px-2.5 py-1 rounded-md text-[11px] font-semibold transition-all cursor-pointer ${
+                          metricTab === "facturacion"
+                            ? "bg-primary text-primary-foreground shadow-sm"
+                            : "text-muted-foreground hover:text-foreground"
+                        }`}
+                      >
+                        Facturación
+                      </button>
+                    </div>
+
+                    <div className="flex items-center gap-1 bg-[#10131a] p-1 rounded-lg border border-border/70">
+                      {["7d", "14d", "30d"].map((r) => (
+                        <button
+                          key={r}
+                          onClick={() => setRangeTab(r)}
+                          className={`px-2 py-1 rounded-md text-[11px] font-mono font-semibold transition-all cursor-pointer ${
+                            rangeTab === r
+                              ? "bg-card text-foreground border border-border/60 shadow-xs"
+                              : "text-muted-foreground hover:text-foreground"
+                          }`}
+                        >
+                          {r}
+                        </button>
+                      ))}
+                    </div>
                   </div>
                 </div>
 
                 <div className="h-44 sm:h-52 w-full pt-2 flex flex-col justify-end">
                   <div className="relative flex-1 w-full flex items-end">
-                    <svg
-                      viewBox="0 0 600 180"
-                      className="w-full h-full overflow-visible"
-                      preserveAspectRatio="none"
-                    >
-                      <defs>
-                        <linearGradient id="chartGradientSim" x1="0" y1="0" x2="0" y2="1">
-                          <stop offset="0%" stopColor="#38bdf8" stopOpacity="0.4" />
-                          <stop offset="100%" stopColor="#38bdf8" stopOpacity="0.0" />
-                        </linearGradient>
-                      </defs>
-                      <path
-                        d="M 0 140 Q 60 130 100 100 T 200 90 T 300 40 T 400 60 T 500 20 T 600 30 L 600 180 L 0 180 Z"
-                        fill="url(#chartGradientSim)"
-                      />
-                      <path
-                        d="M 0 140 Q 60 130 100 100 T 200 90 T 300 40 T 400 60 T 500 20 T 600 30"
-                        fill="none"
-                        stroke="#38bdf8"
-                        strokeWidth="2.5"
-                      />
-                      <circle cx="500" cy="20" r="4.5" fill="#38bdf8" stroke="#0e1017" strokeWidth="2" />
-                    </svg>
+                    {metricTab === "ordenes" ? (
+                      <svg
+                        viewBox="0 0 600 180"
+                        className="w-full h-full overflow-visible"
+                        preserveAspectRatio="none"
+                      >
+                        <defs>
+                          <linearGradient id="fillIngresadosSim" x1="0" y1="0" x2="0" y2="1">
+                            <stop offset="5%" stopColor="#38bdf8" stopOpacity={0.35} />
+                            <stop offset="95%" stopColor="#38bdf8" stopOpacity={0.02} />
+                          </linearGradient>
+                          <linearGradient id="fillEntregadosSim" x1="0" y1="0" x2="0" y2="1">
+                            <stop offset="5%" stopColor="#34d399" stopOpacity={0.35} />
+                            <stop offset="95%" stopColor="#34d399" stopOpacity={0.02} />
+                          </linearGradient>
+                        </defs>
+                        {/* Serie 1: Entregados (Verde esmeralda) */}
+                        <path
+                          d="M 0 150 Q 80 145 150 120 T 300 110 T 450 70 T 600 45 L 600 180 L 0 180 Z"
+                          fill="url(#fillEntregadosSim)"
+                        />
+                        <path
+                          d="M 0 150 Q 80 145 150 120 T 300 110 T 450 70 T 600 45"
+                          fill="none"
+                          stroke="#34d399"
+                          strokeWidth="2.2"
+                        />
+                        {/* Serie 2: Ingresados (Azul sky) */}
+                        <path
+                          d="M 0 130 Q 90 90 180 85 T 320 40 T 460 55 T 600 25 L 600 180 L 0 180 Z"
+                          fill="url(#fillIngresadosSim)"
+                        />
+                        <path
+                          d="M 0 130 Q 90 90 180 85 T 320 40 T 460 55 T 600 25"
+                          fill="none"
+                          stroke="#38bdf8"
+                          strokeWidth="2.2"
+                        />
+                        <circle cx="600" cy="25" r="4" fill="#38bdf8" stroke="#0e1017" strokeWidth="2" />
+                        <circle cx="600" cy="45" r="4" fill="#34d399" stroke="#0e1017" strokeWidth="2" />
+                      </svg>
+                    ) : (
+                      <svg
+                        viewBox="0 0 600 180"
+                        className="w-full h-full overflow-visible"
+                        preserveAspectRatio="none"
+                      >
+                        <defs>
+                          <linearGradient id="fillFacturacionSim" x1="0" y1="0" x2="0" y2="1">
+                            <stop offset="5%" stopColor="#10b981" stopOpacity={0.4} />
+                            <stop offset="95%" stopColor="#10b981" stopOpacity={0.02} />
+                          </linearGradient>
+                        </defs>
+                        <path
+                          d="M 0 155 Q 70 140 140 100 T 280 85 T 420 30 T 600 15 L 600 180 L 0 180 Z"
+                          fill="url(#fillFacturacionSim)"
+                        />
+                        <path
+                          d="M 0 155 Q 70 140 140 100 T 280 85 T 420 30 T 600 15"
+                          fill="none"
+                          stroke="#10b981"
+                          strokeWidth="2.5"
+                        />
+                        <circle cx="600" cy="15" r="4.5" fill="#10b981" stroke="#0e1017" strokeWidth="2" />
+                      </svg>
+                    )}
                   </div>
 
                   <div className="flex justify-between text-[10px] text-muted-foreground/70 font-mono pt-3 border-t border-border/30">
@@ -552,19 +612,45 @@ export default function LinearDashboardShowcase() {
                       <span key={i}>{d}</span>
                     ))}
                   </div>
+
+                  {/* Leyenda comparativa */}
+                  <div className="flex items-center gap-4 text-[10px] pt-2 text-muted-foreground">
+                    {metricTab === "ordenes" ? (
+                      <>
+                        <span className="flex items-center gap-1.5 font-medium">
+                          <span className="w-2 h-2 rounded-full bg-[#38bdf8]" />
+                          Ingresados
+                        </span>
+                        <span className="flex items-center gap-1.5 font-medium">
+                          <span className="w-2 h-2 rounded-full bg-[#34d399]" />
+                          Entregados
+                        </span>
+                      </>
+                    ) : (
+                      <span className="flex items-center gap-1.5 font-medium">
+                        <span className="w-2 h-2 rounded-full bg-[#10b981]" />
+                        Facturación Total ($)
+                      </span>
+                    )}
+                  </div>
                 </div>
               </div>
 
-              {/* Estado del Taller */}
+              {/* Gráfico 2: Estados de Taller / Tipos de Equipos */}
               <div className="lg:col-span-4 rounded-xl border border-border/70 bg-[#151821] p-4 sm:p-5 space-y-4 flex flex-col justify-between">
                 <div className="flex items-center justify-between border-b border-border/50 pb-3">
-                  <h4 className="font-outfit text-sm font-bold text-foreground">
-                    Estado del Taller
-                  </h4>
-                  <div className="flex items-center gap-1 bg-[#10131a] p-0.5 rounded-lg border border-border/70">
+                  <div className="space-y-0.5">
+                    <h4 className="font-outfit text-sm font-bold text-foreground">
+                      {statusTab === "estados" ? "Estados de Taller" : "Tipos de Equipos"}
+                    </h4>
+                    <p className="text-[10px] text-muted-foreground">
+                      {statusTab === "estados" ? "Volumen por etapa operativa" : "Dispositivos más recibidos"}
+                    </p>
+                  </div>
+                  <div className="inline-flex rounded-lg border border-border/80 bg-background/60 p-0.5 shrink-0">
                     <button
                       onClick={() => setStatusTab("estados")}
-                      className={`px-2 py-0.5 rounded text-[10px] font-bold transition-all cursor-pointer ${
+                      className={`px-2 py-1 rounded text-[10px] font-bold transition-all cursor-pointer ${
                         statusTab === "estados"
                           ? "bg-primary text-primary-foreground"
                           : "text-muted-foreground hover:text-foreground"
@@ -574,7 +660,7 @@ export default function LinearDashboardShowcase() {
                     </button>
                     <button
                       onClick={() => setStatusTab("equipos")}
-                      className={`px-2 py-0.5 rounded text-[10px] font-bold transition-all cursor-pointer ${
+                      className={`px-2 py-1 rounded text-[10px] font-bold transition-all cursor-pointer ${
                         statusTab === "equipos"
                           ? "bg-primary text-primary-foreground"
                           : "text-muted-foreground hover:text-foreground"
@@ -736,26 +822,6 @@ export default function LinearDashboardShowcase() {
                     <div className="min-w-0 flex-1 space-y-0.5">
                       <div className="flex items-start justify-between gap-2">
                         <span className="text-xs font-bold font-outfit leading-snug text-foreground">
-                          Módulo OLED iPhone 13 Pro
-                        </span>
-                        <Badge
-                          variant="destructive"
-                          className="text-[9px] font-bold py-0.5 px-1.5 uppercase tracking-wider shrink-0 select-none whitespace-nowrap"
-                        >
-                          Stock: 1
-                        </Badge>
-                      </div>
-                      <p className="text-[10px] text-muted-foreground">
-                        Mínimo sugerido: 3 u. • Pantallas
-                      </p>
-                    </div>
-                  </div>
-
-                  <div className="rounded-xl bg-destructive/10 border border-destructive/25 text-foreground p-3 flex items-start gap-2.5 text-left">
-                    <AlertCircle className="h-4 w-4 text-destructive shrink-0 mt-0.5" />
-                    <div className="min-w-0 flex-1 space-y-0.5">
-                      <div className="flex items-start justify-between gap-2">
-                        <span className="text-xs font-bold font-outfit leading-snug text-foreground">
                           Batería Original MacBook A1708
                         </span>
                         <Badge
@@ -766,24 +832,38 @@ export default function LinearDashboardShowcase() {
                         </Badge>
                       </div>
                       <p className="text-[10px] text-muted-foreground">
-                        Mínimo sugerido: 2 u. • Baterías
+                        Sin stock • Baterías
                       </p>
                     </div>
                   </div>
 
-                  <div className="rounded-xl bg-destructive/10 border border-destructive/25 text-foreground p-3 flex items-start gap-2.5 text-left">
-                    <AlertCircle className="h-4 w-4 text-destructive shrink-0 mt-0.5" />
+                  <div className="rounded-xl bg-amber-500/10 border border-amber-500/25 text-foreground p-3 flex items-start gap-2.5 text-left">
+                    <AlertTriangle className="h-4 w-4 text-amber-400 shrink-0 mt-0.5" />
+                    <div className="min-w-0 flex-1 space-y-0.5">
+                      <div className="flex items-start justify-between gap-2">
+                        <span className="text-xs font-bold font-outfit leading-snug text-foreground">
+                          Módulo OLED iPhone 13 Pro
+                        </span>
+                        <span className="text-[9px] font-bold py-0.5 px-1.5 uppercase tracking-wider shrink-0 select-none whitespace-nowrap rounded bg-amber-500/20 text-amber-400 border border-amber-500/30">
+                          Stock: 1
+                        </span>
+                      </div>
+                      <p className="text-[10px] text-muted-foreground">
+                        Mínimo sugerido: 3 u. • Pantallas
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="rounded-xl bg-amber-500/10 border border-amber-500/25 text-foreground p-3 flex items-start gap-2.5 text-left">
+                    <AlertTriangle className="h-4 w-4 text-amber-400 shrink-0 mt-0.5" />
                     <div className="min-w-0 flex-1 space-y-0.5">
                       <div className="flex items-start justify-between gap-2">
                         <span className="text-xs font-bold font-outfit leading-snug text-foreground">
                           Conector HDMI 2.1 PS5 OEM
                         </span>
-                        <Badge
-                          variant="destructive"
-                          className="text-[9px] font-bold py-0.5 px-1.5 uppercase tracking-wider shrink-0 select-none whitespace-nowrap"
-                        >
+                        <span className="text-[9px] font-bold py-0.5 px-1.5 uppercase tracking-wider shrink-0 select-none whitespace-nowrap rounded bg-amber-500/20 text-amber-400 border border-amber-500/30">
                           Stock: 2
-                        </Badge>
+                        </span>
                       </div>
                       <p className="text-[10px] text-muted-foreground">
                         Mínimo sugerido: 4 u. • Puertos
@@ -797,7 +877,7 @@ export default function LinearDashboardShowcase() {
         )}
 
         {/* ===================================================================== */}
-        {/* VISTA 2: NUEVO INGRESO (CON AYUDA DE CAMPOS, NO RELLENADO) */}
+        {/* VISTA 2: NUEVO INGRESO */}
         {/* ===================================================================== */}
         {activeNav === "nuevo-ingreso" && (
           <div className="flex-1 p-4 sm:p-6 space-y-5 overflow-y-auto no-scrollbar">
@@ -825,7 +905,7 @@ export default function LinearDashboardShowcase() {
               </div>
             </div>
 
-            {/* Formulario en 2 Columnas con placeholders/ayudas de campo reales */}
+            {/* Formulario en 2 Columnas */}
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 items-start">
               {/* COLUMNA IZQUIERDA (5 cols): 1. Datos del Cliente */}
               <div className="lg:col-span-5 rounded-xl border border-border/80 bg-card/40 p-4 sm:p-5 shadow-sm space-y-4">
@@ -839,7 +919,6 @@ export default function LinearDashboardShowcase() {
                   </p>
                 </div>
 
-                {/* Buscador de clientes */}
                 <div className="relative">
                   <Search className="w-4 h-4 text-muted-foreground absolute left-3 top-2.5 pointer-events-none" />
                   <input
@@ -910,7 +989,6 @@ export default function LinearDashboardShowcase() {
                 </div>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                  {/* Tipo de Dispositivo general sin / */}
                   <div>
                     <label className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider block mb-1">
                       Tipo de Dispositivo <span className="text-destructive">*</span>
@@ -975,7 +1053,6 @@ export default function LinearDashboardShowcase() {
                   />
                 </div>
 
-                {/* Checkbox de Términos */}
                 <div className="flex items-start space-x-2.5 pt-1">
                   <input
                     type="checkbox"
@@ -991,7 +1068,6 @@ export default function LinearDashboardShowcase() {
                   </label>
                 </div>
 
-                {/* Checkbox Imprimir Comprobante: sin icono de impresora y oculto en móvil */}
                 <div className="hidden sm:flex items-center space-x-3 bg-primary/5 p-3 rounded-xl border border-primary/20">
                   <input
                     type="checkbox"
@@ -1010,7 +1086,6 @@ export default function LinearDashboardShowcase() {
                   </label>
                 </div>
 
-                {/* Botón de Submit */}
                 <div className="pt-2 flex justify-end">
                   <button
                     type="button"
@@ -1027,7 +1102,7 @@ export default function LinearDashboardShowcase() {
         )}
 
         {/* ===================================================================== */}
-        {/* VISTA 3: ÓRDENES DE SERVICIO (RÉPLICA 1:1) */}
+        {/* VISTA 3: ÓRDENES DE SERVICIO */}
         {/* ===================================================================== */}
         {activeNav === "ordenes" && (
           <div className="flex-1 p-4 sm:p-6 space-y-5 overflow-y-auto no-scrollbar">
@@ -1064,7 +1139,6 @@ export default function LinearDashboardShowcase() {
 
             {/* Contenedor Principal */}
             <div className="rounded-xl border border-border/80 bg-card/30 p-3 sm:p-5 shadow-sm space-y-4 overflow-hidden">
-              {/* Barra de Búsqueda + Píldoras de Estado */}
               <div className="flex flex-col lg:flex-row gap-3 lg:items-center justify-between border-b border-border/50 pb-3.5">
                 <div className="relative w-full lg:max-w-xs flex items-center">
                   <Search className="w-4 h-4 text-muted-foreground absolute left-3 pointer-events-none" />
@@ -1075,7 +1149,6 @@ export default function LinearDashboardShowcase() {
                   />
                 </div>
 
-                {/* Píldoras de filtro rápido */}
                 <div className="flex items-center gap-1.5 overflow-x-auto pb-1 lg:pb-0 no-scrollbar">
                   {[
                     { key: "todos", label: "Todos" },
@@ -1105,7 +1178,7 @@ export default function LinearDashboardShowcase() {
                 </div>
               </div>
 
-              {/* Tabla Completa 1:1 de Órdenes */}
+              {/* Tabla de Órdenes */}
               <div className="overflow-x-auto">
                 <table className="w-full text-left text-xs border-collapse">
                   <thead>
@@ -1124,7 +1197,6 @@ export default function LinearDashboardShowcase() {
                         key={ord.id}
                         className="border-b border-border/40 hover:bg-card/40 transition-colors"
                       >
-                        {/* N° de Orden */}
                         <td className="py-3.5 px-2.5">
                           <div className="font-mono font-bold text-primary flex items-center gap-1.5">
                             <span className="hover:underline cursor-pointer">{ord.code}</span>
@@ -1135,7 +1207,6 @@ export default function LinearDashboardShowcase() {
                           </div>
                         </td>
 
-                        {/* Cliente */}
                         <td className="py-3.5 px-2.5">
                           <span className="font-semibold text-foreground block">
                             {ord.client.name}
@@ -1146,7 +1217,6 @@ export default function LinearDashboardShowcase() {
                           </div>
                         </td>
 
-                        {/* Dispositivo */}
                         <td className="py-3.5 px-2.5">
                           <span className="font-semibold text-foreground block">
                             {ord.deviceModel}
@@ -1156,7 +1226,6 @@ export default function LinearDashboardShowcase() {
                           </span>
                         </td>
 
-                        {/* Diagnóstico / Presupuesto */}
                         <td className="py-3.5 px-2.5 max-w-[220px]">
                           <div className="space-y-1">
                             <span
@@ -1182,7 +1251,6 @@ export default function LinearDashboardShowcase() {
                           </div>
                         </td>
 
-                        {/* Estado: Dropdown estilizado 1:1 */}
                         <td className="py-3.5 px-2.5">
                           <button
                             type="button"
@@ -1193,7 +1261,6 @@ export default function LinearDashboardShowcase() {
                           </button>
                         </td>
 
-                        {/* Acciones */}
                         <td className="py-3.5 px-2.5 text-right">
                           <div className="inline-flex items-center justify-end gap-1">
                             <button
@@ -1236,7 +1303,7 @@ export default function LinearDashboardShowcase() {
         )}
 
         {/* ===================================================================== */}
-        {/* VISTA 4: CLIENTES (RÉPLICA 1:1) */}
+        {/* VISTA 4: CLIENTES */}
         {/* ===================================================================== */}
         {activeNav === "clientes" && (
           <div className="flex-1 p-4 sm:p-6 space-y-5 overflow-y-auto no-scrollbar">
@@ -1272,7 +1339,6 @@ export default function LinearDashboardShowcase() {
 
             {/* Contenedor Principal */}
             <div className="rounded-xl border border-border/80 bg-card/30 p-3 sm:p-5 shadow-sm space-y-4">
-              {/* Buscador y Contador */}
               <div className="flex flex-col sm:flex-row gap-3 items-start sm:items-center justify-between border-b border-border/50 pb-3.5">
                 <div className="relative w-full sm:max-w-sm flex items-center">
                   <Search className="w-4 h-4 text-muted-foreground absolute left-3 pointer-events-none" />
@@ -1287,7 +1353,6 @@ export default function LinearDashboardShowcase() {
                 </span>
               </div>
 
-              {/* Tabla de Clientes */}
               <div className="overflow-x-auto">
                 <table className="w-full text-left text-xs border-collapse">
                   <thead>
@@ -1369,7 +1434,7 @@ export default function LinearDashboardShowcase() {
         )}
 
         {/* ===================================================================== */}
-        {/* VISTA 5: INVENTARIO (RÉPLICA 1:1) */}
+        {/* VISTA 5: INVENTARIO (CON CARDS COMPACTAS DE AVISO 1:1) */}
         {/* ===================================================================== */}
         {activeNav === "inventario" && (
           <div className="flex-1 p-4 sm:p-6 space-y-5 overflow-y-auto no-scrollbar">
@@ -1403,9 +1468,64 @@ export default function LinearDashboardShowcase() {
               </div>
             </div>
 
+            {/* KPIs Compactos de Inventario idénticos a InventoryPage.jsx */}
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3.5">
+              <div className="rounded-xl border border-border/80 bg-card/40 p-4 flex items-center justify-between shadow-sm">
+                <div>
+                  <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider block">
+                    Total de Artículos
+                  </span>
+                  <span className="text-2xl font-outfit font-black text-foreground mt-0.5 block">
+                    148
+                  </span>
+                  <span className="text-[10px] text-muted-foreground font-light">
+                    Repuestos e insumos activos
+                  </span>
+                </div>
+                <div className="w-10 h-10 rounded-xl bg-primary/10 border border-primary/20 flex items-center justify-center text-primary shrink-0">
+                  <Package className="w-5 h-5" />
+                </div>
+              </div>
+
+              <div className="rounded-xl border border-border/80 bg-card/40 p-4 flex items-center justify-between shadow-sm">
+                <div>
+                  <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider block">
+                    Valorización en Stock
+                  </span>
+                  <span className="text-2xl font-outfit font-black text-foreground font-mono mt-0.5 block">
+                    $4.820.000
+                  </span>
+                  <span className="text-[10px] text-muted-foreground font-light">
+                    Capital estimado en mercadería
+                  </span>
+                </div>
+                <div className="w-10 h-10 rounded-xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-400 shrink-0">
+                  <DollarSign className="w-5 h-5" />
+                </div>
+              </div>
+
+              {/* Card de Alerta en Amarillo / Reposición */}
+              <div className="rounded-xl border border-amber-500/30 bg-amber-500/5 p-4 flex items-center justify-between shadow-sm cursor-pointer hover:bg-amber-500/10 transition-colors">
+                <div>
+                  <span className="text-[10px] font-bold uppercase tracking-wider block text-amber-400">
+                    Reposición / Bajo Stock
+                  </span>
+                  <span className="text-2xl font-outfit font-black mt-0.5 block text-amber-400">
+                    3
+                  </span>
+                  <span className="text-[10px] text-muted-foreground font-light">
+                    3 insumos requieren compra
+                  </span>
+                </div>
+                <div className="w-10 h-10 rounded-xl bg-amber-500/15 border border-amber-500/30 flex items-center justify-center text-amber-400 shrink-0">
+                  <AlertTriangle className="w-5 h-5" />
+                </div>
+              </div>
+            </div>
+
             {/* Contenedor Principal */}
             <div className="rounded-xl border border-border/80 bg-card/30 p-3 sm:p-5 shadow-sm space-y-4">
-              {/* Buscador + Filtros por Categoría */}
+              {/* Buscador + Filtros por Estado/Categoría */}
               <div className="flex flex-col lg:flex-row gap-3 lg:items-center justify-between border-b border-border/50 pb-3.5">
                 <div className="relative w-full lg:max-w-xs flex items-center">
                   <Search className="w-4 h-4 text-muted-foreground absolute left-3 pointer-events-none" />
@@ -1419,10 +1539,9 @@ export default function LinearDashboardShowcase() {
                 <div className="flex items-center gap-1.5 overflow-x-auto pb-1 lg:pb-0 no-scrollbar">
                   {[
                     { key: "todos", label: "Todos (148)" },
-                    { key: "pantallas", label: "Pantallas" },
-                    { key: "baterias", label: "Baterías" },
-                    { key: "conectores", label: "Conectores" },
-                    { key: "herramientas", label: "Herramientas" },
+                    { key: "normal", label: "Óptimos" },
+                    { key: "bajo", label: "Bajo Stock" },
+                    { key: "sin", label: "Sin Stock" },
                   ].map((cat) => (
                     <button
                       key={cat.key}
@@ -1465,8 +1584,8 @@ export default function LinearDashboardShowcase() {
                         price: "$145.000,00",
                         qty: 1,
                         min: 3,
-                        status: "CRÍTICO",
-                        statusClass: "bg-destructive/15 text-destructive border-destructive/30",
+                        status: "BAJO",
+                        statusClass: "bg-amber-500/15 text-amber-400 border-amber-500/30",
                       },
                       {
                         sku: "BAT-MBP14M2",
@@ -1576,16 +1695,16 @@ export default function LinearDashboardShowcase() {
         )}
 
         {/* ===================================================================== */}
-        {/* VISTA 6: CAJA Y POS (CON AYUDA DE CAMPO, INTERACTIVO Y LIMPIO) */}
+        {/* VISTA 6: CAJA (SOLO CAJA, SIN CARDS DE ARQUEO, 1:1 CON POSPage.jsx) */}
         {/* ===================================================================== */}
         {activeNav === "caja" && (
           <div className="flex-1 p-4 sm:p-6 space-y-5 overflow-y-auto no-scrollbar">
-            {/* Cabecera Superior */}
+            {/* Cabecera Superior: solo "Caja" */}
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
               <div className="space-y-1">
                 <h3 className="font-outfit text-xl sm:text-2xl font-bold tracking-tight text-foreground flex items-center gap-2.5">
                   <ShoppingCart className="w-5 h-5 sm:w-6 sm:h-6 text-primary shrink-0" />
-                  <span>Caja y Punto de Venta</span>
+                  <span>Caja</span>
                 </h3>
                 <p className="text-xs text-muted-foreground font-light">
                   Facturación rápida de repuestos y accesorios con descuento automático de stock e impresión de ticket.
@@ -1606,57 +1725,12 @@ export default function LinearDashboardShowcase() {
                   className="px-3 py-1.5 rounded-lg text-xs font-semibold text-muted-foreground hover:text-foreground flex items-center gap-1.5 cursor-pointer"
                 >
                   <ClipboardList className="w-3.5 h-3.5" />
-                  <span>Historial</span>
+                  <span>Historial de Ventas</span>
                 </button>
               </div>
             </div>
 
-            {/* Arqueo / Métricas de Caja */}
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-              <div className="rounded-xl border border-primary/25 bg-primary/5 p-3.5 flex items-center justify-between">
-                <div>
-                  <span className="text-[10px] font-bold uppercase tracking-wider text-primary block">
-                    Total en Caja Hoy (8 ops)
-                  </span>
-                  <div className="text-xl sm:text-2xl font-extrabold font-outfit text-foreground mt-0.5">
-                    $837.500
-                  </div>
-                </div>
-                <div className="w-9 h-9 rounded-xl bg-primary/10 border border-primary/20 flex items-center justify-center text-primary shrink-0">
-                  <DollarSign className="w-4 h-4" />
-                </div>
-              </div>
-
-              <div className="rounded-xl border border-emerald-500/25 bg-emerald-500/5 p-3.5 flex items-center justify-between">
-                <div>
-                  <span className="text-[10px] font-bold uppercase tracking-wider text-emerald-400 block">
-                    Cobros de Taller (3 órdenes)
-                  </span>
-                  <div className="text-xl sm:text-2xl font-extrabold font-outfit text-foreground mt-0.5">
-                    $536.000
-                  </div>
-                </div>
-                <div className="w-9 h-9 rounded-xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-400 shrink-0">
-                  <Wrench className="w-4 h-4" />
-                </div>
-              </div>
-
-              <div className="rounded-xl border border-border/80 bg-card/40 p-3.5 flex items-center justify-between">
-                <div>
-                  <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground block">
-                    Ventas de Mostrador (5 tickets)
-                  </span>
-                  <div className="text-xl sm:text-2xl font-extrabold font-outfit text-foreground mt-0.5">
-                    $301.500
-                  </div>
-                </div>
-                <div className="w-9 h-9 rounded-xl bg-secondary border border-border flex items-center justify-center text-muted-foreground shrink-0">
-                  <ShoppingCart className="w-4 h-4" />
-                </div>
-              </div>
-            </div>
-
-            {/* Layout 2 Columnas de POS (7 cols catálogo, 5 cols ticket) */}
+            {/* Layout 2 Columnas de POS directo sin cards de arqueo */}
             <div className="grid grid-cols-1 xl:grid-cols-12 gap-5 items-start">
               {/* Columna Izquierda (7 cols): Catálogo de Productos */}
               <div className="xl:col-span-7 rounded-xl border border-border/80 bg-card/30 p-4 sm:p-5 shadow-sm space-y-4">
@@ -1747,7 +1821,7 @@ export default function LinearDashboardShowcase() {
                   )}
                 </div>
 
-                {/* Contenido del Carrito: Vacío con ayuda del campo vs cargado */}
+                {/* Contenido del Carrito */}
                 {cart.length === 0 ? (
                   <div className="text-center py-10 text-muted-foreground text-xs font-light border border-dashed border-border/70 rounded-xl space-y-1">
                     <ShoppingCart className="w-7 h-7 mx-auto text-muted-foreground/30 mb-1" />
