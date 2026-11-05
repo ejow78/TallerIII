@@ -1,5 +1,5 @@
-import { useState, useEffect, useRef } from "react";
-import LinearDashboardShowcase from "@/components/common/LinearDashboardShowcase";
+import { useState, useEffect, useRef, lazy, Suspense } from "react";
+const LinearDashboardShowcase = lazy(() => import("@/components/common/LinearDashboardShowcase"));
 import { ArrowRight } from "@/components/icons";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -212,7 +212,9 @@ export default function LandingPage() {
 
           {/* Escritorio (>= md): Simulación interactiva del Panel de Control con tabs funcionales */}
           <div className="hidden md:block relative p-1.5 sm:p-2 rounded-2xl bg-gradient-to-b from-primary/20 via-border/40 to-transparent border border-border/80 shadow-2xl">
-            <LinearDashboardShowcase />
+            <Suspense fallback={<div className="h-[660px] w-full rounded-2xl bg-[#10131a] border border-border/60 animate-pulse" />}>
+              <LinearDashboardShowcase />
+            </Suspense>
           </div>
         </div>
       </section>
