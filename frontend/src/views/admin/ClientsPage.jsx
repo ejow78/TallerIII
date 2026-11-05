@@ -18,7 +18,7 @@ import {
   X,
   UserPlus,
   Printer,
-} from "lucide-react";
+} from "@/components/icons";
 import {
   AlertDialog,
   AlertDialogAction,

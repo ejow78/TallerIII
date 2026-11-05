@@ -31,7 +31,7 @@ import {
   Mail,
   MessageSquare,
   Calendar,
-} from "lucide-react";
+} from "@/components/icons";
 import { api, normalizePlan, getLocalUser } from "@/services/api";
 import { toast } from "sonner";
 

@@ -11,7 +11,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
-import { QrCode, HelpCircle, ArrowRight, Camera, X } from "lucide-react";
+import { QrCode, HelpCircle, ArrowRight, Camera, X } from "@/components/icons";
 
 export default function TrackingPortalPage() {
   document.title = "RepairIT | Consulta y Seguimiento de Orden";
@@ -153,7 +153,6 @@ export default function TrackingPortalPage() {
   return (
     <div className="min-h-[85vh] flex flex-col justify-center items-center px-4 py-12 relative overflow-hidden bg-background text-foreground">
       {/* Resplandor decorativo de fondo */}
-      <div className="absolute top-1/3 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[480px] h-[480px] bg-primary/10 rounded-full blur-[100px] pointer-events-none" />
 
       <div className="w-full max-w-lg relative z-10">
         {/* Tarjeta Central de Búsqueda */}

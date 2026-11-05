@@ -35,7 +35,7 @@ import {
   ShoppingCart,
   CreditCard,
   Wallet,
-} from "lucide-react";
+} from "@/components/icons";
 import {
   DropdownMenu,
   DropdownMenuContent,

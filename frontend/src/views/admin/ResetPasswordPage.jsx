@@ -6,7 +6,7 @@ import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import { supabase } from "@/services/supabaseClient";
-import { Lock, ShieldCheck } from "lucide-react";
+import { Lock, ShieldCheck } from "@/components/icons";
 
 export default function ResetPasswordPage() {
   document.title = "RepairIT - Nueva Contraseña";
@@ -55,7 +55,6 @@ export default function ResetPasswordPage() {
     <div className="flex-grow flex items-center justify-center bg-background px-3.5 sm:px-6 py-5 sm:py-12 relative overflow-hidden">
       
       {/* Background Glow */}
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[320px] sm:w-[400px] h-[320px] sm:h-[400px] bg-primary/5 rounded-full blur-[80px] pointer-events-none" />
 
       <Card className="max-w-md w-full bg-card/40 border-border p-4 sm:p-7 rounded-2xl shadow-2xl backdrop-blur relative z-10 space-y-3.5 sm:space-y-4">
         

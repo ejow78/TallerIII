@@ -29,7 +29,7 @@ import {
   Download,
   X,
   Lock,
-} from "lucide-react";
+} from "@/components/icons";
 import { Link } from "react-router-dom";
 import {
   api,

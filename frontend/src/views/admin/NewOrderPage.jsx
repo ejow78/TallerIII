@@ -17,7 +17,7 @@ import {
   Printer,
   X,
   ArrowLeft,
-} from "lucide-react";
+} from "@/components/icons";
 import { sendOrderCreatedEmail } from "@/services/emailService";
 import { printOrderReceipt, getOrderWhatsAppUrl } from "@/utils/printHelper";
 

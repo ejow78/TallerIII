@@ -16,7 +16,7 @@ import {
   Eye, 
   EyeOff, 
   Info
-} from "lucide-react";
+} from "@/components/icons";
 import { api, getLocalUser, hasMultiTallerAccess } from "@/services/api";
 import { supabase } from "@/services/supabaseClient";
 

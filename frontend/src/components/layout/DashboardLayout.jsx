@@ -48,7 +48,7 @@ import {
   ShoppingCart,
   AlertTriangle,
   MessageSquare,
-} from "lucide-react";
+} from "@/components/icons";
 import { toast } from "sonner";
 
 import { api, normalizePlan, hasPOSAccess, hasMultiTallerAccess } from "@/services/api";

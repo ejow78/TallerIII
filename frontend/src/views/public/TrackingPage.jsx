@@ -31,7 +31,7 @@ import {
   AlertCircle,
   ShieldCheck,
   Download
-} from "lucide-react";
+} from "@/components/icons";
 
 // Lista de estados en orden secuencial
 const STEPS = [

@@ -20,7 +20,7 @@ import {
   X,
   Save,
   DollarSign,
-} from "lucide-react";
+} from "@/components/icons";
 import { api, getLocalUser } from "@/services/api";
 
 const DEFAULT_CATEGORIES = [
