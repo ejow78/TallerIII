@@ -165,7 +165,7 @@ export default function LandingPage() {
         <div className="relative z-10 max-w-5xl w-full mx-auto text-center space-y-6 mb-10 sm:mb-14">
           {/* Título Principal */}
           <h1 className="font-outfit text-4xl sm:text-6xl lg:text-[68px] font-extrabold text-foreground tracking-[-0.035em] leading-[1.04] max-w-4xl mx-auto">
-            El sistema operativo para tu servicio técnico
+            Tu taller, todas tus operaciones en un solo lugar.
           </h1>
 
           {/* Subtítulo */}

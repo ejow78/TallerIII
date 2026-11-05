@@ -23,6 +23,19 @@ import {
   QrCode,
   Smartphone,
   Laptop,
+  Download,
+  FileSpreadsheet,
+  UserPlus,
+  Stethoscope,
+  Eye,
+  MessageCircle,
+  Pencil,
+  Plus,
+  Minus,
+  ArrowLeft,
+  User,
+  CreditCard,
+  X,
 } from "@/components/icons";
 import { Badge } from "@/components/ui/badge";
 
@@ -36,7 +49,14 @@ export default function LinearDashboardShowcase() {
   const [statusTab, setStatusTab] = useState("estados"); // "estados" | "equipos"
 
   // Tab de filtro para Órdenes de Servicio
-  const [orderFilter, setOrderFilter] = useState("todas");
+  const [orderFilter, setOrderFilter] = useState("todos");
+
+  // Tab de filtro para Inventario
+  const [inventoryCategory, setInventoryCategory] = useState("todos");
+
+  // Tab para Punto de Venta
+  const [posTab, setPosTab] = useState("venta"); // "venta" | "historial"
+  const [posPaymentMethod, setPosPaymentMethod] = useState("efectivo");
 
   // Fechas dinámicas para el gráfico
   const chartDates = {
@@ -69,9 +89,104 @@ export default function LinearDashboardShowcase() {
     "nuevo-ingreso": "Nuevo Ingreso",
     "ordenes": "Órdenes de Servicio",
     "clientes": "Directorio de Clientes",
-    "inventario": "Inventario de Insumos",
-    "caja": "Control de Caja y POS",
+    "inventario": "Stock e Inventario",
+    "caja": "Caja y Punto de Venta",
   };
+
+  // Datos simulados 1:1 de Órdenes
+  const mockOrders = [
+    {
+      id: "ord-1",
+      code: "TK-9281",
+      date: "05/11/2026 • 10:30 hs",
+      client: {
+        name: "Mariana López",
+        dni: "38.291.840",
+        phone: "+54 9 11 5829-1049",
+      },
+      deviceType: "Smartphone",
+      deviceModel: "iPhone 14 Pro Max 256GB",
+      diagnosis: "Display quebrado tras caída. Requiere reemplazo de panel OLED y sellado perimetral IP68.",
+      budget: { amount: "$165.000", approved: true },
+      status: "en_reparacion",
+      statusLabel: "En Reparación",
+      statusColor: "bg-indigo-500/10 text-indigo-400 border-indigo-500/25",
+    },
+    {
+      id: "ord-2",
+      code: "TK-9280",
+      date: "04/11/2026 • 16:45 hs",
+      client: {
+        name: "Santiago Rossi",
+        dni: "35.104.220",
+        phone: "+54 9 11 4102-9912",
+      },
+      deviceType: "Notebook",
+      deviceModel: "MacBook Pro 14\" M2",
+      diagnosis: "Batería hinchada al 62% de capacidad. Se instaló celda OEM nueva y calibración de ciclos.",
+      budget: { amount: "$280.000", approved: true },
+      status: "listo",
+      statusLabel: "Listo",
+      statusColor: "bg-emerald-500/10 text-emerald-400 border-emerald-500/25",
+    },
+    {
+      id: "ord-3",
+      code: "TK-9279",
+      date: "04/11/2026 • 11:20 hs",
+      client: {
+        name: "Esteban Giménez",
+        dni: "41.882.910",
+        phone: "+54 9 11 6392-8811",
+      },
+      deviceType: "Consola",
+      deviceModel: "PlayStation 5 Digital",
+      diagnosis: "Sin salida de video tras tirón de cable. Pines internos del puerto HDMI 2.1 doblados.",
+      budget: { amount: "$95.000", approved: false, pending: true },
+      status: "diagnostico",
+      statusLabel: "En Diagnóstico",
+      statusColor: "bg-purple-500/10 text-purple-400 border-purple-500/25",
+    },
+    {
+      id: "ord-4",
+      code: "TK-9278",
+      date: "03/11/2026 • 18:10 hs",
+      client: {
+        name: "Valeria Benítez",
+        dni: "39.400.123",
+        phone: "+54 9 11 7201-4455",
+      },
+      deviceType: "Smartphone",
+      deviceModel: "Samsung S24 Ultra",
+      diagnosis: "Falla en puerto de carga Tipo-C y antena NFC. Presupuesto enviado por WhatsApp.",
+      budget: { amount: "$78.000", approved: true },
+      status: "presupuestado",
+      statusLabel: "Presupuestado",
+      statusColor: "bg-amber-500/10 text-amber-400 border-amber-500/25",
+    },
+    {
+      id: "ord-5",
+      code: "TK-9275",
+      date: "02/11/2026 • 09:15 hs",
+      client: {
+        name: "Nicolás Castro",
+        dni: "36.712.500",
+        phone: "+54 9 11 3190-2210",
+      },
+      deviceType: "Tablet",
+      deviceModel: "iPad Air 5 M1",
+      diagnosis: "Reemplazo de cristal táctil touch y limpieza de placa. Entregado conforme.",
+      budget: { amount: "$120.000", approved: true },
+      status: "entregado",
+      statusLabel: "Entregado",
+      statusColor: "bg-muted text-muted-foreground border-border",
+    },
+  ];
+
+  const filteredOrders = mockOrders.filter((ord) => {
+    if (orderFilter === "todos") return true;
+    if (orderFilter === "en_reparacion") return ord.status === "en_reparacion";
+    return ord.status === orderFilter;
+  });
 
   return (
     <div className="w-full rounded-2xl border border-border/80 bg-[#10131a] shadow-[0_20px_60px_-15px_rgba(0,0,0,0.7)] overflow-hidden text-foreground flex flex-col md:flex-row min-h-[660px] text-xs select-none">
@@ -99,173 +214,139 @@ export default function LinearDashboardShowcase() {
               onClick={() => setActiveNav("inicio")}
               className={`w-full flex items-center gap-2.5 px-2.5 py-2 rounded-lg font-semibold transition-all text-left cursor-pointer ${
                 activeNav === "inicio"
-                  ? "bg-primary/10 text-primary border border-primary/20 shadow-sm shadow-primary/10"
+                  ? "bg-primary text-primary-foreground shadow-sm"
                   : "text-muted-foreground hover:text-foreground hover:bg-card/40"
               }`}
             >
-              <LayoutDashboard className="w-4 h-4 text-primary shrink-0" />
-              <span className="text-xs">Inicio</span>
+              <LayoutDashboard className="w-4 h-4 shrink-0" />
+              <span>Inicio</span>
             </button>
 
             {/* Nuevo Ingreso */}
             <button
               onClick={() => setActiveNav("nuevo-ingreso")}
-              className={`w-full flex items-center gap-2.5 px-2.5 py-2 rounded-lg font-medium transition-all text-left cursor-pointer ${
+              className={`w-full flex items-center gap-2.5 px-2.5 py-2 rounded-lg font-semibold transition-all text-left cursor-pointer ${
                 activeNav === "nuevo-ingreso"
-                  ? "bg-primary/10 text-primary border border-primary/20 shadow-sm shadow-primary/10"
+                  ? "bg-primary text-primary-foreground shadow-sm"
                   : "text-muted-foreground hover:text-foreground hover:bg-card/40"
               }`}
             >
               <PlusCircle className="w-4 h-4 shrink-0" />
-              <span className="text-xs">Nuevo Ingreso</span>
+              <span>Nuevo Ingreso</span>
             </button>
 
             {/* Órdenes de Servicio */}
             <button
               onClick={() => setActiveNav("ordenes")}
-              className={`w-full flex items-center gap-2.5 px-2.5 py-2 rounded-lg font-medium transition-all text-left cursor-pointer ${
+              className={`w-full flex items-center gap-2.5 px-2.5 py-2 rounded-lg font-semibold transition-all text-left cursor-pointer ${
                 activeNav === "ordenes"
-                  ? "bg-primary/10 text-primary border border-primary/20 shadow-sm shadow-primary/10"
+                  ? "bg-primary text-primary-foreground shadow-sm"
                   : "text-muted-foreground hover:text-foreground hover:bg-card/40"
               }`}
             >
               <ClipboardList className="w-4 h-4 shrink-0" />
-              <span className="text-xs">Órdenes de Servicio</span>
+              <span>Órdenes de Servicio</span>
             </button>
 
-            {/* Clientes */}
+            {/* Directorio de Clientes */}
             <button
               onClick={() => setActiveNav("clientes")}
-              className={`w-full flex items-center gap-2.5 px-2.5 py-2 rounded-lg font-medium transition-all text-left cursor-pointer ${
+              className={`w-full flex items-center gap-2.5 px-2.5 py-2 rounded-lg font-semibold transition-all text-left cursor-pointer ${
                 activeNav === "clientes"
-                  ? "bg-primary/10 text-primary border border-primary/20 shadow-sm shadow-primary/10"
+                  ? "bg-primary text-primary-foreground shadow-sm"
                   : "text-muted-foreground hover:text-foreground hover:bg-card/40"
               }`}
             >
               <Users className="w-4 h-4 shrink-0" />
-              <span className="text-xs">Clientes</span>
+              <span>Clientes</span>
             </button>
           </div>
 
-          {/* Grupo 2: Stock y Finanzas */}
+          {/* Grupo 2: Gestión y Caja */}
           <div className="space-y-1">
             <div className="text-[9px] font-bold uppercase tracking-widest text-muted-foreground/60 px-2.5 mb-1.5">
-              Stock y Finanzas
+              Gestión y Stock
             </div>
 
             {/* Inventario */}
             <button
               onClick={() => setActiveNav("inventario")}
-              className={`w-full flex items-center gap-2.5 px-2.5 py-2 rounded-lg font-medium transition-all text-left cursor-pointer ${
+              className={`w-full flex items-center gap-2.5 px-2.5 py-2 rounded-lg font-semibold transition-all text-left cursor-pointer ${
                 activeNav === "inventario"
-                  ? "bg-primary/10 text-primary border border-primary/20 shadow-sm shadow-primary/10"
+                  ? "bg-primary text-primary-foreground shadow-sm"
                   : "text-muted-foreground hover:text-foreground hover:bg-card/40"
               }`}
             >
               <Package className="w-4 h-4 shrink-0" />
-              <span className="text-xs">Inventario de Insumos</span>
+              <span>Inventario</span>
             </button>
 
-            {/* Caja */}
+            {/* Caja / POS */}
             <button
               onClick={() => setActiveNav("caja")}
-              className={`w-full flex items-center gap-2.5 px-2.5 py-2 rounded-lg font-medium transition-all text-left cursor-pointer ${
+              className={`w-full flex items-center gap-2.5 px-2.5 py-2 rounded-lg font-semibold transition-all text-left cursor-pointer ${
                 activeNav === "caja"
-                  ? "bg-primary/10 text-primary border border-primary/20 shadow-sm shadow-primary/10"
+                  ? "bg-primary text-primary-foreground shadow-sm"
                   : "text-muted-foreground hover:text-foreground hover:bg-card/40"
               }`}
             >
               <ShoppingCart className="w-4 h-4 shrink-0" />
-              <span className="text-xs">Caja</span>
+              <span>Caja y POS</span>
             </button>
-          </div>
-
-          {/* Grupo 3: Administración */}
-          <div className="space-y-1">
-            <div className="text-[9px] font-bold uppercase tracking-widest text-muted-foreground/60 px-2.5 mb-1.5">
-              Administración
-            </div>
-
-            <div className="flex items-center gap-2.5 px-2.5 py-2 rounded-lg text-muted-foreground hover:text-foreground hover:bg-card/40 transition-colors">
-              <Settings className="w-4 h-4 shrink-0" />
-              <span className="text-xs">Configuración de Taller</span>
-            </div>
-
-            <div className="flex items-center gap-2.5 px-2.5 py-2 rounded-lg text-muted-foreground hover:text-foreground hover:bg-card/40 transition-colors">
-              <KeyRound className="w-4 h-4 shrink-0" />
-              <span className="text-xs">Cuentas de Acceso</span>
-            </div>
           </div>
         </div>
 
-        {/* Footer del Sidebar con Usuario Activo */}
-        <div className="p-3 border-t border-border/80 bg-card/30 space-y-2.5 shrink-0">
-          <div className="flex items-center gap-2.5 px-1">
-            <div className="w-7 h-7 rounded-full bg-primary/15 border border-primary/30 flex items-center justify-center font-bold text-[10px] text-primary uppercase shrink-0">
-              SC
+        {/* Perfil del Taller en la parte inferior */}
+        <div className="p-3 border-t border-border/80 bg-[#0c0e14]">
+          <div className="flex items-center gap-2.5 px-2 py-1.5 rounded-lg bg-card/40 border border-border/60">
+            <div className="w-7 h-7 rounded-full bg-primary/20 border border-primary/30 flex items-center justify-center text-primary font-bold text-xs shrink-0">
+              TR
             </div>
             <div className="min-w-0 flex-1">
-              <span className="text-xs font-bold block truncate leading-none text-foreground">
-                Sucursal Centro
-              </span>
-              <span className="text-[10px] text-muted-foreground block truncate mt-0.5">
-                Javier Ortiz (Admin)
-              </span>
+              <div className="font-bold text-[11px] text-foreground truncate">
+                TechRepair Central
+              </div>
+              <div className="text-[9px] text-emerald-400 font-mono truncate">
+                Plan Taller Pro • Activo
+              </div>
             </div>
-          </div>
-
-          <div className="w-full bg-background border border-border/70 text-muted-foreground text-[11px] font-medium py-1.5 rounded flex items-center justify-center gap-1.5">
-            <LogOut className="w-3 h-3" />
-            <span>Cerrar Sesión</span>
           </div>
         </div>
       </aside>
 
       {/* ========================================================================= */}
-      {/* 2. CONTENIDO PRINCIPAL DINÁMICO SEGÚN LA TAB ACTIVA */}
+      {/* 2. CONTENIDO PRINCIPAL DINÁMICO */}
       {/* ========================================================================= */}
       <main className="flex-1 flex flex-col min-w-0 bg-[#10131a] overflow-hidden">
-        {/* Cabecera Superior del Dashboard */}
-        <header className="h-14 sm:h-16 border-b border-border/80 flex items-center justify-between px-4 sm:px-6 bg-card/20 shrink-0 gap-2">
-          <div className="flex items-center gap-2.5">
-            <div className="w-4 h-4 rounded border border-border/80 flex items-center justify-center text-muted-foreground">
-              <div className="w-2 h-2 border-l border-t border-current" />
-            </div>
-            <span className="text-xs font-medium text-foreground">{navTitles[activeNav]}</span>
+        {/* Barra superior de estado / breadcrumb */}
+        <header className="h-14 sm:h-16 px-4 sm:px-6 border-b border-border/80 flex items-center justify-between shrink-0 bg-[#0e1017]">
+          <div className="flex items-center gap-2 text-muted-foreground text-xs font-medium">
+            <span className="hidden sm:inline">Panel Técnico</span>
+            <span className="hidden sm:inline text-muted-foreground/40">/</span>
+            <span className="text-foreground font-bold">{navTitles[activeNav]}</span>
           </div>
 
-          <div className="flex items-center gap-2">
-            <span className="hidden sm:inline text-[10px] font-mono text-muted-foreground">
-              Sucursal:
+          <div className="flex items-center gap-3">
+            <span className="hidden sm:inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-[10px] font-semibold">
+              <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+              Sistema Operativo en Línea
             </span>
-            <div className="h-7 border border-border/80 bg-card/60 px-2 text-[10px] font-bold rounded flex items-center gap-1.5 text-foreground">
-              <span>Sucursal Centro</span>
-              <ChevronDown className="w-3 h-3 text-muted-foreground" />
-            </div>
+            <button
+              onClick={() => setActiveNav("nuevo-ingreso")}
+              className="h-8 px-3 rounded-lg bg-primary hover:bg-primary/90 text-primary-foreground font-bold text-xs flex items-center gap-1.5 transition-all cursor-pointer shadow-sm shadow-primary/25"
+            >
+              <PlusCircle className="w-3.5 h-3.5" />
+              <span>Nuevo Ingreso</span>
+            </button>
           </div>
         </header>
 
         {/* ===================================================================== */}
-        {/* VISTA 1: INICIO (PANEL DE CONTROL REAL) */}
+        {/* VISTA 1: INICIO (DASHBOARD REAL) */}
         {/* ===================================================================== */}
         {activeNav === "inicio" && (
-          <div className="flex-1 p-4 sm:p-6 space-y-6 overflow-y-auto no-scrollbar">
-            {/* Título de la Sección */}
-            <div className="space-y-1">
-              <div className="flex items-center gap-2">
-                <div className="text-primary">
-                  <LayoutDashboard className="w-5 h-5 text-primary" />
-                </div>
-                <h3 className="font-outfit text-xl sm:text-2xl font-bold tracking-tight text-foreground">
-                  Panel de Control
-                </h3>
-              </div>
-              <p className="text-xs text-muted-foreground font-light">
-                Resumen operativo del taller y control de stock de insumos técnicos de la sucursal activa.
-              </p>
-            </div>
-
-            {/* 4 KPI CARDS */}
+          <div className="flex-1 p-4 sm:p-6 space-y-5 overflow-y-auto no-scrollbar">
+            {/* KPI Cards Superiores */}
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3.5">
               {/* Card 1: Órdenes Activas */}
               <div className="rounded-xl border border-border/70 bg-[#151821] p-4 flex flex-col justify-between space-y-3">
@@ -319,241 +400,139 @@ export default function LinearDashboardShowcase() {
                 </div>
                 <div>
                   <div className="text-2xl sm:text-3xl font-extrabold font-outfit text-foreground tracking-tight">
-                    $837.500
+                    $1.450.000
                   </div>
-                  <div className="text-[11px] text-muted-foreground mt-0.5 truncate">
-                    8 ventas POS • $536.000 en órdenes
+                  <div className="text-[11px] text-emerald-400 font-medium mt-0.5 flex items-center gap-1">
+                    <TrendingUp className="w-3 h-3" />
+                    <span>+24.5% vs. período anterior</span>
                   </div>
                 </div>
               </div>
 
-              {/* Card 4: Estado de Stock */}
+              {/* Card 4: Ticket Promedio */}
               <div className="rounded-xl border border-border/70 bg-[#151821] p-4 flex flex-col justify-between space-y-3">
                 <div className="flex items-center justify-between">
                   <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/80">
-                    Estado de Stock
+                    Ticket Promedio
                   </span>
-                  <div className="w-7 h-7 rounded-lg bg-red-500/10 border border-red-500/20 flex items-center justify-center text-red-400">
-                    <AlertTriangle className="w-3.5 h-3.5" />
+                  <div className="w-7 h-7 rounded-lg bg-primary/10 border border-primary/20 flex items-center justify-center text-primary">
+                    <ArrowUpRight className="w-3.5 h-3.5" />
                   </div>
                 </div>
                 <div>
-                  <div className="text-2xl sm:text-3xl font-extrabold font-outfit text-red-400 tracking-tight">
-                    3 Alertas
+                  <div className="text-2xl sm:text-3xl font-extrabold font-outfit text-foreground tracking-tight">
+                    $131.818
                   </div>
                   <div className="text-[11px] text-muted-foreground mt-0.5 truncate">
-                    3 repuestos requieren reposición
+                    Basado en 11 reparaciones
                   </div>
                 </div>
               </div>
             </div>
 
-            {/* GRÁFICOS GEMELOS CON TABS FUNCIONALES */}
-            <div className="grid grid-cols-1 lg:grid-cols-12 gap-4">
-              {/* Gráfico 1 (Izquierda): Flujo de Equipos */}
+            {/* Fila Central: Gráfico de Métricas + Estado del Taller */}
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-5">
+              {/* Gráfico Principal */}
               <div className="lg:col-span-8 rounded-xl border border-border/70 bg-[#151821] p-4 sm:p-5 space-y-4">
-                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-                  <div className="space-y-0.5">
-                    <div className="flex items-center gap-1.5 font-bold text-sm text-foreground">
-                      <TrendingUp className="w-4 h-4 text-primary" />
-                      <span>
-                        {metricTab === "ordenes"
-                          ? "Flujo de Equipos: Ingresados vs. Entregados"
-                          : "Evolución de Facturación Diaria"}
-                      </span>
-                    </div>
-                    <p className="text-[11px] text-muted-foreground">
-                      {metricTab === "ordenes"
-                        ? "Comparativa diaria de órdenes recibidas y equipos completados"
-                        : "Ingresos por órdenes de reparación y ventas de mostrador POS"}
-                    </p>
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-border/50 pb-3">
+                  <div className="flex items-center gap-1 bg-[#10131a] p-1 rounded-lg border border-border/70">
+                    <button
+                      onClick={() => setMetricTab("ordenes")}
+                      className={`px-3 py-1 rounded-md text-xs font-semibold transition-all cursor-pointer ${
+                        metricTab === "ordenes"
+                          ? "bg-primary text-primary-foreground shadow-sm"
+                          : "text-muted-foreground hover:text-foreground"
+                      }`}
+                    >
+                      Órdenes Registradas
+                    </button>
+                    <button
+                      onClick={() => setMetricTab("facturacion")}
+                      className={`px-3 py-1 rounded-md text-xs font-semibold transition-all cursor-pointer ${
+                        metricTab === "facturacion"
+                          ? "bg-primary text-primary-foreground shadow-sm"
+                          : "text-muted-foreground hover:text-foreground"
+                      }`}
+                    >
+                      Facturación ($)
+                    </button>
                   </div>
 
-                  {/* Filtros Funcionales */}
-                  <div className="flex items-center gap-2 self-start sm:self-center">
-                    <div className="flex rounded-md p-0.5 bg-background border border-border/70 text-[10px]">
+                  <div className="flex items-center gap-1 bg-[#10131a] p-1 rounded-lg border border-border/70 self-start sm:self-auto">
+                    {["7d", "14d", "30d"].map((r) => (
                       <button
-                        onClick={() => setMetricTab("ordenes")}
-                        className={`px-2 py-0.5 rounded font-medium transition-all cursor-pointer ${
-                          metricTab === "ordenes"
-                            ? "bg-primary text-black font-bold"
+                        key={r}
+                        onClick={() => setRangeTab(r)}
+                        className={`px-2.5 py-1 rounded-md text-[11px] font-semibold transition-all uppercase cursor-pointer ${
+                          rangeTab === r
+                            ? "bg-primary text-primary-foreground shadow-sm"
                             : "text-muted-foreground hover:text-foreground"
                         }`}
                       >
-                        Órdenes
+                        {r}
                       </button>
-                      <button
-                        onClick={() => setMetricTab("facturacion")}
-                        className={`px-2 py-0.5 rounded font-medium transition-all cursor-pointer ${
-                          metricTab === "facturacion"
-                            ? "bg-primary text-black font-bold"
-                            : "text-muted-foreground hover:text-foreground"
-                        }`}
-                      >
-                        Facturación
-                      </button>
-                    </div>
-
-                    <div className="flex rounded-md p-0.5 bg-background border border-border/70 text-[10px]">
-                      {["7d", "14d", "30d"].map((r) => (
-                        <button
-                          key={r}
-                          onClick={() => setRangeTab(r)}
-                          className={`px-1.5 py-0.5 rounded font-medium transition-all cursor-pointer ${
-                            rangeTab === r
-                              ? "bg-card text-foreground font-bold"
-                              : "text-muted-foreground hover:text-foreground"
-                          }`}
-                        >
-                          {r}
-                        </button>
-                      ))}
-                    </div>
+                    ))}
                   </div>
                 </div>
 
-                {/* Gráfico Vectorial Dinámico */}
-                <div className="h-44 sm:h-52 w-full pt-2">
-                  <svg viewBox="0 0 540 180" className="w-full h-full overflow-visible">
-                    <defs>
-                      <linearGradient id="cyanArea" x1="0" y1="0" x2="0" y2="1">
-                        <stop offset="0%" stopColor="#38bdf8" stopOpacity="0.35" />
-                        <stop offset="100%" stopColor="#38bdf8" stopOpacity="0.0" />
-                      </linearGradient>
-                      <linearGradient id="emeraldArea" x1="0" y1="0" x2="0" y2="1">
-                        <stop offset="0%" stopColor="#10b981" stopOpacity="0.25" />
-                        <stop offset="100%" stopColor="#10b981" stopOpacity="0.0" />
-                      </linearGradient>
-                      <linearGradient id="blueArea" x1="0" y1="0" x2="0" y2="1">
-                        <stop offset="0%" stopColor="#60a5fa" stopOpacity="0.35" />
-                        <stop offset="100%" stopColor="#60a5fa" stopOpacity="0.0" />
-                      </linearGradient>
-                    </defs>
-
-                    <line x1="30" y1="20" x2="530" y2="20" stroke="#242938" strokeDasharray="3 3" />
-                    <text x="10" y="24" fill="#64748b" fontSize="9" fontFamily="monospace">
-                      {metricTab === "ordenes" ? "4" : "$300k"}
-                    </text>
-
-                    <line x1="30" y1="60" x2="530" y2="60" stroke="#242938" strokeDasharray="3 3" />
-                    <text x="10" y="64" fill="#64748b" fontSize="9" fontFamily="monospace">
-                      {metricTab === "ordenes" ? "3" : "$200k"}
-                    </text>
-
-                    <line x1="30" y1="100" x2="530" y2="100" stroke="#242938" strokeDasharray="3 3" />
-                    <text x="10" y="104" fill="#64748b" fontSize="9" fontFamily="monospace">
-                      {metricTab === "ordenes" ? "2" : "$100k"}
-                    </text>
-
-                    <line x1="30" y1="140" x2="530" y2="140" stroke="#242938" strokeDasharray="3 3" />
-                    <text x="10" y="144" fill="#64748b" fontSize="9" fontFamily="monospace">
-                      {metricTab === "ordenes" ? "1" : "$50k"}
-                    </text>
-
-                    <line x1="30" y1="160" x2="530" y2="160" stroke="#242938" />
-                    <text x="10" y="164" fill="#64748b" fontSize="9" fontFamily="monospace">0</text>
-
-                    {metricTab === "ordenes" ? (
-                      <>
-                        <path
-                          d="M 40 140 L 120 140 L 140 160 L 530 160 L 530 160 L 40 160 Z"
-                          fill="url(#emeraldArea)"
-                        />
-                        <path
-                          d="M 40 140 L 120 140 L 140 160 L 530 160"
-                          fill="none"
-                          stroke="#10b981"
-                          strokeWidth="2.5"
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                        />
-                        <path
-                          d="M 40 140 L 100 140 Q 130 90 145 100 T 190 160 Q 210 90 230 100 T 270 160 L 530 160 L 530 160 L 40 160 Z"
-                          fill="url(#cyanArea)"
-                        />
-                        <path
-                          d="M 40 140 L 100 140 Q 130 90 145 100 T 190 160 Q 210 90 230 100 T 270 160 L 530 160"
-                          fill="none"
-                          stroke="#38bdf8"
-                          strokeWidth="2.5"
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                        />
-                      </>
-                    ) : (
-                      <>
-                        <path
-                          d="M 40 150 Q 100 80 160 110 T 280 40 T 400 90 T 520 50 L 520 160 L 40 160 Z"
-                          fill="url(#blueArea)"
-                        />
-                        <path
-                          d="M 40 150 Q 100 80 160 110 T 280 40 T 400 90 T 520 50"
-                          fill="none"
-                          stroke="#60a5fa"
-                          strokeWidth="2.5"
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                        />
-                      </>
-                    )}
-                  </svg>
-                </div>
-
-                {/* Leyenda y Fechas */}
-                <div className="flex flex-col sm:flex-row items-center justify-between pt-2 border-t border-border/60 text-[10px] font-mono text-muted-foreground gap-2">
-                  <div className="flex items-center gap-4">
-                    {metricTab === "ordenes" ? (
-                      <>
-                        <span className="flex items-center gap-1.5">
-                          <span className="w-2 h-2 rounded-full bg-[#10b981]" />
-                          <span>Equipos Entregados</span>
-                        </span>
-                        <span className="flex items-center gap-1.5">
-                          <span className="w-2 h-2 rounded-full bg-[#38bdf8]" />
-                          <span>Equipos Ingresados</span>
-                        </span>
-                      </>
-                    ) : (
-                      <span className="flex items-center gap-1.5">
-                        <span className="w-2 h-2 rounded-full bg-[#60a5fa]" />
-                        <span>Facturación Diaria ($)</span>
-                      </span>
-                    )}
+                <div className="h-44 sm:h-52 w-full pt-2 flex flex-col justify-end">
+                  <div className="relative flex-1 w-full flex items-end">
+                    <svg
+                      viewBox="0 0 600 180"
+                      className="w-full h-full overflow-visible"
+                      preserveAspectRatio="none"
+                    >
+                      <defs>
+                        <linearGradient id="chartGradientSim" x1="0" y1="0" x2="0" y2="1">
+                          <stop offset="0%" stopColor="#38bdf8" stopOpacity="0.4" />
+                          <stop offset="100%" stopColor="#38bdf8" stopOpacity="0.0" />
+                        </linearGradient>
+                      </defs>
+                      <path
+                        d="M 0 140 Q 60 130 100 100 T 200 90 T 300 40 T 400 60 T 500 20 T 600 30 L 600 180 L 0 180 Z"
+                        fill="url(#chartGradientSim)"
+                      />
+                      <path
+                        d="M 0 140 Q 60 130 100 100 T 200 90 T 300 40 T 400 60 T 500 20 T 600 30"
+                        fill="none"
+                        stroke="#38bdf8"
+                        strokeWidth="2.5"
+                      />
+                      <circle cx="500" cy="20" r="4.5" fill="#38bdf8" stroke="#0e1017" strokeWidth="2" />
+                    </svg>
                   </div>
-                  <div className="flex items-center gap-3 text-muted-foreground/70">
-                    {chartDates[rangeTab].map((d) => (
-                      <span key={d}>{d}</span>
+
+                  <div className="flex justify-between text-[10px] text-muted-foreground/70 font-mono pt-3 border-t border-border/30">
+                    {chartDates[rangeTab].map((d, i) => (
+                      <span key={i}>{d}</span>
                     ))}
                   </div>
                 </div>
               </div>
 
-              {/* Gráfico 2 (Derecha): Estados de Taller (Barras limpias) */}
-              <div className="lg:col-span-4 rounded-xl border border-border/70 bg-[#151821] p-4 sm:p-5 flex flex-col justify-between space-y-4">
-                <div className="flex items-center justify-between">
-                  <div className="space-y-0.5">
-                    <h4 className="font-bold text-sm text-foreground">
-                      {statusTab === "estados" ? "Estados de Taller" : "Equipos en Taller"}
-                    </h4>
-                    <p className="text-[11px] text-muted-foreground">Volumen por etapa operativa</p>
-                  </div>
-                  <div className="flex rounded-md p-0.5 bg-background border border-border/70 text-[10px]">
+              {/* Estado del Taller */}
+              <div className="lg:col-span-4 rounded-xl border border-border/70 bg-[#151821] p-4 sm:p-5 space-y-4 flex flex-col justify-between">
+                <div className="flex items-center justify-between border-b border-border/50 pb-3">
+                  <h4 className="font-outfit text-sm font-bold text-foreground">
+                    Estado del Taller
+                  </h4>
+                  <div className="flex items-center gap-1 bg-[#10131a] p-0.5 rounded-lg border border-border/70">
                     <button
                       onClick={() => setStatusTab("estados")}
-                      className={`px-2 py-0.5 rounded font-medium cursor-pointer ${
+                      className={`px-2 py-0.5 rounded text-[10px] font-bold transition-all cursor-pointer ${
                         statusTab === "estados"
-                          ? "bg-primary text-black font-bold"
-                          : "text-muted-foreground"
+                          ? "bg-primary text-primary-foreground"
+                          : "text-muted-foreground hover:text-foreground"
                       }`}
                     >
                       Estados
                     </button>
                     <button
                       onClick={() => setStatusTab("equipos")}
-                      className={`px-2 py-0.5 rounded font-medium cursor-pointer ${
+                      className={`px-2 py-0.5 rounded text-[10px] font-bold transition-all cursor-pointer ${
                         statusTab === "equipos"
-                          ? "bg-primary text-black font-bold"
-                          : "text-muted-foreground"
+                          ? "bg-primary text-primary-foreground"
+                          : "text-muted-foreground hover:text-foreground"
                       }`}
                     >
                       Equipos
@@ -561,36 +540,28 @@ export default function LinearDashboardShowcase() {
                   </div>
                 </div>
 
-                <div className="space-y-3 py-1">
-                  {statusBars[statusTab].map((item) => (
-                    <div key={item.label} className="flex items-center gap-3 text-xs">
-                      <span className="w-20 text-[11px] text-muted-foreground text-right shrink-0 truncate">
-                        {item.label}
-                      </span>
-                      <div className="flex-1 h-5 bg-background/50 rounded overflow-hidden flex items-center">
+                <div className="space-y-3 flex-1 flex flex-col justify-center">
+                  {statusBars[statusTab].map((bar, i) => (
+                    <div key={i} className="space-y-1">
+                      <div className="flex justify-between text-[11px]">
+                        <span className="text-muted-foreground font-medium">{bar.label}</span>
+                      </div>
+                      <div className="h-2 w-full bg-[#10131a] rounded-full overflow-hidden border border-border/40">
                         <div
-                          className="h-full bg-[#38bdf8] rounded transition-all duration-300"
-                          style={{ width: item.width }}
+                          className="h-full bg-primary rounded-full transition-all duration-300"
+                          style={{ width: bar.width }}
                         />
                       </div>
                     </div>
                   ))}
                 </div>
-
-                <div className="flex items-center justify-between text-[10px] font-mono text-muted-foreground/60 pl-24 pr-2 pt-1 border-t border-border/60">
-                  <span>0</span>
-                  <span>2</span>
-                  <span>4</span>
-                  <span>6</span>
-                  <span>8</span>
-                </div>
               </div>
             </div>
 
-            {/* FILA INFERIOR: INGRESOS RECIENTES & CRÍTICOS DE INVENTARIO */}
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 pt-1">
-              {/* Tabla de Ingresos Recientes */}
-              <div className="lg:col-span-2 rounded-xl border border-border/70 bg-[#151821] p-4 space-y-3">
+            {/* Fila Inferior: Ingresos Recientes + Críticos */}
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-5">
+              {/* Ingresos Recientes con Estilos y Colores de Órdenes de Servicio */}
+              <div className="lg:col-span-8 rounded-xl border border-border/70 bg-[#151821] p-4 space-y-3">
                 <div className="flex items-center justify-between border-b border-border/50 pb-3">
                   <div>
                     <h4 className="font-outfit text-sm font-bold text-foreground">
@@ -602,17 +573,16 @@ export default function LinearDashboardShowcase() {
                   </div>
                   <span
                     onClick={() => setActiveNav("ordenes")}
-                    className="text-xs text-primary hover:underline flex items-center gap-1 font-semibold cursor-pointer"
+                    className="text-xs text-primary hover:underline font-semibold cursor-pointer"
                   >
-                    <span>Ver todas</span>
-                    <ArrowUpRight className="w-3.5 h-3.5" />
+                    Ver todas (18)
                   </span>
                 </div>
 
-                <div className="overflow-x-auto w-full">
+                <div className="overflow-x-auto">
                   <table className="w-full text-left text-xs border-collapse">
                     <thead>
-                      <tr className="border-b border-border/40 text-muted-foreground uppercase tracking-wider font-semibold text-[10px]">
+                      <tr className="border-b border-border/40 text-muted-foreground uppercase text-[10px] font-semibold tracking-wider">
                         <th className="py-2.5">Código QR / Orden</th>
                         <th className="py-2.5">Cliente</th>
                         <th className="py-2.5">Equipo</th>
@@ -632,9 +602,9 @@ export default function LinearDashboardShowcase() {
                           Smartphone • iPhone 14 Pro Max
                         </td>
                         <td className="py-3 text-right">
-                          <Badge className="text-[9px] uppercase font-bold py-0.5 px-2 border bg-primary text-primary-foreground">
+                          <span className="text-[10px] uppercase font-bold py-0.5 px-2.5 rounded-md border inline-block bg-indigo-500/10 text-indigo-400 border-indigo-500/25">
                             En Reparación
-                          </Badge>
+                          </span>
                         </td>
                       </tr>
 
@@ -650,9 +620,9 @@ export default function LinearDashboardShowcase() {
                           Notebook • MacBook Pro 14" M2
                         </td>
                         <td className="py-3 text-right">
-                          <Badge className="text-[9px] uppercase font-bold py-0.5 px-2 border bg-emerald-500/15 text-emerald-400 border-emerald-500/30">
+                          <span className="text-[10px] uppercase font-bold py-0.5 px-2.5 rounded-md border inline-block bg-emerald-500/10 text-emerald-400 border-emerald-500/25">
                             Listo
-                          </Badge>
+                          </span>
                         </td>
                       </tr>
 
@@ -668,12 +638,9 @@ export default function LinearDashboardShowcase() {
                           Consola • PlayStation 5 Digital
                         </td>
                         <td className="py-3 text-right">
-                          <Badge
-                            variant="outline"
-                            className="text-[9px] uppercase font-bold py-0.5 px-2 border text-amber-400 border-amber-400/40"
-                          >
+                          <span className="text-[10px] uppercase font-bold py-0.5 px-2.5 rounded-md border inline-block bg-purple-500/10 text-purple-400 border-purple-500/25">
                             En Diagnóstico
-                          </Badge>
+                          </span>
                         </td>
                       </tr>
 
@@ -689,12 +656,9 @@ export default function LinearDashboardShowcase() {
                           Smartphone • Samsung S24 Ultra
                         </td>
                         <td className="py-3 text-right">
-                          <Badge
-                            variant="outline"
-                            className="text-[9px] uppercase font-bold py-0.5 px-2 border text-purple-400 border-purple-400/40"
-                          >
+                          <span className="text-[10px] uppercase font-bold py-0.5 px-2.5 rounded-md border inline-block bg-amber-500/10 text-amber-400 border-amber-500/25">
                             Presupuestado
-                          </Badge>
+                          </span>
                         </td>
                       </tr>
                     </tbody>
@@ -703,7 +667,7 @@ export default function LinearDashboardShowcase() {
               </div>
 
               {/* Críticos de Inventario */}
-              <div className="rounded-xl border border-border/70 bg-[#151821] p-4 space-y-3 flex flex-col justify-between">
+              <div className="lg:col-span-4 rounded-xl border border-border/70 bg-[#151821] p-4 space-y-3 flex flex-col justify-between">
                 <div className="flex items-center justify-between border-b border-border/50 pb-3">
                   <div>
                     <h4 className="font-outfit text-sm font-bold text-foreground">
@@ -788,424 +752,1059 @@ export default function LinearDashboardShowcase() {
         )}
 
         {/* ===================================================================== */}
-        {/* VISTA 2: NUEVO INGRESO */}
+        {/* VISTA 2: NUEVO INGRESO (RÉPLICA 1:1 DE NewOrderPage.jsx) */}
         {/* ===================================================================== */}
         {activeNav === "nuevo-ingreso" && (
           <div className="flex-1 p-4 sm:p-6 space-y-5 overflow-y-auto no-scrollbar">
-            <div className="space-y-1">
-              <div className="flex items-center gap-2">
-                <PlusCircle className="w-5 h-5 text-primary" />
-                <h3 className="font-outfit text-xl sm:text-2xl font-bold tracking-tight text-foreground">
-                  Registrar Nuevo Ingreso de Equipo
+            {/* Cabecera Superior 1:1 */}
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+              <div className="space-y-1">
+                <h3 className="font-outfit text-xl sm:text-2xl font-bold tracking-tight text-foreground flex items-center gap-2.5">
+                  <PlusCircle className="w-5 h-5 sm:w-6 sm:h-6 text-primary shrink-0" />
+                  <span>Nuevo Ingreso de Equipo</span>
                 </h3>
+                <p className="text-xs text-muted-foreground font-light">
+                  Recepción técnica rápida con autocompletado de clientes y emisión de comprobante QR.
+                </p>
               </div>
-              <p className="text-xs text-muted-foreground font-light">
-                Ficha de recepción técnica, generación de código QR y orden con impresión térmica.
-              </p>
+
+              <div className="flex items-center gap-2 self-start sm:self-auto">
+                <button
+                  type="button"
+                  onClick={() => setActiveNav("ordenes")}
+                  className="h-8 px-3 text-xs font-semibold border border-border/80 bg-card/60 hover:bg-muted/40 rounded-lg flex items-center gap-1.5 cursor-pointer text-foreground"
+                >
+                  <ArrowLeft className="w-3.5 h-3.5" />
+                  <span>Ver Órdenes</span>
+                </button>
+              </div>
             </div>
 
-            <div className="grid grid-cols-1 lg:grid-cols-12 gap-5">
-              {/* Formulario Principal */}
-              <div className="lg:col-span-8 rounded-xl border border-border/70 bg-[#151821] p-4 sm:p-5 space-y-4">
-                {/* Datos del Cliente */}
-                <div className="space-y-3">
-                  <div className="text-[11px] font-bold uppercase tracking-wider text-primary border-b border-border/40 pb-1">
-                    1. Datos del Cliente
+            {/* Formulario 1:1 en 2 Columnas */}
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 items-start">
+              {/* COLUMNA IZQUIERDA (5 cols): 1. Datos del Cliente */}
+              <div className="lg:col-span-5 rounded-xl border border-border/80 bg-card/40 p-4 sm:p-5 shadow-sm space-y-4">
+                <div className="border-b border-border/50 pb-3">
+                  <div className="font-outfit text-sm sm:text-base font-bold text-foreground flex items-center gap-2">
+                    <User className="w-4 h-4 text-primary" />
+                    <span>1. Datos del Cliente</span>
                   </div>
-                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                  <p className="text-[11px] text-muted-foreground mt-0.5">
+                    Buscá un cliente habitual o completá los datos de uno nuevo.
+                  </p>
+                </div>
+
+                {/* Buscador de clientes */}
+                <div className="relative">
+                  <Search className="w-4 h-4 text-muted-foreground absolute left-3 top-2.5 pointer-events-none" />
+                  <input
+                    type="text"
+                    placeholder="Buscar por nombre, DNI o teléfono..."
+                    defaultValue=""
+                    className="w-full bg-background/85 border border-border text-xs pl-9 pr-3 h-9 rounded-lg text-foreground focus:outline-none focus:border-primary"
+                  />
+                </div>
+
+                <div className="space-y-3 pt-1">
+                  <div>
+                    <label className="text-xs font-medium text-foreground block mb-1">
+                      Nombre y Apellido <span className="text-destructive">*</span>
+                    </label>
+                    <input
+                      type="text"
+                      defaultValue="Mariana López"
+                      className="w-full bg-background/85 border border-border text-xs px-3 h-9 rounded-lg text-foreground focus:outline-none focus:border-primary"
+                    />
+                  </div>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                     <div>
-                      <label className="text-[11px] text-muted-foreground block mb-1">Nombre Completo</label>
-                      <input
-                        type="text"
-                        defaultValue="Mariana López"
-                        className="w-full bg-[#10131a] border border-border/80 rounded h-8 px-2.5 text-xs text-foreground focus:outline-none focus:border-primary"
-                      />
-                    </div>
-                    <div>
-                      <label className="text-[11px] text-muted-foreground block mb-1">WhatsApp / Teléfono</label>
-                      <input
-                        type="text"
-                        defaultValue="+54 9 11 5829-1049"
-                        className="w-full bg-[#10131a] border border-border/80 rounded h-8 px-2.5 text-xs text-foreground focus:outline-none focus:border-primary font-mono"
-                      />
-                    </div>
-                    <div>
-                      <label className="text-[11px] text-muted-foreground block mb-1">DNI / Identificación</label>
+                      <label className="text-xs font-medium text-foreground block mb-1">
+                        DNI / CUIT <span className="text-destructive">*</span>
+                      </label>
                       <input
                         type="text"
                         defaultValue="38.291.840"
-                        className="w-full bg-[#10131a] border border-border/80 rounded h-8 px-2.5 text-xs text-foreground focus:outline-none focus:border-primary font-mono"
+                        className="w-full bg-background/85 border border-border text-xs px-3 h-9 rounded-lg text-foreground font-mono focus:outline-none focus:border-primary"
+                      />
+                    </div>
+                    <div>
+                      <label className="text-xs font-medium text-foreground block mb-1">
+                        Teléfono / WhatsApp <span className="text-destructive">*</span>
+                      </label>
+                      <input
+                        type="text"
+                        defaultValue="+54 9 11 5829-1049"
+                        className="w-full bg-background/85 border border-border text-xs px-3 h-9 rounded-lg text-foreground font-mono focus:outline-none focus:border-primary"
                       />
                     </div>
                   </div>
-                </div>
 
-                {/* Datos del Dispositivo */}
-                <div className="space-y-3 pt-2">
-                  <div className="text-[11px] font-bold uppercase tracking-wider text-primary border-b border-border/40 pb-1">
-                    2. Dispositivo y Falla
-                  </div>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                    <div>
-                      <label className="text-[11px] text-muted-foreground block mb-1">Tipo y Marca</label>
-                      <input
-                        type="text"
-                        defaultValue="Smartphone • Apple iPhone 14 Pro Max"
-                        className="w-full bg-[#10131a] border border-border/80 rounded h-8 px-2.5 text-xs text-foreground focus:outline-none focus:border-primary"
-                      />
-                    </div>
-                    <div>
-                      <label className="text-[11px] text-muted-foreground block mb-1">Número de Serie / IMEI</label>
-                      <input
-                        type="text"
-                        defaultValue="F2LZM891N70K"
-                        className="w-full bg-[#10131a] border border-border/80 rounded h-8 px-2.5 text-xs text-foreground focus:outline-none focus:border-primary font-mono"
-                      />
-                    </div>
-                  </div>
                   <div>
-                    <label className="text-[11px] text-muted-foreground block mb-1">Avería Reportada / Diagnóstico Preliminar</label>
-                    <textarea
-                      rows={3}
-                      defaultValue="Pantalla astillada con líneas verticales. Táctil responde parcialmente en zona inferior. Batería al 84% de salud. Se requiere cambio de módulo OLED y sellado estanco."
-                      className="w-full bg-[#10131a] border border-border/80 rounded p-2 text-xs text-foreground focus:outline-none focus:border-primary"
+                    <label className="text-xs font-medium text-foreground block mb-1">
+                      Correo Electrónico (Notificaciones de Estado)
+                    </label>
+                    <input
+                      type="email"
+                      defaultValue="mariana.lopez@gmail.com"
+                      className="w-full bg-background/85 border border-border text-xs px-3 h-9 rounded-lg text-foreground focus:outline-none focus:border-primary"
                     />
                   </div>
                 </div>
               </div>
 
-              {/* Columna Derecha: Previsualización de Comprobante */}
-              <div className="lg:col-span-4 rounded-xl border border-border/70 bg-[#151821] p-4 flex flex-col justify-between space-y-4">
-                <div className="space-y-3">
-                  <div className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground">
-                    Previsualización de Ticket
+              {/* COLUMNA DERECHA (7 cols): 2. Especificaciones del Equipo y Falla */}
+              <div className="lg:col-span-7 rounded-xl border border-border/80 bg-card/40 p-4 sm:p-5 shadow-sm space-y-4">
+                <div className="border-b border-border/50 pb-3">
+                  <div className="font-outfit text-sm sm:text-base font-bold text-foreground flex items-center gap-2">
+                    <Smartphone className="w-4 h-4 text-primary" />
+                    <span>2. Especificaciones del Equipo y Falla</span>
                   </div>
-                  <div className="p-3 bg-white/5 rounded-lg border border-border/60 text-center space-y-2">
-                    <div className="font-outfit font-black text-sm text-foreground">
-                      Repair<span className="text-primary">IT</span>
-                    </div>
-                    <div className="text-[10px] text-muted-foreground font-mono">
-                      ORDEN #TK-9282 • SUCURSAL CENTRO
-                    </div>
-                    <div className="w-24 h-24 mx-auto bg-white p-1.5 rounded flex items-center justify-center">
-                      <QrCode className="w-full h-full text-black" />
-                    </div>
-                    <div className="text-[10px] text-muted-foreground font-mono">
-                      Escaneá para seguir tu reparación
-                    </div>
+                  <p className="text-[11px] text-muted-foreground mt-0.5">
+                    Detallá las características del equipo ingresado y los síntomas reportados.
+                  </p>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  {/* Tipo de dispositivo con nombres únicos sin / */}
+                  <div>
+                    <label className="text-xs font-medium text-foreground block mb-1">
+                      Tipo de Dispositivo <span className="text-destructive">*</span>
+                    </label>
+                    <select
+                      defaultValue="Smartphone"
+                      className="w-full bg-background/85 border border-border text-xs px-3 h-9 rounded-lg text-foreground focus:outline-none focus:border-primary cursor-pointer"
+                    >
+                      <option value="Smartphone">Smartphone</option>
+                      <option value="Notebook">Notebook</option>
+                      <option value="Tablet">Tablet</option>
+                      <option value="PC Escritorio">PC Escritorio</option>
+                      <option value="Consola">Consola</option>
+                      <option value="Monitor">Monitor</option>
+                      <option value="Otro">Otro</option>
+                    </select>
+                  </div>
+
+                  <div>
+                    <label className="text-xs font-medium text-foreground block mb-1">
+                      Marca y Modelo <span className="text-destructive">*</span>
+                    </label>
+                    <input
+                      type="text"
+                      defaultValue="iPhone 14 Pro Max 256GB Deep Purple"
+                      className="w-full bg-background/85 border border-border text-xs px-3 h-9 rounded-lg text-foreground focus:outline-none focus:border-primary"
+                    />
                   </div>
                 </div>
 
-                <button className="w-full py-2.5 rounded-lg bg-primary hover:bg-primary/90 text-primary-foreground font-bold text-xs flex items-center justify-center gap-2 cursor-pointer shadow-lg shadow-primary/20 transition-all">
-                  <CheckCircle className="w-4 h-4" />
-                  <span>Crear Orden y Emitir Ticket</span>
-                </button>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  <div>
+                    <label className="text-xs font-medium text-foreground block mb-1">
+                      Accesorios Dejados
+                    </label>
+                    <input
+                      type="text"
+                      defaultValue="Funda de silicona transparente y cable Lightning"
+                      className="w-full bg-background/85 border border-border text-xs px-3 h-9 rounded-lg text-foreground focus:outline-none focus:border-primary"
+                    />
+                  </div>
+                  <div>
+                    <label className="text-xs font-medium text-foreground block mb-1">
+                      Estado Cosmético / Detalles Visuales
+                    </label>
+                    <input
+                      type="text"
+                      defaultValue="Microrrayones en biseles de acero, módulo sin golpes en cámaras"
+                      className="w-full bg-background/85 border border-border text-xs px-3 h-9 rounded-lg text-foreground focus:outline-none focus:border-primary"
+                    />
+                  </div>
+                </div>
+
+                <div>
+                  <label className="text-xs font-medium text-foreground block mb-1">
+                    Falla Declarada por el Cliente <span className="text-destructive">*</span>
+                  </label>
+                  <textarea
+                    rows={2}
+                    defaultValue="Pantalla totalmente apagada tras caída. Vibra al conectar a cargador y recibe llamadas pero no emite imagen ni respuesta táctil."
+                    className="w-full bg-background/85 border border-border text-xs p-3 rounded-lg text-foreground focus:outline-none focus:border-primary resize-none leading-relaxed"
+                  />
+                </div>
+
+                {/* Checkbox de Términos */}
+                <div className="flex items-start space-x-2.5 pt-1">
+                  <input
+                    type="checkbox"
+                    id="sim-terms"
+                    defaultChecked
+                    className="mt-0.5 rounded border-border accent-primary cursor-pointer"
+                  />
+                  <label
+                    htmlFor="sim-terms"
+                    className="text-xs text-muted-foreground leading-snug cursor-pointer select-none"
+                  >
+                    El cliente acepta las condiciones de revisión técnica y deja constancia del estado cosmético declarado.
+                  </label>
+                </div>
+
+                {/* Checkbox Imprimir Comprobante: sin icono y oculto en móvil */}
+                <div className="hidden sm:flex items-center space-x-3 bg-primary/5 p-3 rounded-xl border border-primary/20">
+                  <input
+                    type="checkbox"
+                    id="sim-print"
+                    defaultChecked
+                    className="rounded border-border accent-primary cursor-pointer shrink-0"
+                  />
+                  <label
+                    htmlFor="sim-print"
+                    className="text-xs font-semibold text-foreground leading-snug cursor-pointer select-none flex-1 min-w-0"
+                  >
+                    <span className="text-primary font-bold mr-1">
+                      Imprimir Comprobante:
+                    </span>
+                    Abrir ventana de comprobante A4 automáticamente al registrar
+                  </label>
+                </div>
+
+                {/* Botón de Submit */}
+                <div className="pt-2 flex justify-end">
+                  <button
+                    type="button"
+                    onClick={() => setActiveNav("ordenes")}
+                    className="w-full sm:w-auto bg-primary hover:bg-primary/95 text-primary-foreground font-bold text-xs py-2.5 px-6 rounded-lg transition-all cursor-pointer shadow-lg shadow-primary/15 flex items-center justify-center gap-2"
+                  >
+                    <PlusCircle className="w-4 h-4" />
+                    <span>Registrar Orden y Generar Comprobante</span>
+                  </button>
+                </div>
               </div>
             </div>
           </div>
         )}
 
         {/* ===================================================================== */}
-        {/* VISTA 3: ÓRDENES DE SERVICIO */}
+        {/* VISTA 3: ÓRDENES DE SERVICIO (RÉPLICA 1:1 DE OrdersPage.jsx) */}
         {/* ===================================================================== */}
         {activeNav === "ordenes" && (
           <div className="flex-1 p-4 sm:p-6 space-y-5 overflow-y-auto no-scrollbar">
+            {/* Cabecera Superior 1:1 */}
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
               <div className="space-y-1">
-                <div className="flex items-center gap-2">
-                  <ClipboardList className="w-5 h-5 text-primary" />
-                  <h3 className="font-outfit text-xl sm:text-2xl font-bold tracking-tight text-foreground">
-                    Órdenes de Servicio
-                  </h3>
-                </div>
+                <h3 className="font-outfit text-xl sm:text-2xl font-bold tracking-tight text-foreground flex items-center gap-2.5">
+                  <ClipboardList className="w-5 h-5 sm:w-6 sm:h-6 text-primary shrink-0" />
+                  <span>Órdenes de Servicio</span>
+                </h3>
                 <p className="text-xs text-muted-foreground font-light">
-                  Seguimiento técnico del taller, fichas detalladas y presupuestos online.
+                  Seguimiento técnico del taller, ficha detallada de equipos, presupuestos y avisos por WhatsApp.
                 </p>
               </div>
 
-              <button
-                onClick={() => setActiveNav("nuevo-ingreso")}
-                className="self-start sm:self-auto px-3 py-1.5 rounded-lg bg-primary text-primary-foreground font-bold text-xs flex items-center gap-1.5 cursor-pointer shadow-sm shadow-primary/25"
-              >
-                <PlusCircle className="w-3.5 h-3.5" />
-                <span>Nuevo Ingreso</span>
-              </button>
-            </div>
-
-            {/* Filtros de Estado */}
-            <div className="flex items-center gap-1 overflow-x-auto no-scrollbar pb-1 border-b border-border/50 text-[11px]">
-              {["todas", "diagnostico", "reparacion", "listo", "entregado"].map((st) => (
+              <div className="flex items-center gap-2 self-start sm:self-auto">
                 <button
-                  key={st}
-                  onClick={() => setOrderFilter(st)}
-                  className={`px-3 py-1 rounded-md font-medium capitalize transition-all cursor-pointer whitespace-nowrap ${
-                    orderFilter === st
-                      ? "bg-primary text-black font-bold"
-                      : "text-muted-foreground hover:text-foreground hover:bg-card/40"
-                  }`}
+                  type="button"
+                  className="h-8 px-3 border border-border/80 hover:bg-muted/40 text-foreground text-xs font-semibold flex items-center gap-1.5 cursor-pointer rounded-lg bg-card/60"
                 >
-                  {st === "todas" ? "Todas (18)" : st === "listo" ? "Listo" : st}
+                  <FileSpreadsheet className="w-4 h-4 text-emerald-400" />
+                  <span>Exportar Excel</span>
                 </button>
-              ))}
+                <button
+                  type="button"
+                  onClick={() => setActiveNav("nuevo-ingreso")}
+                  className="h-8 px-3 bg-primary hover:bg-primary/90 text-primary-foreground text-xs font-bold flex items-center gap-1.5 cursor-pointer rounded-lg shadow-sm"
+                >
+                  <PlusCircle className="w-4 h-4" />
+                  <span>Nuevo Ingreso</span>
+                </button>
+              </div>
             </div>
 
-            {/* Listado de Órdenes */}
-            <div className="space-y-3">
-              {[
-                {
-                  code: "TK-9281",
-                  device: "iPhone 14 Pro Max 256GB",
-                  client: "Mariana López",
-                  issue: "Cambio de Módulo OLED + Sellado IP68",
-                  tech: "Lucas R.",
-                  status: "En Reparación",
-                  badgeClass: "bg-primary text-primary-foreground",
-                  amount: "$165.000",
-                },
-                {
-                  code: "TK-9280",
-                  device: "MacBook Pro 14\" M2",
-                  client: "Santiago Rossi",
-                  issue: "Reemplazo de Batería OEM y Mantenimiento Térmico",
-                  tech: "Martín G.",
-                  status: "Listo",
-                  badgeClass: "bg-emerald-500/15 text-emerald-400 border border-emerald-500/30",
-                  amount: "$280.000",
-                },
-                {
-                  code: "TK-9279",
-                  device: "PlayStation 5 Digital Edition",
-                  client: "Esteban Giménez",
-                  issue: "Reemplazo conector HDMI 2.1 y cambio de Metal Líquido",
-                  tech: "Lucas R.",
-                  status: "En Diagnóstico",
-                  badgeClass: "text-amber-400 border border-amber-400/40",
-                  amount: "$95.000",
-                },
-              ].map((ord) => (
-                <div
-                  key={ord.code}
-                  className="rounded-xl border border-border/70 bg-[#151821] p-4 flex flex-col md:flex-row md:items-center justify-between gap-3 hover:border-primary/40 transition-colors"
-                >
-                  <div className="space-y-1 min-w-0 flex-1">
-                    <div className="flex items-center gap-2">
-                      <span className="font-mono font-bold text-primary text-xs">{ord.code}</span>
-                      <span className="text-muted-foreground/30">•</span>
-                      <h4 className="font-bold text-xs sm:text-sm text-foreground truncate">{ord.device}</h4>
-                      <Badge className={`text-[9px] uppercase font-bold py-0.5 px-2 ${ord.badgeClass}`}>
-                        {ord.status}
-                      </Badge>
-                    </div>
-                    <p className="text-xs text-muted-foreground truncate">{ord.issue}</p>
-                    <div className="text-[11px] text-muted-foreground/80">
-                      Cliente: <span className="text-foreground">{ord.client}</span> • Técnico asignado:{" "}
-                      <span className="text-foreground">{ord.tech}</span>
-                    </div>
-                  </div>
-
-                  <div className="flex items-center justify-between md:justify-end gap-3 shrink-0 pt-2 md:pt-0 border-t md:border-t-0 border-border/40">
-                    <div className="text-left md:text-right">
-                      <div className="font-mono font-bold text-sm text-foreground">{ord.amount}</div>
-                      <div className="text-[10px] text-emerald-400 font-mono">Presupuesto Aprobado</div>
-                    </div>
-                    <div className="flex items-center gap-1">
-                      <button title="Imprimir Ticket" className="w-7 h-7 rounded border border-border/80 bg-card flex items-center justify-center text-muted-foreground hover:text-foreground">
-                        <Printer className="w-3.5 h-3.5" />
-                      </button>
-                      <button title="QR del Cliente" className="w-7 h-7 rounded border border-border/80 bg-card flex items-center justify-center text-muted-foreground hover:text-foreground">
-                        <QrCode className="w-3.5 h-3.5" />
-                      </button>
-                    </div>
-                  </div>
+            {/* Contenedor Principal 1:1 */}
+            <div className="rounded-xl border border-border/80 bg-card/30 p-3 sm:p-5 shadow-sm space-y-4 overflow-hidden">
+              {/* Barra de Búsqueda + Píldoras de Estado */}
+              <div className="flex flex-col lg:flex-row gap-3 lg:items-center justify-between border-b border-border/50 pb-3.5">
+                <div className="relative w-full lg:max-w-xs flex items-center">
+                  <Search className="w-4 h-4 text-muted-foreground absolute left-3 pointer-events-none" />
+                  <input
+                    type="text"
+                    placeholder="Buscar N° orden, cliente, DNI o equipo..."
+                    className="bg-background/85 border border-border text-xs w-full pl-9 pr-3 h-9 rounded-lg text-foreground focus:outline-none focus:border-primary"
+                  />
                 </div>
-              ))}
+
+                {/* Píldoras de filtro rápido */}
+                <div className="flex items-center gap-1.5 overflow-x-auto pb-1 lg:pb-0 no-scrollbar">
+                  {[
+                    { key: "todos", label: "Todos" },
+                    { key: "ingresado", label: "Ingresado" },
+                    { key: "diagnostico", label: "En Diagnóstico" },
+                    { key: "presupuestado", label: "Presupuestado" },
+                    { key: "en_reparacion", label: "En Reparación" },
+                    { key: "listo", label: "Listo" },
+                    { key: "entregado", label: "Entregado" },
+                  ].map((st) => {
+                    const isActive = orderFilter === st.key;
+                    return (
+                      <button
+                        key={st.key}
+                        type="button"
+                        onClick={() => setOrderFilter(st.key)}
+                        className={`px-2.5 py-1.5 rounded-lg text-[11px] font-semibold whitespace-nowrap transition-all cursor-pointer border ${
+                          isActive
+                            ? "bg-primary/15 text-primary border-primary/30 font-bold"
+                            : "bg-background/60 text-muted-foreground border-border/60 hover:text-foreground hover:bg-muted/40"
+                        }`}
+                      >
+                        {st.label}
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+
+              {/* Tabla Completa 1:1 de Órdenes */}
+              <div className="overflow-x-auto">
+                <table className="w-full text-left text-xs border-collapse">
+                  <thead>
+                    <tr className="border-b border-border/60 text-muted-foreground uppercase tracking-wider font-semibold text-[10px]">
+                      <th className="py-3 px-2.5">N° de Orden</th>
+                      <th className="py-3 px-2.5">Cliente</th>
+                      <th className="py-3 px-2.5">Dispositivo</th>
+                      <th className="py-3 px-2.5">Diagnóstico / Presupuesto</th>
+                      <th className="py-3 px-2.5">Estado</th>
+                      <th className="py-3 px-2.5 text-right">Acciones</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {filteredOrders.map((ord) => (
+                      <tr
+                        key={ord.id}
+                        className="border-b border-border/40 hover:bg-card/40 transition-colors"
+                      >
+                        {/* N° de Orden */}
+                        <td className="py-3.5 px-2.5">
+                          <div className="font-mono font-bold text-primary flex items-center gap-1.5">
+                            <span className="hover:underline cursor-pointer">{ord.code}</span>
+                            <ExternalLink className="w-3 h-3 text-muted-foreground hover:text-primary transition-colors cursor-pointer" />
+                          </div>
+                          <div className="text-[10px] text-muted-foreground font-mono flex items-center gap-1 mt-0.5 whitespace-nowrap">
+                            <span>{ord.date}</span>
+                          </div>
+                        </td>
+
+                        {/* Cliente */}
+                        <td className="py-3.5 px-2.5">
+                          <span className="font-semibold text-foreground block">
+                            {ord.client.name}
+                          </span>
+                          <div className="flex flex-col text-[10px] text-muted-foreground font-mono">
+                            <span>DNI: {ord.client.dni}</span>
+                            <span>Tel: {ord.client.phone}</span>
+                          </div>
+                        </td>
+
+                        {/* Dispositivo */}
+                        <td className="py-3.5 px-2.5">
+                          <span className="font-semibold text-foreground block">
+                            {ord.deviceModel}
+                          </span>
+                          <span className="text-[10px] text-muted-foreground">
+                            {ord.deviceType}
+                          </span>
+                        </td>
+
+                        {/* Diagnóstico / Presupuesto */}
+                        <td className="py-3.5 px-2.5 max-w-[220px]">
+                          <div className="space-y-1">
+                            <span
+                              className="font-medium text-foreground truncate block"
+                              title={ord.diagnosis}
+                            >
+                              {ord.diagnosis}
+                            </span>
+                            <div className="flex items-center gap-1.5 pt-0.5">
+                              <span className="text-[11px] font-mono font-bold text-emerald-400">
+                                {ord.budget.amount}
+                              </span>
+                              {ord.budget.approved ? (
+                                <span className="text-[9px] bg-emerald-500/15 text-emerald-400 border border-emerald-500/30 font-bold px-1.5 py-0 rounded">
+                                  Aprobado ✓
+                                </span>
+                              ) : (
+                                <span className="text-[9px] bg-amber-500/15 text-amber-400 border border-amber-500/30 font-semibold px-1.5 py-0 rounded">
+                                  Pendiente
+                                </span>
+                              )}
+                            </div>
+                          </div>
+                        </td>
+
+                        {/* Estado: Dropdown estilizado 1:1 */}
+                        <td className="py-3.5 px-2.5">
+                          <button
+                            type="button"
+                            className={`h-7 border px-2.5 text-[11px] font-bold rounded-lg flex items-center gap-1 cursor-pointer transition-all ${ord.statusColor}`}
+                          >
+                            <span>{ord.statusLabel}</span>
+                            <ChevronDown className="w-3 h-3 opacity-70" />
+                          </button>
+                        </td>
+
+                        {/* Acciones */}
+                        <td className="py-3.5 px-2.5 text-right">
+                          <div className="inline-flex items-center justify-end gap-1">
+                            <button
+                              type="button"
+                              className="h-7 px-2 text-xs font-bold border border-primary/30 text-primary hover:bg-primary/10 rounded-lg flex items-center gap-1 cursor-pointer shrink-0"
+                            >
+                              <Stethoscope className="w-3.5 h-3.5" />
+                              <span>Diagnóstico</span>
+                            </button>
+                            <button
+                              type="button"
+                              className="h-7 w-7 border border-border/70 hover:bg-muted/40 rounded-lg flex items-center justify-center text-muted-foreground hover:text-foreground cursor-pointer shrink-0"
+                              title="Ver ficha"
+                            >
+                              <Eye className="w-3.5 h-3.5" />
+                            </button>
+                            <button
+                              type="button"
+                              className="h-7 w-7 border border-emerald-500/30 hover:bg-emerald-500/10 text-emerald-400 rounded-lg flex items-center justify-center cursor-pointer shrink-0"
+                              title="WhatsApp"
+                            >
+                              <MessageCircle className="w-3.5 h-3.5" />
+                            </button>
+                            <button
+                              type="button"
+                              className="h-7 w-7 border border-border/70 hover:bg-muted/40 rounded-lg flex items-center justify-center text-muted-foreground hover:text-foreground cursor-pointer shrink-0"
+                              title="Imprimir Comprobante"
+                            >
+                              <Printer className="w-3.5 h-3.5" />
+                            </button>
+                          </div>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
             </div>
           </div>
         )}
 
         {/* ===================================================================== */}
-        {/* VISTA 4: CLIENTES */}
+        {/* VISTA 4: CLIENTES (RÉPLICA 1:1 DE ClientsPage.jsx) */}
         {/* ===================================================================== */}
         {activeNav === "clientes" && (
           <div className="flex-1 p-4 sm:p-6 space-y-5 overflow-y-auto no-scrollbar">
-            <div className="space-y-1">
-              <div className="flex items-center gap-2">
-                <Users className="w-5 h-5 text-primary" />
-                <h3 className="font-outfit text-xl sm:text-2xl font-bold tracking-tight text-foreground">
-                  Directorio de Clientes
-                </h3>
-              </div>
-              <p className="text-xs text-muted-foreground font-light">
-                Base de clientes centralizada con historial completo de visitas y reparaciones.
-              </p>
-            </div>
-
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3.5">
-              {[
-                { name: "Mariana López", dni: "38.291.840", phone: "+54 9 11 5829-1049", visits: 3, total: "$240.000" },
-                { name: "Santiago Rossi", dni: "35.104.220", phone: "+54 9 11 4102-9912", visits: 2, total: "$380.000" },
-                { name: "Esteban Giménez", dni: "41.882.910", phone: "+54 9 11 6392-8811", visits: 1, total: "$95.000" },
-                { name: "Valeria Benítez", dni: "39.400.123", phone: "+54 9 11 7201-4455", visits: 4, total: "$510.000" },
-                { name: "Nicolás Castro", dni: "36.712.500", phone: "+54 9 11 3190-2210", visits: 2, total: "$180.000" },
-                { name: "Camila Duarte", dni: "42.001.990", phone: "+54 9 11 8840-1122", visits: 1, total: "$120.000" },
-              ].map((c) => (
-                <div key={c.name} className="rounded-xl border border-border/70 bg-[#151821] p-4 space-y-2.5">
-                  <div className="flex items-start justify-between">
-                    <div>
-                      <h4 className="font-bold text-xs sm:text-sm text-foreground">{c.name}</h4>
-                      <p className="text-[10px] font-mono text-muted-foreground">DNI: {c.dni}</p>
-                    </div>
-                    <span className="text-[10px] font-mono font-bold text-primary bg-primary/10 px-2 py-0.5 rounded">
-                      {c.visits} reparaciones
-                    </span>
-                  </div>
-                  <div className="text-[11px] font-mono text-muted-foreground">{c.phone}</div>
-                  <div className="pt-2 border-t border-border/40 flex items-center justify-between text-xs">
-                    <span className="text-muted-foreground">Facturación total:</span>
-                    <span className="font-mono font-bold text-foreground">{c.total}</span>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        )}
-
-        {/* ===================================================================== */}
-        {/* VISTA 5: INVENTARIO */}
-        {/* ===================================================================== */}
-        {activeNav === "inventario" && (
-          <div className="flex-1 p-4 sm:p-6 space-y-5 overflow-y-auto no-scrollbar">
+            {/* Cabecera Superior 1:1 */}
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
               <div className="space-y-1">
-                <div className="flex items-center gap-2">
-                  <Package className="w-5 h-5 text-primary" />
-                  <h3 className="font-outfit text-xl sm:text-2xl font-bold tracking-tight text-foreground">
-                    Inventario de Insumos y Repuestos
-                  </h3>
-                </div>
+                <h3 className="font-outfit text-xl sm:text-2xl font-bold tracking-tight text-foreground flex items-center gap-2.5">
+                  <Users className="w-5 h-5 sm:w-6 sm:h-6 text-primary shrink-0" />
+                  <span>Directorio de Clientes</span>
+                </h3>
                 <p className="text-xs text-muted-foreground font-light">
-                  Control de stock con alerta de reposición por umbral mínimo y lector de código de barras.
+                  Gestión de fichas de clientes e historial técnico de reparaciones asociadas.
                 </p>
               </div>
 
-              <div className="h-8 border border-border/80 bg-[#151821] px-2.5 rounded text-xs flex items-center gap-2 self-start sm:self-auto">
-                <Search className="w-3.5 h-3.5 text-muted-foreground" />
-                <input
-                  type="text"
-                  placeholder="Buscar repuesto..."
-                  className="bg-transparent border-none text-xs text-foreground focus:outline-none w-36"
-                />
+              <div className="flex items-center gap-2 self-start sm:self-auto">
+                <button
+                  type="button"
+                  className="h-8 px-3 border border-border/80 text-xs font-semibold flex items-center gap-1.5 cursor-pointer rounded-lg bg-card/60 hover:bg-muted/40 text-foreground"
+                >
+                  <Download className="w-3.5 h-3.5 text-emerald-400" />
+                  <span>Exportar Excel</span>
+                </button>
+                <button
+                  type="button"
+                  className="h-8 px-3 bg-primary hover:bg-primary/90 text-primary-foreground text-xs font-bold flex items-center gap-1.5 cursor-pointer rounded-lg shadow-sm"
+                >
+                  <UserPlus className="w-4 h-4" />
+                  <span>Nuevo Cliente</span>
+                </button>
               </div>
             </div>
 
-            <div className="rounded-xl border border-border/70 bg-[#151821] overflow-hidden">
-              <table className="w-full text-left text-xs border-collapse">
-                <thead>
-                  <tr className="border-b border-border/50 bg-card/40 text-muted-foreground uppercase text-[10px] font-bold tracking-wider">
-                    <th className="p-3">Insumo / Repuesto</th>
-                    <th className="p-3">Categoría</th>
-                    <th className="p-3">Precio Venta</th>
-                    <th className="p-3">Stock Actual</th>
-                    <th className="p-3 text-right">Estado</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-border/20">
-                  {[
-                    { name: "Módulo Display OLED iPhone 13 Pro", cat: "Pantallas", price: "$145.000", stock: 1, min: 3, alert: true },
-                    { name: "Batería OEM MacBook Pro A1708", cat: "Baterías", price: "$82.000", stock: 0, min: 2, alert: true },
-                    { name: "Conector HDMI 2.1 PlayStation 5", cat: "Puertos", price: "$28.000", stock: 2, min: 4, alert: true },
-                    { name: "Módulo Pantalla Samsung A54 5G", cat: "Pantallas", price: "$65.000", stock: 8, min: 2, alert: false },
-                    { name: "Pin de Carga Tipo-C Universal", cat: "Conectores", price: "$4.500", stock: 42, min: 10, alert: false },
-                  ].map((it) => (
-                    <tr key={it.name} className="hover:bg-card/40 transition-colors">
-                      <td className="p-3 font-semibold text-foreground">{it.name}</td>
-                      <td className="p-3 text-muted-foreground">{it.cat}</td>
-                      <td className="p-3 font-mono font-bold text-foreground">{it.price}</td>
-                      <td className="p-3 font-mono">
-                        <span className={it.alert ? "text-red-400 font-bold" : "text-foreground"}>
-                          {it.stock} u.
-                        </span>{" "}
-                        <span className="text-[10px] text-muted-foreground/60">(Mín: {it.min})</span>
-                      </td>
-                      <td className="p-3 text-right">
-                        {it.alert ? (
-                          <Badge variant="destructive" className="text-[9px] font-bold py-0.5 px-2">
-                            Reponer
-                          </Badge>
-                        ) : (
-                          <Badge className="text-[9px] font-bold py-0.5 px-2 bg-emerald-500/15 text-emerald-400 border border-emerald-500/30">
-                            Óptimo
-                          </Badge>
-                        )}
-                      </td>
+            {/* Contenedor Principal 1:1 */}
+            <div className="rounded-xl border border-border/80 bg-card/30 p-3 sm:p-5 shadow-sm space-y-4">
+              {/* Buscador y Contador */}
+              <div className="flex flex-col sm:flex-row gap-3 items-start sm:items-center justify-between border-b border-border/50 pb-3.5">
+                <div className="relative w-full sm:max-w-sm flex items-center">
+                  <Search className="w-4 h-4 text-muted-foreground absolute left-3 pointer-events-none" />
+                  <input
+                    type="text"
+                    placeholder="Buscar por nombre, DNI, teléfono o email..."
+                    className="bg-background/85 border border-border text-xs w-full pl-9 pr-3 h-9 rounded-lg text-foreground focus:outline-none focus:border-primary"
+                  />
+                </div>
+                <span className="text-[10px] text-muted-foreground uppercase tracking-widest font-mono font-bold">
+                  Total: 124 Clientes
+                </span>
+              </div>
+
+              {/* Tabla Completa 1:1 de Clientes */}
+              <div className="overflow-x-auto">
+                <table className="w-full text-left text-xs border-collapse">
+                  <thead>
+                    <tr className="border-b border-border/60 text-muted-foreground uppercase tracking-wider font-semibold text-[10px]">
+                      <th className="py-3 px-2.5">ID</th>
+                      <th className="py-3 px-2.5">Nombre y Apellido</th>
+                      <th className="py-3 px-2.5">DNI / CUIT</th>
+                      <th className="py-3 px-2.5">Contacto</th>
+                      <th className="py-3 px-2.5 text-center">Órdenes</th>
+                      <th className="py-3 px-2.5 text-right">Acciones</th>
                     </tr>
-                  ))}
-                </tbody>
-              </table>
+                  </thead>
+                  <tbody>
+                    {[
+                      { id: "CL-842", name: "Mariana López", dni: "38.291.840", phone: "+54 9 11 5829-1049", email: "mariana.lopez@gmail.com", orders: 3 },
+                      { id: "CL-841", name: "Santiago Rossi", dni: "35.104.220", phone: "+54 9 11 4102-9912", email: "santiago.rossi@outlook.com", orders: 2 },
+                      { id: "CL-840", name: "Esteban Giménez", dni: "41.882.910", phone: "+54 9 11 6392-8811", email: "esteban.gimenez@hotmail.com", orders: 1 },
+                      { id: "CL-839", name: "Valeria Benítez", dni: "39.400.123", phone: "+54 9 11 7201-4455", email: "valeria.b@gmail.com", orders: 4 },
+                      { id: "CL-838", name: "Nicolás Castro", dni: "36.712.500", phone: "+54 9 11 3190-2210", email: "nicolas.castro@empresa.com", orders: 2 },
+                    ].map((c) => (
+                      <tr
+                        key={c.id}
+                        className="border-b border-border/40 hover:bg-card/40 transition-colors"
+                      >
+                        <td className="py-3.5 px-2.5 font-mono font-bold text-primary">
+                          {c.id}
+                        </td>
+                        <td className="py-3.5 px-2.5 font-semibold text-foreground">
+                          {c.name}
+                        </td>
+                        <td className="py-3.5 px-2.5 font-mono text-muted-foreground">
+                          {c.dni}
+                        </td>
+                        <td className="py-3.5 px-2.5">
+                          <div className="flex flex-col">
+                            <span className="font-medium text-foreground">{c.phone}</span>
+                            <span className="text-[10px] text-muted-foreground font-mono">
+                              {c.email}
+                            </span>
+                          </div>
+                        </td>
+                        <td className="py-3.5 px-2.5 text-center">
+                          <span className="inline-block px-2 py-0.5 rounded-full bg-primary/10 text-primary font-bold text-[10px]">
+                            {c.orders}
+                          </span>
+                        </td>
+                        <td className="py-3.5 px-2.5 text-right">
+                          <div className="flex items-center justify-end gap-1">
+                            <button
+                              type="button"
+                              className="h-7 w-7 border border-border/70 hover:bg-muted/40 rounded-lg flex items-center justify-center text-muted-foreground hover:text-foreground cursor-pointer"
+                              title="Ver ficha del cliente"
+                            >
+                              <Eye className="w-3.5 h-3.5" />
+                            </button>
+                            <button
+                              type="button"
+                              className="h-7 w-7 border border-border/70 hover:bg-muted/40 rounded-lg flex items-center justify-center text-muted-foreground hover:text-foreground cursor-pointer"
+                              title="Editar cliente"
+                            >
+                              <Pencil className="w-3.5 h-3.5" />
+                            </button>
+                            <button
+                              type="button"
+                              className="h-7 w-7 border border-emerald-500/30 hover:bg-emerald-500/10 text-emerald-400 rounded-lg flex items-center justify-center cursor-pointer"
+                              title="Enviar WhatsApp"
+                            >
+                              <MessageCircle className="w-3.5 h-3.5" />
+                            </button>
+                          </div>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
             </div>
           </div>
         )}
 
         {/* ===================================================================== */}
-        {/* VISTA 6: CAJA Y POS */}
+        {/* VISTA 5: INVENTARIO (RÉPLICA 1:1 DE InventoryPage.jsx) */}
+        {/* ===================================================================== */}
+        {activeNav === "inventario" && (
+          <div className="flex-1 p-4 sm:p-6 space-y-5 overflow-y-auto no-scrollbar">
+            {/* Cabecera Superior 1:1 */}
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+              <div className="space-y-1">
+                <h3 className="font-outfit text-xl sm:text-2xl font-bold tracking-tight text-foreground flex items-center gap-2.5">
+                  <Package className="w-5 h-5 sm:w-6 sm:h-6 text-primary shrink-0" />
+                  <span>Stock e Inventario</span>
+                </h3>
+                <p className="text-xs text-muted-foreground font-light">
+                  Control de repuestos e insumos del taller, alertas de reposición y precios de venta.
+                </p>
+              </div>
+
+              <div className="flex items-center gap-2 self-start sm:self-auto">
+                <button
+                  type="button"
+                  className="h-8 px-3 border border-border/80 text-xs font-semibold flex items-center gap-1.5 cursor-pointer rounded-lg bg-card/60 hover:bg-muted/40 text-foreground"
+                >
+                  <Download className="w-3.5 h-3.5 text-emerald-400" />
+                  <span>Exportar Excel</span>
+                </button>
+                <button
+                  type="button"
+                  className="h-8 px-3 bg-primary hover:bg-primary/90 text-primary-foreground text-xs font-bold flex items-center gap-1.5 cursor-pointer rounded-lg shadow-sm"
+                >
+                  <PlusCircle className="w-4 h-4" />
+                  <span>Nuevo Insumo</span>
+                </button>
+              </div>
+            </div>
+
+            {/* Contenedor Principal 1:1 */}
+            <div className="rounded-xl border border-border/80 bg-card/30 p-3 sm:p-5 shadow-sm space-y-4">
+              {/* Buscador + Filtros por Categoría */}
+              <div className="flex flex-col lg:flex-row gap-3 lg:items-center justify-between border-b border-border/50 pb-3.5">
+                <div className="relative w-full lg:max-w-xs flex items-center">
+                  <Search className="w-4 h-4 text-muted-foreground absolute left-3 pointer-events-none" />
+                  <input
+                    type="text"
+                    placeholder="Buscar por nombre, SKU o categoría..."
+                    className="bg-background/85 border border-border text-xs w-full pl-9 pr-3 h-9 rounded-lg text-foreground focus:outline-none focus:border-primary"
+                  />
+                </div>
+
+                <div className="flex items-center gap-1.5 overflow-x-auto pb-1 lg:pb-0 no-scrollbar">
+                  {[
+                    { key: "todos", label: "Todos (148)" },
+                    { key: "pantallas", label: "Pantallas" },
+                    { key: "baterias", label: "Baterías" },
+                    { key: "conectores", label: "Conectores" },
+                    { key: "herramientas", label: "Herramientas" },
+                  ].map((cat) => (
+                    <button
+                      key={cat.key}
+                      type="button"
+                      onClick={() => setInventoryCategory(cat.key)}
+                      className={`px-2.5 py-1.5 rounded-lg text-[11px] font-semibold whitespace-nowrap transition-all cursor-pointer border ${
+                        inventoryCategory === cat.key
+                          ? "bg-primary/15 text-primary border-primary/30 font-bold"
+                          : "bg-background/60 text-muted-foreground border-border/60 hover:text-foreground hover:bg-muted/40"
+                      }`}
+                    >
+                      {cat.label}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Tabla Completa 1:1 de Stock */}
+              <div className="overflow-x-auto">
+                <table className="w-full text-left text-xs border-collapse">
+                  <thead>
+                    <tr className="border-b border-border/60 text-muted-foreground uppercase tracking-wider font-semibold text-[10px]">
+                      <th className="py-3 px-2.5">SKU</th>
+                      <th className="py-3 px-2.5">Artículo / Insumo</th>
+                      <th className="py-3 px-2.5">Categoría</th>
+                      <th className="py-3 px-2.5">Precio Venta</th>
+                      <th className="py-3 px-2.5 text-center">Stock Actual</th>
+                      <th className="py-3 px-2.5 text-center">Stock Mínimo</th>
+                      <th className="py-3 px-2.5">Estado</th>
+                      <th className="py-3 px-2.5 text-right">Acciones</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {[
+                      {
+                        sku: "MOD-IP14PM",
+                        name: "Módulo OLED iPhone 14 Pro Max",
+                        desc: "Display Super Retina XDR 120Hz ProMotion Original",
+                        cat: "Pantallas",
+                        price: "$145.000,00",
+                        qty: 1,
+                        min: 3,
+                        status: "CRÍTICO",
+                        statusClass: "bg-destructive/15 text-destructive border-destructive/30",
+                      },
+                      {
+                        sku: "BAT-MBP14M2",
+                        name: "Batería Original MacBook Pro 14\" M2",
+                        desc: "Celda de polímero de litio A2519 70Wh OEM",
+                        cat: "Baterías",
+                        price: "$185.000,00",
+                        qty: 0,
+                        min: 2,
+                        status: "SIN STOCK",
+                        statusClass: "bg-destructive/15 text-destructive border-destructive/30",
+                      },
+                      {
+                        sku: "CON-HDMI-PS5",
+                        name: "Conector HDMI 2.1 PlayStation 5",
+                        desc: "Puerto reforzado 19 pines blindado de alta velocidad",
+                        cat: "Conectores",
+                        price: "$28.000,00",
+                        qty: 2,
+                        min: 4,
+                        status: "BAJO",
+                        statusClass: "bg-amber-500/15 text-amber-400 border-amber-500/30",
+                      },
+                      {
+                        sku: "MOD-S24U",
+                        name: "Módulo Display Samsung S24 Ultra",
+                        desc: "Dynamic AMOLED 2X 120Hz con marco titanio",
+                        cat: "Pantallas",
+                        price: "$195.000,00",
+                        qty: 6,
+                        min: 2,
+                        status: "ÓPTIMO",
+                        statusClass: "bg-emerald-500/15 text-emerald-400 border-emerald-500/30",
+                      },
+                      {
+                        sku: "PIN-TYPEC-U",
+                        name: "Pin de Carga USB Tipo-C Hembra",
+                        desc: "Conector universal reversible 16 pines",
+                        cat: "Conectores",
+                        price: "$4.500,00",
+                        qty: 42,
+                        min: 10,
+                        status: "ÓPTIMO",
+                        statusClass: "bg-emerald-500/15 text-emerald-400 border-emerald-500/30",
+                      },
+                    ].map((item) => (
+                      <tr
+                        key={item.sku}
+                        className="border-b border-border/40 hover:bg-card/40 transition-colors"
+                      >
+                        <td className="py-3 px-2.5 font-mono text-[11px] text-muted-foreground">
+                          {item.sku}
+                        </td>
+                        <td className="py-3 px-2.5">
+                          <span className="font-semibold text-foreground block leading-snug">
+                            {item.name}
+                          </span>
+                          <span className="text-[10px] text-muted-foreground font-light block max-w-xs truncate">
+                            {item.desc}
+                          </span>
+                        </td>
+                        <td className="py-3 px-2.5">
+                          <span className="px-2 py-0.5 rounded text-[10px] uppercase font-bold bg-secondary text-secondary-foreground">
+                            {item.cat}
+                          </span>
+                        </td>
+                        <td className="py-3 px-2.5 font-mono text-foreground font-bold">
+                          {item.price}
+                        </td>
+                        <td className="py-3 px-2.5 text-center">
+                          <div className="inline-flex items-center gap-1 border border-border/70 rounded-md px-1.5 py-0.5 bg-background/60">
+                            <button className="text-muted-foreground hover:text-foreground">
+                              <Minus className="w-3 h-3" />
+                            </button>
+                            <span className="font-mono font-bold text-xs px-1 min-w-[20px]">
+                              {item.qty}
+                            </span>
+                            <button className="text-muted-foreground hover:text-foreground">
+                              <Plus className="w-3 h-3" />
+                            </button>
+                          </div>
+                        </td>
+                        <td className="py-3 px-2.5 text-center font-mono text-muted-foreground">
+                          {item.min} u.
+                        </td>
+                        <td className="py-3 px-2.5">
+                          <span className={`px-2 py-0.5 rounded text-[9px] uppercase font-bold border inline-block ${item.statusClass}`}>
+                            {item.status}
+                          </span>
+                        </td>
+                        <td className="py-3 px-2.5 text-right">
+                          <button
+                            type="button"
+                            className="h-7 w-7 border border-border/70 hover:bg-muted/40 rounded-lg inline-flex items-center justify-center text-muted-foreground hover:text-foreground cursor-pointer"
+                            title="Editar insumo"
+                          >
+                            <Pencil className="w-3.5 h-3.5" />
+                          </button>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* ===================================================================== */}
+        {/* VISTA 6: CAJA Y POS (RÉPLICA 1:1 DE POSPage.jsx) */}
         {/* ===================================================================== */}
         {activeNav === "caja" && (
           <div className="flex-1 p-4 sm:p-6 space-y-5 overflow-y-auto no-scrollbar">
-            <div className="space-y-1">
-              <div className="flex items-center gap-2">
-                <ShoppingCart className="w-5 h-5 text-primary" />
-                <h3 className="font-outfit text-xl sm:text-2xl font-bold tracking-tight text-foreground">
-                  Control de Caja y Punto de Venta
+            {/* Cabecera Superior 1:1 */}
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+              <div className="space-y-1">
+                <h3 className="font-outfit text-xl sm:text-2xl font-bold tracking-tight text-foreground flex items-center gap-2.5">
+                  <ShoppingCart className="w-5 h-5 sm:w-6 sm:h-6 text-primary shrink-0" />
+                  <span>Caja y Punto de Venta</span>
                 </h3>
+                <p className="text-xs text-muted-foreground font-light">
+                  Facturación rápida de repuestos y accesorios con descuento automático de stock e impresión de ticket.
+                </p>
               </div>
-              <p className="text-xs text-muted-foreground font-light">
-                Arqueo de caja diaria, cobro directo de órdenes terminadas y ventas de mostrador.
-              </p>
+
+              {/* Selector de Vista: Punto de Venta vs Historial */}
+              <div className="flex items-center bg-card/80 border border-border/80 rounded-xl p-1 self-start sm:self-auto shadow-sm select-none">
+                <button
+                  type="button"
+                  onClick={() => setPosTab("venta")}
+                  className={`px-3 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-1.5 cursor-pointer transition-all ${
+                    posTab === "venta"
+                      ? "bg-primary text-primary-foreground font-bold shadow-sm"
+                      : "text-muted-foreground hover:text-foreground"
+                  }`}
+                >
+                  <ShoppingCart className="w-3.5 h-3.5" />
+                  <span>Punto de Venta</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setPosTab("historial")}
+                  className={`px-3 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-1.5 cursor-pointer transition-all ${
+                    posTab === "historial"
+                      ? "bg-primary text-primary-foreground font-bold shadow-sm"
+                      : "text-muted-foreground hover:text-foreground"
+                  }`}
+                >
+                  <ClipboardList className="w-3.5 h-3.5" />
+                  <span>Historial de Caja</span>
+                </button>
+              </div>
             </div>
 
-            {/* Resumen de Caja */}
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3.5">
-              <div className="rounded-xl border border-border/70 bg-[#151821] p-4 space-y-1">
-                <span className="text-[10px] uppercase font-bold text-muted-foreground tracking-wider">
-                  Total en Caja Hoy
-                </span>
-                <div className="text-2xl font-extrabold font-outfit text-foreground">$837.500</div>
-                <div className="text-[10px] text-emerald-400 font-mono">Caja abierta a las 09:00</div>
-              </div>
-
-              <div className="rounded-xl border border-border/70 bg-[#151821] p-4 space-y-1">
-                <span className="text-[10px] uppercase font-bold text-muted-foreground tracking-wider">
-                  Cobros de Reparaciones
-                </span>
-                <div className="text-2xl font-extrabold font-outfit text-primary">$536.000</div>
-                <div className="text-[10px] text-muted-foreground font-mono">3 órdenes liquidadas</div>
-              </div>
-
-              <div className="rounded-xl border border-border/70 bg-[#151821] p-4 space-y-1">
-                <span className="text-[10px] uppercase font-bold text-muted-foreground tracking-wider">
-                  Ventas de Accesorios / POS
-                </span>
-                <div className="text-2xl font-extrabold font-outfit text-emerald-400">$301.500</div>
-                <div className="text-[10px] text-muted-foreground font-mono">8 ventas en mostrador</div>
-              </div>
-            </div>
-
-            {/* Órdenes Listas para Cobrar */}
-            <div className="rounded-xl border border-border/70 bg-[#151821] p-4 space-y-3">
-              <h4 className="font-bold text-xs sm:text-sm text-foreground">Órdenes Listas para Cobro y Entrega</h4>
-              <div className="space-y-2">
-                <div className="p-3 bg-card/40 rounded-lg border border-border/60 flex items-center justify-between">
-                  <div>
-                    <div className="font-bold text-xs text-foreground">TK-9280 • MacBook Pro 14" M2</div>
-                    <div className="text-[10px] text-muted-foreground">Cliente: Santiago Rossi • Estado: Listo</div>
-                  </div>
-                  <div className="flex items-center gap-3">
-                    <span className="font-mono font-bold text-sm text-foreground">$280.000</span>
-                    <button className="px-3 py-1.5 rounded bg-primary text-black font-bold text-xs cursor-pointer hover:bg-primary/90">
-                      Cobrar en Caja
-                    </button>
+            {/* Tarjetas de Arqueo / KPIs de Caja 1:1 */}
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+              <div className="rounded-xl border border-primary/25 bg-primary/5 p-3.5 flex items-center justify-between">
+                <div>
+                  <span className="text-[10px] font-bold uppercase tracking-wider text-primary block">
+                    Total en Caja Hoy (8 ops)
+                  </span>
+                  <div className="text-xl sm:text-2xl font-extrabold font-outfit text-foreground mt-0.5">
+                    $837.500
                   </div>
                 </div>
+                <div className="w-9 h-9 rounded-xl bg-primary/10 border border-primary/20 flex items-center justify-center text-primary shrink-0">
+                  <DollarSign className="w-4 h-4" />
+                </div>
+              </div>
+
+              <div className="rounded-xl border border-emerald-500/25 bg-emerald-500/5 p-3.5 flex items-center justify-between">
+                <div>
+                  <span className="text-[10px] font-bold uppercase tracking-wider text-emerald-400 block">
+                    Cobros de Taller (3 órdenes)
+                  </span>
+                  <div className="text-xl sm:text-2xl font-extrabold font-outfit text-foreground mt-0.5">
+                    $536.000
+                  </div>
+                </div>
+                <div className="w-9 h-9 rounded-xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-400 shrink-0">
+                  <Wrench className="w-4 h-4" />
+                </div>
+              </div>
+
+              <div className="rounded-xl border border-border/80 bg-card/40 p-3.5 flex items-center justify-between">
+                <div>
+                  <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground block">
+                    Ventas de Mostrador (5 tickets)
+                  </span>
+                  <div className="text-xl sm:text-2xl font-extrabold font-outfit text-foreground mt-0.5">
+                    $301.500
+                  </div>
+                </div>
+                <div className="w-9 h-9 rounded-xl bg-secondary border border-border flex items-center justify-center text-muted-foreground shrink-0">
+                  <ShoppingCart className="w-4 h-4" />
+                </div>
+              </div>
+            </div>
+
+            {/* Layout 2 Columnas de POS (7 cols catálogo, 5 cols ticket actual) */}
+            <div className="grid grid-cols-1 xl:grid-cols-12 gap-5 items-start">
+              {/* Columna Izquierda (7 cols): Catálogo de Productos */}
+              <div className="xl:col-span-7 rounded-xl border border-border/80 bg-card/30 p-4 sm:p-5 shadow-sm space-y-4">
+                <div className="space-y-3 border-b border-border/50 pb-3.5">
+                  <div className="relative">
+                    <Search className="w-4 h-4 text-muted-foreground absolute left-3 top-2.5 pointer-events-none" />
+                    <input
+                      type="text"
+                      placeholder="Buscar por nombre o código de barra..."
+                      className="w-full bg-background/85 border border-border text-xs pl-9 pr-3 h-9 rounded-lg text-foreground focus:outline-none focus:border-primary"
+                    />
+                  </div>
+
+                  <div className="flex items-center gap-1.5 overflow-x-auto pb-1 no-scrollbar">
+                    {["Todos", "Accesorios", "Cables", "Cargadores", "Fundas"].map((c, i) => (
+                      <button
+                        key={c}
+                        type="button"
+                        className={`px-2.5 py-1 rounded-lg text-[11px] font-semibold transition-all cursor-pointer border ${
+                          i === 0
+                            ? "bg-primary/15 text-primary border-primary/30 font-bold"
+                            : "bg-background/60 text-muted-foreground border-border/60 hover:text-foreground"
+                        }`}
+                      >
+                        {c}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Grid de Artículos */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  {[
+                    { name: "Cargador Rápido 35W Dual USB-C", code: "ACC-CH35", price: "$24.500", stock: 14 },
+                    { name: "Cable Lightning a USB-C Trenzado 1.5m", code: "CAB-LT15", price: "$12.000", stock: 22 },
+                    { name: "Vidrio Templado 9D Curvo Antiespía", code: "VID-9D01", price: "$8.500", stock: 35 },
+                    { name: "Funda Armor Antigolpes iPhone 14 Pro", code: "FUN-IP14", price: "$15.000", stock: 8 },
+                  ].map((p) => (
+                    <div
+                      key={p.code}
+                      className="rounded-xl border border-border/70 bg-background/50 p-3 flex flex-col justify-between space-y-2 hover:border-primary/40 transition-colors"
+                    >
+                      <div>
+                        <div className="flex items-start justify-between gap-1">
+                          <span className="font-bold text-xs text-foreground leading-snug">
+                            {p.name}
+                          </span>
+                        </div>
+                        <span className="font-mono text-[10px] text-muted-foreground block mt-0.5">
+                          SKU: {p.code} • Stock: {p.stock} u.
+                        </span>
+                      </div>
+                      <div className="flex items-center justify-between pt-1 border-t border-border/30">
+                        <span className="font-mono font-bold text-sm text-foreground">
+                          {p.price}
+                        </span>
+                        <button
+                          type="button"
+                          className="h-7 px-2.5 bg-primary/15 hover:bg-primary text-primary hover:text-primary-foreground font-bold text-xs rounded-md transition-colors flex items-center gap-1 cursor-pointer"
+                        >
+                          <Plus className="w-3 h-3" />
+                          <span>Agregar</span>
+                        </button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Columna Derecha (5 cols): Ticket de Venta Actual */}
+              <div className="xl:col-span-5 rounded-xl border border-border/80 bg-card/40 p-4 sm:p-5 shadow-sm space-y-4">
+                <div className="border-b border-border/50 pb-3 flex items-center justify-between">
+                  <div>
+                    <div className="font-outfit text-sm sm:text-base font-bold text-foreground flex items-center gap-2">
+                      <ShoppingCart className="w-4 h-4 text-primary" />
+                      <span>Ticket de Venta Actual</span>
+                    </div>
+                    <p className="text-[11px] text-muted-foreground mt-0.5">
+                      3 artículos cargados al comprobante
+                    </p>
+                  </div>
+                  <span className="text-[10px] font-mono font-bold bg-primary/10 text-primary px-2 py-0.5 rounded">
+                    Mesa #01
+                  </span>
+                </div>
+
+                {/* Cliente Asignado */}
+                <div className="rounded-lg bg-background/60 border border-border/60 p-2.5 flex items-center justify-between">
+                  <div>
+                    <span className="text-[10px] text-muted-foreground block uppercase font-bold">Cliente</span>
+                    <span className="font-bold text-xs text-foreground">Mariana López</span>
+                    <span className="text-[10px] text-muted-foreground font-mono block">DNI: 38.291.840</span>
+                  </div>
+                  <span className="text-[10px] text-primary hover:underline font-semibold cursor-pointer">
+                    Cambiar
+                  </span>
+                </div>
+
+                {/* Lista de Ítems en el Carrito */}
+                <div className="space-y-2 max-h-48 overflow-y-auto no-scrollbar pr-1">
+                  <div className="p-2 rounded-lg bg-background/50 border border-border/50 flex items-center justify-between text-xs">
+                    <div className="min-w-0 flex-1 pr-2">
+                      <div className="font-semibold text-foreground truncate">Cargador Rápido 35W Dual USB-C</div>
+                      <div className="text-[10px] text-muted-foreground">1 x $24.500</div>
+                    </div>
+                    <span className="font-mono font-bold text-foreground">$24.500</span>
+                  </div>
+
+                  <div className="p-2 rounded-lg bg-background/50 border border-border/50 flex items-center justify-between text-xs">
+                    <div className="min-w-0 flex-1 pr-2">
+                      <div className="font-semibold text-foreground truncate">Vidrio Templado 9D Curvo Antiespía</div>
+                      <div className="text-[10px] text-muted-foreground">2 x $8.500</div>
+                    </div>
+                    <span className="font-mono font-bold text-foreground">$17.000</span>
+                  </div>
+
+                  <div className="p-2 rounded-lg bg-primary/5 border border-primary/20 flex items-center justify-between text-xs">
+                    <div className="min-w-0 flex-1 pr-2">
+                      <div className="font-semibold text-primary truncate">Reparación TK-9281 (Módulo OLED)</div>
+                      <div className="text-[10px] text-muted-foreground">Orden de Servicio Lista</div>
+                    </div>
+                    <span className="font-mono font-bold text-primary">$165.000</span>
+                  </div>
+                </div>
+
+                {/* Desglose de Totales */}
+                <div className="space-y-1.5 pt-2 border-t border-border/50 text-xs">
+                  <div className="flex justify-between text-muted-foreground">
+                    <span>Subtotal:</span>
+                    <span className="font-mono font-semibold text-foreground">$206.500</span>
+                  </div>
+                  <div className="flex justify-between text-muted-foreground">
+                    <span>Descuento Promoción (10%):</span>
+                    <span className="font-mono font-semibold text-emerald-400">-$20.650</span>
+                  </div>
+                  <div className="flex justify-between items-baseline pt-2 border-t border-border/40">
+                    <span className="text-sm font-bold text-foreground">Total a Cobrar:</span>
+                    <span className="font-mono text-2xl font-black text-emerald-400">$185.850</span>
+                  </div>
+                </div>
+
+                {/* Métodos de Pago */}
+                <div className="space-y-1.5 pt-1">
+                  <span className="text-[10px] uppercase font-bold text-muted-foreground block">
+                    Método de Pago
+                  </span>
+                  <div className="grid grid-cols-2 gap-2 text-xs">
+                    {[
+                      { id: "efectivo", label: "Efectivo", icon: DollarSign },
+                      { id: "transferencia", label: "Transferencia", icon: Smartphone },
+                      { id: "debito", label: "Débito", icon: CreditCard },
+                      { id: "credito", label: "Crédito", icon: CreditCard },
+                    ].map((m) => {
+                      const Icon = m.icon;
+                      const isSel = posPaymentMethod === m.id;
+                      return (
+                        <button
+                          key={m.id}
+                          type="button"
+                          onClick={() => setPosPaymentMethod(m.id)}
+                          className={`h-8 px-2.5 rounded-lg border text-xs font-semibold flex items-center justify-center gap-1.5 cursor-pointer transition-all ${
+                            isSel
+                              ? "bg-primary text-primary-foreground border-primary font-bold shadow-sm"
+                              : "bg-background/60 text-muted-foreground border-border/70 hover:text-foreground"
+                          }`}
+                        >
+                          <Icon className="w-3.5 h-3.5" />
+                          <span>{m.label}</span>
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+
+                {/* Botón de Cobro */}
+                <button
+                  type="button"
+                  className="w-full h-10 rounded-lg bg-emerald-500 hover:bg-emerald-600 text-black font-extrabold text-xs flex items-center justify-center gap-2 cursor-pointer shadow-lg shadow-emerald-500/20 transition-all mt-2"
+                >
+                  <CheckCircle className="w-4 h-4" />
+                  <span>Cobrar Ticket e Imprimir Recibo</span>
+                </button>
               </div>
             </div>
           </div>

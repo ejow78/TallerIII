@@ -87,14 +87,38 @@ const statusChartConfig = {
 };
 
 const STATUS_META = {
-  ingresado: { label: "Ingresado", color: "#94a3b8", badge: "secondary" },
-  diagnostico: { label: "En Diagnóstico", color: "#f59e0b", badge: "outline" },
-  presupuestado: { label: "Presupuestado", color: "#a855f7", badge: "outline" },
-  en_reparacion: { label: "En Reparación", color: "#38bdf8", badge: "default" },
-  reparacion: { label: "En Reparación", color: "#38bdf8", badge: "default" },
-  listo: { label: "Listo", color: "#10b981", badge: "success" },
-  entregado: { label: "Entregado", color: "#059669", badge: "success" },
-  rechazado: { label: "Rechazado", color: "#ef4444", badge: "destructive" },
+  ingresado: {
+    label: "Ingresado",
+    colorClass: "bg-sky-500/10 text-sky-400 border-sky-500/25",
+  },
+  diagnostico: {
+    label: "En Diagnóstico",
+    colorClass: "bg-purple-500/10 text-purple-400 border-purple-500/25",
+  },
+  presupuestado: {
+    label: "Presupuestado",
+    colorClass: "bg-amber-500/10 text-amber-400 border-amber-500/25",
+  },
+  en_reparacion: {
+    label: "En Reparación",
+    colorClass: "bg-indigo-500/10 text-indigo-400 border-indigo-500/25",
+  },
+  reparacion: {
+    label: "En Reparación",
+    colorClass: "bg-indigo-500/10 text-indigo-400 border-indigo-500/25",
+  },
+  listo: {
+    label: "Listo",
+    colorClass: "bg-emerald-500/10 text-emerald-400 border-emerald-500/25",
+  },
+  entregado: {
+    label: "Entregado",
+    colorClass: "bg-muted text-muted-foreground border-border",
+  },
+  rechazado: {
+    label: "Rechazado",
+    colorClass: "bg-red-500/10 text-red-400 border-red-500/25",
+  },
 };
 
 export default function DashboardPage() {
@@ -1881,12 +1905,13 @@ export default function DashboardPage() {
                             <span>{o.trackingCode}</span>
                             <ExternalLink className="w-3 h-3 opacity-70" />
                           </a>
-                          <Badge
-                            variant={stMeta.badge}
-                            className="text-[9px] uppercase font-bold py-0.5 px-2 border shrink-0 whitespace-nowrap"
+                          <span
+                            className={`text-[10px] uppercase font-bold py-0.5 px-2.5 rounded-md border shrink-0 whitespace-nowrap ${
+                              stMeta.colorClass || "bg-secondary text-secondary-foreground border-border"
+                            }`}
                           >
                             {stMeta.label}
-                          </Badge>
+                          </span>
                         </div>
                         <div className="space-y-0.5 text-left">
                           <span className="text-xs font-semibold text-foreground block leading-snug">
@@ -1950,12 +1975,13 @@ export default function DashboardPage() {
                               {o.deviceModel}
                             </td>
                             <td className="py-3 text-right">
-                              <Badge
-                                variant={stMeta.badge}
-                                className="text-[9px] uppercase font-bold py-0.5 px-2 border"
+                              <span
+                                className={`text-[10px] uppercase font-bold py-0.5 px-2.5 rounded-md border inline-block ${
+                                  stMeta.colorClass || "bg-secondary text-secondary-foreground border-border"
+                                }`}
                               >
                                 {stMeta.label}
-                              </Badge>
+                              </span>
                             </td>
                           </tr>
                         );

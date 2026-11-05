@@ -14,7 +14,6 @@ import {
   UserCheck,
   Smartphone,
   User,
-  Printer,
   X,
   ArrowLeft,
 } from "@/components/icons";
@@ -457,13 +456,13 @@ export default function NewOrderPage() {
                   onChange={(e) => setDeviceType(e.target.value)}
                   className="w-full h-9 bg-background/85 border border-border rounded-lg px-3 py-1 text-xs text-foreground focus:outline-none focus:ring-1 focus:ring-primary"
                 >
-                  <option value="Smartphone">Smartphone / Celular</option>
-                  <option value="Notebook">Notebook / Laptop</option>
-                  <option value="Tablet">Tablet / iPad</option>
-                  <option value="PC Escritorio">PC Escritorio / Gamer</option>
-                  <option value="Consola">Consola de Videojuegos</option>
-                  <option value="Monitor / Periférico">Monitor / Impresora</option>
-                  <option value="Otro">Otro Dispositivo</option>
+                  <option value="Smartphone">Smartphone</option>
+                  <option value="Notebook">Notebook</option>
+                  <option value="Tablet">Tablet</option>
+                  <option value="PC Escritorio">PC Escritorio</option>
+                  <option value="Consola">Consola</option>
+                  <option value="Monitor">Monitor</option>
+                  <option value="Otro">Otro</option>
                 </select>
               </div>
               <div className="space-y-1.5">
@@ -556,7 +555,7 @@ export default function NewOrderPage() {
                 </Label>
               </div>
 
-              <div className="flex items-start sm:items-center space-x-3 bg-primary/5 p-3 rounded-xl border border-primary/20">
+              <div className="hidden sm:flex items-start sm:items-center space-x-3 bg-primary/5 p-3 rounded-xl border border-primary/20">
                 <Checkbox
                   id="auto-print"
                   checked={autoPrint}
@@ -568,8 +567,7 @@ export default function NewOrderPage() {
                   className="text-xs font-semibold text-foreground leading-snug cursor-pointer select-none flex-1 min-w-0"
                 >
                   <span className="inline-flex items-center gap-1.5 text-primary mr-1 font-bold">
-                    <Printer className="w-3.5 h-3.5 shrink-0 inline" />
-                    Imprimir Comprobante QR:
+                    Imprimir Comprobante:
                   </span>
                   Abrir ventana de comprobante A4 automáticamente al registrar
                 </Label>
