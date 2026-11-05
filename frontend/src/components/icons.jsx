@@ -78,7 +78,7 @@ import {
   X as PX,
 } from "@phosphor-icons/react";
 
-const make = (Comp, defaultWeight = "duotone") => {
+const make = (Comp, defaultWeight = "regular") => {
   const Icon = forwardRef(({ strokeWidth: _sw, ...props }, ref) => (
     <Comp ref={ref} weight={defaultWeight} {...props} />
   ));
@@ -87,7 +87,7 @@ const make = (Comp, defaultWeight = "duotone") => {
 };
 
 // Íconos de interfaz (chevrons, cerrar, check): trazo simple, sin relleno
-const ui = (Comp) => make(Comp, "bold");
+const ui = (Comp) => make(Comp, "regular");
 
 export const AlertCircle = make(WarningCircle);
 export const AlertTriangle = make(Warning);

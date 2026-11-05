@@ -545,7 +545,7 @@ export default function DashboardLayout() {
         {/* Área Principal */}
         <SidebarInset className="flex-1 flex flex-col min-w-0 h-dvh max-h-dvh overflow-hidden bg-background">
           {/* Cabecera Superior */}
-          <header className="h-14 sm:h-16 border-b border-border/80 flex items-center justify-between px-3 sm:px-6 bg-card/20 backdrop-blur-sm shrink-0 z-40 gap-2">
+          <header className="sticky top-0 z-50 h-14 sm:h-16 border-b border-border/80 flex items-center justify-between px-3 sm:px-6 bg-background/95 backdrop-blur-md shrink-0 gap-2">
             <div className="flex items-center gap-2 sm:gap-4 min-w-0 flex-1">
               <SidebarTrigger className="text-muted-foreground hover:text-foreground cursor-pointer shrink-0" />
               <Separator orientation="vertical" className="h-4 !self-center shrink-0" />

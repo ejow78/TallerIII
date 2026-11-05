@@ -1,4 +1,6 @@
 import { useState, useEffect, useRef } from "react";
+import LinearDashboardShowcase from "@/components/common/LinearDashboardShowcase";
+import { ArrowRight } from "@/components/icons";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -150,53 +152,65 @@ export default function LandingPage() {
 
   return (
     <div className="flex-grow flex flex-col">
-      {/* Sección Hero Split con Ventana en Perspectiva 3D */}
-      <section className="relative py-12 lg:py-16 px-6 flex items-center justify-center overflow-hidden min-h-[calc(100vh-4rem)] bg-[linear-gradient(to_right,rgba(255,255,255,0.025)_1px,transparent_1px),linear-gradient(to_bottom,rgba(255,255,255,0.025)_1px,transparent_1px)] bg-[size:48px_48px]">
-        <div className="relative z-10 max-w-[1380px] w-full mx-auto grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-10 items-center">
-          {/* Columna Izquierda: Propuesta de Valor & CTA */}
-          <div className="lg:col-span-5 text-center lg:text-left space-y-6">
-            <h1 className="font-outfit text-4xl sm:text-5xl lg:text-[58px] xl:text-[62px] font-extrabold text-foreground tracking-tight leading-[1.06]">
-              Tu taller técnico, más transparente que nunca
-            </h1>
+      {/* Sección Hero Linear: Canvas Oscuro con Spotlight Radial y Showcase Interactivo */}
+      <section className="relative pt-12 sm:pt-16 pb-20 px-4 sm:px-6 flex flex-col items-center justify-center overflow-hidden bg-[#08090a]">
+        {/* Spotlight Radial Superior Linear */}
+        <div 
+          className="pointer-events-none absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-7xl h-[480px] opacity-40 select-none"
+          style={{
+            background: "radial-gradient(ellipse 65% 55% at 50% 0%, rgba(94, 106, 210, 0.35), transparent 70%)"
+          }}
+        />
 
-            <p className="text-muted-foreground text-sm sm:text-base max-w-lg mx-auto lg:mx-0 font-light leading-relaxed">
-              Controlá órdenes de servicio, stock de repuestos y caja en tiempo real. Brindá seguimiento con código QR y aprobación de presupuestos online sin fricción.
-            </p>
-
-            <div className="flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-3 pt-2">
-              <Button
-                asChild
-                size="lg"
-                className="w-full sm:w-auto bg-primary hover:bg-primary/90 text-primary-foreground font-bold px-7 h-11 rounded-lg shadow-lg shadow-primary/20 transition-all cursor-pointer"
-              >
-                <a href={registerUrl}>Comenzar Ahora</a>
-              </Button>
-              <Button
-                asChild
-                variant="outline"
-                size="lg"
-                className="w-full sm:w-auto border-border/80 bg-card/40 hover:bg-card/80 text-foreground font-semibold px-6 h-11 rounded-lg gap-2 cursor-pointer"
-              >
-                <a href={trackingUrl}>
-                  <span>Seguir mi Equipo</span>
-                </a>
-              </Button>
-            </div>
+        <div className="relative z-10 max-w-5xl w-full mx-auto text-center space-y-6 mb-10 sm:mb-14">
+          {/* Badge de Anuncio estilo Linear */}
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-mono bg-white/[0.04] border border-white/10 hover:border-primary/40 text-muted-foreground transition-all">
+            <span className="flex h-2 w-2 rounded-full bg-primary" />
+            <span className="text-foreground font-medium">RepairIT 2.0</span>
+            <span className="text-white/20">•</span>
+            <span>El estándar para talleres de alta precisión</span>
+            <ArrowRight className="w-3 h-3 text-muted-foreground ml-0.5" />
           </div>
 
-          {/* Columna Derecha: Captura Real del Panel de Control en Perspectiva 3D */}
-          <div
-            className="lg:col-span-7 flex items-center justify-center"
-            style={{ perspective: "1300px" }}
-          >
-            <div className="relative w-full max-w-[820px] rounded-xl border border-white/15 bg-[#111113] shadow-[-28px_32px_70px_rgba(0,0,0,0.75)] ring-1 ring-primary/20 transition-transform duration-500 ease-out hover:[transform:rotateY(-4deg)_rotateX(1.5deg)_scale(1.01)] lg:[transform:rotateY(-13deg)_rotateX(5deg)_rotateZ(0.5deg)] overflow-hidden select-none">
-              <img
-                src="/hero-dashboard.png"
-                alt="Panel de Control de RepairIT con métricas, gráficos e inventario en vivo"
-                className="w-full h-auto block object-cover"
-                loading="eager"
-              />
-            </div>
+          {/* Título Principal Linear */}
+          <h1 className="text-4xl sm:text-6xl lg:text-[68px] font-extrabold text-foreground tracking-[-0.035em] leading-[1.04] max-w-4xl mx-auto">
+            El sistema operativo para tu servicio técnico
+          </h1>
+
+          {/* Subtítulo */}
+          <p className="text-muted-foreground text-sm sm:text-base lg:text-lg max-w-2xl mx-auto font-normal leading-relaxed tracking-tight">
+            Controlá órdenes de servicio, stock de repuestos y cobros de caja con la velocidad, elegancia y trazabilidad que tu taller necesita. Todo en tiempo real.
+          </p>
+
+          {/* Botones de Acción */}
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-3 pt-2">
+            <Button
+              asChild
+              size="lg"
+              className="w-full sm:w-auto bg-primary hover:bg-primary/90 text-white font-medium px-6 h-11 rounded shadow-lg shadow-primary/25 transition-all cursor-pointer"
+            >
+              <a href={registerUrl} className="flex items-center gap-2">
+                <span>Comenzar Ahora</span>
+                <ArrowRight className="w-4 h-4" />
+              </a>
+            </Button>
+            <Button
+              asChild
+              variant="outline"
+              size="lg"
+              className="w-full sm:w-auto border-white/12 bg-white/[0.03] hover:bg-white/[0.07] text-foreground font-medium px-6 h-11 rounded gap-2 cursor-pointer transition-all"
+            >
+              <a href={trackingUrl}>
+                <span>Consultar Estado de Orden</span>
+              </a>
+            </Button>
+          </div>
+        </div>
+
+        {/* Showcase de Dashboard Interactivo Estilo Linear */}
+        <div className="relative z-10 max-w-[1140px] w-full mx-auto">
+          <div className="relative p-1 sm:p-2 rounded-2xl bg-gradient-to-b from-white/12 via-white/5 to-transparent border border-white/10 shadow-2xl">
+            <LinearDashboardShowcase />
           </div>
         </div>
       </section>
