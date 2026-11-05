@@ -152,28 +152,28 @@ export default function LandingPage() {
 
   return (
     <div className="flex-grow flex flex-col">
-      {/* Sección Hero Linear: Canvas Oscuro con Spotlight Radial y Showcase Interactivo */}
-      <section className="relative pt-12 sm:pt-16 pb-20 px-4 sm:px-6 flex flex-col items-center justify-center overflow-hidden bg-[#08090a]">
-        {/* Spotlight Radial Superior Linear */}
+      {/* Sección Hero: Canvas Técnico con Spotlight Radial en Cyan y Showcase Interactivo del Dashboard */}
+      <section className="relative pt-12 sm:pt-16 pb-20 px-4 sm:px-6 flex flex-col items-center justify-center overflow-hidden bg-background">
+        {/* Spotlight Radial Superior en Cyan RepairIT */}
         <div 
-          className="pointer-events-none absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-7xl h-[480px] opacity-40 select-none"
+          className="pointer-events-none absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-7xl h-[480px] opacity-35 select-none"
           style={{
-            background: "radial-gradient(ellipse 65% 55% at 50% 0%, rgba(94, 106, 210, 0.35), transparent 70%)"
+            background: "radial-gradient(ellipse 65% 55% at 50% 0%, rgba(56, 189, 248, 0.28), transparent 70%)"
           }}
         />
 
         <div className="relative z-10 max-w-5xl w-full mx-auto text-center space-y-6 mb-10 sm:mb-14">
-          {/* Badge de Anuncio estilo Linear */}
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-mono bg-white/[0.04] border border-white/10 hover:border-primary/40 text-muted-foreground transition-all">
-            <span className="flex h-2 w-2 rounded-full bg-primary" />
-            <span className="text-foreground font-medium">RepairIT 2.0</span>
-            <span className="text-white/20">•</span>
+          {/* Badge de Anuncio estilo Linear con color RepairIT */}
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-mono bg-card/60 border border-border/80 hover:border-primary/50 text-muted-foreground transition-all">
+            <span className="flex h-2 w-2 rounded-full bg-primary animate-pulse" />
+            <span className="text-foreground font-semibold">RepairIT 2.0</span>
+            <span className="text-muted-foreground/40">•</span>
             <span>El estándar para talleres de alta precisión</span>
             <ArrowRight className="w-3 h-3 text-muted-foreground ml-0.5" />
           </div>
 
-          {/* Título Principal Linear */}
-          <h1 className="text-4xl sm:text-6xl lg:text-[68px] font-extrabold text-foreground tracking-[-0.035em] leading-[1.04] max-w-4xl mx-auto">
+          {/* Título Principal */}
+          <h1 className="font-outfit text-4xl sm:text-6xl lg:text-[68px] font-extrabold text-foreground tracking-[-0.035em] leading-[1.04] max-w-4xl mx-auto">
             El sistema operativo para tu servicio técnico
           </h1>
 
@@ -187,7 +187,7 @@ export default function LandingPage() {
             <Button
               asChild
               size="lg"
-              className="w-full sm:w-auto bg-primary hover:bg-primary/90 text-white font-medium px-6 h-11 rounded shadow-lg shadow-primary/25 transition-all cursor-pointer"
+              className="w-full sm:w-auto bg-primary hover:bg-primary/90 text-primary-foreground font-bold px-7 h-11 rounded-lg shadow-lg shadow-primary/25 transition-all cursor-pointer"
             >
               <a href={registerUrl} className="flex items-center gap-2">
                 <span>Comenzar Ahora</span>
@@ -198,7 +198,7 @@ export default function LandingPage() {
               asChild
               variant="outline"
               size="lg"
-              className="w-full sm:w-auto border-white/12 bg-white/[0.03] hover:bg-white/[0.07] text-foreground font-medium px-6 h-11 rounded gap-2 cursor-pointer transition-all"
+              className="w-full sm:w-auto border-border/80 bg-card/60 hover:bg-card text-foreground font-semibold px-6 h-11 rounded-lg gap-2 cursor-pointer transition-all"
             >
               <a href={trackingUrl}>
                 <span>Consultar Estado de Orden</span>
@@ -207,9 +207,9 @@ export default function LandingPage() {
           </div>
         </div>
 
-        {/* Showcase de Dashboard Interactivo Estilo Linear */}
-        <div className="relative z-10 max-w-[1140px] w-full mx-auto">
-          <div className="relative p-1 sm:p-2 rounded-2xl bg-gradient-to-b from-white/12 via-white/5 to-transparent border border-white/10 shadow-2xl">
+        {/* Showcase del Panel de Control de RepairIT */}
+        <div className="relative z-10 max-w-[1280px] w-full mx-auto">
+          <div className="relative p-1 sm:p-2 rounded-2xl bg-gradient-to-b from-primary/20 via-border/40 to-transparent border border-border/80 shadow-2xl">
             <LinearDashboardShowcase />
           </div>
         </div>
