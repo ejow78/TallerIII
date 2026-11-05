@@ -6,16 +6,6 @@ import { Badge } from "@/components/ui/badge";
 import { Card, CardHeader, CardTitle, CardContent, CardDescription, CardFooter } from "@/components/ui/card";
 import { Accordion, AccordionItem, AccordionTrigger, AccordionContent } from "@/components/ui/accordion";
 import { toast } from "sonner";
-import {
-  Activity,
-  BarChart3,
-  DollarSign,
-  PackageCheck,
-  Building2,
-  Wrench,
-  Check,
-  Search,
-} from "lucide-react";
 
 export default function LandingPage() {
   const [isMobile, setIsMobile] = useState(false);
@@ -197,7 +187,6 @@ export default function LandingPage() {
                 className="w-full sm:w-auto border-border/80 bg-card/40 hover:bg-card/80 text-foreground font-semibold px-6 h-11 rounded-lg gap-2 cursor-pointer"
               >
                 <a href={trackingUrl}>
-                  <Search className="w-4 h-4 text-primary" />
                   <span>Seguir mi Equipo</span>
                 </a>
               </Button>
@@ -238,7 +227,10 @@ export default function LandingPage() {
             <Card className="bg-card/45 border-border/60 hover:border-primary/40 transition-colors duration-200">
               <CardHeader className="space-y-3 pb-2">
                 <div className="w-10 h-10 rounded-lg bg-primary/10 border border-primary/20 flex items-center justify-center text-primary">
-                  <Activity className="w-5 h-5" />
+                  <svg viewBox="0 0 24 24" fill="none" className="w-5 h-5" aria-hidden="true">
+                    <rect x="3" y="4" width="18" height="16" rx="2" fill="currentColor" fillOpacity="0.14" />
+                    <path d="M4 12h4l2.5-5 3 10 2.5-5H20" stroke="currentColor" strokeWidth="1.8" strokeLinecap="square" strokeLinejoin="miter" />
+                  </svg>
                 </div>
                 <CardTitle className="font-outfit text-lg font-bold text-foreground">
                   Seguimiento en Línea
@@ -255,7 +247,10 @@ export default function LandingPage() {
             <Card className="bg-card/45 border-border/60 hover:border-primary/40 transition-colors duration-200">
               <CardHeader className="space-y-3 pb-2">
                 <div className="w-10 h-10 rounded-lg bg-primary/10 border border-primary/20 flex items-center justify-center text-primary">
-                  <Wrench className="w-5 h-5" />
+                  <svg viewBox="0 0 24 24" fill="none" className="w-5 h-5" aria-hidden="true">
+                    <path d="M5 4h14v16H5z" fill="currentColor" fillOpacity="0.14" />
+                    <path d="M8 9h8M8 13h5M9 17l2 2 4.5-4.5" stroke="currentColor" strokeWidth="1.8" strokeLinecap="square" />
+                  </svg>
                 </div>
                 <CardTitle className="font-outfit text-lg font-bold text-foreground">
                   Presupuestos Online
@@ -272,7 +267,11 @@ export default function LandingPage() {
             <Card className="bg-card/45 border-border/60 hover:border-primary/40 transition-colors duration-200">
               <CardHeader className="space-y-3 pb-2">
                 <div className="w-10 h-10 rounded-lg bg-primary/10 border border-primary/20 flex items-center justify-center text-primary">
-                  <BarChart3 className="w-5 h-5" />
+                  <svg viewBox="0 0 24 24" fill="none" className="w-5 h-5" aria-hidden="true">
+                    <rect x="4" y="13" width="4" height="7" fill="currentColor" fillOpacity="0.25" />
+                    <rect x="10" y="9" width="4" height="11" fill="currentColor" fillOpacity="0.45" />
+                    <rect x="16" y="4" width="4" height="16" fill="currentColor" />
+                  </svg>
                 </div>
                 <CardTitle className="font-outfit text-lg font-bold text-foreground">
                   Métricas en Tiempo Real
@@ -289,7 +288,10 @@ export default function LandingPage() {
             <Card className="bg-card/45 border-border/60 hover:border-primary/40 transition-colors duration-200">
               <CardHeader className="space-y-3 pb-2">
                 <div className="w-10 h-10 rounded-lg bg-primary/10 border border-primary/20 flex items-center justify-center text-primary">
-                  <PackageCheck className="w-5 h-5" />
+                  <svg viewBox="0 0 24 24" fill="none" className="w-5 h-5" aria-hidden="true">
+                    <path d="M12 3L20 7.5V16.5L12 21L4 16.5V7.5L12 3Z" fill="currentColor" fillOpacity="0.14" stroke="currentColor" strokeWidth="1.7" />
+                    <path d="M4 7.5L12 12L20 7.5M12 12V21" stroke="currentColor" strokeWidth="1.7" />
+                  </svg>
                 </div>
                 <CardTitle className="font-outfit text-lg font-bold text-foreground">
                   Stock e Inventario
@@ -306,7 +308,11 @@ export default function LandingPage() {
             <Card className="bg-card/45 border-border/60 hover:border-primary/40 transition-colors duration-200">
               <CardHeader className="space-y-3 pb-2">
                 <div className="w-10 h-10 rounded-lg bg-primary/10 border border-primary/20 flex items-center justify-center text-primary">
-                  <DollarSign className="w-5 h-5" />
+                  <svg viewBox="0 0 24 24" fill="none" className="w-5 h-5" aria-hidden="true">
+                    <rect x="3" y="6" width="18" height="12" rx="1.5" fill="currentColor" fillOpacity="0.14" stroke="currentColor" strokeWidth="1.7" />
+                    <circle cx="12" cy="12" r="2.5" stroke="currentColor" strokeWidth="1.7" />
+                    <path d="M6 9h1M17 15h1" stroke="currentColor" strokeWidth="1.7" strokeLinecap="square" />
+                  </svg>
                 </div>
                 <CardTitle className="font-outfit text-lg font-bold text-foreground">
                   Caja y Punto de Venta
@@ -323,7 +329,12 @@ export default function LandingPage() {
             <Card className="bg-card/45 border-border/60 hover:border-primary/40 transition-colors duration-200">
               <CardHeader className="space-y-3 pb-2">
                 <div className="w-10 h-10 rounded-lg bg-primary/10 border border-primary/20 flex items-center justify-center text-primary">
-                  <Building2 className="w-5 h-5" />
+                  <svg viewBox="0 0 24 24" fill="none" className="w-5 h-5" aria-hidden="true">
+                    <rect x="4" y="4" width="6" height="6" fill="currentColor" fillOpacity="0.2" stroke="currentColor" strokeWidth="1.7" />
+                    <rect x="14" y="4" width="6" height="6" fill="currentColor" fillOpacity="0.2" stroke="currentColor" strokeWidth="1.7" />
+                    <rect x="9" y="14" width="6" height="6" fill="currentColor" stroke="currentColor" strokeWidth="1.7" />
+                    <path d="M7 10v2h10v-2M12 12v2" stroke="currentColor" strokeWidth="1.7" />
+                  </svg>
                 </div>
                 <CardTitle className="font-outfit text-lg font-bold text-foreground">
                   Control Multi-Sucursal
@@ -373,23 +384,23 @@ export default function LandingPage() {
                 <div className="border-t border-border/40 my-4" />
                 <ul className="space-y-3 text-xs text-muted-foreground font-light">
                   <li className="flex items-start gap-2.5">
-                    <Check className="w-4 h-4 text-primary shrink-0 mt-0.5" />
+                    <span className="mt-1.5 h-1.5 w-1.5 rotate-45 bg-primary shrink-0" aria-hidden="true" />
                     <span>Hasta <strong>100 órdenes de servicio</strong> al mes</span>
                   </li>
                   <li className="flex items-start gap-2.5">
-                    <Check className="w-4 h-4 text-primary shrink-0 mt-0.5" />
+                    <span className="mt-1.5 h-1.5 w-1.5 rotate-45 bg-primary shrink-0" aria-hidden="true" />
                     <span>Gestión de clientes y catálogo de repuestos</span>
                   </li>
                   <li className="flex items-start gap-2.5">
-                    <Check className="w-4 h-4 text-primary shrink-0 mt-0.5" />
+                    <span className="mt-1.5 h-1.5 w-1.5 rotate-45 bg-primary shrink-0" aria-hidden="true" />
                     <span>Comprobantes A4 imprimibles con código QR</span>
                   </li>
                   <li className="flex items-start gap-2.5">
-                    <Check className="w-4 h-4 text-primary shrink-0 mt-0.5" />
+                    <span className="mt-1.5 h-1.5 w-1.5 rotate-45 bg-primary shrink-0" aria-hidden="true" />
                     <span>Portal web para que el cliente consulte su equipo</span>
                   </li>
                   <li className="flex items-start gap-2.5">
-                    <Check className="w-4 h-4 text-primary shrink-0 mt-0.5" />
+                    <span className="mt-1.5 h-1.5 w-1.5 rotate-45 bg-primary shrink-0" aria-hidden="true" />
                     <span>Avisos por correo electrónico y WhatsApp</span>
                   </li>
                 </ul>
@@ -426,23 +437,23 @@ export default function LandingPage() {
                 <div className="border-t border-border/40 my-4" />
                 <ul className="space-y-3 text-xs text-muted-foreground font-light">
                   <li className="flex items-start gap-2.5">
-                    <Check className="w-4 h-4 text-primary shrink-0 mt-0.5" />
+                    <span className="mt-1.5 h-1.5 w-1.5 rotate-45 bg-primary shrink-0" aria-hidden="true" />
                     <span className="font-medium text-foreground">Órdenes de servicio e inventario ilimitados</span>
                   </li>
                   <li className="flex items-start gap-2.5">
-                    <Check className="w-4 h-4 text-primary shrink-0 mt-0.5" />
+                    <span className="mt-1.5 h-1.5 w-1.5 rotate-45 bg-primary shrink-0" aria-hidden="true" />
                     <span className="font-medium text-foreground">Módulo de Caja y Punto de Venta (POS)</span>
                   </li>
                   <li className="flex items-start gap-2.5">
-                    <Check className="w-4 h-4 text-primary shrink-0 mt-0.5" />
+                    <span className="mt-1.5 h-1.5 w-1.5 rotate-45 bg-primary shrink-0" aria-hidden="true" />
                     <span className="font-medium text-foreground">Panel de métricas y gráficos financieros</span>
                   </li>
                   <li className="flex items-start gap-2.5">
-                    <Check className="w-4 h-4 text-primary shrink-0 mt-0.5" />
+                    <span className="mt-1.5 h-1.5 w-1.5 rotate-45 bg-primary shrink-0" aria-hidden="true" />
                     <span>Alertas de stock crítico y exportación a Excel</span>
                   </li>
                   <li className="flex items-start gap-2.5">
-                    <Check className="w-4 h-4 text-primary shrink-0 mt-0.5" />
+                    <span className="mt-1.5 h-1.5 w-1.5 rotate-45 bg-primary shrink-0" aria-hidden="true" />
                     <span>Aprobación digital de presupuestos con DNI</span>
                   </li>
                 </ul>
@@ -473,23 +484,23 @@ export default function LandingPage() {
                 <div className="border-t border-border/40 my-4" />
                 <ul className="space-y-3 text-xs text-muted-foreground font-light">
                   <li className="flex items-start gap-2.5">
-                    <Check className="w-4 h-4 text-primary shrink-0 mt-0.5" />
+                    <span className="mt-1.5 h-1.5 w-1.5 rotate-45 bg-primary shrink-0" aria-hidden="true" />
                     <span>Todo lo incluido en <strong>Taller Pro</strong> (Caja POS + Métricas)</span>
                   </li>
                   <li className="flex items-start gap-2.5">
-                    <Check className="w-4 h-4 text-primary shrink-0 mt-0.5" />
+                    <span className="mt-1.5 h-1.5 w-1.5 rotate-45 bg-primary shrink-0" aria-hidden="true" />
                     <span className="font-medium text-foreground">Administración de múltiples sucursales</span>
                   </li>
                   <li className="flex items-start gap-2.5">
-                    <Check className="w-4 h-4 text-primary shrink-0 mt-0.5" />
+                    <span className="mt-1.5 h-1.5 w-1.5 rotate-45 bg-primary shrink-0" aria-hidden="true" />
                     <span className="font-medium text-foreground">Cuentas de acceso para técnicos por sucursal</span>
                   </li>
                   <li className="flex items-start gap-2.5">
-                    <Check className="w-4 h-4 text-primary shrink-0 mt-0.5" />
+                    <span className="mt-1.5 h-1.5 w-1.5 rotate-45 bg-primary shrink-0" aria-hidden="true" />
                     <span>Cambio rápido de sede desde el panel admin</span>
                   </li>
                   <li className="flex items-start gap-2.5">
-                    <Check className="w-4 h-4 text-primary shrink-0 mt-0.5" />
+                    <span className="mt-1.5 h-1.5 w-1.5 rotate-45 bg-primary shrink-0" aria-hidden="true" />
                     <span>Soporte prioritario y asistencia dedicada</span>
                   </li>
                 </ul>

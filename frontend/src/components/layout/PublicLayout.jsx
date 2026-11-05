@@ -1,7 +1,6 @@
 import { Link, Outlet, useLocation } from "react-router-dom";
 import { Separator } from "@/components/ui/separator";
 import { Button } from "@/components/ui/button";
-import { Search } from "lucide-react";
 
 export default function PublicLayout() {
   const location = useLocation();
