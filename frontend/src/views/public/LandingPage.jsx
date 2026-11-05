@@ -163,15 +163,6 @@ export default function LandingPage() {
         />
 
         <div className="relative z-10 max-w-5xl w-full mx-auto text-center space-y-6 mb-10 sm:mb-14">
-          {/* Badge de Anuncio estilo Linear con color RepairIT */}
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-mono bg-card/60 border border-border/80 hover:border-primary/50 text-muted-foreground transition-all">
-            <span className="flex h-2 w-2 rounded-full bg-primary animate-pulse" />
-            <span className="text-foreground font-semibold">RepairIT 2.0</span>
-            <span className="text-muted-foreground/40">•</span>
-            <span>El estándar para talleres de alta precisión</span>
-            <ArrowRight className="w-3 h-3 text-muted-foreground ml-0.5" />
-          </div>
-
           {/* Título Principal */}
           <h1 className="font-outfit text-4xl sm:text-6xl lg:text-[68px] font-extrabold text-foreground tracking-[-0.035em] leading-[1.04] max-w-4xl mx-auto">
             El sistema operativo para tu servicio técnico
@@ -209,7 +200,18 @@ export default function LandingPage() {
 
         {/* Showcase del Panel de Control de RepairIT */}
         <div className="relative z-10 max-w-[1280px] w-full mx-auto">
-          <div className="relative p-1 sm:p-2 rounded-2xl bg-gradient-to-b from-primary/20 via-border/40 to-transparent border border-border/80 shadow-2xl">
+          {/* Móvil (< md): Captura del dashboard real para navegación compacta y nítida */}
+          <div className="block md:hidden w-full rounded-2xl overflow-hidden border border-border/80 bg-card shadow-2xl">
+            <img
+              src="/hero-dashboard.png"
+              alt="Panel de Control de RepairIT"
+              className="w-full h-auto object-cover block"
+              loading="eager"
+            />
+          </div>
+
+          {/* Escritorio (>= md): Simulación interactiva del Panel de Control con tabs funcionales */}
+          <div className="hidden md:block relative p-1.5 sm:p-2 rounded-2xl bg-gradient-to-b from-primary/20 via-border/40 to-transparent border border-border/80 shadow-2xl">
             <LinearDashboardShowcase />
           </div>
         </div>
