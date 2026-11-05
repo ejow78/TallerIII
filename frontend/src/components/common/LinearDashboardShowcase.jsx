@@ -35,7 +35,7 @@ import {
   ArrowLeft,
   User,
   CreditCard,
-  X,
+  Trash2,
 } from "@/components/icons";
 import { Badge } from "@/components/ui/badge";
 
@@ -54,8 +54,8 @@ export default function LinearDashboardShowcase() {
   // Tab de filtro para Inventario
   const [inventoryCategory, setInventoryCategory] = useState("todos");
 
-  // Tab para Punto de Venta
-  const [posTab, setPosTab] = useState("venta"); // "venta" | "historial"
+  // Estado del Carrito en Caja (interactivo y arrancando limpio)
+  const [cart, setCart] = useState([]);
   const [posPaymentMethod, setPosPaymentMethod] = useState("efectivo");
 
   // Fechas dinámicas para el gráfico
@@ -86,11 +86,11 @@ export default function LinearDashboardShowcase() {
 
   const navTitles = {
     "inicio": "Inicio",
-    "nuevo-ingreso": "Nuevo Ingreso",
+    "nuevo-ingreso": "Ingreso de Equipos",
     "ordenes": "Órdenes de Servicio",
     "clientes": "Directorio de Clientes",
-    "inventario": "Stock e Inventario",
-    "caja": "Caja y Punto de Venta",
+    "inventario": "Inventario de Insumos",
+    "caja": "Control de Caja (POS)",
   };
 
   // Datos simulados 1:1 de Órdenes
@@ -188,10 +188,36 @@ export default function LinearDashboardShowcase() {
     return ord.status === orderFilter;
   });
 
+  // Catálogo disponible para POS
+  const posCatalog = [
+    { id: "p1", name: "Cargador Rápido 35W Dual USB-C", code: "ACC-CH35", price: 24500, stock: 14 },
+    { id: "p2", name: "Cable Lightning a USB-C Trenzado 1.5m", code: "CAB-LT15", price: 12000, stock: 22 },
+    { id: "p3", name: "Vidrio Templado 9D Curvo Antiespía", code: "VID-9D01", price: 8500, stock: 35 },
+    { id: "p4", name: "Funda Armor Antigolpes iPhone 14 Pro", code: "FUN-IP14", price: 15000, stock: 8 },
+  ];
+
+  const addToCart = (product) => {
+    setCart((prev) => {
+      const exists = prev.find((item) => item.id === product.id);
+      if (exists) {
+        return prev.map((item) =>
+          item.id === product.id ? { ...item, qty: item.qty + 1 } : item
+        );
+      }
+      return [...prev, { ...product, qty: 1 }];
+    });
+  };
+
+  const removeFromCart = (id) => {
+    setCart((prev) => prev.filter((item) => item.id !== id));
+  };
+
+  const cartSubtotal = cart.reduce((sum, item) => sum + item.price * item.qty, 0);
+
   return (
     <div className="w-full rounded-2xl border border-border/80 bg-[#10131a] shadow-[0_20px_60px_-15px_rgba(0,0,0,0.7)] overflow-hidden text-foreground flex flex-col md:flex-row min-h-[660px] text-xs select-none">
       {/* ========================================================================= */}
-      {/* 1. SIDEBAR IZQUIERDA (Clickeable y con tabs funcionales) */}
+      {/* 1. SIDEBAR IZQUIERDA (Estilo idéntico al panel técnico) */}
       {/* ========================================================================= */}
       <aside className="w-full md:w-56 lg:w-60 bg-[#0e1017] border-b md:border-b-0 md:border-r border-border/80 flex flex-col shrink-0">
         {/* Cabecera del Sidebar con Logo Oficial */}
@@ -214,51 +240,51 @@ export default function LinearDashboardShowcase() {
               onClick={() => setActiveNav("inicio")}
               className={`w-full flex items-center gap-2.5 px-2.5 py-2 rounded-lg font-semibold transition-all text-left cursor-pointer ${
                 activeNav === "inicio"
-                  ? "bg-primary text-primary-foreground shadow-sm"
+                  ? "bg-primary/10 text-primary border border-primary/20 shadow-sm shadow-primary/10"
                   : "text-muted-foreground hover:text-foreground hover:bg-card/40"
               }`}
             >
-              <LayoutDashboard className="w-4 h-4 shrink-0" />
-              <span>Inicio</span>
+              <LayoutDashboard className="w-4 h-4 text-primary shrink-0" />
+              <span className="text-xs">Inicio</span>
             </button>
 
             {/* Nuevo Ingreso */}
             <button
               onClick={() => setActiveNav("nuevo-ingreso")}
-              className={`w-full flex items-center gap-2.5 px-2.5 py-2 rounded-lg font-semibold transition-all text-left cursor-pointer ${
+              className={`w-full flex items-center gap-2.5 px-2.5 py-2 rounded-lg font-medium transition-all text-left cursor-pointer ${
                 activeNav === "nuevo-ingreso"
-                  ? "bg-primary text-primary-foreground shadow-sm"
+                  ? "bg-primary/10 text-primary border border-primary/20 shadow-sm shadow-primary/10"
                   : "text-muted-foreground hover:text-foreground hover:bg-card/40"
               }`}
             >
               <PlusCircle className="w-4 h-4 shrink-0" />
-              <span>Nuevo Ingreso</span>
+              <span className="text-xs">Nuevo Ingreso</span>
             </button>
 
             {/* Órdenes de Servicio */}
             <button
               onClick={() => setActiveNav("ordenes")}
-              className={`w-full flex items-center gap-2.5 px-2.5 py-2 rounded-lg font-semibold transition-all text-left cursor-pointer ${
+              className={`w-full flex items-center gap-2.5 px-2.5 py-2 rounded-lg font-medium transition-all text-left cursor-pointer ${
                 activeNav === "ordenes"
-                  ? "bg-primary text-primary-foreground shadow-sm"
+                  ? "bg-primary/10 text-primary border border-primary/20 shadow-sm shadow-primary/10"
                   : "text-muted-foreground hover:text-foreground hover:bg-card/40"
               }`}
             >
               <ClipboardList className="w-4 h-4 shrink-0" />
-              <span>Órdenes de Servicio</span>
+              <span className="text-xs">Órdenes de Servicio</span>
             </button>
 
             {/* Directorio de Clientes */}
             <button
               onClick={() => setActiveNav("clientes")}
-              className={`w-full flex items-center gap-2.5 px-2.5 py-2 rounded-lg font-semibold transition-all text-left cursor-pointer ${
+              className={`w-full flex items-center gap-2.5 px-2.5 py-2 rounded-lg font-medium transition-all text-left cursor-pointer ${
                 activeNav === "clientes"
-                  ? "bg-primary text-primary-foreground shadow-sm"
+                  ? "bg-primary/10 text-primary border border-primary/20 shadow-sm shadow-primary/10"
                   : "text-muted-foreground hover:text-foreground hover:bg-card/40"
               }`}
             >
               <Users className="w-4 h-4 shrink-0" />
-              <span>Clientes</span>
+              <span className="text-xs">Clientes</span>
             </button>
           </div>
 
@@ -271,45 +297,67 @@ export default function LinearDashboardShowcase() {
             {/* Inventario */}
             <button
               onClick={() => setActiveNav("inventario")}
-              className={`w-full flex items-center gap-2.5 px-2.5 py-2 rounded-lg font-semibold transition-all text-left cursor-pointer ${
+              className={`w-full flex items-center gap-2.5 px-2.5 py-2 rounded-lg font-medium transition-all text-left cursor-pointer ${
                 activeNav === "inventario"
-                  ? "bg-primary text-primary-foreground shadow-sm"
+                  ? "bg-primary/10 text-primary border border-primary/20 shadow-sm shadow-primary/10"
                   : "text-muted-foreground hover:text-foreground hover:bg-card/40"
               }`}
             >
               <Package className="w-4 h-4 shrink-0" />
-              <span>Inventario</span>
+              <span className="text-xs">Inventario</span>
             </button>
 
             {/* Caja / POS */}
             <button
               onClick={() => setActiveNav("caja")}
-              className={`w-full flex items-center gap-2.5 px-2.5 py-2 rounded-lg font-semibold transition-all text-left cursor-pointer ${
+              className={`w-full flex items-center gap-2.5 px-2.5 py-2 rounded-lg font-medium transition-all text-left cursor-pointer ${
                 activeNav === "caja"
-                  ? "bg-primary text-primary-foreground shadow-sm"
+                  ? "bg-primary/10 text-primary border border-primary/20 shadow-sm shadow-primary/10"
                   : "text-muted-foreground hover:text-foreground hover:bg-card/40"
               }`}
             >
               <ShoppingCart className="w-4 h-4 shrink-0" />
-              <span>Caja y POS</span>
+              <span className="text-xs">Caja y POS</span>
             </button>
+          </div>
+
+          {/* Grupo 3: Administración */}
+          <div className="space-y-1">
+            <div className="text-[9px] font-bold uppercase tracking-widest text-muted-foreground/60 px-2.5 mb-1.5">
+              Administración
+            </div>
+
+            <div className="flex items-center gap-2.5 px-2.5 py-2 rounded-lg text-muted-foreground hover:text-foreground hover:bg-card/40 transition-colors">
+              <Settings className="w-4 h-4 shrink-0" />
+              <span className="text-xs">Configuración de Taller</span>
+            </div>
+
+            <div className="flex items-center gap-2.5 px-2.5 py-2 rounded-lg text-muted-foreground hover:text-foreground hover:bg-card/40 transition-colors">
+              <KeyRound className="w-4 h-4 shrink-0" />
+              <span className="text-xs">Cuentas de Acceso</span>
+            </div>
           </div>
         </div>
 
-        {/* Perfil del Taller en la parte inferior */}
-        <div className="p-3 border-t border-border/80 bg-[#0c0e14]">
-          <div className="flex items-center gap-2.5 px-2 py-1.5 rounded-lg bg-card/40 border border-border/60">
-            <div className="w-7 h-7 rounded-full bg-primary/20 border border-primary/30 flex items-center justify-center text-primary font-bold text-xs shrink-0">
-              TR
+        {/* Footer del Sidebar con Usuario Activo */}
+        <div className="p-3 border-t border-border/80 bg-card/30 space-y-2.5 shrink-0">
+          <div className="flex items-center gap-2.5 px-1">
+            <div className="w-7 h-7 rounded-full bg-primary/15 border border-primary/30 flex items-center justify-center font-bold text-[10px] text-primary uppercase shrink-0">
+              SC
             </div>
             <div className="min-w-0 flex-1">
-              <div className="font-bold text-[11px] text-foreground truncate">
-                TechRepair Central
-              </div>
-              <div className="text-[9px] text-emerald-400 font-mono truncate">
-                Plan Taller Pro • Activo
-              </div>
+              <span className="text-xs font-bold block truncate leading-none text-foreground">
+                Sucursal Centro
+              </span>
+              <span className="text-[10px] text-muted-foreground block truncate mt-0.5">
+                Javier Ortiz (Admin)
+              </span>
             </div>
+          </div>
+
+          <div className="w-full bg-background border border-border/70 text-muted-foreground text-[11px] font-medium py-1.5 rounded flex items-center justify-center gap-1.5">
+            <LogOut className="w-3 h-3" />
+            <span>Cerrar Sesión</span>
           </div>
         </div>
       </aside>
@@ -318,31 +366,28 @@ export default function LinearDashboardShowcase() {
       {/* 2. CONTENIDO PRINCIPAL DINÁMICO */}
       {/* ========================================================================= */}
       <main className="flex-1 flex flex-col min-w-0 bg-[#10131a] overflow-hidden">
-        {/* Barra superior de estado / breadcrumb */}
-        <header className="h-14 sm:h-16 px-4 sm:px-6 border-b border-border/80 flex items-center justify-between shrink-0 bg-[#0e1017]">
-          <div className="flex items-center gap-2 text-muted-foreground text-xs font-medium">
-            <span className="hidden sm:inline">Panel Técnico</span>
-            <span className="hidden sm:inline text-muted-foreground/40">/</span>
-            <span className="text-foreground font-bold">{navTitles[activeNav]}</span>
+        {/* Cabecera Superior del Dashboard (idéntica al Panel Técnico) */}
+        <header className="h-14 sm:h-16 border-b border-border/80 flex items-center justify-between px-4 sm:px-6 bg-card/20 shrink-0 gap-2">
+          <div className="flex items-center gap-2.5">
+            <div className="w-4 h-4 rounded border border-border/80 flex items-center justify-center text-muted-foreground">
+              <div className="w-2 h-2 border-l border-t border-current" />
+            </div>
+            <span className="text-xs font-medium text-foreground">{navTitles[activeNav]}</span>
           </div>
 
-          <div className="flex items-center gap-3">
-            <span className="hidden sm:inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-[10px] font-semibold">
-              <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
-              Sistema Operativo en Línea
+          <div className="flex items-center gap-2">
+            <span className="hidden sm:inline text-[10px] font-mono text-muted-foreground">
+              Sucursal:
             </span>
-            <button
-              onClick={() => setActiveNav("nuevo-ingreso")}
-              className="h-8 px-3 rounded-lg bg-primary hover:bg-primary/90 text-primary-foreground font-bold text-xs flex items-center gap-1.5 transition-all cursor-pointer shadow-sm shadow-primary/25"
-            >
-              <PlusCircle className="w-3.5 h-3.5" />
-              <span>Nuevo Ingreso</span>
-            </button>
+            <div className="h-7 border border-border/80 bg-card/60 px-2 text-[10px] font-bold rounded flex items-center gap-1.5 text-foreground">
+              <span>Sucursal Centro</span>
+              <ChevronDown className="w-3 h-3 text-muted-foreground" />
+            </div>
           </div>
         </header>
 
         {/* ===================================================================== */}
-        {/* VISTA 1: INICIO (DASHBOARD REAL) */}
+        {/* VISTA 1: INICIO (PANEL DE CONTROL REAL) */}
         {/* ===================================================================== */}
         {activeNav === "inicio" && (
           <div className="flex-1 p-4 sm:p-6 space-y-5 overflow-y-auto no-scrollbar">
@@ -752,11 +797,11 @@ export default function LinearDashboardShowcase() {
         )}
 
         {/* ===================================================================== */}
-        {/* VISTA 2: NUEVO INGRESO (RÉPLICA 1:1 DE NewOrderPage.jsx) */}
+        {/* VISTA 2: NUEVO INGRESO (CON AYUDA DE CAMPOS, NO RELLENADO) */}
         {/* ===================================================================== */}
         {activeNav === "nuevo-ingreso" && (
           <div className="flex-1 p-4 sm:p-6 space-y-5 overflow-y-auto no-scrollbar">
-            {/* Cabecera Superior 1:1 */}
+            {/* Cabecera Superior */}
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
               <div className="space-y-1">
                 <h3 className="font-outfit text-xl sm:text-2xl font-bold tracking-tight text-foreground flex items-center gap-2.5">
@@ -780,7 +825,7 @@ export default function LinearDashboardShowcase() {
               </div>
             </div>
 
-            {/* Formulario 1:1 en 2 Columnas */}
+            {/* Formulario en 2 Columnas con placeholders/ayudas de campo reales */}
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 items-start">
               {/* COLUMNA IZQUIERDA (5 cols): 1. Datos del Cliente */}
               <div className="lg:col-span-5 rounded-xl border border-border/80 bg-card/40 p-4 sm:p-5 shadow-sm space-y-4">
@@ -800,53 +845,52 @@ export default function LinearDashboardShowcase() {
                   <input
                     type="text"
                     placeholder="Buscar por nombre, DNI o teléfono..."
-                    defaultValue=""
                     className="w-full bg-background/85 border border-border text-xs pl-9 pr-3 h-9 rounded-lg text-foreground focus:outline-none focus:border-primary"
                   />
                 </div>
 
                 <div className="space-y-3 pt-1">
                   <div>
-                    <label className="text-xs font-medium text-foreground block mb-1">
+                    <label className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider block mb-1">
                       Nombre y Apellido <span className="text-destructive">*</span>
                     </label>
                     <input
                       type="text"
-                      defaultValue="Mariana López"
+                      placeholder="Ej. Juan Pérez"
                       className="w-full bg-background/85 border border-border text-xs px-3 h-9 rounded-lg text-foreground focus:outline-none focus:border-primary"
                     />
                   </div>
 
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                     <div>
-                      <label className="text-xs font-medium text-foreground block mb-1">
+                      <label className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider block mb-1">
                         DNI / CUIT <span className="text-destructive">*</span>
                       </label>
                       <input
                         type="text"
-                        defaultValue="38.291.840"
+                        placeholder="Ej. 38.450.123"
                         className="w-full bg-background/85 border border-border text-xs px-3 h-9 rounded-lg text-foreground font-mono focus:outline-none focus:border-primary"
                       />
                     </div>
                     <div>
-                      <label className="text-xs font-medium text-foreground block mb-1">
-                        Teléfono / WhatsApp <span className="text-destructive">*</span>
+                      <label className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider block mb-1">
+                        Teléfono (WhatsApp) <span className="text-destructive">*</span>
                       </label>
                       <input
                         type="text"
-                        defaultValue="+54 9 11 5829-1049"
+                        placeholder="+54 381 5551234"
                         className="w-full bg-background/85 border border-border text-xs px-3 h-9 rounded-lg text-foreground font-mono focus:outline-none focus:border-primary"
                       />
                     </div>
                   </div>
 
                   <div>
-                    <label className="text-xs font-medium text-foreground block mb-1">
-                      Correo Electrónico (Notificaciones de Estado)
+                    <label className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider block mb-1">
+                      Correo Electrónico
                     </label>
                     <input
                       type="email"
-                      defaultValue="mariana.lopez@gmail.com"
+                      placeholder="cliente@ejemplo.com"
                       className="w-full bg-background/85 border border-border text-xs px-3 h-9 rounded-lg text-foreground focus:outline-none focus:border-primary"
                     />
                   </div>
@@ -861,14 +905,14 @@ export default function LinearDashboardShowcase() {
                     <span>2. Especificaciones del Equipo y Falla</span>
                   </div>
                   <p className="text-[11px] text-muted-foreground mt-0.5">
-                    Detallá las características del equipo ingresado y los síntomas reportados.
+                    Detallá el modelo recibido, estado estético, accesorios y motivo de ingreso.
                   </p>
                 </div>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                  {/* Tipo de dispositivo con nombres únicos sin / */}
+                  {/* Tipo de Dispositivo general sin / */}
                   <div>
-                    <label className="text-xs font-medium text-foreground block mb-1">
+                    <label className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider block mb-1">
                       Tipo de Dispositivo <span className="text-destructive">*</span>
                     </label>
                     <select
@@ -886,12 +930,12 @@ export default function LinearDashboardShowcase() {
                   </div>
 
                   <div>
-                    <label className="text-xs font-medium text-foreground block mb-1">
-                      Marca y Modelo <span className="text-destructive">*</span>
+                    <label className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider block mb-1">
+                      Marca y Modelo Exacto <span className="text-destructive">*</span>
                     </label>
                     <input
                       type="text"
-                      defaultValue="iPhone 14 Pro Max 256GB Deep Purple"
+                      placeholder="Ej. iPhone 14 Pro / Lenovo Legion 5"
                       className="w-full bg-background/85 border border-border text-xs px-3 h-9 rounded-lg text-foreground focus:outline-none focus:border-primary"
                     />
                   </div>
@@ -899,34 +943,34 @@ export default function LinearDashboardShowcase() {
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   <div>
-                    <label className="text-xs font-medium text-foreground block mb-1">
-                      Accesorios Dejados
+                    <label className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider block mb-1">
+                      Accesorios Entregados
                     </label>
                     <input
                       type="text"
-                      defaultValue="Funda de silicona transparente y cable Lightning"
+                      placeholder="Ej. Cargador original, funda (o vacío si ninguno)"
                       className="w-full bg-background/85 border border-border text-xs px-3 h-9 rounded-lg text-foreground focus:outline-none focus:border-primary"
                     />
                   </div>
                   <div>
-                    <label className="text-xs font-medium text-foreground block mb-1">
-                      Estado Cosmético / Detalles Visuales
+                    <label className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider block mb-1">
+                      Estado Cosmético de Recepción
                     </label>
                     <input
                       type="text"
-                      defaultValue="Microrrayones en biseles de acero, módulo sin golpes en cámaras"
+                      placeholder="Ej. Rayón en tapa trasera, vidrio templado sano"
                       className="w-full bg-background/85 border border-border text-xs px-3 h-9 rounded-lg text-foreground focus:outline-none focus:border-primary"
                     />
                   </div>
                 </div>
 
                 <div>
-                  <label className="text-xs font-medium text-foreground block mb-1">
+                  <label className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider block mb-1">
                     Falla Declarada por el Cliente <span className="text-destructive">*</span>
                   </label>
                   <textarea
                     rows={2}
-                    defaultValue="Pantalla totalmente apagada tras caída. Vibra al conectar a cargador y recibe llamadas pero no emite imagen ni respuesta táctil."
+                    placeholder="Describí los síntomas reportados por el cliente..."
                     className="w-full bg-background/85 border border-border text-xs p-3 rounded-lg text-foreground focus:outline-none focus:border-primary resize-none leading-relaxed"
                   />
                 </div>
@@ -947,7 +991,7 @@ export default function LinearDashboardShowcase() {
                   </label>
                 </div>
 
-                {/* Checkbox Imprimir Comprobante: sin icono y oculto en móvil */}
+                {/* Checkbox Imprimir Comprobante: sin icono de impresora y oculto en móvil */}
                 <div className="hidden sm:flex items-center space-x-3 bg-primary/5 p-3 rounded-xl border border-primary/20">
                   <input
                     type="checkbox"
@@ -983,11 +1027,11 @@ export default function LinearDashboardShowcase() {
         )}
 
         {/* ===================================================================== */}
-        {/* VISTA 3: ÓRDENES DE SERVICIO (RÉPLICA 1:1 DE OrdersPage.jsx) */}
+        {/* VISTA 3: ÓRDENES DE SERVICIO (RÉPLICA 1:1) */}
         {/* ===================================================================== */}
         {activeNav === "ordenes" && (
           <div className="flex-1 p-4 sm:p-6 space-y-5 overflow-y-auto no-scrollbar">
-            {/* Cabecera Superior 1:1 */}
+            {/* Cabecera Superior */}
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
               <div className="space-y-1">
                 <h3 className="font-outfit text-xl sm:text-2xl font-bold tracking-tight text-foreground flex items-center gap-2.5">
@@ -1018,7 +1062,7 @@ export default function LinearDashboardShowcase() {
               </div>
             </div>
 
-            {/* Contenedor Principal 1:1 */}
+            {/* Contenedor Principal */}
             <div className="rounded-xl border border-border/80 bg-card/30 p-3 sm:p-5 shadow-sm space-y-4 overflow-hidden">
               {/* Barra de Búsqueda + Píldoras de Estado */}
               <div className="flex flex-col lg:flex-row gap-3 lg:items-center justify-between border-b border-border/50 pb-3.5">
@@ -1192,11 +1236,11 @@ export default function LinearDashboardShowcase() {
         )}
 
         {/* ===================================================================== */}
-        {/* VISTA 4: CLIENTES (RÉPLICA 1:1 DE ClientsPage.jsx) */}
+        {/* VISTA 4: CLIENTES (RÉPLICA 1:1) */}
         {/* ===================================================================== */}
         {activeNav === "clientes" && (
           <div className="flex-1 p-4 sm:p-6 space-y-5 overflow-y-auto no-scrollbar">
-            {/* Cabecera Superior 1:1 */}
+            {/* Cabecera Superior */}
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
               <div className="space-y-1">
                 <h3 className="font-outfit text-xl sm:text-2xl font-bold tracking-tight text-foreground flex items-center gap-2.5">
@@ -1226,7 +1270,7 @@ export default function LinearDashboardShowcase() {
               </div>
             </div>
 
-            {/* Contenedor Principal 1:1 */}
+            {/* Contenedor Principal */}
             <div className="rounded-xl border border-border/80 bg-card/30 p-3 sm:p-5 shadow-sm space-y-4">
               {/* Buscador y Contador */}
               <div className="flex flex-col sm:flex-row gap-3 items-start sm:items-center justify-between border-b border-border/50 pb-3.5">
@@ -1243,7 +1287,7 @@ export default function LinearDashboardShowcase() {
                 </span>
               </div>
 
-              {/* Tabla Completa 1:1 de Clientes */}
+              {/* Tabla de Clientes */}
               <div className="overflow-x-auto">
                 <table className="w-full text-left text-xs border-collapse">
                   <thead>
@@ -1325,11 +1369,11 @@ export default function LinearDashboardShowcase() {
         )}
 
         {/* ===================================================================== */}
-        {/* VISTA 5: INVENTARIO (RÉPLICA 1:1 DE InventoryPage.jsx) */}
+        {/* VISTA 5: INVENTARIO (RÉPLICA 1:1) */}
         {/* ===================================================================== */}
         {activeNav === "inventario" && (
           <div className="flex-1 p-4 sm:p-6 space-y-5 overflow-y-auto no-scrollbar">
-            {/* Cabecera Superior 1:1 */}
+            {/* Cabecera Superior */}
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
               <div className="space-y-1">
                 <h3 className="font-outfit text-xl sm:text-2xl font-bold tracking-tight text-foreground flex items-center gap-2.5">
@@ -1359,7 +1403,7 @@ export default function LinearDashboardShowcase() {
               </div>
             </div>
 
-            {/* Contenedor Principal 1:1 */}
+            {/* Contenedor Principal */}
             <div className="rounded-xl border border-border/80 bg-card/30 p-3 sm:p-5 shadow-sm space-y-4">
               {/* Buscador + Filtros por Categoría */}
               <div className="flex flex-col lg:flex-row gap-3 lg:items-center justify-between border-b border-border/50 pb-3.5">
@@ -1396,7 +1440,7 @@ export default function LinearDashboardShowcase() {
                 </div>
               </div>
 
-              {/* Tabla Completa 1:1 de Stock */}
+              {/* Tabla de Stock */}
               <div className="overflow-x-auto">
                 <table className="w-full text-left text-xs border-collapse">
                   <thead>
@@ -1532,11 +1576,11 @@ export default function LinearDashboardShowcase() {
         )}
 
         {/* ===================================================================== */}
-        {/* VISTA 6: CAJA Y POS (RÉPLICA 1:1 DE POSPage.jsx) */}
+        {/* VISTA 6: CAJA Y POS (CON AYUDA DE CAMPO, INTERACTIVO Y LIMPIO) */}
         {/* ===================================================================== */}
         {activeNav === "caja" && (
           <div className="flex-1 p-4 sm:p-6 space-y-5 overflow-y-auto no-scrollbar">
-            {/* Cabecera Superior 1:1 */}
+            {/* Cabecera Superior */}
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
               <div className="space-y-1">
                 <h3 className="font-outfit text-xl sm:text-2xl font-bold tracking-tight text-foreground flex items-center gap-2.5">
@@ -1552,32 +1596,22 @@ export default function LinearDashboardShowcase() {
               <div className="flex items-center bg-card/80 border border-border/80 rounded-xl p-1 self-start sm:self-auto shadow-sm select-none">
                 <button
                   type="button"
-                  onClick={() => setPosTab("venta")}
-                  className={`px-3 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-1.5 cursor-pointer transition-all ${
-                    posTab === "venta"
-                      ? "bg-primary text-primary-foreground font-bold shadow-sm"
-                      : "text-muted-foreground hover:text-foreground"
-                  }`}
+                  className="px-3 py-1.5 rounded-lg text-xs font-bold bg-primary text-primary-foreground shadow-sm flex items-center gap-1.5 cursor-pointer"
                 >
                   <ShoppingCart className="w-3.5 h-3.5" />
                   <span>Punto de Venta</span>
                 </button>
                 <button
                   type="button"
-                  onClick={() => setPosTab("historial")}
-                  className={`px-3 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-1.5 cursor-pointer transition-all ${
-                    posTab === "historial"
-                      ? "bg-primary text-primary-foreground font-bold shadow-sm"
-                      : "text-muted-foreground hover:text-foreground"
-                  }`}
+                  className="px-3 py-1.5 rounded-lg text-xs font-semibold text-muted-foreground hover:text-foreground flex items-center gap-1.5 cursor-pointer"
                 >
                   <ClipboardList className="w-3.5 h-3.5" />
-                  <span>Historial de Caja</span>
+                  <span>Historial</span>
                 </button>
               </div>
             </div>
 
-            {/* Tarjetas de Arqueo / KPIs de Caja 1:1 */}
+            {/* Arqueo / Métricas de Caja */}
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
               <div className="rounded-xl border border-primary/25 bg-primary/5 p-3.5 flex items-center justify-between">
                 <div>
@@ -1622,7 +1656,7 @@ export default function LinearDashboardShowcase() {
               </div>
             </div>
 
-            {/* Layout 2 Columnas de POS (7 cols catálogo, 5 cols ticket actual) */}
+            {/* Layout 2 Columnas de POS (7 cols catálogo, 5 cols ticket) */}
             <div className="grid grid-cols-1 xl:grid-cols-12 gap-5 items-start">
               {/* Columna Izquierda (7 cols): Catálogo de Productos */}
               <div className="xl:col-span-7 rounded-xl border border-border/80 bg-card/30 p-4 sm:p-5 shadow-sm space-y-4">
@@ -1655,12 +1689,7 @@ export default function LinearDashboardShowcase() {
 
                 {/* Grid de Artículos */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                  {[
-                    { name: "Cargador Rápido 35W Dual USB-C", code: "ACC-CH35", price: "$24.500", stock: 14 },
-                    { name: "Cable Lightning a USB-C Trenzado 1.5m", code: "CAB-LT15", price: "$12.000", stock: 22 },
-                    { name: "Vidrio Templado 9D Curvo Antiespía", code: "VID-9D01", price: "$8.500", stock: 35 },
-                    { name: "Funda Armor Antigolpes iPhone 14 Pro", code: "FUN-IP14", price: "$15.000", stock: 8 },
-                  ].map((p) => (
+                  {posCatalog.map((p) => (
                     <div
                       key={p.code}
                       className="rounded-xl border border-border/70 bg-background/50 p-3 flex flex-col justify-between space-y-2 hover:border-primary/40 transition-colors"
@@ -1677,10 +1706,11 @@ export default function LinearDashboardShowcase() {
                       </div>
                       <div className="flex items-center justify-between pt-1 border-t border-border/30">
                         <span className="font-mono font-bold text-sm text-foreground">
-                          {p.price}
+                          ${p.price.toLocaleString("es-AR")}
                         </span>
                         <button
                           type="button"
+                          onClick={() => addToCart(p)}
                           className="h-7 px-2.5 bg-primary/15 hover:bg-primary text-primary hover:text-primary-foreground font-bold text-xs rounded-md transition-colors flex items-center gap-1 cursor-pointer"
                         >
                           <Plus className="w-3 h-3" />
@@ -1701,66 +1731,76 @@ export default function LinearDashboardShowcase() {
                       <span>Ticket de Venta Actual</span>
                     </div>
                     <p className="text-[11px] text-muted-foreground mt-0.5">
-                      3 artículos cargados al comprobante
+                      {cart.length === 0
+                        ? "Seleccioná artículos del catálogo para cobrar"
+                        : `${cart.length} ${cart.length === 1 ? "artículo" : "artículos"} cargados`}
                     </p>
                   </div>
-                  <span className="text-[10px] font-mono font-bold bg-primary/10 text-primary px-2 py-0.5 rounded">
-                    Mesa #01
-                  </span>
+                  {cart.length > 0 && (
+                    <button
+                      type="button"
+                      onClick={() => setCart([])}
+                      className="text-[10px] text-muted-foreground hover:text-destructive underline cursor-pointer"
+                    >
+                      Vaciar ticket
+                    </button>
+                  )}
                 </div>
 
-                {/* Cliente Asignado */}
-                <div className="rounded-lg bg-background/60 border border-border/60 p-2.5 flex items-center justify-between">
-                  <div>
-                    <span className="text-[10px] text-muted-foreground block uppercase font-bold">Cliente</span>
-                    <span className="font-bold text-xs text-foreground">Mariana López</span>
-                    <span className="text-[10px] text-muted-foreground font-mono block">DNI: 38.291.840</span>
+                {/* Contenido del Carrito: Vacío con ayuda del campo vs cargado */}
+                {cart.length === 0 ? (
+                  <div className="text-center py-10 text-muted-foreground text-xs font-light border border-dashed border-border/70 rounded-xl space-y-1">
+                    <ShoppingCart className="w-7 h-7 mx-auto text-muted-foreground/30 mb-1" />
+                    <p className="font-semibold text-foreground">El ticket está vacío</p>
+                    <p className="text-[11px]">
+                      Hacé clic en "+ Agregar" sobre los productos de la izquierda.
+                    </p>
                   </div>
-                  <span className="text-[10px] text-primary hover:underline font-semibold cursor-pointer">
-                    Cambiar
-                  </span>
-                </div>
-
-                {/* Lista de Ítems en el Carrito */}
-                <div className="space-y-2 max-h-48 overflow-y-auto no-scrollbar pr-1">
-                  <div className="p-2 rounded-lg bg-background/50 border border-border/50 flex items-center justify-between text-xs">
-                    <div className="min-w-0 flex-1 pr-2">
-                      <div className="font-semibold text-foreground truncate">Cargador Rápido 35W Dual USB-C</div>
-                      <div className="text-[10px] text-muted-foreground">1 x $24.500</div>
-                    </div>
-                    <span className="font-mono font-bold text-foreground">$24.500</span>
+                ) : (
+                  <div className="space-y-2 max-h-48 overflow-y-auto no-scrollbar pr-1">
+                    {cart.map((item) => (
+                      <div
+                        key={item.id}
+                        className="p-2 rounded-lg bg-background/50 border border-border/50 flex items-center justify-between text-xs"
+                      >
+                        <div className="min-w-0 flex-1 pr-2">
+                          <div className="font-semibold text-foreground truncate">
+                            {item.name}
+                          </div>
+                          <div className="text-[10px] text-muted-foreground">
+                            {item.qty} x ${item.price.toLocaleString("es-AR")}
+                          </div>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <span className="font-mono font-bold text-foreground">
+                            ${(item.price * item.qty).toLocaleString("es-AR")}
+                          </span>
+                          <button
+                            type="button"
+                            onClick={() => removeFromCart(item.id)}
+                            className="text-muted-foreground hover:text-destructive cursor-pointer"
+                          >
+                            <Trash2 className="w-3.5 h-3.5" />
+                          </button>
+                        </div>
+                      </div>
+                    ))}
                   </div>
-
-                  <div className="p-2 rounded-lg bg-background/50 border border-border/50 flex items-center justify-between text-xs">
-                    <div className="min-w-0 flex-1 pr-2">
-                      <div className="font-semibold text-foreground truncate">Vidrio Templado 9D Curvo Antiespía</div>
-                      <div className="text-[10px] text-muted-foreground">2 x $8.500</div>
-                    </div>
-                    <span className="font-mono font-bold text-foreground">$17.000</span>
-                  </div>
-
-                  <div className="p-2 rounded-lg bg-primary/5 border border-primary/20 flex items-center justify-between text-xs">
-                    <div className="min-w-0 flex-1 pr-2">
-                      <div className="font-semibold text-primary truncate">Reparación TK-9281 (Módulo OLED)</div>
-                      <div className="text-[10px] text-muted-foreground">Orden de Servicio Lista</div>
-                    </div>
-                    <span className="font-mono font-bold text-primary">$165.000</span>
-                  </div>
-                </div>
+                )}
 
                 {/* Desglose de Totales */}
                 <div className="space-y-1.5 pt-2 border-t border-border/50 text-xs">
                   <div className="flex justify-between text-muted-foreground">
                     <span>Subtotal:</span>
-                    <span className="font-mono font-semibold text-foreground">$206.500</span>
-                  </div>
-                  <div className="flex justify-between text-muted-foreground">
-                    <span>Descuento Promoción (10%):</span>
-                    <span className="font-mono font-semibold text-emerald-400">-$20.650</span>
+                    <span className="font-mono font-semibold text-foreground">
+                      ${cartSubtotal.toLocaleString("es-AR")}
+                    </span>
                   </div>
                   <div className="flex justify-between items-baseline pt-2 border-t border-border/40">
                     <span className="text-sm font-bold text-foreground">Total a Cobrar:</span>
-                    <span className="font-mono text-2xl font-black text-emerald-400">$185.850</span>
+                    <span className="font-mono text-2xl font-black text-emerald-400">
+                      ${cartSubtotal.toLocaleString("es-AR")}
+                    </span>
                   </div>
                 </div>
 
@@ -1800,7 +1840,8 @@ export default function LinearDashboardShowcase() {
                 {/* Botón de Cobro */}
                 <button
                   type="button"
-                  className="w-full h-10 rounded-lg bg-emerald-500 hover:bg-emerald-600 text-black font-extrabold text-xs flex items-center justify-center gap-2 cursor-pointer shadow-lg shadow-emerald-500/20 transition-all mt-2"
+                  disabled={cart.length === 0}
+                  className="w-full h-10 rounded-lg bg-emerald-500 hover:bg-emerald-600 disabled:opacity-40 disabled:pointer-events-none text-black font-extrabold text-xs flex items-center justify-center gap-2 cursor-pointer shadow-lg shadow-emerald-500/20 transition-all mt-2"
                 >
                   <CheckCircle className="w-4 h-4" />
                   <span>Cobrar Ticket e Imprimir Recibo</span>
