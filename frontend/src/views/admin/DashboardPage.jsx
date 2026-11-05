@@ -29,6 +29,7 @@ import {
 } from "recharts";
 import {
   AlertCircle,
+  AlertTriangle,
   PackageCheck,
   Wrench,
   ArrowUpRight,
@@ -1461,6 +1462,7 @@ export default function DashboardPage() {
   const lowStockCount = lowStockItems.length;
   const stockHasAlert = outOfStockCount > 0 || lowStockCount > 0;
   const isCriticalNoStock = outOfStockCount > 0;
+  const allAlertItems = [...outOfStockItems, ...lowStockItems];
 
   const lowStockDetail =
     !isBasicPlan && stockHasAlert
@@ -2074,32 +2076,49 @@ export default function DashboardPage() {
                   </p>
                 </div>
               </div>
-            ) : lowStockItems.length > 0 ? (
-              lowStockItems.slice(0, 5).map((item) => (
-                <div
-                  key={item._id}
-                  className="rounded-xl bg-destructive/10 border border-destructive/25 text-foreground p-3.5 flex items-start gap-2.5 text-left"
-                >
-                  <AlertCircle className="h-4 w-4 text-destructive shrink-0 mt-0.5" />
-                  <div className="min-w-0 flex-1 space-y-1">
-                    <div className="flex items-start justify-between gap-2">
-                      <span className="text-xs font-bold font-outfit leading-snug text-foreground">
-                        {item.name}
-                      </span>
-                      <Badge
-                        variant="destructive"
-                        className="text-[9px] font-bold py-0.5 px-1.5 uppercase tracking-wider shrink-0 select-none whitespace-nowrap"
-                      >
-                        Stock: {item.quantity}
-                      </Badge>
+            ) : allAlertItems.length > 0 ? (
+              allAlertItems.slice(0, 5).map((item) => {
+                const isZeroStock = (item.quantity || 0) <= 0;
+                return (
+                  <div
+                    key={item._id}
+                    className={`rounded-xl p-3.5 flex items-start gap-2.5 text-left border ${
+                      isZeroStock
+                        ? "bg-destructive/10 border-destructive/25 text-foreground"
+                        : "bg-amber-500/10 border-amber-500/25 text-foreground"
+                    }`}
+                  >
+                    {isZeroStock ? (
+                      <AlertCircle className="h-4 w-4 text-destructive shrink-0 mt-0.5" />
+                    ) : (
+                      <AlertTriangle className="h-4 w-4 text-amber-400 shrink-0 mt-0.5" />
+                    )}
+                    <div className="min-w-0 flex-1 space-y-1">
+                      <div className="flex items-start justify-between gap-2">
+                        <span className="text-xs font-bold font-outfit leading-snug text-foreground">
+                          {item.name}
+                        </span>
+                        {isZeroStock ? (
+                          <Badge
+                            variant="destructive"
+                            className="text-[9px] font-bold py-0.5 px-1.5 uppercase tracking-wider shrink-0 select-none whitespace-nowrap"
+                          >
+                            Stock: 0
+                          </Badge>
+                        ) : (
+                          <span className="text-[9px] font-bold py-0.5 px-1.5 uppercase tracking-wider shrink-0 select-none whitespace-nowrap rounded bg-amber-500/20 text-amber-400 border border-amber-500/30">
+                            Stock: {item.quantity}
+                          </span>
+                        )}
+                      </div>
+                      <p className="text-[11px] text-muted-foreground leading-relaxed">
+                        Mínimo sugerido: {item.minQuantity || item.min_quantity} u. •{" "}
+                        {item.category || "General"}
+                      </p>
                     </div>
-                    <p className="text-[11px] text-muted-foreground leading-relaxed">
-                      Mínimo sugerido: {item.minQuantity || item.min_quantity} u. •{" "}
-                      {item.category || "General"}
-                    </p>
                   </div>
-                </div>
-              ))
+                );
+              })
             ) : (
               <div className="text-center py-10 flex flex-col items-center justify-center h-full">
                 <div className="w-10 h-10 rounded-full bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center mb-3">
