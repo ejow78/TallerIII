@@ -92,7 +92,7 @@ const STATUS_META = {
   presupuestado: { label: "Presupuestado", color: "#a855f7", badge: "outline" },
   en_reparacion: { label: "En Reparación", color: "#38bdf8", badge: "default" },
   reparacion: { label: "En Reparación", color: "#38bdf8", badge: "default" },
-  listo: { label: "Listo p/ Retirar", color: "#10b981", badge: "success" },
+  listo: { label: "Listo", color: "#10b981", badge: "success" },
   entregado: { label: "Entregado", color: "#059669", badge: "success" },
   rechazado: { label: "Rechazado", color: "#ef4444", badge: "destructive" },
 };
