@@ -1078,17 +1078,35 @@ export default function InventoryPage() {
                   >
                     Stock Actual
                   </Label>
-                  <Input
-                    id="item-qty"
-                    type="number"
-                    min="0"
-                    step="1"
-                    inputMode="numeric"
-                    required
-                    value={itemQty}
-                    onChange={(e) => setItemQty(e.target.value)}
-                    className="bg-background/85 border-border focus-visible:ring-1 focus-visible:ring-primary text-xs font-mono h-9 rounded-lg"
-                  />
+                  <div className="flex items-center bg-background/85 border border-border rounded-lg h-9 px-1 focus-within:ring-1 focus-within:ring-primary">
+                    <button
+                      type="button"
+                      onClick={() => setItemQty((prev) => Math.max(0, (parseInt(prev, 10) || 0) - 1))}
+                      className="w-7 h-7 rounded hover:bg-amber-500/15 text-muted-foreground hover:text-amber-400 flex items-center justify-center transition-colors cursor-pointer shrink-0"
+                      title="Restar 1 unidad"
+                    >
+                      <Minus className="w-3.5 h-3.5" />
+                    </button>
+                    <input
+                      id="item-qty"
+                      type="number"
+                      min="0"
+                      step="1"
+                      inputMode="numeric"
+                      required
+                      value={itemQty}
+                      onChange={(e) => setItemQty(e.target.value)}
+                      className="w-full bg-transparent text-center font-mono font-bold text-xs text-foreground focus:outline-none"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setItemQty((prev) => (parseInt(prev, 10) || 0) + 1)}
+                      className="w-7 h-7 rounded hover:bg-emerald-500/15 text-muted-foreground hover:text-emerald-400 flex items-center justify-center transition-colors cursor-pointer shrink-0"
+                      title="Sumar 1 unidad"
+                    >
+                      <Plus className="w-3.5 h-3.5" />
+                    </button>
+                  </div>
                 </div>
 
                 <div className="space-y-1.5">
@@ -1098,17 +1116,35 @@ export default function InventoryPage() {
                   >
                     Stock Mínimo
                   </Label>
-                  <Input
-                    id="item-min"
-                    type="number"
-                    min="0"
-                    step="1"
-                    inputMode="numeric"
-                    required
-                    value={itemMinQty}
-                    onChange={(e) => setItemMinQty(e.target.value)}
-                    className="bg-background/85 border-border focus-visible:ring-1 focus-visible:ring-primary text-xs font-mono h-9 rounded-lg"
-                  />
+                  <div className="flex items-center bg-background/85 border border-border rounded-lg h-9 px-1 focus-within:ring-1 focus-within:ring-primary">
+                    <button
+                      type="button"
+                      onClick={() => setItemMinQty((prev) => Math.max(0, (parseInt(prev, 10) || 0) - 1))}
+                      className="w-7 h-7 rounded hover:bg-amber-500/15 text-muted-foreground hover:text-amber-400 flex items-center justify-center transition-colors cursor-pointer shrink-0"
+                      title="Restar 1 unidad"
+                    >
+                      <Minus className="w-3.5 h-3.5" />
+                    </button>
+                    <input
+                      id="item-min"
+                      type="number"
+                      min="0"
+                      step="1"
+                      inputMode="numeric"
+                      required
+                      value={itemMinQty}
+                      onChange={(e) => setItemMinQty(e.target.value)}
+                      className="w-full bg-transparent text-center font-mono font-bold text-xs text-foreground focus:outline-none"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setItemMinQty((prev) => (parseInt(prev, 10) || 0) + 1)}
+                      className="w-7 h-7 rounded hover:bg-emerald-500/15 text-muted-foreground hover:text-emerald-400 flex items-center justify-center transition-colors cursor-pointer shrink-0"
+                      title="Sumar 1 unidad"
+                    >
+                      <Plus className="w-3.5 h-3.5" />
+                    </button>
+                  </div>
                 </div>
 
                 <div className="space-y-1.5">
@@ -1127,7 +1163,7 @@ export default function InventoryPage() {
                     required
                     value={itemPrice}
                     onChange={(e) => setItemPrice(e.target.value)}
-                    className="bg-background/85 border-border focus-visible:ring-1 focus-visible:ring-primary text-xs font-mono h-9 rounded-lg"
+                    className="bg-background/85 border-border focus-visible:ring-1 focus-visible:ring-primary text-xs font-mono h-9 rounded-lg text-center"
                   />
                 </div>
               </div>

@@ -203,4 +203,30 @@
   h1, h2, h3, h4, h5, h6, [data-slot="card-title"], .font-outfit {
     font-family: var(--font-heading);
   }
+
+  /* Ocultar flechas numéricas nativas del navegador (spin buttons) */
+  input[type="number"]::-webkit-outer-spin-button,
+  input[type="number"]::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }
+  input[type="number"] {
+    -moz-appearance: textfield;
+  }
+}
+
+/* Ocultar barra de scroll en el panel de control preservando el scroll funcional */
+.scrollbar-none::-webkit-scrollbar,
+[data-slot="sidebar-inset"] main::-webkit-scrollbar,
+[data-slot="sidebar-inset"]::-webkit-scrollbar,
+[data-slot="sidebar-content"]::-webkit-scrollbar {
+  display: none;
+}
+
+.scrollbar-none,
+[data-slot="sidebar-inset"] main,
+[data-slot="sidebar-inset"],
+[data-slot="sidebar-content"] {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
 }

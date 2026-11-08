@@ -294,7 +294,7 @@ export default function DashboardLayout() {
           </SidebarHeader>
 
           {/* Contenido de Navegación por Secciones */}
-          <SidebarContent className="px-2 py-2 sm:py-4 space-y-1 sm:space-y-2 flex-1 min-h-0 overflow-y-auto">
+          <SidebarContent className="px-2 py-2 sm:py-4 space-y-1 sm:space-y-2 flex-1 min-h-0 overflow-y-auto scrollbar-none [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
             {isSuperAdmin ? (
               <SidebarGroup>
                 <SidebarGroupLabel className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/60 px-3 mb-1">
@@ -611,7 +611,7 @@ export default function DashboardLayout() {
           </header>
 
           {/* Contenido Dinámico de las Páginas del Dashboard */}
-          <main className="flex-1 min-h-0 p-3.5 sm:p-6 md:p-8 pb-8 sm:pb-10 overflow-y-auto overflow-x-hidden max-w-7xl w-full mx-auto">
+          <main className="flex-1 min-h-0 p-3.5 sm:p-6 md:p-8 pb-8 sm:pb-10 overflow-y-auto overflow-x-hidden max-w-7xl w-full mx-auto scrollbar-none [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
             <Outlet />
           </main>
 
