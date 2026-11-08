@@ -286,14 +286,10 @@ export default function TrackingPage() {
         <Skeleton className="h-6 w-32 rounded-lg" />
         <Skeleton className="h-36 w-full rounded-2xl" />
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <div className="md:col-span-2 space-y-6">
-            <Skeleton className="h-56 w-full rounded-2xl" />
-            <Skeleton className="h-56 w-full rounded-2xl" />
-          </div>
-          <div className="space-y-6">
-            <Skeleton className="h-60 w-full rounded-2xl" />
-            <Skeleton className="h-44 w-full rounded-2xl" />
-          </div>
+          <Skeleton className="order-1 md:order-1 md:col-span-2 h-56 w-full rounded-2xl" />
+          <Skeleton className="order-2 md:order-2 md:col-span-1 h-56 w-full rounded-2xl" />
+          <Skeleton className="order-4 md:order-3 md:col-span-2 h-48 w-full rounded-2xl" />
+          <Skeleton className="order-3 md:order-4 md:col-span-1 h-48 w-full rounded-2xl" />
         </div>
       </div>
     );
@@ -428,14 +424,15 @@ export default function TrackingPage() {
 
       </Card>
 
-      {/* GRID BENTO PRINCIPAL (2 Columnas Simétricas en Desktop) */}
+      {/* GRID BENTO RESPONSIVE:
+          - En Móvil: 1. Informe -> 2. Cotización -> 3. Taller -> 4. Historial
+          - En Desktop: Matriz 2x2 simétrica perfecta (Fila 1: Informe + Cotización, Fila 2: Historial + Taller)
+      */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
 
-        {/* COLUMNA IZQUIERDA (2/3): Informe Técnico e Historial */}
-        <div className="md:col-span-2 flex flex-col gap-6">
-
-          {/* BENTO CARD: Informe Técnico y Revisión */}
-          <Card className="bg-card/50 backdrop-blur-md border-border/70 p-5 sm:p-6 rounded-2xl shadow-sm space-y-4">
+        {/* CARD 1: Informe Técnico y Revisión (Móvil: 1º / Desktop: Fila 1 Col 1-2) */}
+        <Card className="order-1 md:order-1 md:col-span-2 bg-card/50 backdrop-blur-md border-border/70 p-5 sm:p-6 rounded-2xl shadow-sm space-y-4 flex flex-col justify-between">
+          <div>
             <div className="flex items-center gap-2.5 border-b border-border/50 pb-3">
               <div className="w-8 h-8 rounded-lg bg-primary/10 border border-primary/20 flex items-center justify-center text-primary shrink-0">
                 <Stethoscope className="w-4 h-4" />
@@ -450,7 +447,7 @@ export default function TrackingPage() {
               </div>
             </div>
 
-            <div className="space-y-4">
+            <div className="space-y-4 pt-3">
               {/* Falla Reportada */}
               <div className="space-y-1.5">
                 <span className="text-[11px] font-bold text-muted-foreground uppercase tracking-wider block">
@@ -500,54 +497,12 @@ export default function TrackingPage() {
                 </div>
               )}
             </div>
-          </Card>
+          </div>
+        </Card>
 
-          {/* BENTO CARD: Historial de Movimientos (Alineación simétrica) */}
-          <Card className="bg-card/50 backdrop-blur-md border-border/70 p-5 sm:p-6 rounded-2xl shadow-sm space-y-4 flex-1 flex flex-col justify-between">
-            <div>
-              <div className="flex items-center gap-2.5 border-b border-border/50 pb-3">
-                <div className="w-8 h-8 rounded-lg bg-primary/10 border border-primary/20 flex items-center justify-center text-primary shrink-0">
-                  <Clock className="w-4 h-4" />
-                </div>
-                <div>
-                  <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider block">
-                    Trazabilidad
-                  </span>
-                  <h3 className="font-outfit text-sm font-bold text-foreground leading-tight">
-                    Historial de Movimientos
-                  </h3>
-                </div>
-              </div>
-
-              <div className="space-y-3 pt-3">
-                {Array.isArray(order.history) && order.history.length > 0 ? (
-                  order.history.map((log, idx) => (
-                    <div
-                      key={idx}
-                      className="flex flex-col sm:flex-row sm:items-baseline gap-1.5 sm:gap-3 text-xs border-b border-border/30 pb-2.5 last:border-0 last:pb-0"
-                    >
-                      <span className="font-mono text-[11px] font-semibold text-muted-foreground shrink-0 bg-muted/30 px-2 py-0.5 rounded border border-border/30 w-fit">
-                        {log.date}
-                      </span>
-                      <p className="text-foreground/90 font-light leading-relaxed">
-                        {log.text}
-                      </p>
-                    </div>
-                  ))
-                ) : (
-                  <p className="text-xs text-muted-foreground font-light">Sin registros de movimientos.</p>
-                )}
-              </div>
-            </div>
-          </Card>
-
-        </div>
-
-        {/* COLUMNA DERECHA (1/3): Presupuesto Primero (Más Importante) y Taller Responsable */}
-        <div className="flex flex-col gap-6">
-
-          {/* BENTO CARD: Presupuesto Oficial (Cotización en Primer Lugar) */}
-          <Card className="bg-card/50 backdrop-blur-md border-border/70 p-5 sm:p-6 rounded-2xl shadow-sm space-y-4">
+        {/* CARD 2: Presupuesto Oficial (Móvil: 2º / Desktop: Fila 1 Col 3) */}
+        <Card className="order-2 md:order-2 md:col-span-1 bg-card/50 backdrop-blur-md border-border/70 p-5 sm:p-6 rounded-2xl shadow-sm space-y-4 flex flex-col justify-between">
+          <div>
             <div className="flex items-center gap-2.5 border-b border-border/50 pb-3">
               <div className="w-8 h-8 rounded-lg bg-primary/10 border border-primary/20 flex items-center justify-center text-primary shrink-0">
                 <FileText className="w-4 h-4" />
@@ -563,7 +518,7 @@ export default function TrackingPage() {
             </div>
 
             {order.budget && order.budget.items?.length > 0 ? (
-              <div className="space-y-4 pt-1">
+              <div className="space-y-4 pt-3">
                 <div className="space-y-2">
                   {order.budget.items.map((item, idx) => (
                     <div key={idx} className="flex justify-between items-start text-xs border-b border-border/30 pb-2 last:border-0 last:pb-0">
@@ -654,71 +609,109 @@ export default function TrackingPage() {
                 </Badge>
               </div>
             )}
-          </Card>
+          </div>
+        </Card>
 
-          {/* BENTO CARD: Taller Responsable / Sucursal (Alineación simétrica con enlace a mapa) */}
-          <Card className="bg-card/50 backdrop-blur-md border-border/70 p-5 rounded-2xl shadow-sm space-y-3.5 flex-1 flex flex-col justify-between">
-            <div>
-              <div className="flex items-center gap-2.5 border-b border-border/50 pb-3">
-                <div className="w-8 h-8 rounded-lg bg-primary/10 border border-primary/20 flex items-center justify-center text-primary shrink-0">
-                  <Store className="w-4 h-4" />
-                </div>
-                <div>
-                  <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider block">
-                    Taller Responsable
-                  </span>
-                  <h3 className="font-outfit text-sm font-bold text-foreground leading-tight">
-                    {venueName}
-                  </h3>
-                </div>
+        {/* CARD 3: Taller Responsable (Móvil: 3º / Desktop: Fila 2 Col 3) */}
+        <Card className="order-3 md:order-4 md:col-span-1 bg-card/50 backdrop-blur-md border-border/70 p-5 rounded-2xl shadow-sm space-y-3.5 flex flex-col justify-between">
+          <div>
+            <div className="flex items-center gap-2.5 border-b border-border/50 pb-3">
+              <div className="w-8 h-8 rounded-lg bg-primary/10 border border-primary/20 flex items-center justify-center text-primary shrink-0">
+                <Store className="w-4 h-4" />
               </div>
-
-              <div className="space-y-3 pt-1 text-xs">
-                {parsedVenue.address && (
-                  <div className="flex items-start gap-2.5">
-                    <MapPin className="w-4 h-4 text-primary shrink-0 mt-0.5" />
-                    <div className="flex-1 min-w-0">
-                      <p className="text-foreground/90 font-medium leading-snug">
-                        {parsedVenue.address}
-                      </p>
-                      <a
-                        href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(parsedVenue.address)}`}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="inline-flex items-center gap-1 text-[11px] text-primary hover:underline font-semibold mt-1 cursor-pointer"
-                      >
-                        <span>Ver en Google Maps</span>
-                        <ExternalLink className="w-3 h-3" />
-                      </a>
-                    </div>
-                  </div>
-                )}
-
-                {parsedVenue.hours && (
-                  <div className="flex items-start gap-2.5 pt-2 border-t border-border/30">
-                    <Clock className="w-4 h-4 text-emerald-400 shrink-0 mt-0.5" />
-                    <p className="text-foreground/80 font-medium leading-relaxed flex-1">
-                      {parsedVenue.hours}
-                    </p>
-                  </div>
-                )}
-
-                {venuePhone && (
-                  <div className="flex items-center gap-2.5 pt-2 border-t border-border/30">
-                    <Phone className="w-4 h-4 text-sky-400 shrink-0" />
-                    <a
-                      href={`tel:${venuePhone.replace(/\s+/g, '')}`}
-                      className="text-foreground/90 font-semibold hover:text-primary transition-colors text-xs"
-                    >
-                      {venuePhone}
-                    </a>
-                  </div>
-                )}
+              <div>
+                <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider block">
+                  Taller Responsable
+                </span>
+                <h3 className="font-outfit text-sm font-bold text-foreground leading-tight">
+                  {venueName}
+                </h3>
               </div>
             </div>
-          </Card>
 
-        </div>
+            <div className="space-y-3 pt-2 text-xs">
+              {parsedVenue.address && (
+                <div className="flex items-start gap-2.5">
+                  <MapPin className="w-4 h-4 text-primary shrink-0 mt-0.5" />
+                  <div className="flex-1 min-w-0">
+                    <p className="text-foreground/90 font-medium leading-snug">
+                      {parsedVenue.address}
+                    </p>
+                    <a
+                      href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(parsedVenue.address)}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center gap-1 text-[11px] text-primary hover:underline font-semibold mt-1 cursor-pointer"
+                    >
+                      <span>Ver en Google Maps</span>
+                      <ExternalLink className="w-3 h-3" />
+                    </a>
+                  </div>
+                </div>
+              )}
+
+              {parsedVenue.hours && (
+                <div className="flex items-start gap-2.5 pt-2 border-t border-border/30">
+                  <Clock className="w-4 h-4 text-emerald-400 shrink-0 mt-0.5" />
+                  <p className="text-foreground/80 font-medium leading-relaxed flex-1">
+                    {parsedVenue.hours}
+                  </p>
+                </div>
+              )}
+
+              {venuePhone && (
+                <div className="flex items-center gap-2.5 pt-2 border-t border-border/30">
+                  <Phone className="w-4 h-4 text-sky-400 shrink-0" />
+                  <a
+                    href={`tel:${venuePhone.replace(/\s+/g, '')}`}
+                    className="text-foreground/90 font-semibold hover:text-primary transition-colors text-xs"
+                  >
+                    {venuePhone}
+                  </a>
+                </div>
+              )}
+            </div>
+          </div>
+        </Card>
+
+        {/* CARD 4: Historial de Movimientos (Móvil: 4º / Desktop: Fila 2 Col 1-2) */}
+        <Card className="order-4 md:order-3 md:col-span-2 bg-card/50 backdrop-blur-md border-border/70 p-5 sm:p-6 rounded-2xl shadow-sm space-y-4 flex flex-col justify-between">
+          <div>
+            <div className="flex items-center gap-2.5 border-b border-border/50 pb-3">
+              <div className="w-8 h-8 rounded-lg bg-primary/10 border border-primary/20 flex items-center justify-center text-primary shrink-0">
+                <Clock className="w-4 h-4" />
+              </div>
+              <div>
+                <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider block">
+                  Trazabilidad
+                </span>
+                <h3 className="font-outfit text-sm font-bold text-foreground leading-tight">
+                  Historial de Movimientos
+                </h3>
+              </div>
+            </div>
+
+            <div className="space-y-3 pt-3">
+              {Array.isArray(order.history) && order.history.length > 0 ? (
+                order.history.map((log, idx) => (
+                  <div
+                    key={idx}
+                    className="flex flex-col sm:flex-row sm:items-baseline gap-1.5 sm:gap-3 text-xs border-b border-border/30 pb-2.5 last:border-0 last:pb-0"
+                  >
+                    <span className="font-mono text-[11px] font-semibold text-muted-foreground shrink-0 bg-muted/30 px-2 py-0.5 rounded border border-border/30 w-fit">
+                      {log.date}
+                    </span>
+                    <p className="text-foreground/90 font-light leading-relaxed">
+                      {log.text}
+                    </p>
+                  </div>
+                ))
+              ) : (
+                <p className="text-xs text-muted-foreground font-light">Sin registros de movimientos.</p>
+              )}
+            </div>
+          </div>
+        </Card>
 
       </div>
 
