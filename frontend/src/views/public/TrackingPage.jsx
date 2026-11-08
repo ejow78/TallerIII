@@ -1,3 +1,4 @@
+import { parseVenueAddress } from '@/utils/venueHelper';
 import { useParams, Link } from "react-router-dom";
 import { useState, useEffect } from "react";
 import { Card, CardContent } from "@/components/ui/card";
@@ -22,7 +23,8 @@ import { api } from "@/services/api";
 import { escapeHtml, printHtml } from "@/utils/printHelper";
 import { Input } from "@/components/ui/input";
 import { 
-  ArrowLeft, 
+  ArrowLeft,
+  MapPin, 
   CheckCircle2, 
   Clock, 
   FileText, 
@@ -77,7 +79,9 @@ export default function TrackingPage() {
 
     const clientName = escapeHtml(order.clientId?.name || "Cliente");
     const venueName = escapeHtml(order.venueId?.name || "Taller RepairIT");
-    const venueAddress = escapeHtml(order.venueId?.address || "Sucursal Central");
+    const parsedPdfVenue = parseVenueAddress(order.venueId?.address);
+    const venueAddress = escapeHtml(parsedPdfVenue.address || "Sucursal Central");
+    const venueHours = escapeHtml(parsedPdfVenue.hours || "");
     const safeTrackingCode = escapeHtml(order.trackingCode || "");
     const safeStatus = escapeHtml((order.status || "INGRESADO").replace("_", " "));
     const safeDate = escapeHtml(
@@ -151,7 +155,7 @@ export default function TrackingPage() {
             <div>
               <div class="logo">Repair<span style="color: #0284c7;">IT</span></div>
               <div class="logo-sub">Comprobante Oficial de Servicio Técnico</div>
-              <div style="font-size: 10px; color: #334155; margin-top: 2px;">${venueName} &bull; ${venueAddress}</div>
+              <div style="font-size: 10px; color: #334155; margin-top: 2px;">${venueName} &bull; ${venueAddress}${venueHours ? ` &bull; Horarios: ${venueHours}` : ""}</div>
             </div>
             <div style="text-align: right;">
               <span class="badge">${safeStatus}</span>
@@ -372,11 +376,35 @@ export default function TrackingPage() {
               </div>
             )}
 
-            <div className="text-[11px] text-muted-foreground pt-1 flex items-center gap-2">
-              <span>Cliente: <strong className="text-foreground font-medium">{clientName}</strong></span>
-              <span>&bull;</span>
-              <span>Sede: <strong className="text-foreground font-medium">{order.venueId?.name || "Taller Central"}</strong></span>
-            </div>
+            {(() => {
+              const parsedV = parseVenueAddress(order.venueId?.address);
+              return (
+                <div className="pt-3 border-t border-border/50 space-y-2 text-xs">
+                  <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-muted-foreground text-[11px]">
+                    <span>Cliente: <strong className="text-foreground font-medium">{clientName}</strong></span>
+                    <span>&bull;</span>
+                    <span>Taller: <strong className="text-foreground font-medium">{order.venueId?.name || "Taller Central"}</strong></span>
+                  </div>
+
+                  {(parsedV.address || parsedV.hours) && (
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 pt-1 text-[11px] bg-muted/20 p-2.5 rounded-xl border border-border/40">
+                      {parsedV.address && (
+                        <div className="flex items-start gap-1.5 text-muted-foreground">
+                          <MapPin className="w-3.5 h-3.5 text-primary shrink-0 mt-0.5" />
+                          <span><strong className="text-foreground font-medium">Dirección:</strong> {parsedV.address}</span>
+                        </div>
+                      )}
+                      {parsedV.hours && (
+                        <div className="flex items-start gap-1.5 text-muted-foreground">
+                          <Clock className="w-3.5 h-3.5 text-emerald-400 shrink-0 mt-0.5" />
+                          <span><strong className="text-foreground font-medium">Horarios:</strong> {parsedV.hours}</span>
+                        </div>
+                      )}
+                    </div>
+                  )}
+                </div>
+              );
+            })()}
           </Card>
 
           {/* Historial Compacto */}

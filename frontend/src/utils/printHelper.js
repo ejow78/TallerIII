@@ -1,3 +1,4 @@
+import { parseVenueAddress } from './venueHelper';
 // Utilidades centralizadas de Impresión Directa (sin bloqueo de pop-ups) y WhatsApp
 
 export function escapeHtml(value) {
@@ -87,7 +88,9 @@ export function printOrderReceipt(order, profile = {}, clientOverride = null) {
   if (!order) return;
   const client = clientOverride || order.clientId || {};
   const venueName = escapeHtml(profile?.name || "Taller RepairIT");
-  const venueAddress = escapeHtml(profile?.address || "Sucursal Central");
+  const parsedReceiptVenue = parseVenueAddress(profile?.address);
+  const venueAddress = escapeHtml(parsedReceiptVenue.address || "Sucursal Central");
+  const venueHours = escapeHtml(parsedReceiptVenue.hours || "");
   const venuePhone = escapeHtml(profile?.phone || "");
   const venueEmail = escapeHtml(profile?.email || "");
   const safeTrackingCode = escapeHtml(order.trackingCode || "");
@@ -170,6 +173,7 @@ export function printOrderReceipt(order, profile = {}, clientOverride = null) {
             <td style="vertical-align: top; width: 60%;">
               <div class="logo-text">${venueName}</div>
               <div class="logo-sub">${venueAddress}</div>
+              ${venueHours ? `<div class="logo-sub">Horarios: ${venueHours}</div>` : ""}
               <div class="logo-sub">Tel: ${venuePhone || "N/A"} &bull; Email: ${venueEmail || "N/A"}</div>
             </td>
             <td style="vertical-align: top; text-align: right; width: 40%;">
@@ -340,7 +344,9 @@ export function printOrderReceipt(order, profile = {}, clientOverride = null) {
 export function printPosReceipt(sale, profile = {}) {
   if (!sale) return;
   const venueName = escapeHtml(profile?.name || "RepairIT Taller");
-  const venueAddress = escapeHtml(profile?.address || "Sucursal Activa");
+  const parsedThermalVenue = parseVenueAddress(profile?.address);
+  const venueAddress = escapeHtml(parsedThermalVenue.address || "Sucursal Activa");
+  const venueHours = escapeHtml(parsedThermalVenue.hours || "");
   const venuePhone = escapeHtml(profile?.phone || "");
   const saleDateObj = new Date(sale.created_at || Date.now());
   const dateStr = escapeHtml(
@@ -401,6 +407,7 @@ export function printPosReceipt(sale, profile = {}) {
       <body>
         <div class="center bold" style="font-size: 16px;">${venueName.toUpperCase()}</div>
         <div class="center" style="font-size: 11px;">${venueAddress}</div>
+        ${venueHours ? `<div class="center" style="font-size: 10px; color: #475569;">Horarios: ${venueHours}</div>` : ""}
         ${venuePhone ? `<div class="center" style="font-size: 11px;">Tel: ${venuePhone}</div>` : ""}
         <div class="divider"></div>
         <div><strong>COMPROBANTE DE VENTA</strong></div>

@@ -1,3 +1,4 @@
+import { parseVenueAddress, formatVenueAddress } from '@/utils/venueHelper';
 import { useState, useEffect } from "react";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -8,6 +9,7 @@ import { toast } from "sonner";
 import {
   Store,
   Save,
+  Clock,
   CheckCircle,
   Plus,
   Edit,
@@ -20,6 +22,7 @@ export default function ProfilePage() {
   const initialUser = getLocalUser();
   const [venueName, setVenueName] = useState("");
   const [address, setAddress] = useState("");
+  const [hours, setHours] = useState("");
   const [phone, setPhone] = useState("");
   const [email, setEmail] = useState("");
   const [venues, setVenues] = useState([]);
@@ -40,12 +43,15 @@ export default function ProfilePage() {
   const [modalEmail, setModalEmail] = useState("");
   const [modalPhone, setModalPhone] = useState("");
   const [modalAddress, setModalAddress] = useState("");
+  const [modalHours, setModalHours] = useState("");
 
   const fetchProfile = async () => {
     try {
       const data = await api.auth.getProfile();
       setVenueName(data.name || "");
-      setAddress(data.address || "");
+      const parsedVenueData = parseVenueAddress(data.address || "");
+      setAddress(parsedVenueData.address);
+      setHours(parsedVenueData.hours);
       setPhone(data.phone || "");
       setEmail(data.email || "");
       if (data.subscriptionPlan) {
@@ -72,7 +78,8 @@ export default function ProfilePage() {
   const handleSave = async (e) => {
     e.preventDefault();
     try {
-      await api.auth.updateProfile({ name: venueName, address, phone, email });
+      const fullAddress = formatVenueAddress(address, hours);
+      await api.auth.updateProfile({ name: venueName, address: fullAddress, phone, email });
       toast.success("¡Configuración del Taller Guardada!", {
         description: `Los datos de la sucursal "${venueName}" han sido actualizados con éxito.`,
       });
@@ -91,6 +98,7 @@ export default function ProfilePage() {
     setModalEmail("");
     setModalPhone("");
     setModalAddress("");
+    setModalHours("");
     setShowModal(true);
   };
 
@@ -100,19 +108,22 @@ export default function ProfilePage() {
     setModalName(venue.name || "");
     setModalEmail(venue.email || "");
     setModalPhone(venue.phone || "");
-    setModalAddress(venue.address || "");
+    const parsedModalVenue = parseVenueAddress(venue.address || "");
+    setModalAddress(parsedModalVenue.address);
+    setModalHours(parsedModalVenue.hours);
     setShowModal(true);
   };
 
   const handleModalSubmit = async (e) => {
     e.preventDefault();
     try {
+      const fullModalAddress = formatVenueAddress(modalAddress, modalHours);
       if (modalMode === "create") {
         await api.auth.createVenue({
           name: modalName,
           email: modalEmail,
           phone: modalPhone,
-          address: modalAddress,
+          address: fullModalAddress,
         });
         toast.success("Nueva sucursal creada con éxito");
       } else {
@@ -120,7 +131,7 @@ export default function ProfilePage() {
           name: modalName,
           email: modalEmail,
           phone: modalPhone,
-          address: modalAddress,
+          address: fullModalAddress,
         });
         toast.success("Datos de sucursal actualizados con éxito");
       }
@@ -239,6 +250,24 @@ export default function ProfilePage() {
                   </div>
                 </div>
 
+                <div className="space-y-1.5">
+                  <Label htmlFor="venue-hours" className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider block flex items-center gap-1.5">
+                    <Clock className="w-3.5 h-3.5 text-primary" />
+                    Horarios de Atención
+                  </Label>
+                  <Input
+                    id="venue-hours"
+                    type="text"
+                    value={hours}
+                    onChange={(e) => setHours(e.target.value)}
+                    placeholder="Ej. Lunes a Viernes de 9:00 a 18:00 hs • Sábados de 9:00 a 13:00 hs"
+                    className="bg-background/85 border-border focus-visible:ring-1 focus-visible:ring-primary text-xs"
+                  />
+                  <p className="text-[11px] text-muted-foreground font-light">
+                    Estos horarios se mostrarán a tus clientes en el portal de seguimiento online y en los comprobantes.
+                  </p>
+                </div>
+
                 <div className="flex justify-end pt-2">
                   <Button
                     type="submit"
@@ -315,7 +344,20 @@ export default function ProfilePage() {
                               </Badge>
                             )}
                           </div>
-                          <p className="text-muted-foreground font-light leading-tight">{v.address}</p>
+                          {(() => {
+                            const parsed = parseVenueAddress(v.address);
+                            return (
+                              <>
+                                <p className="text-muted-foreground font-light leading-tight">{parsed.address || "Sin dirección"}</p>
+                                {parsed.hours && (
+                                  <p className="text-emerald-400 font-medium text-[11px] flex items-center gap-1">
+                                    <Clock className="w-3 h-3 shrink-0" />
+                                    <span>{parsed.hours}</span>
+                                  </p>
+                                )}
+                              </>
+                            );
+                          })()}
                           <p className="text-muted-foreground font-mono text-[10px]">Tel: {v.phone}</p>
                           <p className="text-muted-foreground font-mono text-[10px] truncate">{v.email}</p>
                         </div>
@@ -449,6 +491,21 @@ export default function ProfilePage() {
                   value={modalAddress}
                   onChange={(e) => setModalAddress(e.target.value)}
                   placeholder="Ej. Av. Aconquija 1300, Yerba Buena"
+                  className="bg-background/85 border-border focus-visible:ring-1 focus-visible:ring-primary text-xs"
+                />
+              </div>
+
+              <div className="space-y-1.5">
+                <Label htmlFor="modal-hours" className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider block flex items-center gap-1.5">
+                  <Clock className="w-3.5 h-3.5 text-primary" />
+                  Horarios de Atención
+                </Label>
+                <Input
+                  id="modal-hours"
+                  type="text"
+                  value={modalHours}
+                  onChange={(e) => setModalHours(e.target.value)}
+                  placeholder="Ej. Lunes a Viernes de 08:30 a 18:30 hs • Sábados de 09:00 a 13:00 hs"
                   className="bg-background/85 border-border focus-visible:ring-1 focus-visible:ring-primary text-xs"
                 />
               </div>
