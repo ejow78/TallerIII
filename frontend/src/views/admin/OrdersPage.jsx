@@ -46,6 +46,7 @@ import {
 import { api, getLocalUser, normalizePlan, hasPOSAccess } from "@/services/api";
 import { sendBudgetReadyEmail, sendOrderReadyEmail } from "@/services/emailService";
 import { printOrderReceipt, printPosReceipt, getOrderWhatsAppUrl } from "@/utils/printHelper";
+import { cn } from "@/lib/utils";
 
 const STATUS_FILTERS = [
   { key: "todos", label: "Todas" },
