@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import { supabase } from "@/services/supabaseClient";
 import { Lock, ShieldCheck } from "lucide-react";
+import { GridPattern } from "@/components/ui/grid-pattern";
 
 export default function ResetPasswordPage() {
   document.title = "RepairIT - Nueva Contraseña";

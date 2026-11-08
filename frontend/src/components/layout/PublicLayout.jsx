@@ -36,64 +36,92 @@ export default function PublicLayout() {
       </a>
 
       {/* Navbar con Efecto de Desenfoque y Vidrio (Glassmorphism) */}
-      <header className="sticky top-0 z-50 bg-card/60 backdrop-blur-md border-b border-border/80">
+      <header className="sticky top-0 z-50 bg-card/75 backdrop-blur-xl border-b border-border/70 shadow-sm transition-all">
         <div className="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
 
           {/* Logo del Proyecto (RepairIT) */}
           <a
             href={window.location.hostname.includes("repairit.cloud") ? "https://repairit.cloud" : "/"}
             onClick={handleNavClick("https://repairit.cloud")}
-            className="flex items-center gap-2"
+            className="flex items-center gap-2 hover:opacity-90 transition-opacity"
           >
             <span className="font-outfit text-2xl font-black tracking-tight text-foreground">
               Repair<span className="text-primary">IT</span>
             </span>
           </a>
 
-          {/* Menú de Navegación de la Landing - Oculto en vistas de acceso/autenticación para mantener la interfaz limpia */}
-          {!isAuthPage && (
-            <nav className="flex items-center gap-4 sm:gap-6">
+          {/* Menú de Navegación de la Landing */}
+          {!isAuthPage ? (
+            <nav className="flex items-center gap-3 sm:gap-6">
               <a
                 href={window.location.hostname.includes("repairit.cloud") ? "https://repairit.cloud" : "/"}
                 onClick={handleNavClick("https://repairit.cloud")}
-                className="hidden md:block text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
+                className="hidden lg:block text-xs font-semibold uppercase tracking-wider text-muted-foreground hover:text-foreground transition-colors"
               >
                 Inicio
               </a>
               <a
                 href={window.location.hostname.includes("repairit.cloud") ? "https://repairit.cloud/#caracteristicas" : "/#caracteristicas"}
                 onClick={handleNavClick("https://repairit.cloud/#caracteristicas")}
-                className="hidden md:block text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
+                className="hidden md:block text-xs font-semibold uppercase tracking-wider text-muted-foreground hover:text-foreground transition-colors"
               >
-                Servicios
+                Funcionalidades
               </a>
               <a
                 href={window.location.hostname.includes("repairit.cloud") ? "https://repairit.cloud/#precios" : "/#precios"}
                 onClick={handleNavClick("https://repairit.cloud/#precios")}
-                className="hidden md:block text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
+                className="hidden md:block text-xs font-semibold uppercase tracking-wider text-muted-foreground hover:text-foreground transition-colors"
               >
                 Precios
               </a>
               <a
                 href={window.location.hostname.includes("repairit.cloud") ? "https://repairit.cloud/#faq" : "/#faq"}
                 onClick={handleNavClick("https://repairit.cloud/#faq")}
-                className="hidden md:block text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
+                className="hidden md:block text-xs font-semibold uppercase tracking-wider text-muted-foreground hover:text-foreground transition-colors"
               >
-                Preguntas
+                FAQ
               </a>
               <a
                 href={window.location.hostname.includes("repairit.cloud") ? "https://repairit.cloud/#contacto" : "/#contacto"}
                 onClick={handleNavClick("https://repairit.cloud/#contacto")}
-                className="hidden md:block text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
+                className="hidden lg:block text-xs font-semibold uppercase tracking-wider text-muted-foreground hover:text-foreground transition-colors"
               >
                 Contacto
               </a>
-              <Button asChild size="sm" className="bg-primary hover:bg-primary/90 text-primary-foreground font-bold transition-all duration-200">
+
+              {/* Botón rápido para que los clientes consulten el estado de su equipo */}
+              <Button
+                asChild
+                variant="outline"
+                size="sm"
+                className="hidden sm:inline-flex items-center gap-1.5 text-xs font-medium border-border/80 bg-background/60 hover:bg-background/90 text-foreground h-9 px-3 rounded-lg"
+              >
+                <a href={window.location.hostname.includes("repairit.cloud") ? "https://tracking.repairit.cloud/consulta" : "/consulta"}>
+                  <Search className="w-3.5 h-3.5 text-primary" />
+                  <span>Seguimiento</span>
+                </a>
+              </Button>
+
+              {/* Botón de acceso para talleres */}
+              <Button asChild size="sm" className="bg-primary hover:bg-primary/90 text-primary-foreground font-bold px-4 h-9 rounded-lg shadow-sm shadow-primary/20 text-xs sm:text-sm transition-all duration-200">
                 <a href={window.location.hostname.includes("repairit.cloud") ? "https://app.repairit.cloud/login" : "/login"}>
                   Ingresar
                 </a>
               </Button>
             </nav>
+          ) : (
+            <div className="flex items-center gap-3">
+              <Button
+                asChild
+                variant="ghost"
+                size="sm"
+                className="text-xs text-muted-foreground hover:text-foreground h-8 px-2.5 rounded-lg"
+              >
+                <a href={window.location.hostname.includes("repairit.cloud") ? "https://repairit.cloud" : "/"}>
+                  Volver al inicio
+                </a>
+              </Button>
+            </div>
           )}
 
         </div>

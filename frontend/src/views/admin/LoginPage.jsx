@@ -8,6 +8,7 @@ import { toast } from "sonner";
 import { api } from "@/services/api";
 import { supabase } from "@/services/supabaseClient";
 import { Turnstile } from "@marsidev/react-turnstile";
+import { GridPattern } from "@/components/ui/grid-pattern";
 
 export default function LoginPage() {
   document.title = "RepairIT - Iniciar Sesión";
@@ -61,24 +62,44 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="flex-grow flex items-center justify-center bg-background px-3.5 sm:px-6 py-5 sm:py-12 relative overflow-hidden">
+    <div className="flex-grow flex items-center justify-center bg-background px-4 sm:px-6 py-8 sm:py-16 relative overflow-hidden min-h-[calc(100vh-4rem)]">
+      {/* Fondo técnico GridPattern */}
+      <GridPattern
+        width={38}
+        height={38}
+        x={-1}
+        y={-1}
+        squares={[
+          [2, 2],
+          [5, 4],
+          [8, 1],
+          [11, 5],
+          [14, 2],
+          [17, 4],
+        ]}
+        className="stroke-white/[0.06] fill-white/[0.02] [mask-image:radial-gradient(ellipse_75%_65%_at_50%_50%,white,transparent_80%)] pointer-events-none"
+      />
 
-      <Card className="max-w-md w-full bg-card/40 border-border p-4 sm:p-7 rounded-2xl shadow-2xl backdrop-blur relative z-10 space-y-3.5 sm:space-y-4">
-        
-        {/* Título y descripción */}
-        <div className="text-center space-y-1 sm:space-y-1.5">
-          <CardTitle className="font-outfit text-xl sm:text-2xl font-bold text-foreground tracking-tight border-0 pb-0">
+      <Card className="max-w-md w-full bg-card/65 border border-border/70 p-6 sm:p-8 rounded-2xl shadow-2xl backdrop-blur-xl relative z-10 space-y-5">
+        {/* Logo de la marca */}
+        <div className="flex flex-col items-center text-center space-y-1.5">
+          <Link to="/" className="inline-block hover:opacity-90 transition-opacity">
+            <span className="font-outfit text-3xl font-black tracking-tight text-foreground">
+              Repair<span className="text-primary">IT</span>
+            </span>
+          </Link>
+          <CardTitle className="font-outfit text-xl sm:text-2xl font-bold text-foreground tracking-tight border-0 pb-0 pt-1">
             Acceso al Panel Técnico
           </CardTitle>
-          <CardDescription className="text-[11px] sm:text-xs text-muted-foreground font-light leading-relaxed">
-            Ingresá tus credenciales autorizadas para gestionar las órdenes y el inventario.
+          <CardDescription className="text-xs text-muted-foreground font-light leading-relaxed">
+            Ingresá tus credenciales autorizadas para gestionar las órdenes y el taller.
           </CardDescription>
         </div>
 
         {/* Formulario */}
-        <form onSubmit={handleLogin} className="space-y-3 sm:space-y-3.5">
+        <form onSubmit={handleLogin} className="space-y-4">
           <div className="space-y-1.5">
-            <Label htmlFor="login-email" className="text-[11px] sm:text-xs font-semibold text-muted-foreground uppercase tracking-wider block">
+            <Label htmlFor="login-email" className="text-xs font-semibold text-muted-foreground uppercase tracking-wider block">
               Correo Electrónico
             </Label>
             <Input 
@@ -90,18 +111,18 @@ export default function LoginPage() {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               placeholder="tecnico@repairit.cloud"
-              className="w-full h-10 bg-background/85 border-border rounded-lg px-3.5 text-base sm:text-sm text-foreground placeholder-muted-foreground/50 focus-visible:ring-1 focus-visible:ring-primary transition-all"
+              className="w-full h-11 bg-background/70 border border-border/80 rounded-xl px-3.5 text-sm text-foreground placeholder:text-muted-foreground/50 focus-visible:ring-1 focus-visible:ring-primary focus-visible:border-primary/50 transition-all font-sans"
             />
           </div>
 
           <div className="space-y-1.5">
             <div className="flex items-center justify-between gap-2">
-              <Label htmlFor="login-password" className="text-[11px] sm:text-xs font-semibold text-muted-foreground uppercase tracking-wider block">
+              <Label htmlFor="login-password" className="text-xs font-semibold text-muted-foreground uppercase tracking-wider block">
                 Contraseña
               </Label>
               <Link 
                 to="/recuperar-password"
-                className="text-[11px] text-muted-foreground hover:text-primary transition-colors font-light"
+                className="text-xs text-muted-foreground hover:text-primary transition-colors font-light"
               >
                 ¿Olvidaste tu contraseña?
               </Link>
@@ -114,7 +135,7 @@ export default function LoginPage() {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               placeholder="••••••••"
-              className="w-full h-10 bg-background/85 border-border rounded-lg px-3.5 text-base sm:text-sm text-foreground placeholder-muted-foreground/50 focus-visible:ring-1 focus-visible:ring-primary transition-all"
+              className="w-full h-11 bg-background/70 border border-border/80 rounded-xl px-3.5 text-sm text-foreground placeholder:text-muted-foreground/50 focus-visible:ring-1 focus-visible:ring-primary focus-visible:border-primary/50 transition-all font-sans"
             />
           </div>
 
@@ -147,7 +168,7 @@ export default function LoginPage() {
 
           <Button 
             type="submit" 
-            className="w-full h-10 bg-primary hover:bg-primary/90 text-primary-foreground font-bold text-xs sm:text-sm rounded-lg shadow-lg shadow-primary/15 transition-all mt-1 cursor-pointer select-none"
+            className="w-full h-11 bg-primary hover:bg-primary/90 text-primary-foreground font-bold text-sm rounded-xl shadow-lg shadow-primary/20 transition-all mt-1 cursor-pointer select-none"
           >
             Iniciar Sesión
           </Button>
@@ -163,7 +184,7 @@ export default function LoginPage() {
           type="button"
           onClick={handleGoogleLogin}
           variant="outline"
-          className="w-full h-10 border-border/80 hover:bg-card/65 hover:text-foreground text-xs font-semibold rounded-lg flex items-center justify-center gap-2 transition-all cursor-pointer select-none"
+          className="w-full h-11 border border-border/80 bg-background/50 hover:bg-card/80 text-foreground text-xs sm:text-sm font-semibold rounded-xl flex items-center justify-center gap-2.5 transition-all cursor-pointer select-none"
         >
           <svg className="w-4 h-4 shrink-0" viewBox="0 0 24 24">
             <path
@@ -193,7 +214,7 @@ export default function LoginPage() {
             className="text-xs text-muted-foreground hover:text-foreground font-medium transition-colors cursor-pointer select-none"
           >
             <a href={window.location.hostname.includes("repairit.cloud") ? "https://repairit.cloud" : "/"}>
-              &larr; Volver a la consulta pública
+              &larr; Volver a la página principal
             </a>
           </Button>
         </div>

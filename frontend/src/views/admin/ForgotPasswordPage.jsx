@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import { supabase } from "@/services/supabaseClient";
 import { Turnstile } from "@marsidev/react-turnstile";
+import { GridPattern } from "@/components/ui/grid-pattern";
 import { Mail, CheckCircle2, ArrowRight } from "lucide-react";
 
 export default function ForgotPasswordPage() {

@@ -36,6 +36,10 @@ import {
   Laptop,
   Stethoscope,
   FileText,
+  User,
+  Mail,
+  MessageSquare,
+  Send,
   X,
 } from "lucide-react";
 import { GridPattern } from "@/components/ui/grid-pattern";
@@ -579,7 +583,7 @@ export default function LandingPage() {
                   <div>
                     <div className="leading-tight">Presupuesto Aprobado</div>
                     <div className="text-[10px] font-normal text-emerald-400/80">
-                      Aprobado con DNI 38.450.123 • Orden autorizada para reparación.
+                      Orden autorizada para reparación.
                     </div>
                   </div>
                 </div>
@@ -981,99 +985,123 @@ export default function LandingPage() {
           </div>
 
           <div className="pt-4">
-            <Accordion type="single" collapsible className="w-full space-y-4">
+            <Accordion type="single" collapsible className="w-full space-y-3.5">
               <AccordionItem
                 value="item-1"
-                className="border border-border/60 bg-card/45 rounded-lg px-4 hover:border-border transition-colors"
+                className="border border-border/70 bg-card/45 rounded-xl px-5 hover:border-primary/40 hover:bg-card/65 transition-all shadow-sm"
               >
-                <AccordionTrigger className="text-base text-foreground font-semibold py-4 hover:no-underline font-outfit text-left">
-                  ¿Qué necesito para empezar a utilizar RepairIT en mi taller?
+                <AccordionTrigger className="text-sm sm:text-base text-foreground font-bold py-4 hover:no-underline font-outfit text-left">
+                  <div className="flex items-center gap-3">
+                    <span className="font-mono text-xs text-primary font-semibold shrink-0">01.</span>
+                    <span>¿Qué necesito para empezar a utilizar RepairIT en mi taller?</span>
+                  </div>
                 </AccordionTrigger>
-                <AccordionContent className="text-muted-foreground text-sm font-light pb-4 leading-relaxed">
+                <AccordionContent className="text-muted-foreground text-xs sm:text-sm font-light pb-4 pl-7 leading-relaxed">
                   Solo necesitás un navegador web (Chrome, Firefox o Edge) en tu computadora, tablet o celular. No requiere instalar ningún software ni configurar servidores locales. Podés crear tu cuenta y empezar a cargar órdenes en 2 minutos.
                 </AccordionContent>
               </AccordionItem>
 
               <AccordionItem
                 value="item-2"
-                className="border border-border/60 bg-card/45 rounded-lg px-4 hover:border-border transition-colors"
+                className="border border-border/70 bg-card/45 rounded-xl px-5 hover:border-primary/40 hover:bg-card/65 transition-all shadow-sm"
               >
-                <AccordionTrigger className="text-base text-foreground font-semibold py-4 hover:no-underline font-outfit text-left">
-                  ¿Cómo reduce RepairIT las llamadas telefónicas de mis clientes?
+                <AccordionTrigger className="text-sm sm:text-base text-foreground font-bold py-4 hover:no-underline font-outfit text-left">
+                  <div className="flex items-center gap-3">
+                    <span className="font-mono text-xs text-primary font-semibold shrink-0">02.</span>
+                    <span>¿Cómo reduce RepairIT las llamadas telefónicas de mis clientes?</span>
+                  </div>
                 </AccordionTrigger>
-                <AccordionContent className="text-muted-foreground text-sm font-light pb-4 leading-relaxed">
+                <AccordionContent className="text-muted-foreground text-xs sm:text-sm font-light pb-4 pl-7 leading-relaxed">
                   Al ingresar un equipo, el sistema genera un código único y un comprobante con código QR. Además, envía notificaciones automáticas por correo electrónico al cliente cuando el equipo ingresa, cuando se actualiza el presupuesto y en el momento exacto en que está listo para retirar, permitiéndole consultar los avances desde su celular sin necesidad de llamar al taller.
                 </AccordionContent>
               </AccordionItem>
 
               <AccordionItem
                 value="item-3"
-                className="border border-border/60 bg-card/45 rounded-lg px-4 hover:border-border transition-colors"
+                className="border border-border/70 bg-card/45 rounded-xl px-5 hover:border-primary/40 hover:bg-card/65 transition-all shadow-sm"
               >
-                <AccordionTrigger className="text-base text-foreground font-semibold py-4 hover:no-underline font-outfit text-left">
-                  ¿Pueden mis clientes aprobar o rechazar presupuestos en línea?
+                <AccordionTrigger className="text-sm sm:text-base text-foreground font-bold py-4 hover:no-underline font-outfit text-left">
+                  <div className="flex items-center gap-3">
+                    <span className="font-mono text-xs text-primary font-semibold shrink-0">03.</span>
+                    <span>¿Pueden mis clientes aprobar o rechazar presupuestos en línea?</span>
+                  </div>
                 </AccordionTrigger>
-                <AccordionContent className="text-muted-foreground text-sm font-light pb-4 leading-relaxed">
+                <AccordionContent className="text-muted-foreground text-xs sm:text-sm font-light pb-4 pl-7 leading-relaxed">
                   Exacto. Cuando cargás el diagnóstico y los ítems del presupuesto, el cliente puede revisar el detalle de repuestos y mano de obra desde su celular y presionar "Aprobar Presupuesto", dejando constancia digital con fecha, hora y validación por DNI.
                 </AccordionContent>
               </AccordionItem>
 
               <AccordionItem
                 value="item-4"
-                className="border border-border/60 bg-card/45 rounded-lg px-4 hover:border-border transition-colors"
+                className="border border-border/70 bg-card/45 rounded-xl px-5 hover:border-primary/40 hover:bg-card/65 transition-all shadow-sm"
               >
-                <AccordionTrigger className="text-base text-foreground font-semibold py-4 hover:no-underline font-outfit text-left">
-                  ¿Cómo funciona el control de inventario y caja?
+                <AccordionTrigger className="text-sm sm:text-base text-foreground font-bold py-4 hover:no-underline font-outfit text-left">
+                  <div className="flex items-center gap-3">
+                    <span className="font-mono text-xs text-primary font-semibold shrink-0">04.</span>
+                    <span>¿Cómo funciona el control de inventario y caja?</span>
+                  </div>
                 </AccordionTrigger>
-                <AccordionContent className="text-muted-foreground text-sm font-light pb-4 leading-relaxed">
+                <AccordionContent className="text-muted-foreground text-xs sm:text-sm font-light pb-4 pl-7 leading-relaxed">
                   RepairIT descuenta automáticamente del stock los repuestos e insumos utilizados en cada reparación. Además, registra las señas, ventas de mostrador y cobros finales en tu balance de caja diario por sucursal.
                 </AccordionContent>
               </AccordionItem>
 
               <AccordionItem
                 value="item-5"
-                className="border border-border/60 bg-card/45 rounded-lg px-4 hover:border-border transition-colors"
+                className="border border-border/70 bg-card/45 rounded-xl px-5 hover:border-primary/40 hover:bg-card/65 transition-all shadow-sm"
               >
-                <AccordionTrigger className="text-base text-foreground font-semibold py-4 hover:no-underline font-outfit text-left">
-                  ¿Qué tan segura está la información de mi taller y mis clientes?
+                <AccordionTrigger className="text-sm sm:text-base text-foreground font-bold py-4 hover:no-underline font-outfit text-left">
+                  <div className="flex items-center gap-3">
+                    <span className="font-mono text-xs text-primary font-semibold shrink-0">05.</span>
+                    <span>¿Qué tan segura está la información de mi taller y mis clientes?</span>
+                  </div>
                 </AccordionTrigger>
-                <AccordionContent className="text-muted-foreground text-sm font-light pb-4 leading-relaxed">
+                <AccordionContent className="text-muted-foreground text-xs sm:text-sm font-light pb-4 pl-7 leading-relaxed">
                   Toda la información viaja y se almacena de forma cifrada y protegida en la nube con Supabase y PostgreSQL. La plataforma cuenta con aislamiento estricto por taller, lo que garantiza que solo vos y tu personal autorizado puedan acceder a los datos de tus clientes, órdenes de servicio, inventario y movimientos de caja.
                 </AccordionContent>
               </AccordionItem>
 
               <AccordionItem
                 value="item-6"
-                className="border border-border/60 bg-card/45 rounded-lg px-4 hover:border-border transition-colors"
+                className="border border-border/70 bg-card/45 rounded-xl px-5 hover:border-primary/40 hover:bg-card/65 transition-all shadow-sm"
               >
-                <AccordionTrigger className="text-base text-foreground font-semibold py-4 hover:no-underline font-outfit text-left">
-                  ¿Puedo administrar múltiples talleres o sucursales desde una sola cuenta?
+                <AccordionTrigger className="text-sm sm:text-base text-foreground font-bold py-4 hover:no-underline font-outfit text-left">
+                  <div className="flex items-center gap-3">
+                    <span className="font-mono text-xs text-primary font-semibold shrink-0">06.</span>
+                    <span>¿Puedo administrar múltiples talleres o sucursales desde una sola cuenta?</span>
+                  </div>
                 </AccordionTrigger>
-                <AccordionContent className="text-muted-foreground text-sm font-light pb-4 leading-relaxed">
+                <AccordionContent className="text-muted-foreground text-xs sm:text-sm font-light pb-4 pl-7 leading-relaxed">
                   Sí. Nuestro plan Multi-Sucursal permite gestionar múltiples sucursales con inventarios, cajas y técnicos independientes, supervisados centralmente desde un panel de administración unificado.
                 </AccordionContent>
               </AccordionItem>
 
               <AccordionItem
                 value="item-7"
-                className="border border-border/60 bg-card/45 rounded-lg px-4 hover:border-border transition-colors"
+                className="border border-border/70 bg-card/45 rounded-xl px-5 hover:border-primary/40 hover:bg-card/65 transition-all shadow-sm"
               >
-                <AccordionTrigger className="text-base text-foreground font-semibold py-4 hover:no-underline font-outfit text-left">
-                  ¿Qué rubros de servicio técnico pueden utilizar RepairIT?
+                <AccordionTrigger className="text-sm sm:text-base text-foreground font-bold py-4 hover:no-underline font-outfit text-left">
+                  <div className="flex items-center gap-3">
+                    <span className="font-mono text-xs text-primary font-semibold shrink-0">07.</span>
+                    <span>¿Qué rubros de servicio técnico pueden utilizar RepairIT?</span>
+                  </div>
                 </AccordionTrigger>
-                <AccordionContent className="text-muted-foreground text-sm font-light pb-4 leading-relaxed">
+                <AccordionContent className="text-muted-foreground text-xs sm:text-sm font-light pb-4 pl-7 leading-relaxed">
                   RepairIT está adaptado para talleres de reparación de celulares y smartphones, servicio técnico de notebooks y computadoras, consolas de videojuegos, electrodomésticos, audio, televisión y mecánica general. La gestión de estados y presupuestos es completamente flexible.
                 </AccordionContent>
               </AccordionItem>
 
               <AccordionItem
                 value="item-8"
-                className="border border-border/60 bg-card/45 rounded-lg px-4 hover:border-border transition-colors"
+                className="border border-border/70 bg-card/45 rounded-xl px-5 hover:border-primary/40 hover:bg-card/65 transition-all shadow-sm"
               >
-                <AccordionTrigger className="text-base text-foreground font-semibold py-4 hover:no-underline font-outfit text-left">
-                  ¿Cómo se imprimen los comprobantes de recepción de equipos?
+                <AccordionTrigger className="text-sm sm:text-base text-foreground font-bold py-4 hover:no-underline font-outfit text-left">
+                  <div className="flex items-center gap-3">
+                    <span className="font-mono text-xs text-primary font-semibold shrink-0">08.</span>
+                    <span>¿Cómo se imprimen los comprobantes de recepción de equipos?</span>
+                  </div>
                 </AccordionTrigger>
-                <AccordionContent className="text-muted-foreground text-sm font-light pb-4 leading-relaxed">
+                <AccordionContent className="text-muted-foreground text-xs sm:text-sm font-light pb-4 pl-7 leading-relaxed">
                   El sistema genera automáticamente comprobantes digitales de recepción listos para imprimir en impresoras térmicas de tickets (80mm) o formato estándar A4. Cada comprobante incluye los datos del taller, falla declarada y el código QR de seguimiento online para el cliente.
                 </AccordionContent>
               </AccordionItem>
@@ -1082,27 +1110,48 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* SECCIÓN 7: CONTACTO */}
-      <section id="contacto" className="py-20 px-6 bg-card/10 border-t border-border/50 relative z-10">
-        <div className="max-w-2xl mx-auto space-y-10">
+      {/* SECCIÓN 7: CONTACTO CON GRID PATTERN */}
+      <section id="contacto" className="py-24 px-6 bg-card/10 border-t border-border/50 relative overflow-hidden z-10">
+        {/* Fondo técnico GridPattern con desvanecimiento radial suave */}
+        <GridPattern
+          width={36}
+          height={36}
+          x={-1}
+          y={-1}
+          squares={[
+            [2, 2],
+            [5, 4],
+            [9, 1],
+            [12, 5],
+            [16, 3],
+            [20, 2],
+          ]}
+          className="stroke-white/[0.06] fill-white/[0.02] [mask-image:radial-gradient(ellipse_70%_60%_at_50%_50%,white,transparent_80%)] pointer-events-none"
+        />
+
+        <div className="max-w-2xl mx-auto space-y-10 relative z-10">
           <div className="text-center space-y-3">
-            <h2 className="font-outfit text-3xl font-bold text-foreground tracking-tight">
+            <span className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground/75 block">
+              Soporte & Asistencia
+            </span>
+            <h2 className="font-outfit text-3xl sm:text-4xl font-bold text-foreground tracking-tight">
               Ponete en Contacto
             </h2>
-            <p className="text-muted-foreground text-sm font-light">
-              ¿Tenés alguna consulta técnica o comercial sobre nuestro servicio? Escribinos.
+            <p className="text-muted-foreground text-sm font-light max-w-lg mx-auto leading-relaxed">
+              ¿Tenés alguna consulta técnica o comercial sobre la plataforma? Escribinos y te responderemos a la brevedad.
             </p>
           </div>
 
-          <Card className="bg-card/60 border-border p-6 shadow-xl backdrop-blur-md">
+          <Card className="bg-card/65 border border-border/70 p-6 sm:p-8 rounded-2xl shadow-2xl backdrop-blur-xl">
             <form onSubmit={handleContactSubmit} className="space-y-4">
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div className="space-y-1.5">
                   <label
                     htmlFor="name"
-                    className="text-xs font-semibold text-muted-foreground uppercase tracking-wider block"
+                    className="text-xs font-semibold text-muted-foreground uppercase tracking-wider flex items-center gap-1.5"
                   >
-                    Nombre Completo
+                    <User className="w-3.5 h-3.5 text-primary" />
+                    <span>Nombre Completo</span>
                   </label>
                   <Input
                     id="name"
@@ -1111,15 +1160,16 @@ export default function LandingPage() {
                     value={contactName}
                     onChange={(e) => setContactName(e.target.value)}
                     placeholder="Ej. Juan Pérez"
-                    className="bg-background/80 border-border focus-visible:ring-1 focus-visible:ring-primary text-sm"
+                    className="bg-background/70 border-border/70 focus-visible:ring-1 focus-visible:ring-primary text-sm h-11 rounded-xl font-sans"
                   />
                 </div>
                 <div className="space-y-1.5">
                   <label
                     htmlFor="email"
-                    className="text-xs font-semibold text-muted-foreground uppercase tracking-wider block"
+                    className="text-xs font-semibold text-muted-foreground uppercase tracking-wider flex items-center gap-1.5"
                   >
-                    Email
+                    <Mail className="w-3.5 h-3.5 text-primary" />
+                    <span>Email de Contacto</span>
                   </label>
                   <Input
                     id="email"
@@ -1128,7 +1178,7 @@ export default function LandingPage() {
                     value={contactEmail}
                     onChange={(e) => setContactEmail(e.target.value)}
                     placeholder="contacto@ejemplo.com"
-                    className="bg-background/80 border-border focus-visible:ring-1 focus-visible:ring-primary text-sm"
+                    className="bg-background/70 border-border/70 focus-visible:ring-1 focus-visible:ring-primary text-sm h-11 rounded-xl font-sans"
                   />
                 </div>
               </div>
@@ -1136,9 +1186,10 @@ export default function LandingPage() {
               <div className="space-y-1.5">
                 <label
                   htmlFor="message"
-                  className="text-xs font-semibold text-muted-foreground uppercase tracking-wider block"
+                  className="text-xs font-semibold text-muted-foreground uppercase tracking-wider flex items-center gap-1.5"
                 >
-                  Mensaje / Consulta
+                  <MessageSquare className="w-3.5 h-3.5 text-primary" />
+                  <span>Mensaje o Consulta</span>
                 </label>
                 <Textarea
                   id="message"
@@ -1146,13 +1197,13 @@ export default function LandingPage() {
                   rows={4}
                   value={contactMessage}
                   onChange={(e) => setContactMessage(e.target.value)}
-                  placeholder="Detallá tu consulta aquí..."
-                  className="bg-background/80 border-border focus-visible:ring-1 focus-visible:ring-primary text-sm resize-none"
+                  placeholder="Contanos sobre tu taller o tu consulta..."
+                  className="bg-background/70 border-border/70 focus-visible:ring-1 focus-visible:ring-primary text-sm rounded-xl resize-none font-sans"
                 />
               </div>
 
               {/* Checkbox de Privacidad Accesible (WCAG H44/H65) */}
-              <div className="flex items-start space-x-3 pt-2">
+              <div className="flex items-start space-x-3 pt-1">
                 <input
                   type="checkbox"
                   id="privacy"
@@ -1169,13 +1220,13 @@ export default function LandingPage() {
                     className="text-xs text-muted-foreground font-light leading-tight select-none cursor-pointer"
                   >
                     Acepto que mis datos sean tratados de acuerdo con las{" "}
-                    <span className="text-primary hover:underline font-semibold cursor-pointer">
+                    <a href="/privacidad" target="_blank" rel="noreferrer" className="text-primary hover:underline font-semibold cursor-pointer">
                       Políticas de Privacidad
-                    </span>{" "}
+                    </a>{" "}
                     y los{" "}
-                    <span className="text-primary hover:underline font-semibold cursor-pointer">
+                    <a href="/terminos" target="_blank" rel="noreferrer" className="text-primary hover:underline font-semibold cursor-pointer">
                       Términos de Servicio
-                    </span>{" "}
+                    </a>{" "}
                     de RepairIT.
                   </label>
                 </div>
@@ -1197,9 +1248,10 @@ export default function LandingPage() {
               <Button
                 type="submit"
                 disabled={isSendingContact}
-                className="w-full bg-primary hover:bg-primary/90 text-primary-foreground font-bold text-sm py-2.5 rounded-lg transition-all mt-2 cursor-pointer select-none"
+                className="w-full h-11 bg-primary hover:bg-primary/90 text-primary-foreground font-bold text-sm rounded-xl shadow-lg shadow-primary/20 transition-all mt-2 cursor-pointer select-none gap-2"
               >
-                {isSendingContact ? "Enviando mensaje..." : "Enviar Consulta"}
+                <Send className="w-4 h-4" />
+                <span>{isSendingContact ? "Enviando mensaje..." : "Enviar Consulta"}</span>
               </Button>
             </form>
           </Card>

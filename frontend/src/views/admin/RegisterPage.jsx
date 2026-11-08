@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import { supabase } from "@/services/supabaseClient";
 import { Turnstile } from "@marsidev/react-turnstile";
+import { GridPattern } from "@/components/ui/grid-pattern";
 
 export default function RegisterPage() {
   const [name, setName] = useState("");
@@ -154,11 +155,31 @@ export default function RegisterPage() {
   // Pantalla de Confirmación de Correo Enviado (Mismo estilo exacto)
   if (registeredEmail) {
     return (
-      <div className="flex-grow flex items-center justify-center bg-background px-3.5 sm:px-6 py-5 sm:py-12 relative overflow-hidden">
+      <div className="flex-grow flex items-center justify-center bg-background px-4 sm:px-6 py-8 sm:py-16 relative overflow-hidden min-h-[calc(100vh-4rem)]">
+        <GridPattern
+          width={38}
+          height={38}
+          x={-1}
+          y={-1}
+          squares={[
+            [2, 2],
+            [5, 4],
+            [8, 1],
+            [11, 5],
+            [14, 2],
+            [17, 4],
+          ]}
+          className="stroke-white/[0.06] fill-white/[0.02] [mask-image:radial-gradient(ellipse_75%_65%_at_50%_50%,white,transparent_80%)] pointer-events-none"
+        />
 
-        <Card className="max-w-md w-full bg-card/40 border-border p-5 sm:p-8 rounded-2xl shadow-2xl backdrop-blur relative z-10 text-center space-y-5">
-          <div className="space-y-1.5">
-            <CardTitle className="font-outfit text-xl sm:text-2xl font-bold text-foreground tracking-tight border-0 pb-0">
+        <Card className="max-w-md w-full bg-card/65 border border-border/70 p-6 sm:p-8 rounded-2xl shadow-2xl backdrop-blur-xl relative z-10 text-center space-y-5">
+          <div className="flex flex-col items-center space-y-1">
+            <Link to="/" className="inline-block hover:opacity-90 transition-opacity">
+              <span className="font-outfit text-3xl font-black tracking-tight text-foreground">
+                Repair<span className="text-primary">IT</span>
+              </span>
+            </Link>
+            <CardTitle className="font-outfit text-xl sm:text-2xl font-bold text-foreground tracking-tight border-0 pb-0 pt-2">
               ¡Revisá tu Correo!
             </CardTitle>
             <CardDescription className="text-xs text-muted-foreground font-light leading-relaxed">
@@ -171,16 +192,16 @@ export default function RegisterPage() {
             Hacé clic en el enlace que te enviamos para activar tu taller y acceder al panel de control.
           </p>
 
-          <div className="space-y-2.5 pt-1">
+          <div className="space-y-3 pt-1">
             <Button
               variant="outline"
               onClick={handleResendEmail}
-              className="w-full h-10 border-border/80 text-xs font-semibold rounded-lg hover:bg-card/70 cursor-pointer"
+              className="w-full h-11 border-border/80 text-xs font-semibold rounded-xl hover:bg-card/70 cursor-pointer"
             >
               ¿No te llegó el correo? Reenviar enlace
             </Button>
 
-            <Button asChild className="w-full h-10 bg-primary hover:bg-primary/90 text-primary-foreground font-bold text-xs sm:text-sm rounded-lg shadow-lg shadow-primary/15 cursor-pointer">
+            <Button asChild className="w-full h-11 bg-primary hover:bg-primary/90 text-primary-foreground font-bold text-xs sm:text-sm rounded-xl shadow-lg shadow-primary/20 cursor-pointer">
               <Link to="/login">
                 Iniciar Sesión
               </Link>
@@ -192,26 +213,45 @@ export default function RegisterPage() {
   }
 
   return (
-    <div className="flex-grow flex items-center justify-center bg-background px-3.5 sm:px-6 py-4 sm:py-10 relative overflow-hidden">
+    <div className="flex-grow flex items-center justify-center bg-background px-4 sm:px-6 py-8 sm:py-16 relative overflow-hidden min-h-[calc(100vh-4rem)]">
+      {/* Fondo técnico GridPattern */}
+      <GridPattern
+        width={38}
+        height={38}
+        x={-1}
+        y={-1}
+        squares={[
+          [2, 2],
+          [5, 4],
+          [8, 1],
+          [11, 5],
+          [14, 2],
+          [17, 4],
+        ]}
+        className="stroke-white/[0.06] fill-white/[0.02] [mask-image:radial-gradient(ellipse_75%_65%_at_50%_50%,white,transparent_80%)] pointer-events-none"
+      />
 
-      <Card className="max-w-md w-full bg-card/40 border-border p-4 sm:p-7 rounded-2xl shadow-2xl backdrop-blur relative z-10 space-y-3 sm:space-y-4">
-        
-        {/* Título y descripción */}
-        <div className="text-center space-y-1">
-          <CardTitle className="font-outfit text-xl sm:text-2xl font-bold text-foreground tracking-tight border-0 pb-0">
+      <Card className="max-w-md w-full bg-card/65 border border-border/70 p-6 sm:p-8 rounded-2xl shadow-2xl backdrop-blur-xl relative z-10 space-y-5">
+        {/* Logo de la marca */}
+        <div className="flex flex-col items-center text-center space-y-1.5">
+          <Link to="/" className="inline-block hover:opacity-90 transition-opacity">
+            <span className="font-outfit text-3xl font-black tracking-tight text-foreground">
+              Repair<span className="text-primary">IT</span>
+            </span>
+          </Link>
+          <CardTitle className="font-outfit text-xl sm:text-2xl font-bold text-foreground tracking-tight border-0 pb-0 pt-1">
             Registrá tu Taller
           </CardTitle>
-          <CardDescription className="text-[11px] sm:text-xs text-muted-foreground font-light leading-relaxed">
+          <CardDescription className="text-xs text-muted-foreground font-light leading-relaxed">
             Creá tu cuenta para gestionar órdenes, finanzas y clientes con seguimiento online.
           </CardDescription>
         </div>
 
         {/* Formulario */}
-        <form onSubmit={handleRegister} className="space-y-2.5 sm:space-y-3.5">
-          
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 sm:gap-3">
-            <div className="space-y-1">
-              <Label htmlFor="reg-name" className="text-[11px] sm:text-xs font-semibold text-muted-foreground uppercase tracking-wider block">
+        <form onSubmit={handleRegister} className="space-y-3.5">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div className="space-y-1.5">
+              <Label htmlFor="reg-name" className="text-xs font-semibold text-muted-foreground uppercase tracking-wider block">
                 Tu Nombre
               </Label>
               <Input 
@@ -222,12 +262,12 @@ export default function RegisterPage() {
                 value={name}
                 onChange={(e) => setName(e.target.value)}
                 placeholder="Juan Pérez"
-                className="w-full h-10 bg-background/85 border-border rounded-lg px-3.5 text-base sm:text-sm text-foreground placeholder-muted-foreground/50 focus-visible:ring-1 focus-visible:ring-primary transition-all"
+                className="w-full h-11 bg-background/70 border border-border/80 rounded-xl px-3.5 text-sm text-foreground placeholder:text-muted-foreground/50 focus-visible:ring-1 focus-visible:ring-primary focus-visible:border-primary/50 transition-all font-sans"
               />
             </div>
 
-            <div className="space-y-1">
-              <Label htmlFor="reg-workshop" className="text-[11px] sm:text-xs font-semibold text-muted-foreground uppercase tracking-wider block">
+            <div className="space-y-1.5">
+              <Label htmlFor="reg-workshop" className="text-xs font-semibold text-muted-foreground uppercase tracking-wider block">
                 Nombre del Taller
               </Label>
               <Input 
@@ -238,13 +278,13 @@ export default function RegisterPage() {
                 value={workshopName}
                 onChange={(e) => setWorkshopName(e.target.value)}
                 placeholder="FixTech Electrónica"
-                className="w-full h-10 bg-background/85 border-border rounded-lg px-3.5 text-base sm:text-sm text-foreground placeholder-muted-foreground/50 focus-visible:ring-1 focus-visible:ring-primary transition-all"
+                className="w-full h-11 bg-background/70 border border-border/80 rounded-xl px-3.5 text-sm text-foreground placeholder:text-muted-foreground/50 focus-visible:ring-1 focus-visible:ring-primary focus-visible:border-primary/50 transition-all font-sans"
               />
             </div>
           </div>
 
-          <div className="space-y-1">
-            <Label htmlFor="reg-email" className="text-[11px] sm:text-xs font-semibold text-muted-foreground uppercase tracking-wider block">
+          <div className="space-y-1.5">
+            <Label htmlFor="reg-email" className="text-xs font-semibold text-muted-foreground uppercase tracking-wider block">
               Correo Electrónico
             </Label>
             <Input 
@@ -256,13 +296,13 @@ export default function RegisterPage() {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               placeholder="taller@ejemplo.com"
-              className="w-full h-10 bg-background/85 border-border rounded-lg px-3.5 text-base sm:text-sm text-foreground placeholder-muted-foreground/50 focus-visible:ring-1 focus-visible:ring-primary transition-all"
+              className="w-full h-11 bg-background/70 border border-border/80 rounded-xl px-3.5 text-sm text-foreground placeholder:text-muted-foreground/50 focus-visible:ring-1 focus-visible:ring-primary focus-visible:border-primary/50 transition-all font-sans"
             />
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 sm:gap-3">
-            <div className="space-y-1">
-              <Label htmlFor="reg-pass" className="text-[11px] sm:text-xs font-semibold text-muted-foreground uppercase tracking-wider block">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div className="space-y-1.5">
+              <Label htmlFor="reg-pass" className="text-xs font-semibold text-muted-foreground uppercase tracking-wider block">
                 Contraseña
               </Label>
               <Input 
@@ -273,13 +313,13 @@ export default function RegisterPage() {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder="••••••••"
-                className="w-full h-10 bg-background/85 border-border rounded-lg px-3.5 text-base sm:text-sm text-foreground placeholder-muted-foreground/50 focus-visible:ring-1 focus-visible:ring-primary transition-all"
+                className="w-full h-11 bg-background/70 border border-border/80 rounded-xl px-3.5 text-sm text-foreground placeholder:text-muted-foreground/50 focus-visible:ring-1 focus-visible:ring-primary focus-visible:border-primary/50 transition-all font-sans"
               />
             </div>
 
-            <div className="space-y-1">
-              <Label htmlFor="reg-confirm" className="text-[11px] sm:text-xs font-semibold text-muted-foreground uppercase tracking-wider block">
-                Confirmar Contraseña
+            <div className="space-y-1.5">
+              <Label htmlFor="reg-confirm" className="text-xs font-semibold text-muted-foreground uppercase tracking-wider block">
+                Confirmar
               </Label>
               <Input 
                 id="reg-confirm"
@@ -289,7 +329,7 @@ export default function RegisterPage() {
                 value={confirmPassword}
                 onChange={(e) => setConfirmPassword(e.target.value)}
                 placeholder="••••••••"
-                className="w-full h-10 bg-background/85 border-border rounded-lg px-3.5 text-base sm:text-sm text-foreground placeholder-muted-foreground/50 focus-visible:ring-1 focus-visible:ring-primary transition-all"
+                className="w-full h-11 bg-background/70 border border-border/80 rounded-xl px-3.5 text-sm text-foreground placeholder:text-muted-foreground/50 focus-visible:ring-1 focus-visible:ring-primary focus-visible:border-primary/50 transition-all font-sans"
               />
             </div>
           </div>
@@ -314,7 +354,7 @@ export default function RegisterPage() {
           <Button 
             type="submit" 
             disabled={loading}
-            className="w-full h-10 bg-primary hover:bg-primary/90 text-primary-foreground font-bold text-xs sm:text-sm rounded-lg shadow-lg shadow-primary/15 transition-all mt-1 cursor-pointer select-none"
+            className="w-full h-11 bg-primary hover:bg-primary/90 text-primary-foreground font-bold text-sm rounded-xl shadow-lg shadow-primary/20 transition-all mt-1 cursor-pointer select-none"
           >
             {loading ? "Creando taller..." : "Crear mi Cuenta de Taller"}
           </Button>
@@ -330,7 +370,7 @@ export default function RegisterPage() {
           type="button"
           onClick={handleGoogleRegister}
           variant="outline"
-          className="w-full h-10 border-border/80 hover:bg-card/65 hover:text-foreground text-xs font-semibold rounded-lg flex items-center justify-center gap-2 transition-all cursor-pointer select-none"
+          className="w-full h-11 border border-border/80 bg-background/50 hover:bg-card/80 text-foreground text-xs sm:text-sm font-semibold rounded-xl flex items-center justify-center gap-2.5 transition-all cursor-pointer select-none"
         >
           <svg className="w-4 h-4 shrink-0" viewBox="0 0 24 24">
             <path
@@ -372,7 +412,7 @@ export default function RegisterPage() {
             className="text-xs text-muted-foreground hover:text-foreground font-medium transition-colors cursor-pointer select-none"
           >
             <a href={window.location.hostname.includes("repairit.cloud") ? "https://repairit.cloud" : "/"}>
-              &larr; Volver a la consulta pública
+              &larr; Volver a la página principal
             </a>
           </Button>
         </div>
