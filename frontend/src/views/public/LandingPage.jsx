@@ -15,12 +15,32 @@ import {
   Wrench,
   Check,
   Search,
+  CheckCircle2,
+  QrCode,
+  Smartphone,
+  ShieldCheck,
+  Clock,
+  ArrowRight,
+  TrendingUp,
+  Receipt,
+  Sparkles,
+  Calculator,
+  Sliders,
+  AlertTriangle,
+  Minus,
+  Plus,
+  Zap,
 } from "lucide-react";
 
 export default function LandingPage() {
   const [isMobile, setIsMobile] = useState(false);
   const pricingCarouselRef = useRef(null);
   const [activePlanIndex, setActivePlanIndex] = useState(1); // 0: Inicial, 1: Pro, 2: Multi-Sucursal
+
+  // Estado para la Calculadora de Ahorro para el Taller
+  const [monthlyDevices, setMonthlyDevices] = useState(60);
+  const savedHours = Math.round(monthlyDevices * 0.45);
+  const estimatedSavings = (savedHours * 4500).toLocaleString("es-AR");
 
   useEffect(() => {
     document.title = "RepairIT | Software de Servicio Técnico y Gestión para Talleres";
@@ -30,7 +50,6 @@ export default function LandingPage() {
     handleResize();
     window.addEventListener("resize", handleResize);
 
-    // Centrar horizontalmente en el Plan Pro (centro) al cargar en móvil sin desplazar la ventana
     const centerProCard = () => {
       if (pricingCarouselRef.current && window.innerWidth < 768) {
         const el = pricingCarouselRef.current;
@@ -100,7 +119,6 @@ export default function LandingPage() {
   const handleContactSubmit = async (e) => {
     e.preventDefault();
 
-    // 1. Trampa Honeypot para bots automáticos (si viene lleno, es un bot)
     if (honeypot.trim()) {
       toast.success("¡Mensaje enviado con éxito!", {
         description: "Gracias por contactarte.",
@@ -161,13 +179,20 @@ export default function LandingPage() {
 
   return (
     <div className="flex-grow flex flex-col">
-      {/* Sección Hero Split con Ventana en Perspectiva 3D */}
-      <section className="relative py-12 lg:py-16 px-6 flex items-center justify-center overflow-hidden min-h-[calc(100vh-4rem)] bg-[linear-gradient(to_right,rgba(255,255,255,0.025)_1px,transparent_1px),linear-gradient(to_bottom,rgba(255,255,255,0.025)_1px,transparent_1px)] bg-[size:48px_48px]">
+      {/* SECCIÓN 1: HERO PRINCIPAL CON TEXTURA DE PRECISIÓN TÉCNICA */}
+      <section className="relative py-14 lg:py-20 px-6 flex items-center justify-center overflow-hidden min-h-[calc(100vh-4rem)]">
+        {/* Textura Dot Pattern con desvanecimiento radial de bordes */}
+        <div className="absolute inset-0 bg-[radial-gradient(rgba(255,255,255,0.07)_1px,transparent_1px)] bg-[size:28px_28px] [mask-image:radial-gradient(ellipse_70%_60%_at_50%_35%,#000_65%,transparent_100%)] pointer-events-none" />
 
         <div className="relative z-10 max-w-[1380px] w-full mx-auto grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-10 items-center">
           {/* Columna Izquierda: Propuesta de Valor & CTA */}
           <div className="lg:col-span-5 text-center lg:text-left space-y-6">
-            <h1 className="font-outfit text-4xl sm:text-5xl lg:text-[58px] xl:text-[62px] font-extrabold text-foreground tracking-tight leading-[1.06]">
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/10 border border-primary/25 text-primary text-xs font-semibold select-none">
+              <Sparkles className="w-3.5 h-3.5" />
+              <span>Software de Gestión para Talleres Técnicos</span>
+            </div>
+
+            <h1 className="font-outfit text-4xl sm:text-5xl lg:text-[56px] xl:text-[60px] font-extrabold text-foreground tracking-tight leading-[1.06]">
               Tu taller, todas tus operaciones en un solo lugar
             </h1>
 
@@ -191,7 +216,7 @@ export default function LandingPage() {
               >
                 <a href={trackingUrl}>
                   <Search className="w-4 h-4 text-primary" />
-                  <span>Seguir mi Equipo</span>
+                  Consultar Estado de Equipo
                 </a>
               </Button>
             </div>
@@ -211,125 +236,343 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* Sección de Características con Títulos Mejorados y Textos Concisos */}
-      <section id="caracteristicas" className="py-20 px-6 bg-background border-t border-border/50 relative z-10">
-        <div className="max-w-7xl mx-auto space-y-12">
-          <div className="text-center max-w-2xl mx-auto space-y-3">
-            <h2 className="font-outfit text-3xl font-bold text-foreground tracking-tight">
-              Todo lo que tu Taller Necesita
+      {/* SECCIÓN 2: EL CIRCUITO DEL TALLER EN 3 PASOS (STORYTELLING LINEAL) */}
+      <section className="py-20 px-6 bg-card/15 border-t border-border/50 relative z-10">
+        <div className="max-w-7xl mx-auto space-y-14">
+          <div className="text-center max-w-2xl mx-auto space-y-2.5">
+            <span className="text-[11px] font-bold uppercase tracking-wider text-primary block">
+              El Circuito del Taller
+            </span>
+            <h2 className="font-outfit text-3xl sm:text-4xl font-bold text-foreground tracking-tight">
+              De la recepción a la entrega, sin fricción
             </h2>
-            <p className="text-muted-foreground text-sm font-light">
-              Automatizá la recepción de equipos, eliminá consultas repetitivas y llevá el control exacto de tu taller.
+            <p className="text-muted-foreground text-sm font-light leading-relaxed">
+              Diseñado para eliminar pasos manuales, reducir llamadas repetitivas y proteger la reputación de tu negocio.
             </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 pt-2">
-            {/* Feature 1 */}
-            <Card className="bg-card/45 border-border/60 hover:border-primary/40 transition-colors duration-200">
-              <CardHeader className="space-y-3 pb-2">
-                <div className="w-10 h-10 rounded-lg bg-primary/10 border border-primary/20 flex items-center justify-center text-primary">
-                  <Activity className="w-5 h-5" />
-                </div>
-                <CardTitle className="font-outfit text-lg font-bold text-foreground">
-                  Seguimiento en Línea
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <p className="text-muted-foreground text-sm font-light leading-relaxed">
-                  Tus clientes consultan el estado de su reparación en tiempo real desde la web y reciben avisos automáticos por email.
-                </p>
-              </CardContent>
-            </Card>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 sm:gap-8">
+            {/* Paso 1 */}
+            <div className="relative rounded-2xl bg-card/40 border border-border/70 p-6 sm:p-7 space-y-4 hover:border-border transition-colors">
+              <div className="flex items-center justify-between">
+                <span className="font-mono text-xs font-bold text-primary bg-primary/10 border border-primary/25 px-2.5 py-1 rounded-md">
+                  Paso 01
+                </span>
+                <QrCode className="w-5 h-5 text-muted-foreground" />
+              </div>
+              <h3 className="font-outfit text-lg font-bold text-foreground">
+                Recepción & Comprobante QR
+              </h3>
+              <p className="text-xs text-muted-foreground font-light leading-relaxed">
+                Registrás el equipo en 30 segundos con su estado cosmético y accesorios. El sistema genera un comprobante con código QR único para que el cliente lo rastree desde su celular.
+              </p>
+            </div>
 
-            {/* Feature 2 */}
-            <Card className="bg-card/45 border-border/60 hover:border-primary/40 transition-colors duration-200">
-              <CardHeader className="space-y-3 pb-2">
-                <div className="w-10 h-10 rounded-lg bg-primary/10 border border-primary/20 flex items-center justify-center text-primary">
-                  <Wrench className="w-5 h-5" />
-                </div>
-                <CardTitle className="font-outfit text-lg font-bold text-foreground">
-                  Presupuestos Online
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <p className="text-muted-foreground text-sm font-light leading-relaxed">
-                  Enviá diagnósticos detallados para que el cliente apruebe el costo desde su celular validando su DNI.
-                </p>
-              </CardContent>
-            </Card>
+            {/* Paso 2 */}
+            <div className="relative rounded-2xl bg-card/40 border border-border/70 p-6 sm:p-7 space-y-4 hover:border-border transition-colors">
+              <div className="flex items-center justify-between">
+                <span className="font-mono text-xs font-bold text-sky-400 bg-sky-500/10 border border-sky-500/25 px-2.5 py-1 rounded-md">
+                  Paso 02
+                </span>
+                <Smartphone className="w-5 h-5 text-muted-foreground" />
+              </div>
+              <h3 className="font-outfit text-lg font-bold text-foreground">
+                Diagnóstico & Aprobación Web
+              </h3>
+              <p className="text-xs text-muted-foreground font-light leading-relaxed">
+                Cargás el presupuesto desglosado. El cliente recibe el aviso por WhatsApp o email y aprueba el monto ingresando su DNI en el portal público, dejando respaldo digital oficial.
+              </p>
+            </div>
 
-            {/* Feature 3 */}
-            <Card className="bg-card/45 border-border/60 hover:border-primary/40 transition-colors duration-200">
-              <CardHeader className="space-y-3 pb-2">
-                <div className="w-10 h-10 rounded-lg bg-primary/10 border border-primary/20 flex items-center justify-center text-primary">
-                  <BarChart3 className="w-5 h-5" />
-                </div>
-                <CardTitle className="font-outfit text-lg font-bold text-foreground">
-                  Métricas en Tiempo Real
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <p className="text-muted-foreground text-sm font-light leading-relaxed">
-                  Visualizá el flujo de equipos, estados del taller y facturación diaria con gráficos interactivos en tu panel.
-                </p>
-              </CardContent>
-            </Card>
-
-            {/* Feature 4 */}
-            <Card className="bg-card/45 border-border/60 hover:border-primary/40 transition-colors duration-200">
-              <CardHeader className="space-y-3 pb-2">
-                <div className="w-10 h-10 rounded-lg bg-primary/10 border border-primary/20 flex items-center justify-center text-primary">
-                  <PackageCheck className="w-5 h-5" />
-                </div>
-                <CardTitle className="font-outfit text-lg font-bold text-foreground">
-                  Stock e Inventario
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <p className="text-muted-foreground text-sm font-light leading-relaxed">
-                  Controlá repuestos con lector de código de barras, alertas de bajo stock y exportación directa a Excel.
-                </p>
-              </CardContent>
-            </Card>
-
-            {/* Feature 5 */}
-            <Card className="bg-card/45 border-border/60 hover:border-primary/40 transition-colors duration-200">
-              <CardHeader className="space-y-3 pb-2">
-                <div className="w-10 h-10 rounded-lg bg-primary/10 border border-primary/20 flex items-center justify-center text-primary">
-                  <DollarSign className="w-5 h-5" />
-                </div>
-                <CardTitle className="font-outfit text-lg font-bold text-foreground">
-                  Caja y Punto de Venta
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <p className="text-muted-foreground text-sm font-light leading-relaxed">
-                  Registrá ventas de mostrador y cobros de órdenes con múltiples medios de pago y cálculo de vuelto.
-                </p>
-              </CardContent>
-            </Card>
-
-            {/* Feature 6 */}
-            <Card className="bg-card/45 border-border/60 hover:border-primary/40 transition-colors duration-200">
-              <CardHeader className="space-y-3 pb-2">
-                <div className="w-10 h-10 rounded-lg bg-primary/10 border border-primary/20 flex items-center justify-center text-primary">
-                  <Building2 className="w-5 h-5" />
-                </div>
-                <CardTitle className="font-outfit text-lg font-bold text-foreground">
-                  Control Multi-Sucursal
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <p className="text-muted-foreground text-sm font-light leading-relaxed">
-                  Supervisá todas tus sedes desde una sola cuenta y asigná accesos individuales para cada técnico.
-                </p>
-              </CardContent>
-            </Card>
+            {/* Paso 3 */}
+            <div className="relative rounded-2xl bg-card/40 border border-border/70 p-6 sm:p-7 space-y-4 hover:border-border transition-colors">
+              <div className="flex items-center justify-between">
+                <span className="font-mono text-xs font-bold text-emerald-400 bg-emerald-500/10 border border-emerald-500/25 px-2.5 py-1 rounded-md">
+                  Paso 03
+                </span>
+                <Receipt className="w-5 h-5 text-muted-foreground" />
+              </div>
+              <h3 className="font-outfit text-lg font-bold text-foreground">
+                Cobro en Caja & Retiro
+              </h3>
+              <p className="text-xs text-muted-foreground font-light leading-relaxed">
+                Al marcar el equipo como entregado, se registra el cobro en el módulo de caja, se descuentan automáticamente los repuestos del stock y el cliente se va con su equipo listo.
+              </p>
+            </div>
           </div>
         </div>
       </section>
 
-      {/* Sección de Precios */}
+      {/* SECCIÓN 3: BENTO GRID DE FUNCIONALIDADES CON MICRO-INTERFACES REALES */}
+      <section id="caracteristicas" className="py-20 px-6 bg-background border-t border-border/50 relative z-10">
+        <div className="max-w-7xl mx-auto space-y-12">
+          <div className="text-center max-w-2xl mx-auto space-y-2.5">
+            <span className="text-[11px] font-bold uppercase tracking-wider text-primary block">
+              Funcionalidades con Propósito
+            </span>
+            <h2 className="font-outfit text-3xl sm:text-4xl font-bold text-foreground tracking-tight">
+              Herramientas reales pensadas para el servicio técnico
+            </h2>
+            <p className="text-muted-foreground text-sm font-light">
+              Sin funciones de relleno. Cada módulo resuelve una fricción operativa concreta de tu taller.
+            </p>
+          </div>
+
+          {/* BENTO GRID (Layout Asimétrico) */}
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 pt-2">
+            {/* Bento Item 1 (8 cols): Seguimiento de Clientes en Vivo */}
+            <div className="lg:col-span-8 rounded-2xl bg-card/45 border border-border/70 p-6 sm:p-8 flex flex-col justify-between space-y-6 hover:border-border transition-colors">
+              <div className="space-y-2">
+                <div className="w-9 h-9 rounded-lg bg-sky-500/10 border border-sky-500/20 flex items-center justify-center text-sky-400">
+                  <Activity className="w-4.5 h-4.5" />
+                </div>
+                <h3 className="font-outfit text-xl font-bold text-foreground">
+                  Portal de Seguimiento del Cliente
+                </h3>
+                <p className="text-xs text-muted-foreground font-light leading-relaxed max-w-xl">
+                  Tus clientes consultan el estado de su equipo ingresando su código único. Ven fotos, notas técnicas y estados actualizados en tiempo real sin llamar al taller.
+                </p>
+              </div>
+
+              {/* Micro-UI: Vista simulada de la consulta pública */}
+              <div className="rounded-xl bg-background/80 border border-border/70 p-4 space-y-3 font-sans">
+                <div className="flex items-center justify-between text-xs border-b border-border/50 pb-2.5">
+                  <span className="font-mono text-muted-foreground">Orden: <strong>#ORD-1084</strong></span>
+                  <span className="rounded-md bg-emerald-500/10 text-emerald-400 border border-emerald-500/25 px-2 py-0.5 text-[10px] font-bold uppercase">
+                    Listo para Retirar
+                  </span>
+                </div>
+                <div className="flex items-center justify-between text-xs">
+                  <div>
+                    <span className="font-bold text-foreground block">iPhone 14 Pro Max</span>
+                    <span className="text-[11px] text-muted-foreground">Cambio de Módulo Display • Garantía 90 días</span>
+                  </div>
+                  <span className="text-emerald-400 font-bold font-mono text-sm">$89.000</span>
+                </div>
+                {/* Stepper horizontal de estados */}
+                <div className="grid grid-cols-4 gap-1.5 pt-1 text-center text-[10px] font-semibold text-muted-foreground">
+                  <div className="p-1 rounded bg-muted/60 text-foreground">1. Ingresado</div>
+                  <div className="p-1 rounded bg-muted/60 text-foreground">2. Presupuestado</div>
+                  <div className="p-1 rounded bg-muted/60 text-foreground">3. Reparación</div>
+                  <div className="p-1 rounded bg-emerald-500/15 text-emerald-400 border border-emerald-500/30">4. Listo ✓</div>
+                </div>
+              </div>
+            </div>
+
+            {/* Bento Item 2 (4 cols): Aprobación Digital con DNI */}
+            <div className="lg:col-span-4 rounded-2xl bg-card/45 border border-border/70 p-6 sm:p-8 flex flex-col justify-between space-y-6 hover:border-border transition-colors">
+              <div className="space-y-2">
+                <div className="w-9 h-9 rounded-lg bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-400">
+                  <ShieldCheck className="w-4.5 h-4.5" />
+                </div>
+                <h3 className="font-outfit text-xl font-bold text-foreground">
+                  Aprobación con DNI
+                </h3>
+                <p className="text-xs text-muted-foreground font-light leading-relaxed">
+                  El cliente aprueba el costo desglosado desde su celular con su documento. Se acabó el clásico «yo nunca autoricé ese gasto».
+                </p>
+              </div>
+
+              {/* Micro-UI: Presupuesto validado */}
+              <div className="rounded-xl bg-background/80 border border-border/70 p-4 space-y-2.5 text-xs font-mono">
+                <div className="flex justify-between text-muted-foreground">
+                  <span>Módulo OLED:</span>
+                  <span className="text-foreground">$89.000</span>
+                </div>
+                <div className="flex justify-between text-muted-foreground">
+                  <span>Mano de Obra:</span>
+                  <span className="text-foreground">$25.000</span>
+                </div>
+                <div className="border-t border-border/50 pt-2 flex justify-between font-bold text-foreground">
+                  <span>Total:</span>
+                  <span className="text-primary">$114.000</span>
+                </div>
+                <div className="rounded bg-emerald-500/10 border border-emerald-500/25 p-2 text-center text-emerald-400 text-[10px] font-bold">
+                  ✓ Aprobado digitalmente por Juan Pérez (DNI 38.450.123)
+                </div>
+              </div>
+            </div>
+
+            {/* Bento Item 3 (4 cols): Stock con Stepper & Alertas */}
+            <div className="lg:col-span-4 rounded-2xl bg-card/45 border border-border/70 p-6 sm:p-8 flex flex-col justify-between space-y-6 hover:border-border transition-colors">
+              <div className="space-y-2">
+                <div className="w-9 h-9 rounded-lg bg-amber-500/10 border border-amber-500/20 flex items-center justify-center text-amber-400">
+                  <AlertTriangle className="w-4.5 h-4.5" />
+                </div>
+                <h3 className="font-outfit text-xl font-bold text-foreground">
+                  Stock & Insumos Críticos
+                </h3>
+                <p className="text-xs text-muted-foreground font-light leading-relaxed">
+                  Alertas amarillas preventivas para insumos por agotarse y rojas para stock cero. Ajustá cantidades con un clic.
+                </p>
+              </div>
+
+              {/* Micro-UI: Insumos de taller con Stepper */}
+              <div className="rounded-xl bg-background/80 border border-border/70 p-3.5 space-y-2.5 text-xs">
+                <div className="flex items-center justify-between border-b border-border/40 pb-2">
+                  <div className="min-w-0">
+                    <span className="font-bold text-foreground block truncate">Batería iPhone 13</span>
+                    <span className="text-[10px] text-amber-400 font-semibold">Stock: 1 (Mín: 3)</span>
+                  </div>
+                  <span className="rounded bg-amber-500/15 text-amber-400 border border-amber-500/30 text-[9px] font-bold px-1.5 py-0.5 uppercase">
+                    Por Reponer
+                  </span>
+                </div>
+                <div className="flex items-center justify-between">
+                  <div className="min-w-0">
+                    <span className="font-bold text-foreground block truncate">Pasta Térmica MX-4</span>
+                    <span className="text-[10px] text-muted-foreground">Stock: 8 (Mín: 2)</span>
+                  </div>
+                  <span className="rounded bg-emerald-500/10 text-emerald-400 border border-emerald-500/25 text-[9px] font-bold px-1.5 py-0.5 uppercase">
+                    Óptimo
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            {/* Bento Item 4 (8 cols): Caja POS & Facturación Clara */}
+            <div className="lg:col-span-8 rounded-2xl bg-card/45 border border-border/70 p-6 sm:p-8 flex flex-col justify-between space-y-6 hover:border-border transition-colors">
+              <div className="space-y-2">
+                <div className="w-9 h-9 rounded-lg bg-primary/10 border border-primary/20 flex items-center justify-center text-primary">
+                  <DollarSign className="w-4.5 h-4.5" />
+                </div>
+                <h3 className="font-outfit text-xl font-bold text-foreground">
+                  Caja y Punto de Venta (POS)
+                </h3>
+                <p className="text-xs text-muted-foreground font-light leading-relaxed max-w-xl">
+                  Cobros de órdenes y ventas de mostrador con múltiples medios de pago (efectivo, Mercado Pago, transferencia o tarjetas). Cierre de caja diario sin descuadres.
+                </p>
+              </div>
+
+              {/* Micro-UI: Balance y cobro en vivo */}
+              <div className="rounded-xl bg-background/80 border border-border/70 p-4 grid grid-cols-1 sm:grid-cols-3 gap-3 text-left">
+                <div className="p-3 rounded-lg bg-card/50 border border-border/60">
+                  <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground block">
+                    Caja Hoy
+                  </span>
+                  <span className="font-outfit text-xl font-black text-foreground block mt-1">
+                    $837.500
+                  </span>
+                  <span className="text-[10px] text-muted-foreground">8 ventas y cobros</span>
+                </div>
+                <div className="p-3 rounded-lg bg-card/50 border border-border/60">
+                  <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground block">
+                    Órdenes en Taller
+                  </span>
+                  <span className="font-outfit text-xl font-black text-primary block mt-1">
+                    5 Activas
+                  </span>
+                  <span className="text-[10px] text-primary">2 listas p/ entregar</span>
+                </div>
+                <div className="p-3 rounded-lg bg-card/50 border border-border/60">
+                  <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground block">
+                    Alertas Stock
+                  </span>
+                  <span className="font-outfit text-xl font-black text-amber-400 block mt-1">
+                    3 Por Reponer
+                  </span>
+                  <span className="text-[10px] text-amber-400">0 insumos en cero</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* SECCIÓN 4: CALCULADORA INTERACTIVA DE RETORNO Y AHORRO PARA EL TALLER */}
+      <section className="py-20 px-6 bg-card/15 border-t border-border/50 relative z-10">
+        <div className="max-w-4xl mx-auto space-y-10">
+          <div className="text-center space-y-2.5">
+            <span className="text-[11px] font-bold uppercase tracking-wider text-primary block">
+              Calculadora de Impacto
+            </span>
+            <h2 className="font-outfit text-3xl sm:text-4xl font-bold text-foreground tracking-tight">
+              ¿Cuánto tiempo y dinero pierde tu taller sin un sistema?
+            </h2>
+            <p className="text-muted-foreground text-sm font-light max-w-xl mx-auto">
+              Deslizá la barra según la cantidad promedio de reparaciones mensuales que maneja tu taller:
+            </p>
+          </div>
+
+          <div className="rounded-2xl bg-card/60 border border-border/80 p-6 sm:p-10 space-y-8 backdrop-blur-md shadow-xl">
+            {/* Slider Interactivo */}
+            <div className="space-y-4">
+              <div className="flex items-center justify-between">
+                <span className="text-xs font-bold uppercase tracking-wider text-muted-foreground">
+                  Equipos recibidos por mes:
+                </span>
+                <span className="font-outfit font-black text-2xl sm:text-3xl text-primary">
+                  {monthlyDevices} <span className="text-xs font-normal text-muted-foreground">equipos / mes</span>
+                </span>
+              </div>
+              <input
+                type="range"
+                min="15"
+                max="250"
+                step="5"
+                value={monthlyDevices}
+                onChange={(e) => setMonthlyDevices(Number(e.target.value))}
+                className="w-full h-2 bg-muted rounded-lg appearance-none cursor-pointer accent-primary"
+              />
+              <div className="flex justify-between text-[11px] text-muted-foreground font-mono">
+                <span>15 equipos</span>
+                <span>120 equipos</span>
+                <span>250 equipos</span>
+              </div>
+            </div>
+
+            {/* Tarjetas reactivas de resultados */}
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-2 border-t border-border/60">
+              <div className="p-4 rounded-xl bg-background/70 border border-border/70 text-center space-y-1">
+                <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground block">
+                  Tiempo Ahorrado
+                </span>
+                <span className="font-outfit text-3xl font-black text-sky-400 block">
+                  ~{savedHours} hs
+                </span>
+                <span className="text-[11px] text-muted-foreground block">
+                  Menos llamadas y mensajes al mes
+                </span>
+              </div>
+
+              <div className="p-4 rounded-xl bg-background/70 border border-border/70 text-center space-y-1">
+                <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground block">
+                  Valor del Tiempo Ganado
+                </span>
+                <span className="font-outfit text-3xl font-black text-emerald-400 block">
+                  ${estimatedSavings}
+                </span>
+                <span className="text-[11px] text-muted-foreground block">
+                  En horas productivas de banco técnico
+                </span>
+              </div>
+
+              <div className="p-4 rounded-xl bg-background/70 border border-border/70 text-center space-y-1">
+                <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground block">
+                  Retorno de Inversión
+                </span>
+                <span className="font-outfit text-3xl font-black text-primary block">
+                  Inmediato
+                </span>
+                <span className="text-[11px] text-muted-foreground block">
+                  El plan Pro se paga con 1 sola reparación
+                </span>
+              </div>
+            </div>
+
+            <div className="text-center pt-2">
+              <Button
+                asChild
+                className="bg-primary hover:bg-primary/90 text-primary-foreground font-bold px-8 py-3 rounded-lg cursor-pointer"
+              >
+                <a href={registerUrl}>Probar RepairIT Gratis para mi Taller</a>
+              </Button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* SECCIÓN 5: PLANES DE PRECIOS */}
       <section id="precios" className="py-20 px-6 bg-card/10 border-t border-border/50 relative z-10">
         <div className="max-w-7xl mx-auto space-y-12">
           <div className="text-center max-w-2xl mx-auto space-y-3">
@@ -352,19 +595,19 @@ export default function LandingPage() {
               <CardHeader className="space-y-2">
                 <CardTitle className="font-outfit text-xl font-bold text-foreground">Taller Básico</CardTitle>
                 <CardDescription className="text-xs text-muted-foreground font-light">
-                  Ideal para técnicos independientes que comienzan.
+                  Para técnicos independientes o talleres que dan sus primeros pasos.
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-6 flex-grow">
-                <div className="flex items-baseline gap-1">
+                <div className="flex items-baseline gap-1.5">
                   <span className="text-4xl font-extrabold text-foreground font-outfit">Gratis</span>
-                  <span className="text-muted-foreground text-xs font-light">/ para siempre</span>
+                  <span className="text-muted-foreground text-xs font-light">/ mes</span>
                 </div>
                 <div className="border-t border-border/40 my-4" />
                 <ul className="space-y-3 text-xs text-muted-foreground font-light">
                   <li className="flex items-start gap-2.5">
                     <Check className="w-4 h-4 text-primary shrink-0 mt-0.5" />
-                    <span>Hasta <strong>100 órdenes de servicio</strong> al mes</span>
+                    <span>Hasta 100 órdenes de servicio al mes</span>
                   </li>
                   <li className="flex items-start gap-2.5">
                     <Check className="w-4 h-4 text-primary shrink-0 mt-0.5" />
@@ -514,7 +757,7 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* Sección de Preguntas Frecuentes (FAQ) */}
+      {/* SECCIÓN 6: PREGUNTAS FRECUENTES (FAQ) */}
       <section id="faq" className="py-20 px-6 bg-background border-t border-border/50 relative z-10">
         <div className="max-w-3xl mx-auto space-y-12">
           <div className="text-center space-y-3">
@@ -560,7 +803,7 @@ export default function LandingPage() {
                   ¿Pueden mis clientes aprobar o rechazar presupuestos en línea?
                 </AccordionTrigger>
                 <AccordionContent className="text-muted-foreground text-sm font-light pb-4 leading-relaxed">
-                  Exacto. Cuando cargás el diagnóstico y los ítems del presupuesto, el cliente puede revisar el detalle de repuestos y mano de obra desde su celular y presionar "Aprobar Presupuesto", dejando constancia digital con fecha y hora.
+                  Exacto. Cuando cargás el diagnóstico y los ítems del presupuesto, el cliente puede revisar el detalle de repuestos y mano de obra desde su celular y presionar "Aprobar Presupuesto", dejando constancia digital con fecha, hora y validación por DNI.
                 </AccordionContent>
               </AccordionItem>
 
@@ -584,7 +827,7 @@ export default function LandingPage() {
                   ¿Qué tan segura está la información de mi taller y mis clientes?
                 </AccordionTrigger>
                 <AccordionContent className="text-muted-foreground text-sm font-light pb-4 leading-relaxed">
-                  Toda la información viaja y se almacena de forma cifrada y protegida en la nube. La plataforma cuenta con aislamiento estricto por taller, lo que garantiza que solo vos y tu personal autorizado puedan acceder a los datos de tus clientes, órdenes de servicio, inventario y movimientos de caja.
+                  Toda la información viaja y se almacena de forma cifrada y protegida en la nube con Supabase y PostgreSQL. La plataforma cuenta con aislamiento estricto por taller, lo que garantiza que solo vos y tu personal autorizado puedan acceder a los datos de tus clientes, órdenes de servicio, inventario y movimientos de caja.
                 </AccordionContent>
               </AccordionItem>
 
@@ -628,7 +871,7 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* Sección de Contacto */}
+      {/* SECCIÓN 7: CONTACTO */}
       <section id="contacto" className="py-20 px-6 bg-card/10 border-t border-border/50 relative z-10">
         <div className="max-w-2xl mx-auto space-y-10">
           <div className="text-center space-y-3">
