@@ -101,9 +101,6 @@ export default function PublicLayout() {
 
       {/* Contenedor Principal (Hijo) con Efectos de Fondo Encapsulados */}
       <main id="main-content" tabIndex="-1" className="flex-1 flex flex-col relative z-10 overflow-hidden outline-none">
-        {/* Efectos de Fondo Decorativos */}
-        <div className="absolute top-0 left-1/4 w-[500px] h-[500px] bg-primary/5 rounded-full blur-[120px] pointer-events-none" />
-        <div className="absolute bottom-0 right-1/4 w-[500px] h-[500px] bg-primary/5 rounded-full blur-[120px] pointer-events-none" />
         <Outlet />
       </main>
 
