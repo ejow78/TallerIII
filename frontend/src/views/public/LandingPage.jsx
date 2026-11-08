@@ -492,27 +492,41 @@ export default function LandingPage() {
                     </div>
                   </div>
 
-                  {/* Sub-card Cotización antes de aprobar */}
-                  <div className="p-3 sm:p-3.5 rounded-xl bg-card/60 border border-border/60 flex flex-col justify-between space-y-2.5">
-                    <div className="space-y-1.5 text-xs">
-                      <div className="flex justify-between items-start text-xs border-b border-border/30 pb-1.5">
-                        <span className="text-foreground/85 font-light pr-2 leading-tight">Reemplazo de Mosfet e IC Regulador PMIC</span>
-                        <span className="font-mono font-bold text-primary shrink-0">$18.500</span>
-                      </div>
-                      <div className="flex justify-between items-start text-xs">
-                        <span className="text-foreground/85 font-light pr-2 leading-tight">Mantenimiento térmico y limpieza de placa madre</span>
-                        <span className="font-mono font-bold text-primary shrink-0">$6.500</span>
-                      </div>
-                    </div>
-                    <div className="flex justify-between items-baseline pt-1 border-t border-border/50">
-                      <span className="text-xs font-bold text-muted-foreground uppercase tracking-wider">Total</span>
-                      <span className="font-outfit font-black text-lg text-primary font-mono">
-                        $25.000
+                  {/* Sub-card Historial de Movimientos (Trazabilidad en Vivo) */}
+                  <div className="p-3 sm:p-3.5 rounded-xl bg-card/60 border border-border/60 flex flex-col justify-between space-y-2">
+                    <div className="flex items-center justify-between border-b border-border/40 pb-1.5">
+                      <span className="text-[10px] font-bold text-sky-400 uppercase tracking-wider flex items-center gap-1.5">
+                        <Clock className="w-3.5 h-3.5" /> Historial de Movimientos
+                      </span>
+                      <span className="flex items-center gap-1 text-[9px] font-mono text-emerald-400 font-semibold bg-emerald-500/10 px-1.5 py-0.5 rounded border border-emerald-500/20">
+                        <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" /> En Vivo
                       </span>
                     </div>
-                    <div className="flex items-center justify-center gap-1.5 py-2 px-3 rounded-lg bg-primary hover:bg-primary/95 text-primary-foreground text-xs font-bold shadow-md shadow-primary/20 cursor-pointer">
-                      <ShieldCheck className="w-3.5 h-3.5" />
-                      <span>Aprobar Presupuesto Online</span>
+                    <div className="space-y-1.5 text-xs flex-grow">
+                      <div className="flex items-start gap-2 text-[11px] border-b border-border/20 pb-1.5">
+                        <span className="font-mono text-[10px] text-muted-foreground shrink-0 bg-muted/40 px-1.5 py-0.5 rounded border border-border/30">
+                          11:30 hs
+                        </span>
+                        <span className="text-foreground/90 font-light leading-snug">
+                          Diagnóstico finalizado. Presupuesto cargado y notificado.
+                        </span>
+                      </div>
+                      <div className="flex items-start gap-2 text-[11px] border-b border-border/20 pb-1.5">
+                        <span className="font-mono text-[10px] text-muted-foreground shrink-0 bg-muted/40 px-1.5 py-0.5 rounded border border-border/30">
+                          10:15 hs
+                        </span>
+                        <span className="text-foreground/80 font-light leading-snug">
+                          Ingreso a laboratorio técnico para revisión de placa madre.
+                        </span>
+                      </div>
+                      <div className="flex items-start gap-2 text-[11px]">
+                        <span className="font-mono text-[10px] text-muted-foreground shrink-0 bg-muted/40 px-1.5 py-0.5 rounded border border-border/30">
+                          09:30 hs
+                        </span>
+                        <span className="text-foreground/70 font-light leading-snug">
+                          Recepción en mostrador y emisión de orden #RT-9L4X7V3B.
+                        </span>
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -795,7 +809,7 @@ export default function LandingPage() {
               Planes a tu Medida
             </h2>
             <p className="text-muted-foreground text-sm font-light">
-              Escogé el nivel de potencia y gestión que tu taller necesita para crecer.
+              Elegí el nivel de potencia y gestión que tu taller necesita para crecer.
             </p>
           </div>
 
