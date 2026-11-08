@@ -11,7 +11,6 @@ import { Turnstile } from "@marsidev/react-turnstile";
 import { GridPattern } from "@/components/ui/grid-pattern";
 
 export default function LoginPage() {
-  document.title = "RepairIT - Iniciar Sesión";
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [captchaToken, setCaptchaToken] = useState("");

@@ -2,34 +2,21 @@ import { useState, useEffect, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { Badge } from "@/components/ui/badge";
 import { Card, CardHeader, CardTitle, CardContent, CardDescription, CardFooter } from "@/components/ui/card";
 import { Accordion, AccordionItem, AccordionTrigger, AccordionContent } from "@/components/ui/accordion";
 import { toast } from "sonner";
 import {
   Activity,
-  BarChart3,
   DollarSign,
-  PackageCheck,
-  Building2,
-  Wrench,
   Check,
   Search,
-  CheckCircle2,
   QrCode,
   Smartphone,
   ShieldCheck,
   Clock,
   ArrowRight,
-  TrendingUp,
   Receipt,
-  Sparkles,
-  Calculator,
-  Sliders,
   AlertTriangle,
-  Minus,
-  Plus,
-  Zap,
   Lock,
   Maximize2,
   Download,
@@ -46,23 +33,12 @@ import { GridPattern } from "@/components/ui/grid-pattern";
 import { cn } from "@/lib/utils";
 
 export default function LandingPage() {
-  const [isMobile, setIsMobile] = useState(false);
   const [isDashboardModalOpen, setIsDashboardModalOpen] = useState(false);
   const pricingCarouselRef = useRef(null);
   const [activePlanIndex, setActivePlanIndex] = useState(1); // 0: Inicial, 1: Pro, 2: Multi-Sucursal
 
-  // Estado para la Calculadora de Ahorro para el Taller
-  const [monthlyDevices, setMonthlyDevices] = useState(60);
-  const savedHours = Math.round(monthlyDevices * 0.45);
-  const estimatedSavings = (savedHours * 4500).toLocaleString("es-AR");
-
   useEffect(() => {
     document.title = "RepairIT | Software de Servicio Técnico y Gestión para Talleres";
-    const handleResize = () => {
-      setIsMobile(window.innerWidth < 640);
-    };
-    handleResize();
-    window.addEventListener("resize", handleResize);
 
     const centerProCard = () => {
       if (pricingCarouselRef.current && window.innerWidth < 768) {
@@ -81,7 +57,6 @@ export default function LandingPage() {
     const timer = setTimeout(centerProCard, 100);
 
     return () => {
-      window.removeEventListener("resize", handleResize);
       clearTimeout(timer);
     };
   }, []);

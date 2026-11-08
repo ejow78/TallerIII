@@ -1,9 +1,12 @@
+import { useEffect } from "react";
 import { Link } from "react-router-dom";
 import { GridPattern } from "@/components/ui/grid-pattern";
 import { ArrowLeft } from "lucide-react";
 
 export default function PrivacyPage() {
-  document.title = "RepairIT - Políticas de Privacidad";
+  useEffect(() => {
+    document.title = "RepairIT - Políticas de Privacidad";
+  }, []);
 
   return (
     <div className="relative min-h-[calc(100vh-4rem)] py-12 px-4 sm:px-6 flex flex-col justify-center items-center overflow-hidden">

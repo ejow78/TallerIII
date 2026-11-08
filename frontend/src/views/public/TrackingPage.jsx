@@ -49,6 +49,25 @@ const STEPS = [
   { key: "entregado", label: "Entregado" }
 ];
 
+function getDeviceIcon(type = "") {
+  const t = type.toLowerCase();
+  if (t.includes("celular") || t.includes("smartphone") || t.includes("teléfono") || t.includes("telefono") || t.includes("iphone") || t.includes("samsung")) {
+    return Smartphone;
+  }
+  if (t.includes("tablet") || t.includes("ipad")) {
+    return Tablet;
+  }
+  if (t.includes("notebook") || t.includes("laptop") || t.includes("macbook") || t.includes("pc") || t.includes("computadora")) {
+    return Laptop;
+  }
+  return Cpu;
+}
+
+function renderDeviceIcon(type = "", className = "w-6 h-6") {
+  const Icon = getDeviceIcon(type);
+  return <Icon className={className} />;
+}
+
 export default function TrackingPage() {
   const { id } = useParams();
   const [loading, setLoading] = useState(true);
@@ -280,21 +299,6 @@ export default function TrackingPage() {
     : 0;
   const currentStepIndex = foundIndex >= 0 ? foundIndex : 0;
 
-  // Ícono dinámico del dispositivo
-  const getDeviceIcon = (type = "") => {
-    const t = type.toLowerCase();
-    if (t.includes("celular") || t.includes("smartphone") || t.includes("teléfono") || t.includes("telefono") || t.includes("iphone") || t.includes("samsung")) {
-      return Smartphone;
-    }
-    if (t.includes("tablet") || t.includes("ipad")) {
-      return Tablet;
-    }
-    if (t.includes("notebook") || t.includes("laptop") || t.includes("macbook") || t.includes("pc") || t.includes("computadora")) {
-      return Laptop;
-    }
-    return Cpu;
-  };
-
   // Renderizador de Skeleton de carga
   if (loading) {
     return (
@@ -331,7 +335,7 @@ export default function TrackingPage() {
   }
 
   const clientName = order.clientId?.name || "Cliente";
-  const DeviceIcon = getDeviceIcon(order.deviceType);
+
   const parsedVenue = parseVenueAddress(order.venueId?.address);
   const venueName = order.venueId?.name || "Taller RepairIT";
   const venuePhone = order.venueId?.phone;
@@ -356,7 +360,7 @@ export default function TrackingPage() {
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 border-b border-border/50 pb-5">
           <div className="flex items-center gap-3.5">
             <div className="w-12 h-12 rounded-2xl bg-primary/10 border border-primary/20 flex items-center justify-center text-primary shrink-0 shadow-inner">
-              <DeviceIcon className="w-6 h-6" />
+              {renderDeviceIcon(order.deviceType, "w-6 h-6")}
             </div>
             <div className="space-y-0.5">
               {/* Código de Orden limpio sin píldora */}

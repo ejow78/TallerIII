@@ -18,7 +18,9 @@ import { GridPattern } from "@/components/ui/grid-pattern";
 import { cn } from "@/lib/utils";
 
 export default function TrackingPortalPage() {
-  document.title = "RepairIT | Consulta y Seguimiento de Orden";
+  useEffect(() => {
+    document.title = "RepairIT | Consulta y Seguimiento de Orden";
+  }, []);
   const [trackingCode, setTrackingCode] = useState("");
   const [loading, setLoading] = useState(false);
   const [scannerOpen, setScannerOpen] = useState(false);

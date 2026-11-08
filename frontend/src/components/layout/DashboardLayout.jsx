@@ -1,8 +1,7 @@
 import { useState, useEffect } from "react";
-import { NavLink, Outlet, useNavigate, useLocation, Navigate } from "react-router-dom";
+import { NavLink, Outlet, useLocation, Navigate } from "react-router-dom";
 import { Separator } from "@/components/ui/separator";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -39,7 +38,6 @@ import {
   ClipboardList,
   Package,
   LogOut,
-  Store,
   Settings,
   PlusCircle,
   Users,
@@ -63,7 +61,6 @@ function MobileSidebarAutoClose({ pathname }) {
 }
 
 export default function DashboardLayout() {
-  const navigate = useNavigate();
   const location = useLocation();
 
   // Guard síncrono: Impedir parpadeo visual (FOUC) si no hay token de sesión

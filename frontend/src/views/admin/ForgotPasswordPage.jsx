@@ -1,4 +1,4 @@
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { Card, CardTitle, CardDescription } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -11,7 +11,9 @@ import { GridPattern } from "@/components/ui/grid-pattern";
 import { Mail, ArrowRight, ArrowLeft } from "lucide-react";
 
 export default function ForgotPasswordPage() {
-  document.title = "RepairIT - Recuperar Contraseña";
+  useEffect(() => {
+    document.title = "RepairIT - Recuperar Contraseña";
+  }, []);
   const [email, setEmail] = useState("");
   const [loading, setLoading] = useState(false);
   const [sent, setSent] = useState(false);
