@@ -233,18 +233,18 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* SECCIÓN 2: EL CIRCUITO DEL TALLER EN 3 PASOS (STORYTELLING LINEAL) */}
+      {/* SECCIÓN 2: FLUJO DE TRABAJO EN 3 PASOS */}
       <section className="py-20 px-6 bg-card/15 border-t border-border/50 relative z-10">
         <div className="max-w-7xl mx-auto space-y-14">
           <div className="text-center max-w-2xl mx-auto space-y-2.5">
             <span className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground/75 block">
-              El Circuito del Taller
+              Flujo de Trabajo
             </span>
             <h2 className="font-outfit text-3xl sm:text-4xl font-bold text-foreground tracking-tight">
-              De la recepción a la entrega, sin fricción
+              Del ingreso a la entrega en 3 simples pasos
             </h2>
             <p className="text-muted-foreground text-sm font-light leading-relaxed">
-              Diseñado para eliminar pasos manuales, reducir llamadas repetitivas y proteger la reputación de tu negocio.
+              Diseñado para eliminar pasos manuales, reducir llamadas repetitivas y dar claridad total en cada orden.
             </p>
           </div>
 
@@ -261,7 +261,7 @@ export default function LandingPage() {
                 Recepción & Comprobante QR
               </h3>
               <p className="text-xs text-muted-foreground font-light leading-relaxed">
-                Registrás el equipo en 30 segundos con su estado cosmético y accesorios. El sistema genera un comprobante con código QR único para que el cliente lo rastree desde su celular.
+                Registrás el equipo en 30 segundos con su estado cosmético y accesorios. El sistema genera un link de seguimiento único y comprobante con código QR para que el cliente pueda ver el seguimiento en vivo.
               </p>
             </div>
 
@@ -277,7 +277,7 @@ export default function LandingPage() {
                 Diagnóstico & Aprobación Web
               </h3>
               <p className="text-xs text-muted-foreground font-light leading-relaxed">
-                Cargás el presupuesto desglosado. El cliente recibe el aviso por WhatsApp o email y aprueba el monto ingresando su DNI en el portal público, dejando respaldo digital oficial.
+                Cargás el presupuesto desglosado. El cliente recibe el aviso por WhatsApp o email y aprueba el monto ingresando su DNI en el portal de seguimiento antes de comenzar la reparación.
               </p>
             </div>
 
@@ -327,7 +327,7 @@ export default function LandingPage() {
                   Portal de Seguimiento del Cliente
                 </h3>
                 <p className="text-xs text-muted-foreground font-light leading-relaxed max-w-xl">
-                  Tus clientes consultan el estado de su equipo ingresando su código único. Ven fotos, notas técnicas y estados actualizados en tiempo real sin llamar al taller.
+                  Tus clientes consultan el estado de su equipo ingresando su código único. Ven el diagnóstico, notas técnicas y el avance en tiempo real sin llamar al taller.
                 </p>
               </div>
 
@@ -336,7 +336,7 @@ export default function LandingPage() {
                 <div className="flex items-center justify-between text-xs border-b border-border/50 pb-2.5">
                   <span className="font-mono text-muted-foreground">Orden: <strong>#ORD-1084</strong></span>
                   <span className="rounded-md bg-emerald-500/10 text-emerald-400 border border-emerald-500/25 px-2 py-0.5 text-[10px] font-bold uppercase">
-                    Listo para Retirar
+                    Listo
                   </span>
                 </div>
                 <div className="flex items-center justify-between text-xs">
@@ -351,7 +351,7 @@ export default function LandingPage() {
                   <div className="p-1 rounded bg-muted/60 text-foreground">1. Ingresado</div>
                   <div className="p-1 rounded bg-muted/60 text-foreground">2. Presupuestado</div>
                   <div className="p-1 rounded bg-muted/60 text-foreground">3. Reparación</div>
-                  <div className="p-1 rounded bg-emerald-500/15 text-emerald-400 border border-emerald-500/30">4. Listo p/ Retirar</div>
+                  <div className="p-1 rounded bg-emerald-500/15 text-emerald-400 border border-emerald-500/30">4. Listo</div>
                   <div className="p-1 rounded bg-muted/40 text-muted-foreground border border-border/40">5. Entregado</div>
                 </div>
               </div>
@@ -438,7 +438,7 @@ export default function LandingPage() {
                   Caja y Punto de Venta
                 </h3>
                 <p className="text-xs text-muted-foreground font-light leading-relaxed max-w-xl">
-                  Cobros de órdenes y ventas de mostrador con múltiples medios de pago (efectivo, Mercado Pago, transferencia o tarjetas). Cierre de caja diario sin descuadres.
+                  Cobros de órdenes y ventas de mostrador con múltiples medios de pago. Cierre de caja diario sin descuadres ni faltantes.
                 </p>
               </div>
 
@@ -469,7 +469,7 @@ export default function LandingPage() {
                   <span className="font-outfit text-xl font-black text-sky-400 block mt-1">
                     $417.500
                   </span>
-                  <span className="text-[10px] text-sky-400">Mercado Pago y tarjetas</span>
+                  <span className="text-[10px] text-sky-400">Tarjetas y transferencias</span>
                 </div>
               </div>
             </div>
@@ -494,9 +494,9 @@ export default function LandingPage() {
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 sm:gap-8 items-stretch">
             {/* Columna 1: Taller Tradicional */}
-            <div className="rounded-2xl bg-destructive/5 border border-destructive/20 p-6 sm:p-8 flex flex-col justify-between space-y-6">
+            <div className="rounded-2xl bg-card/45 border border-border/70 p-6 sm:p-8 flex flex-col justify-between space-y-6 hover:border-border transition-colors">
               <div className="space-y-4">
-                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-md bg-destructive/15 text-destructive text-xs font-bold uppercase tracking-wider">
+                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-md bg-muted/60 text-muted-foreground border border-border/60 text-xs font-semibold uppercase tracking-wider">
                   <span>Taller Tradicional</span>
                 </div>
                 <h3 className="font-outfit text-xl font-bold text-foreground">
@@ -528,9 +528,9 @@ export default function LandingPage() {
             </div>
 
             {/* Columna 2: Con RepairIT */}
-            <div className="rounded-2xl bg-primary/5 border border-primary/25 p-6 sm:p-8 flex flex-col justify-between space-y-6">
+            <div className="rounded-2xl bg-card/45 border border-border/70 p-6 sm:p-8 flex flex-col justify-between space-y-6 hover:border-border transition-colors">
               <div className="space-y-4">
-                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-md bg-primary/15 text-primary text-xs font-bold uppercase tracking-wider">
+                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-md bg-primary/10 text-primary border border-primary/25 text-xs font-semibold uppercase tracking-wider">
                   <span>Con RepairIT</span>
                 </div>
                 <h3 className="font-outfit text-xl font-bold text-foreground">
@@ -547,7 +547,7 @@ export default function LandingPage() {
                   </li>
                   <li className="flex items-start gap-2.5">
                     <span className="text-primary font-bold shrink-0">✓</span>
-                    <span>Presupuesto detallado aprobado con DNI antes de tocar el equipo, con respaldo oficial.</span>
+                    <span>Presupuesto detallado aprobado con DNI en el portal de seguimiento antes de comenzar la reparación.</span>
                   </li>
                   <li className="flex items-start gap-2.5">
                     <span className="text-primary font-bold shrink-0">✓</span>
@@ -555,20 +555,28 @@ export default function LandingPage() {
                   </li>
                   <li className="flex items-start gap-2.5">
                     <span className="text-primary font-bold shrink-0">✓</span>
-                    <span>Caja cuadrada con desglose instantáneo de efectivo, Mercado Pago y transferencias.</span>
+                    <span>Caja cuadrada con desglose instantáneo de cobros en efectivo, tarjetas y transferencias bancarias.</span>
                   </li>
                 </ul>
               </div>
-
-              <div className="pt-2">
-                <Button
-                  asChild
-                  className="w-full bg-primary hover:bg-primary/90 text-primary-foreground font-bold py-2.5 rounded-lg cursor-pointer"
-                >
-                  <a href={registerUrl}>Comenzar a ordenar mi taller</a>
-                </Button>
-              </div>
             </div>
+          </div>
+
+          {/* CTA centrado debajo de la comparativa */}
+          <div className="flex flex-col items-center justify-center pt-2 space-y-2.5">
+            <Button
+              asChild
+              size="lg"
+              className="bg-primary hover:bg-primary/90 text-primary-foreground font-bold px-8 h-12 rounded-xl shadow-lg shadow-primary/20 transition-all cursor-pointer"
+            >
+              <a href={registerUrl} className="flex items-center gap-2">
+                <span>Comenzar a ordenar mi taller</span>
+                <ArrowRight className="w-4 h-4" />
+              </a>
+            </Button>
+            <span className="text-[11px] text-muted-foreground font-light">
+              Sin tarjeta de crédito requerida • 14 días de prueba gratuita
+            </span>
           </div>
         </div>
       </section>
