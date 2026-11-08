@@ -43,7 +43,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 
-import { api, getLocalUser, normalizePlan, hasPOSAccess } from "@/services/api";
+import { api, getLocalUser, normalizePlan, hasPOSAccess, cache } from "@/services/api";
 import { sendBudgetReadyEmail, sendOrderReadyEmail } from "@/services/emailService";
 import { printOrderReceipt, printPosReceipt, getOrderWhatsAppUrl } from "@/utils/printHelper";
 import { cn } from "@/lib/utils";
@@ -67,9 +67,9 @@ export default function OrdersPage() {
   );
   const canUsePOS = hasPOSAccess(effectivePlan);
 
-  const [orders, setOrders] = useState([]);
-  const [inventoryItems, setInventoryItems] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [orders, setOrders] = useState(() => cache.get(`orders_${currentUser?.venueId}`) || []);
+  const [inventoryItems, setInventoryItems] = useState(() => cache.get(`inventory_${currentUser?.venueId}`) || []);
+  const [loading, setLoading] = useState(() => !cache.has(`orders_${currentUser?.venueId}`));
   const [searchQuery, setSearchQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState("todos");
 
@@ -114,7 +114,6 @@ export default function OrdersPage() {
 
   const loadData = async () => {
     try {
-      setLoading(true);
       const [ordersData, invData] = await Promise.all([
         api.orders.getAll(),
         api.inventory.getAll().catch(() => []),
@@ -161,7 +160,15 @@ export default function OrdersPage() {
   };
 
   useEffect(() => {
-    loadData();
+    let isMounted = true;
+    const fetchOrders = async () => {
+      if (!isMounted) return;
+      await loadData();
+    };
+    fetchOrders();
+    return () => {
+      isMounted = false;
+    };
   }, []);
 
   // Cerrar modales con la tecla Escape
@@ -427,17 +434,22 @@ export default function OrdersPage() {
       return;
     }
 
+    const previousOrders = [...orders];
+    // Optimistic: remover de la pantalla inmediatamente
+    setOrders((prev) => prev.filter((o) => o._id !== order._id));
+    if (detailOrder?._id === order._id) {
+      setShowDetailModal(false);
+      setDetailOrder(null);
+    }
+
     try {
       await api.orders.delete(order._id);
       toast.success("Orden eliminada", {
         description: `La orden #${order.trackingCode} fue eliminada del sistema.`,
       });
-      if (detailOrder?._id === order._id) {
-        setShowDetailModal(false);
-        setDetailOrder(null);
-      }
-      loadData();
     } catch (error) {
+      // Revertir
+      setOrders(previousOrders);
       toast.error("Error al eliminar orden", {
         description: error.message || "Intente nuevamente.",
       });
@@ -694,6 +706,47 @@ export default function OrdersPage() {
   };
 
   const handleStatusChange = async (id, newStatus) => {
+    const previousOrders = [...orders];
+    const previousDetail = detailOrder ? { ...detailOrder } : null;
+
+    const dateStr =
+      new Date().toLocaleDateString("es-AR", {
+        timeZone: "America/Argentina/Buenos_Aires",
+        day: "2-digit",
+        month: "2-digit",
+        year: "numeric",
+      }) +
+      " " +
+      new Date().toLocaleTimeString("es-AR", {
+        timeZone: "America/Argentina/Buenos_Aires",
+        hour: "2-digit",
+        minute: "2-digit",
+        hour12: false,
+      });
+
+    // Optimistic UI: actualización instantánea en memoria (0 ms)
+    setOrders((prev) =>
+      prev.map((order) => {
+        if (order._id !== id) return order;
+        const newHistory = [
+          ...(Array.isArray(order.history) ? order.history : []),
+          { date: dateStr, text: `Estado cambiado a ${newStatus.toUpperCase()}` },
+        ];
+        return { ...order, status: newStatus, history: newHistory };
+      })
+    );
+
+    if (detailOrder && detailOrder._id === id) {
+      setDetailOrder((prev) => ({
+        ...prev,
+        status: newStatus,
+        history: [
+          ...(Array.isArray(prev?.history) ? prev.history : []),
+          { date: dateStr, text: `Estado cambiado a ${newStatus.toUpperCase()}` },
+        ],
+      }));
+    }
+
     try {
       await api.orders.updateStatus(id, newStatus, `Estado cambiado a ${newStatus.toUpperCase()}`);
       toast.success(`Estado de orden actualizado`, {
@@ -702,7 +755,7 @@ export default function OrdersPage() {
 
       // Si el nuevo estado es "listo", enviar correo de retiro al cliente
       if (newStatus === "listo") {
-        const targetOrder = orders.find((o) => o._id === id);
+        const targetOrder = previousOrders.find((o) => o._id === id);
         const clientEmail = targetOrder?.clientId?.email;
         if (clientEmail && clientEmail.includes("@")) {
           try {
@@ -721,9 +774,10 @@ export default function OrdersPage() {
           }
         }
       }
-
-      loadData();
     } catch (error) {
+      // Revertir estado si falló la petición
+      setOrders(previousOrders);
+      if (previousDetail) setDetailOrder(previousDetail);
       toast.error("Error al actualizar estado", {
         description: error.message || "Por favor, intente nuevamente.",
       });
@@ -731,8 +785,8 @@ export default function OrdersPage() {
   };
 
   const getStatusDropdown = (orderId, currentStatus) => {
-    let colorClass = "";
-    let statusLabel = "";
+    let colorClass;
+    let statusLabel;
     switch (currentStatus) {
       case "ingresado":
         colorClass = "bg-sky-500/10 text-sky-400 border-sky-500/25 hover:bg-sky-500/20";

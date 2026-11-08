@@ -1,7 +1,6 @@
 import { useState, useEffect, useMemo } from "react";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Alert, AlertTitle, AlertDescription } from "@/components/ui/alert";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -40,13 +39,11 @@ import {
   Search,
   LayoutDashboard,
   ExternalLink,
-  PlusCircle,
   TrendingUp,
   DollarSign,
   Package,
   Clock,
   CheckCircle2,
-  ShoppingCart,
   Eye,
   Pencil,
   Trash2,
@@ -61,7 +58,7 @@ import {
   Mail,
 } from "lucide-react";
 import { Link } from "react-router-dom";
-import { api, normalizePlan, hasPOSAccess } from "@/services/api";
+import { api, normalizePlan, hasPOSAccess, cache } from "@/services/api";
 import { toast } from "sonner";
 import { Label } from "@/components/ui/label";
 
@@ -123,13 +120,12 @@ const STATUS_META = {
 };
 
 export default function DashboardPage() {
-  const [loading, setLoading] = useState(true);
-
   // Datos de sesión del usuario
   const user = JSON.parse(
     sessionStorage.getItem("repairit_user") || localStorage.getItem("repairit_user") || "{}"
   );
   const isSuperAdmin = user.role === "superadmin";
+  const [loading, setLoading] = useState(() => !isSuperAdmin && !cache.has(`orders_${user.venueId}`));
 
   // Estados de SuperAdmin
   const [organizations, setOrganizations] = useState([]);
@@ -145,9 +141,9 @@ export default function DashboardPage() {
   const [submittingSuper, setSubmittingSuper] = useState(false);
 
   // Estados de Taller
-  const [orders, setOrders] = useState([]);
-  const [inventory, setInventory] = useState([]);
-  const [sales, setSales] = useState([]);
+  const [orders, setOrders] = useState(() => cache.get(`orders_${user.venueId}`) || []);
+  const [inventory, setInventory] = useState(() => cache.get(`inventory_${user.venueId}`) || []);
+  const [sales, setSales] = useState(() => cache.get(`sales_${user.venueId}`) || []);
   const [activePlan, setActivePlan] = useState(() => normalizePlan(user.subscriptionPlan));
 
   // Controles de Gráficos Interactivos
@@ -171,7 +167,6 @@ export default function DashboardPage() {
 
   const loadWorkshopData = async () => {
     try {
-      setLoading(true);
       const [ordersData, inventoryData, salesData, profileData] = await Promise.all([
         api.orders.getAll().catch(() => []),
         api.inventory.getAll().catch(() => []),
@@ -194,11 +189,19 @@ export default function DashboardPage() {
   };
 
   useEffect(() => {
-    if (isSuperAdmin) {
-      loadSuperData();
-    } else {
-      loadWorkshopData();
-    }
+    let isMounted = true;
+    const fetchData = async () => {
+      if (!isMounted) return;
+      if (isSuperAdmin) {
+        await loadSuperData();
+      } else {
+        await loadWorkshopData();
+      }
+    };
+    fetchData();
+    return () => {
+      isMounted = false;
+    };
   }, [isSuperAdmin]);
 
   // Actualizar Plan (SuperAdmin)

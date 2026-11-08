@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef, useMemo } from "react";
+import { useState, useEffect, useRef, useMemo } from "react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -21,7 +21,7 @@ import {
   Save,
   DollarSign,
 } from "lucide-react";
-import { api, getLocalUser } from "@/services/api";
+import { api, getLocalUser, cache } from "@/services/api";
 
 const DEFAULT_CATEGORIES = [
   "Insumos",
@@ -37,8 +37,8 @@ const DEFAULT_CATEGORIES = [
 export default function InventoryPage() {
   const currentUser = getLocalUser();
   const isTechnician = currentUser?.role === "tecnico";
-  const [items, setItems] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [items, setItems] = useState(() => cache.get(`inventory_${currentUser?.venueId}`) || []);
+  const [loading, setLoading] = useState(() => !cache.has(`inventory_${currentUser?.venueId}`));
 
   // Filtros
   const [searchQuery, setSearchQuery] = useState("");
@@ -63,7 +63,6 @@ export default function InventoryPage() {
 
   const loadData = async () => {
     try {
-      setLoading(true);
       const data = await api.inventory.getAll();
       setItems(data || []);
     } catch (error) {
@@ -76,8 +75,72 @@ export default function InventoryPage() {
   };
 
   useEffect(() => {
-    loadData();
+    let isMounted = true;
+    const fetchInventory = async () => {
+      if (!isMounted) return;
+      await loadData();
+    };
+    fetchInventory();
+    return () => {
+      isMounted = false;
+    };
   }, []);
+
+  const handleOpenCreateModal = () => {
+    setEditingId(null);
+    setItemName("");
+    setItemCategory("Repuestos");
+    setItemDesc("");
+    setItemQty(0);
+    setItemMinQty(2);
+    setItemPrice(0);
+    setItemCode("");
+    setShowModal(true);
+  };
+
+  const handleOpenEditModal = (item) => {
+    setEditingId(item._id);
+    setItemName(item.name || "");
+    setItemCategory(item.category || "Repuestos");
+    setItemDesc(item.description || "");
+    setItemQty(item.quantity || 0);
+    setItemMinQty(item.min_quantity ?? item.minQuantity ?? 0);
+    setItemPrice(item.price || 0);
+    setItemCode(item.code || "");
+    setShowModal(true);
+  };
+
+  const handleInventoryScan = (barcode) => {
+    const existingItem = items.find(
+      (item) => (item.code || "").toLowerCase() === barcode.toLowerCase()
+    );
+
+    if (existingItem) {
+      handleOpenEditModal(existingItem);
+      toast.info(`Insumo detectado: ${existingItem.name}`, {
+        description: `Se abrió la edición para ajustar cantidad. Código: ${existingItem.code}`,
+      });
+    } else {
+      setEditingId(null);
+      setItemName("");
+      setItemCategory("Repuestos");
+      setItemDesc("");
+      setItemQty(0);
+      setItemMinQty(2);
+      setItemPrice(0);
+      setItemCode(barcode);
+      setShowModal(true);
+
+      toast.success(`Nuevo código detectado: "${barcode}"`, {
+        description: "Completá el nombre y precio del insumo.",
+        duration: 4000,
+      });
+
+      setTimeout(() => {
+        document.getElementById("item-name")?.focus();
+      }, 150);
+    }
+  };
 
   // Lector de código de barras silencioso en segundo plano
   useEffect(() => {
@@ -116,38 +179,6 @@ export default function InventoryPage() {
     };
   }, [items, showModal]);
 
-  const handleInventoryScan = (barcode) => {
-    const existingItem = items.find(
-      (item) => (item.code || "").toLowerCase() === barcode.toLowerCase()
-    );
-
-    if (existingItem) {
-      handleOpenEditModal(existingItem);
-      toast.info(`Insumo detectado: ${existingItem.name}`, {
-        description: `Se abrió la edición para ajustar cantidad. Código: ${existingItem.code}`,
-      });
-    } else {
-      setEditingId(null);
-      setItemName("");
-      setItemCategory("Repuestos");
-      setItemDesc("");
-      setItemQty(0);
-      setItemMinQty(2);
-      setItemPrice(0);
-      setItemCode(barcode);
-      setShowModal(true);
-
-      toast.success(`Nuevo código detectado: "${barcode}"`, {
-        description: "Completá el nombre y precio del insumo.",
-        duration: 4000,
-      });
-
-      setTimeout(() => {
-        document.getElementById("item-name")?.focus();
-      }, 150);
-    }
-  };
-
   const handleCodeKeyDown = (e) => {
     if (e.key === "Enter") {
       e.preventDefault();
@@ -159,30 +190,6 @@ export default function InventoryPage() {
     const fromItems = items.map((i) => i.category).filter(Boolean);
     return Array.from(new Set([...DEFAULT_CATEGORIES, ...fromItems]));
   }, [items]);
-
-  const handleOpenCreateModal = () => {
-    setEditingId(null);
-    setItemName("");
-    setItemCategory("Repuestos");
-    setItemDesc("");
-    setItemQty(0);
-    setItemMinQty(2);
-    setItemPrice(0);
-    setItemCode("");
-    setShowModal(true);
-  };
-
-  const handleOpenEditModal = (item) => {
-    setEditingId(item._id);
-    setItemName(item.name || "");
-    setItemCategory(item.category || "Repuestos");
-    setItemDesc(item.description || "");
-    setItemQty(item.quantity || 0);
-    setItemMinQty(item.min_quantity ?? item.minQuantity ?? 0);
-    setItemPrice(item.price || 0);
-    setItemCode(item.code || "");
-    setShowModal(true);
-  };
 
   const handleSaveItem = async (e) => {
     e.preventDefault();
@@ -246,6 +253,12 @@ export default function InventoryPage() {
       return;
     }
 
+    const previousItems = [...items];
+    // Optimistic UI: actualización instantánea en pantalla (0 ms)
+    setItems((prev) =>
+      prev.map((i) => (i._id === id ? { ...i, quantity: newQty } : i))
+    );
+
     try {
       await api.inventory.adjustStock(id, delta);
       const minQty = item.min_quantity ?? item.minQuantity ?? 0;
@@ -256,8 +269,9 @@ export default function InventoryPage() {
       } else {
         toast.success("Stock actualizado.");
       }
-      loadData();
     } catch (error) {
+      // Revertir
+      setItems(previousItems);
       toast.error("Error al ajustar stock", {
         description: error.message || "Intente de nuevo.",
       });
@@ -277,13 +291,17 @@ export default function InventoryPage() {
       return;
     }
 
+    const previousItems = [...items];
+    // Optimistic UI: remover inmediatamente de pantalla
+    setItems((prev) => prev.filter((i) => i._id !== id));
+
     try {
       await api.inventory.delete(id);
       toast.success(`Insumo eliminado`, {
         description: `${name} fue retirado del catálogo.`,
       });
-      loadData();
     } catch (error) {
+      setItems(previousItems);
       toast.error("Error al eliminar insumo", {
         description: error.message || "Por favor, intente nuevamente.",
       });

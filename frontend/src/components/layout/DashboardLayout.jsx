@@ -60,55 +60,87 @@ function MobileSidebarAutoClose({ pathname }) {
   return null;
 }
 
+// Prefetch dinámico en hover (chunks JS + caché en memoria en 0 ms)
+const prefetchRoute = (path) => {
+  try {
+    switch (path) {
+      case "/dashboard":
+        import("@/views/admin/DashboardPage");
+        break;
+      case "/dashboard/nuevo-ingreso":
+        import("@/views/admin/NewOrderPage");
+        break;
+      case "/dashboard/ordenes":
+        import("@/views/admin/OrdersPage");
+        api.orders.getAll().catch(() => {});
+        api.inventory.getAll().catch(() => {});
+        break;
+      case "/dashboard/clientes":
+        import("@/views/admin/ClientsPage");
+        api.clients.getAll().catch(() => {});
+        api.orders.getAll().catch(() => {});
+        break;
+      case "/dashboard/inventario":
+        import("@/views/admin/InventoryPage");
+        api.inventory.getAll().catch(() => {});
+        break;
+      case "/dashboard/caja":
+        import("@/views/admin/POSPage");
+        api.orders.getAll().catch(() => {});
+        api.inventory.getAll().catch(() => {});
+        break;
+      case "/dashboard/perfil":
+        import("@/views/admin/ProfilePage");
+        api.auth.getProfile().catch(() => {});
+        break;
+      case "/dashboard/cuentas":
+        import("@/views/admin/VenueAccountsPage");
+        api.venueAccounts.getAll().catch(() => {});
+        break;
+      case "/dashboard/usuarios":
+        import("@/views/admin/SuperAdminUsersPage");
+        break;
+      default:
+        break;
+    }
+  } catch {
+    // Silencio en prefetch fallido
+  }
+};
+
 export default function DashboardLayout() {
   const location = useLocation();
-
-  // Guard síncrono: Impedir parpadeo visual (FOUC) si no hay token de sesión
-  const token = sessionStorage.getItem("repairit_token") || localStorage.getItem("repairit_token");
-  if (!token) {
-    if (window.location.hostname.includes("repairit.cloud")) {
-      window.location.href = "https://app.repairit.cloud/login";
-    } else {
-      return <Navigate to="/login" replace />;
-    }
-    return null;
-  }
-
-  // Actualización síncrona del título del documento
   const currentPath = location.pathname;
-  if (currentPath === "/dashboard/nuevo-ingreso") document.title = "RepairIT - Registrar Ingreso";
-  else if (currentPath === "/dashboard/ordenes") document.title = "RepairIT - Órdenes de Servicio";
-  else if (currentPath === "/dashboard/clientes") document.title = "RepairIT - Directorio de Clientes";
-  else if (currentPath === "/dashboard/inventario") document.title = "RepairIT - Inventario de Insumos";
-  else if (currentPath === "/dashboard/caja") document.title = "RepairIT - Control de Caja";
-  else if (currentPath === "/dashboard/usuarios") document.title = "RepairIT - Gestión de Usuarios";
-  else if (currentPath === "/dashboard/consultas") document.title = "RepairIT - Consultas Web";
-  else if (currentPath === "/dashboard/cuentas") document.title = "RepairIT - Cuentas de Acceso";
-  else if (currentPath === "/dashboard/perfil") document.title = "RepairIT - Configuración de Taller";
-  else document.title = "RepairIT - Panel de Control";
-
-  const user = JSON.parse(sessionStorage.getItem("repairit_user") || localStorage.getItem("repairit_user") || "{}");
-  const isSuperAdmin = user.role === "superadmin";
-
-  // Guard de Roles por Ruta (RBAC)
-  if (user.role === "tecnico" && (currentPath === "/dashboard/perfil" || currentPath === "/dashboard/cuentas" || currentPath === "/dashboard/usuarios" || currentPath === "/dashboard/consultas")) {
-    return <Navigate to="/dashboard" replace />;
-  }
-  if (!isSuperAdmin && (currentPath === "/dashboard/usuarios" || currentPath === "/dashboard/consultas")) {
-    return <Navigate to="/dashboard" replace />;
-  }
 
   const [venues, setVenues] = useState([]);
   const [activeVenue, setActiveVenue] = useState(null);
   const [sidebarStats, setSidebarStats] = useState({ activeOrders: 0, lowStock: 0, outOfStock: 0, contactMessagesCount: 0 });
 
+  const token = sessionStorage.getItem("repairit_token") || localStorage.getItem("repairit_token");
+  const user = JSON.parse(sessionStorage.getItem("repairit_user") || localStorage.getItem("repairit_user") || "{}");
+  const isSuperAdmin = user.role === "superadmin";
   const effectivePlan = normalizePlan(activeVenue?.subscriptionPlan || user.subscriptionPlan);
 
   useEffect(() => {
+    if (currentPath === "/dashboard/nuevo-ingreso") document.title = "RepairIT - Registrar Ingreso";
+    else if (currentPath === "/dashboard/ordenes") document.title = "RepairIT - Órdenes de Servicio";
+    else if (currentPath === "/dashboard/clientes") document.title = "RepairIT - Directorio de Clientes";
+    else if (currentPath === "/dashboard/inventario") document.title = "RepairIT - Inventario de Insumos";
+    else if (currentPath === "/dashboard/caja") document.title = "RepairIT - Control de Caja";
+    else if (currentPath === "/dashboard/usuarios") document.title = "RepairIT - Gestión de Usuarios";
+    else if (currentPath === "/dashboard/consultas") document.title = "RepairIT - Consultas Web";
+    else if (currentPath === "/dashboard/cuentas") document.title = "RepairIT - Cuentas de Acceso";
+    else if (currentPath === "/dashboard/perfil") document.title = "RepairIT - Configuración de Taller";
+    else document.title = "RepairIT - Panel de Control";
+  }, [currentPath]);
+
+  useEffect(() => {
+    let isMounted = true;
     if (isSuperAdmin) {
       api.super
         .getContactMessages()
         .then((msgs) => {
+          if (!isMounted) return;
           setSidebarStats((prev) => ({
             ...prev,
             contactMessagesCount: Array.isArray(msgs) ? msgs.length : 0,
@@ -124,6 +156,8 @@ export default function DashboardLayout() {
             api.orders.getAll().catch(() => []),
             api.inventory.getAll().catch(() => []),
           ]);
+
+          if (!isMounted) return;
 
           if (profile) {
             setActiveVenue(profile);
@@ -154,7 +188,32 @@ export default function DashboardLayout() {
       };
       loadSidebarData();
     }
-  }, [isSuperAdmin, location.pathname]);
+    return () => {
+      isMounted = false;
+    };
+  }, [isSuperAdmin, location.pathname, user.subscriptionPlan]);
+
+  useEffect(() => {
+    if (!token && window.location.hostname.includes("repairit.cloud")) {
+      window.location.href = "https://app.repairit.cloud/login";
+    }
+  }, [token]);
+
+  // Guard de sesión
+  if (!token) {
+    if (window.location.hostname.includes("repairit.cloud")) {
+      return null;
+    }
+    return <Navigate to="/login" replace />;
+  }
+
+  // Guard de Roles por Ruta (RBAC)
+  if (user.role === "tecnico" && (currentPath === "/dashboard/perfil" || currentPath === "/dashboard/cuentas" || currentPath === "/dashboard/usuarios" || currentPath === "/dashboard/consultas")) {
+    return <Navigate to="/dashboard" replace />;
+  }
+  if (!isSuperAdmin && (currentPath === "/dashboard/usuarios" || currentPath === "/dashboard/consultas")) {
+    return <Navigate to="/dashboard" replace />;
+  }
 
   const handleHeaderSwitchVenue = async (venueId) => {
     try {
@@ -304,6 +363,8 @@ export default function DashboardLayout() {
                         asChild
                         isActive={location.pathname === "/dashboard"}
                         className={navItemClass}
+                        onMouseEnter={() => prefetchRoute("/dashboard")}
+                        onFocus={() => prefetchRoute("/dashboard")}
                       >
                         <NavLink to="/dashboard" end className="flex items-center gap-3 w-full">
                           <LayoutDashboard className="w-[18px] h-[18px] shrink-0" />
@@ -317,6 +378,8 @@ export default function DashboardLayout() {
                         asChild
                         isActive={location.pathname === "/dashboard/usuarios"}
                         className={navItemClass}
+                        onMouseEnter={() => prefetchRoute("/dashboard/usuarios")}
+                        onFocus={() => prefetchRoute("/dashboard/usuarios")}
                       >
                         <NavLink to="/dashboard/usuarios" className="flex items-center gap-3 w-full">
                           <Users className="w-[18px] h-[18px] shrink-0" />
@@ -330,6 +393,8 @@ export default function DashboardLayout() {
                         asChild
                         isActive={location.pathname === "/dashboard/consultas"}
                         className={navItemClass}
+                        onMouseEnter={() => prefetchRoute("/dashboard/consultas")}
+                        onFocus={() => prefetchRoute("/dashboard/consultas")}
                       >
                         <NavLink to="/dashboard/consultas" className="flex items-center gap-3 w-full">
                           <MessageSquare className="w-[18px] h-[18px] shrink-0" />
@@ -359,6 +424,8 @@ export default function DashboardLayout() {
                           asChild
                           isActive={location.pathname === "/dashboard"}
                           className={navItemClass}
+                          onMouseEnter={() => prefetchRoute("/dashboard")}
+                          onFocus={() => prefetchRoute("/dashboard")}
                         >
                           <NavLink to="/dashboard" end className="flex items-center gap-3 w-full">
                             <LayoutDashboard className="w-[18px] h-[18px] shrink-0" />
@@ -372,6 +439,8 @@ export default function DashboardLayout() {
                           asChild
                           isActive={location.pathname === "/dashboard/nuevo-ingreso"}
                           className={navItemClass}
+                          onMouseEnter={() => prefetchRoute("/dashboard/nuevo-ingreso")}
+                          onFocus={() => prefetchRoute("/dashboard/nuevo-ingreso")}
                         >
                           <NavLink to="/dashboard/nuevo-ingreso" className="flex items-center gap-3 w-full">
                             <PlusCircle className="w-[18px] h-[18px] shrink-0" />
@@ -385,6 +454,8 @@ export default function DashboardLayout() {
                           asChild
                           isActive={location.pathname === "/dashboard/ordenes"}
                           className={navItemClass}
+                          onMouseEnter={() => prefetchRoute("/dashboard/ordenes")}
+                          onFocus={() => prefetchRoute("/dashboard/ordenes")}
                         >
                           <NavLink to="/dashboard/ordenes" className="flex items-center gap-3 w-full">
                             <ClipboardList className="w-[18px] h-[18px] shrink-0" />
@@ -403,6 +474,8 @@ export default function DashboardLayout() {
                           asChild
                           isActive={location.pathname === "/dashboard/clientes"}
                           className={navItemClass}
+                          onMouseEnter={() => prefetchRoute("/dashboard/clientes")}
+                          onFocus={() => prefetchRoute("/dashboard/clientes")}
                         >
                           <NavLink to="/dashboard/clientes" className="flex items-center gap-3 w-full">
                             <Users className="w-[18px] h-[18px] shrink-0" />
@@ -426,6 +499,8 @@ export default function DashboardLayout() {
                           asChild
                           isActive={location.pathname === "/dashboard/inventario"}
                           className={navItemClass}
+                          onMouseEnter={() => prefetchRoute("/dashboard/inventario")}
+                          onFocus={() => prefetchRoute("/dashboard/inventario")}
                         >
                           <NavLink to="/dashboard/inventario" className="flex items-center gap-3 w-full">
                             <Package className="w-[18px] h-[18px] shrink-0" />
@@ -457,6 +532,8 @@ export default function DashboardLayout() {
                             asChild
                             isActive={location.pathname === "/dashboard/caja"}
                             className={navItemClass}
+                            onMouseEnter={() => prefetchRoute("/dashboard/caja")}
+                            onFocus={() => prefetchRoute("/dashboard/caja")}
                           >
                             <NavLink to="/dashboard/caja" className="flex items-center gap-3 w-full">
                               <ShoppingCart className="w-[18px] h-[18px] shrink-0" />
@@ -482,6 +559,8 @@ export default function DashboardLayout() {
                             asChild
                             isActive={location.pathname === "/dashboard/perfil"}
                             className={navItemClass}
+                            onMouseEnter={() => prefetchRoute("/dashboard/perfil")}
+                            onFocus={() => prefetchRoute("/dashboard/perfil")}
                           >
                             <NavLink to="/dashboard/perfil" className="flex items-center gap-3 w-full">
                               <Settings className="w-[18px] h-[18px] shrink-0" />
@@ -496,6 +575,8 @@ export default function DashboardLayout() {
                               asChild
                               isActive={location.pathname === "/dashboard/cuentas"}
                               className={navItemClass}
+                              onMouseEnter={() => prefetchRoute("/dashboard/cuentas")}
+                              onFocus={() => prefetchRoute("/dashboard/cuentas")}
                             >
                               <NavLink to="/dashboard/cuentas" className="flex items-center gap-3 w-full">
                                 <KeyRound className="w-[18px] h-[18px] shrink-0" />

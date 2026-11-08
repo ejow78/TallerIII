@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { Card, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -30,10 +30,9 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 
-import { api, getLocalUser } from "@/services/api";
+import { api, getLocalUser, cache } from "@/services/api";
 import { useNavigate } from "react-router-dom";
 import {
-  getClientWhatsAppUrl,
   getOrderWhatsAppUrl,
   printOrderReceipt,
 } from "@/utils/printHelper";
@@ -42,10 +41,10 @@ export default function ClientsPage() {
   const currentUser = getLocalUser();
   const isTechnician = currentUser?.role === "tecnico";
   const navigate = useNavigate();
-  const [clients, setClients] = useState([]);
-  const [orders, setOrders] = useState([]);
+  const [clients, setClients] = useState(() => cache.get(`clients_${currentUser?.organizationId}_${currentUser?.venueId}`) || []);
+  const [orders, setOrders] = useState(() => cache.get(`orders_${currentUser?.venueId}`) || []);
   const [profile, setProfile] = useState(null);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(() => !cache.has(`clients_${currentUser?.organizationId}_${currentUser?.venueId}`));
   const [searchQuery, setSearchQuery] = useState("");
 
   // Modal de Alta / Edición de Cliente
@@ -66,7 +65,6 @@ export default function ClientsPage() {
 
   const loadData = async () => {
     try {
-      setLoading(true);
       const [clientsData, ordersData, profileData] = await Promise.all([
         api.clients.getAll(),
         api.orders.getAll(),
@@ -85,7 +83,15 @@ export default function ClientsPage() {
   };
 
   useEffect(() => {
-    loadData();
+    let isMounted = true;
+    const fetchClients = async () => {
+      if (!isMounted) return;
+      await loadData();
+    };
+    fetchClients();
+    return () => {
+      isMounted = false;
+    };
   }, []);
 
   const handleOpenNewClientModal = () => {
@@ -170,16 +176,22 @@ export default function ClientsPage() {
 
   const confirmDeleteClient = async () => {
     if (!clientToDelete) return;
+    const targetId = clientToDelete._id;
+    const targetName = clientToDelete.name;
+    const previousClients = [...clients];
+
+    // Optimistic UI: remover de memoria al instante (0 ms)
+    setClients((prev) => prev.filter((c) => c._id !== targetId));
+    setClientToDelete(null);
+    setShowDeleteAlert(false);
 
     try {
-      await api.clients.delete(clientToDelete._id);
+      await api.clients.delete(targetId);
       toast.error("Cliente eliminado", {
-        description: `${clientToDelete.name} y su historial de órdenes asociadas fueron eliminados.`,
+        description: `${targetName} y su historial de órdenes asociadas fueron eliminados.`,
       });
-      setClientToDelete(null);
-      setShowDeleteAlert(false);
-      loadData();
     } catch (error) {
+      setClients(previousClients);
       toast.error("Error al eliminar cliente", {
         description: error.message || "Por favor, intente nuevamente.",
       });
@@ -189,11 +201,6 @@ export default function ClientsPage() {
   const handleViewOrders = (client) => {
     setSelectedClientForOrders(client);
     setShowOrdersModal(true);
-  };
-
-  const handleOpenWhatsAppClient = (client) => {
-    const url = getClientWhatsAppUrl(client, profile);
-    if (url) window.open(url, "_blank", "noopener,noreferrer");
   };
 
   const handleExportToExcel = async () => {

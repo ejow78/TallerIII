@@ -45,6 +45,79 @@ export const saveLocalUser = (userObj) => {
   }
 };
 
+// ==========================================
+// CACHÉ EN MEMORIA CENTRALIZADO CON SWR
+// ==========================================
+class MemoryCache {
+  constructor() {
+    this.store = new Map();
+    this.inFlight = new Map();
+  }
+
+  get(key) {
+    const entry = this.store.get(key);
+    return entry ? entry.data : null;
+  }
+
+  has(key) {
+    return this.store.has(key);
+  }
+
+  set(key, data, ttl = 60000) {
+    this.store.set(key, { data, expiresAt: Date.now() + ttl });
+  }
+
+  invalidate(keyPrefix = "") {
+    if (!keyPrefix) {
+      this.store.clear();
+      return;
+    }
+    for (const key of this.store.keys()) {
+      if (key.startsWith(keyPrefix)) {
+        this.store.delete(key);
+      }
+    }
+  }
+
+  async fetch(key, fetcher, options = {}) {
+    const { ttl = 60000, force = false } = options;
+    const entry = this.store.get(key);
+
+    if (entry && !force) {
+      const isFresh = Date.now() < entry.expiresAt;
+      if (isFresh) {
+        return entry.data;
+      }
+      // SWR (Stale-While-Revalidate): devolver datos de memoria y revalidar en background
+      fetcher()
+        .then((fresh) => {
+          this.set(key, fresh, ttl);
+        })
+        .catch(() => {});
+      return entry.data;
+    }
+
+    if (this.inFlight.has(key)) {
+      return this.inFlight.get(key);
+    }
+
+    const promise = (async () => {
+      try {
+        const fresh = await fetcher();
+        this.set(key, fresh, ttl);
+        return fresh;
+      } finally {
+        this.inFlight.delete(key);
+      }
+    })();
+
+    this.inFlight.set(key, promise);
+    return promise;
+  }
+}
+
+export const cache = new MemoryCache();
+
 const mapClient = (client) => {
   if (!client) return null;
   if (typeof client === "string") return { name: "Cliente", _id: client };
@@ -216,115 +289,119 @@ export const api = {
     },
 
     logout: async () => {
+      cache.invalidate();
       await supabase.auth.signOut();
       localStorage.removeItem("repairit_token");
       localStorage.removeItem("repairit_user");
     },
 
-    getProfile: async () => {
+    getProfile: async (options = {}) => {
       let user = getLocalUser();
+      const profileKey = `profile_${user._id || user.id || user.email || "current"}`;
 
-      // Siempre refrescar perfil y organización desde Supabase para mantener el plan sincronizado
-      try {
-        const { data: authData } = await supabase.auth.getUser();
-        if (authData?.user) {
-          const { data: profile } = await supabase
-            .from("profiles")
-            .select("*, organization:organizations(*), venue:venues(*)")
-            .eq("id", authData.user.id)
-            .maybeSingle();
+      return cache.fetch(profileKey, async () => {
+        // Siempre refrescar perfil y organización desde Supabase para mantener el plan sincronizado
+        try {
+          const { data: authData } = await supabase.auth.getUser();
+          if (authData?.user) {
+            const { data: profile } = await supabase
+              .from("profiles")
+              .select("*, organization:organizations(*), venue:venues(*)")
+              .eq("id", authData.user.id)
+              .maybeSingle();
 
-          if (profile) {
-            const normalizedPlan = normalizePlan(
-              profile.organization?.subscription_plan || user.subscriptionPlan
-            );
-            const subStatus =
-              profile.organization?.subscription_status ||
-              user.subscriptionStatus ||
-              "activo";
+            if (profile) {
+              const normalizedPlan = normalizePlan(
+                profile.organization?.subscription_plan || user.subscriptionPlan
+              );
+              const subStatus =
+                profile.organization?.subscription_status ||
+                user.subscriptionStatus ||
+                "activo";
 
-            user = {
-              ...user,
-              _id: profile.id,
-              name: profile.name || user.name,
-              email: authData.user.email || user.email,
-              role: profile.role || user.role,
-              subscriptionPlan: normalizedPlan,
-              subscriptionStatus: subStatus,
-              organizationId: profile.organization_id || user.organizationId,
-              venueId: profile.venue_id || user.venueId,
-            };
-            saveLocalUser(user);
+              user = {
+                ...user,
+                _id: profile.id,
+                name: profile.name || user.name,
+                email: authData.user.email || user.email,
+                role: profile.role || user.role,
+                subscriptionPlan: normalizedPlan,
+                subscriptionStatus: subStatus,
+                organizationId: profile.organization_id || user.organizationId,
+                venueId: profile.venue_id || user.venueId,
+              };
+              saveLocalUser(user);
+            }
           }
+        } catch (e) {
+          console.error("Error al sincronizar perfil:", e);
         }
-      } catch (e) {
-        console.error("Error al sincronizar perfil:", e);
-      }
 
-      if (!user.venueId || user.venueId === "undefined") {
-        return {
-          name: "Sucursal Central",
-          address: "Av. Sarmiento 1234, San Miguel de Tucumán [Horario: Lunes a Viernes de 9:00 a 18:00 hs • Sábados de 9:00 a 13:00 hs]",
-          phone: "+54 381 4223344",
-          email: "central@repairit.cloud",
-          subscriptionPlan: normalizePlan(user.subscriptionPlan),
-          subscriptionStatus: user.subscriptionStatus || "activo",
-        };
-      }
+        if (!user.venueId || user.venueId === "undefined") {
+          return {
+            name: "Sucursal Central",
+            address: "Av. Sarmiento 1234, San Miguel de Tucumán [Horario: Lunes a Viernes de 9:00 a 18:00 hs • Sábados de 9:00 a 13:00 hs]",
+            phone: "+54 381 4223344",
+            email: "central@repairit.cloud",
+            subscriptionPlan: normalizePlan(user.subscriptionPlan),
+            subscriptionStatus: user.subscriptionStatus || "activo",
+          };
+        }
 
-      const { data, error } = await supabase
-        .from("venues")
-        .select("*, organization:organizations(id, name, subscription_plan, subscription_status)")
-        .eq("id", user.venueId)
-        .maybeSingle();
+        const { data, error } = await supabase
+          .from("venues")
+          .select("*, organization:organizations(id, name, subscription_plan, subscription_status)")
+          .eq("id", user.venueId)
+          .maybeSingle();
 
-      if (error || !data) {
-        return {
-          name: "Sucursal Central",
-          address: "Av. Sarmiento 1234, San Miguel de Tucumán [Horario: Lunes a Viernes de 9:00 a 18:00 hs • Sábados de 9:00 a 13:00 hs]",
-          phone: "+54 381 4223344",
-          email: "central@repairit.cloud",
-          subscriptionPlan: normalizePlan(user.subscriptionPlan),
-          subscriptionStatus: user.subscriptionStatus || "activo",
-        };
-      }
+        if (error || !data) {
+          return {
+            name: "Sucursal Central",
+            address: "Av. Sarmiento 1234, San Miguel de Tucumán [Horario: Lunes a Viernes de 9:00 a 18:00 hs • Sábados de 9:00 a 13:00 hs]",
+            phone: "+54 381 4223344",
+            email: "central@repairit.cloud",
+            subscriptionPlan: normalizePlan(user.subscriptionPlan),
+            subscriptionStatus: user.subscriptionStatus || "activo",
+          };
+        }
 
-      const finalPlan = normalizePlan(
-        data.organization?.subscription_plan || user.subscriptionPlan
-      );
-      const finalStatus =
-        data.organization?.subscription_status || user.subscriptionStatus || "activo";
-
-      if (user.role !== "superadmin" && (finalStatus === "suspendido" || finalStatus === "vencido")) {
-        await supabase.auth.signOut();
-        sessionStorage.clear();
-        localStorage.clear();
-        window.location.href = "/login?error=" + encodeURIComponent(
-          finalStatus === "suspendido"
-            ? "Tu cuenta de taller se encuentra suspendida."
-            : "La licencia de tu taller está vencida. Requiere renovación para operar."
+        const finalPlan = normalizePlan(
+          data.organization?.subscription_plan || user.subscriptionPlan
         );
-        throw new Error(
-          finalStatus === "suspendido"
-            ? "Tu cuenta de taller se encuentra suspendida."
-            : "La licencia de tu taller está vencida. Requiere renovación."
-        );
-      }
+        const finalStatus =
+          data.organization?.subscription_status || user.subscriptionStatus || "activo";
 
-      if (user.subscriptionPlan !== finalPlan || user.subscriptionStatus !== finalStatus) {
-        saveLocalUser({
-          ...user,
+        if (user.role !== "superadmin" && (finalStatus === "suspendido" || finalStatus === "vencido")) {
+          await supabase.auth.signOut();
+          sessionStorage.clear();
+          localStorage.clear();
+          window.location.href = "/login?error=" + encodeURIComponent(
+            finalStatus === "suspendido"
+              ? "Tu cuenta de taller se encuentra suspendida."
+              : "La licencia de tu taller está vencida. Requiere renovación para operar."
+          );
+          throw new Error(
+            finalStatus === "suspendido"
+              ? "Tu cuenta de taller se encuentra suspendida."
+              : "La licencia de tu taller está vencida. Requiere renovación."
+          );
+        }
+
+        if (user.subscriptionPlan !== finalPlan || user.subscriptionStatus !== finalStatus) {
+          saveLocalUser({
+            ...user,
+            subscriptionPlan: finalPlan,
+            subscriptionStatus: finalStatus,
+          });
+        }
+
+        return {
+          ...data,
+          _id: data.id,
           subscriptionPlan: finalPlan,
           subscriptionStatus: finalStatus,
-        });
-      }
-
-      return {
-        ...data,
-        _id: data.id,
-        subscriptionPlan: finalPlan,
-        subscriptionStatus: finalStatus,
-      };
+        };
+      }, { ttl: 30000, ...options });
     },
 
     updateProfile: async (profileData) => {
@@ -344,10 +421,11 @@ export const api = {
         .single();
 
       if (error) throw new Error(error.message);
+      cache.invalidate("profile_");
       return { ...data, _id: data.id };
     },
 
-    getVenues: async () => {
+    getVenues: async (options = {}) => {
       let user = getLocalUser();
       if (!user.organizationId || user.organizationId === "undefined") {
         try {
@@ -368,14 +446,17 @@ export const api = {
       }
 
       if (!user.organizationId) return [];
+      const cacheKey = `venues_${user.organizationId}`;
 
-      const { data, error } = await supabase
-        .from("venues")
-        .select("*")
-        .eq("organization_id", user.organizationId);
+      return cache.fetch(cacheKey, async () => {
+        const { data, error } = await supabase
+          .from("venues")
+          .select("*")
+          .eq("organization_id", user.organizationId);
 
-      if (error || !data) return [];
-      return data.map((v) => ({ ...v, _id: v.id }));
+        if (error || !data) return [];
+        return data.map((v) => ({ ...v, _id: v.id }));
+      }, { ttl: 60000, ...options });
     },
 
     createVenue: async (venueData) => {
@@ -396,6 +477,7 @@ export const api = {
         .single();
 
       if (error) throw new Error(error.message);
+      cache.invalidate("venues_");
       return { ...data, _id: data.id };
     },
 
@@ -413,6 +495,7 @@ export const api = {
         .single();
 
       if (error) throw new Error(error.message);
+      cache.invalidate("venues_");
       return { ...data, _id: data.id };
     },
 
@@ -438,6 +521,7 @@ export const api = {
         .eq("id", user._id || user.id);
 
       if (error) throw new Error(error.message);
+      cache.invalidate();
 
       return { venueId };
     },
@@ -445,19 +529,22 @@ export const api = {
 
   // Clientes
   clients: {
-    getAll: async () => {
+    getAll: async (options = {}) => {
       const user = getLocalUser();
       if (!user.organizationId || !user.venueId || user.organizationId === "undefined" || user.venueId === "undefined") {
         return [];
       }
-      const { data, error } = await supabase
-        .from("clients")
-        .select("*")
-        .eq("organization_id", user.organizationId)
-        .eq("venue_id", user.venueId);
+      const cacheKey = `clients_${user.organizationId}_${user.venueId}`;
+      return cache.fetch(cacheKey, async () => {
+        const { data, error } = await supabase
+          .from("clients")
+          .select("*")
+          .eq("organization_id", user.organizationId)
+          .eq("venue_id", user.venueId);
 
-      if (error) throw new Error(error.message);
-      return data.map((c) => ({ ...c, _id: c.id }));
+        if (error) throw new Error(error.message);
+        return data.map((c) => ({ ...c, _id: c.id }));
+      }, { ttl: 60000, ...options });
     },
 
     create: async (clientData) => {
@@ -481,6 +568,7 @@ export const api = {
           .select()
           .single();
         if (error) throw new Error(error.message);
+        cache.invalidate("clients_");
         return { ...data, _id: data.id };
       }
 
@@ -496,6 +584,7 @@ export const api = {
         .single();
 
       if (error) throw new Error(error.message);
+      cache.invalidate("clients_");
       return { ...data, _id: data.id };
     },
 
@@ -511,6 +600,7 @@ export const api = {
         .single();
 
       if (error) throw new Error(error.message);
+      cache.invalidate("clients_");
       return { ...data, _id: data.id };
     },
 
@@ -527,24 +617,28 @@ export const api = {
         .eq("venue_id", user.venueId);
 
       if (error) throw new Error(error.message);
+      cache.invalidate("clients_");
       return { message: "Cliente eliminado correctamente." };
     },
   },
 
   // Órdenes
   orders: {
-    getAll: async () => {
+    getAll: async (options = {}) => {
       const user = getLocalUser();
       if (!user.venueId || user.venueId === "undefined") return [];
-      const { data, error } = await supabase
-        .from("orders")
-        .select("*, clientId:clients(*), venueId:venues(*)")
-        .eq("venue_id", user.venueId)
-        .order("created_at", { ascending: false, nullsFirst: false });
+      const cacheKey = `orders_${user.venueId}`;
 
-      if (error) throw new Error(error.message);
+      return cache.fetch(cacheKey, async () => {
+        const { data, error } = await supabase
+          .from("orders")
+          .select("*, clientId:clients(*), venueId:venues(*)")
+          .eq("venue_id", user.venueId)
+          .order("created_at", { ascending: false, nullsFirst: false });
 
-      return data.map(mapOrder);
+        if (error) throw new Error(error.message);
+        return data.map(mapOrder);
+      }, { ttl: 45000, ...options });
     },
 
     create: async (orderData) => {
@@ -594,6 +688,7 @@ export const api = {
         .single();
 
       if (error) throw new Error(error.message);
+      cache.invalidate("orders_");
       return mapOrder(data);
     },
 
@@ -613,6 +708,7 @@ export const api = {
         .single();
 
       if (error) throw new Error(error.message);
+      cache.invalidate("orders_");
       return mapOrder(data);
     },
 
@@ -628,6 +724,7 @@ export const api = {
         .eq("venue_id", user.venueId);
 
       if (error) throw new Error(error.message);
+      cache.invalidate("orders_");
       return { message: "Orden eliminada correctamente." };
     },
 
@@ -670,6 +767,7 @@ export const api = {
         .single();
 
       if (error) throw new Error(error.message);
+      cache.invalidate("orders_");
       return mapOrder(data);
     },
 
@@ -715,6 +813,7 @@ export const api = {
         .single();
 
       if (error) throw new Error(error.message);
+      cache.invalidate("orders_");
       return mapOrder(data);
     },
 
@@ -861,22 +960,27 @@ export const api = {
         throw new Error(rpcData.error || "No se pudo aprobar el presupuesto.");
       }
 
+      cache.invalidate("orders_");
       return rpcData;
     },
   },
 
   // Inventario
   inventory: {
-    getAll: async () => {
+    getAll: async (options = {}) => {
       const user = getLocalUser();
       if (!user.venueId || user.venueId === "undefined") return [];
-      const { data, error } = await supabase
-        .from("inventory")
-        .select("*")
-        .eq("venue_id", user.venueId);
+      const cacheKey = `inventory_${user.venueId}`;
 
-      if (error) throw new Error(error.message);
-      return data.map(item => ({ ...item, _id: item.id }));
+      return cache.fetch(cacheKey, async () => {
+        const { data, error } = await supabase
+          .from("inventory")
+          .select("*")
+          .eq("venue_id", user.venueId);
+
+        if (error) throw new Error(error.message);
+        return data.map(item => ({ ...item, _id: item.id }));
+      }, { ttl: 60000, ...options });
     },
 
     create: async (itemData) => {
@@ -901,6 +1005,7 @@ export const api = {
         .single();
 
       if (error) throw new Error(error.message);
+      cache.invalidate("inventory_");
       return { ...data, _id: data.id };
     },
 
@@ -926,6 +1031,7 @@ export const api = {
         .single();
 
       if (error) throw new Error(error.message);
+      cache.invalidate("inventory_");
       return { ...data, _id: data.id };
     },
 
@@ -941,6 +1047,7 @@ export const api = {
         .eq("venue_id", user.venueId);
 
       if (error) throw new Error(error.message);
+      cache.invalidate("inventory_");
       return { message: "Artículo eliminado." };
     },
 
@@ -964,6 +1071,7 @@ export const api = {
         .single();
 
       if (error) throw new Error(error.message);
+      cache.invalidate("inventory_");
       return { ...data, _id: data.id };
     },
 
@@ -982,37 +1090,43 @@ export const api = {
         .upsert(sanitized, { onConflict: "venue_id, code" });
 
       if (error) throw new Error(error.message);
+      cache.invalidate("inventory_");
       return data;
     },
   },
 
   // Ventas de Caja (POS)
   sales: {
-    getAll: async (venueId = null) => {
+    getAll: async (venueId = null, options = {}) => {
       const user = getLocalUser();
-      let query = supabase
-        .from("sales")
-        .select("*, venue:venues(name), profile:profiles(name)");
-      
-      if (venueId && venueId !== "todas") {
-        query = query.eq("venue_id", venueId);
-      } else if (user.role !== "superadmin") {
-        if (user.subscriptionPlan === "Multi-Taller Pro") {
-          query = query.eq("organization_id", user.organizationId);
-        } else {
-          query = query.eq("venue_id", user.venueId);
+      const targetVenue = venueId || user.venueId || "all";
+      const cacheKey = `sales_${targetVenue}`;
+
+      return cache.fetch(cacheKey, async () => {
+        let query = supabase
+          .from("sales")
+          .select("*, venue:venues(name), profile:profiles(name)");
+        
+        if (venueId && venueId !== "todas") {
+          query = query.eq("venue_id", venueId);
+        } else if (user.role !== "superadmin") {
+          if (user.subscriptionPlan === "Multi-Taller Pro") {
+            query = query.eq("organization_id", user.organizationId);
+          } else {
+            query = query.eq("venue_id", user.venueId);
+          }
         }
-      }
 
-      const { data, error } = await query.order("created_at", { ascending: false });
+        const { data, error } = await query.order("created_at", { ascending: false });
 
-      if (error) throw new Error(error.message);
-      return data.map((s) => ({
-        ...s,
-        _id: s.id,
-        venueName: s.venue?.name || "Desconocida",
-        cajero: s.profile?.name || "Sistema",
-      }));
+        if (error) throw new Error(error.message);
+        return data.map((s) => ({
+          ...s,
+          _id: s.id,
+          venueName: s.venue?.name || "Desconocida",
+          cajero: s.profile?.name || "Sistema",
+        }));
+      }, { ttl: 45000, ...options });
     },
 
     create: async (saleData) => {
@@ -1066,6 +1180,8 @@ export const api = {
         }
       }
 
+      cache.invalidate("sales_");
+      cache.invalidate("inventory_");
       return { ...sale, _id: sale.id };
     },
   },
@@ -1274,24 +1390,28 @@ export const api = {
 
   // Cuentas de Acceso de Venue (Para Administradores)
   venueAccounts: {
-    getAll: async () => {
+    getAll: async (options = {}) => {
       const user = getLocalUser();
       if (user.role === "tecnico") {
         throw new Error("Los técnicos no tienen permisos para gestionar cuentas de acceso.");
       }
       if (!user.organizationId || user.organizationId === "undefined") return [];
-      const { data, error } = await supabase
-        .from("profiles")
-        .select("*, venue:venues(*)")
-        .eq("organization_id", user.organizationId)
-        .eq("role", "tecnico");
+      const cacheKey = `venueAccounts_${user.organizationId}`;
 
-      if (error) throw new Error(error.message);
-      return data.map((p) => ({
-        ...p,
-        _id: p.id,
-        venueId: p.venue ? { ...p.venue, _id: p.venue.id } : null,
-      }));
+      return cache.fetch(cacheKey, async () => {
+        const { data, error } = await supabase
+          .from("profiles")
+          .select("*, venue:venues(*)")
+          .eq("organization_id", user.organizationId)
+          .eq("role", "tecnico");
+
+        if (error) throw new Error(error.message);
+        return data.map((p) => ({
+          ...p,
+          _id: p.id,
+          venueId: p.venue ? { ...p.venue, _id: p.venue.id } : null,
+        }));
+      }, { ttl: 60000, ...options });
     },
 
     create: async (accountData) => {
@@ -1307,6 +1427,7 @@ export const api = {
       });
 
       if (error) throw new Error(error.message);
+      cache.invalidate("venueAccounts_");
       return data;
     },
 
@@ -1320,6 +1441,7 @@ export const api = {
       });
 
       if (error) throw new Error(error.message);
+      cache.invalidate("venueAccounts_");
       return { message: "Cuenta eliminada correctamente." };
     },
   },
