@@ -1489,7 +1489,7 @@ export default function DashboardPage() {
         {/* Card 1: Órdenes Activas */}
         <Card className="bg-card/45 border-border/80 shadow-sm hover:border-primary/30 transition-colors">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-1.5 sm:pb-2 px-3.5 sm:px-6 pt-3.5 sm:pt-6">
-            <span className="text-[10px] sm:text-[11px] font-semibold text-muted-foreground uppercase tracking-wider leading-tight">
+            <span className="text-xs sm:text-[13px] font-bold text-muted-foreground uppercase tracking-wider leading-tight">
               Órdenes Activas
             </span>
             <div className="w-6 h-6 sm:w-7 sm:h-7 rounded-lg bg-primary/10 border border-primary/20 flex items-center justify-center shrink-0">
@@ -1509,7 +1509,7 @@ export default function DashboardPage() {
         {/* Card 2: Equipos Entregados */}
         <Card className="bg-card/45 border-border/80 shadow-sm hover:border-emerald-500/30 transition-colors">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-1.5 sm:pb-2 px-3.5 sm:px-6 pt-3.5 sm:pt-6">
-            <span className="text-[10px] sm:text-[11px] font-semibold text-muted-foreground uppercase tracking-wider leading-tight">
+            <span className="text-xs sm:text-[13px] font-bold text-muted-foreground uppercase tracking-wider leading-tight">
               Equipos Entregados
             </span>
             <div className="w-6 h-6 sm:w-7 sm:h-7 rounded-lg bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center shrink-0">
@@ -1531,7 +1531,7 @@ export default function DashboardPage() {
         {/* Card 3: Balance Operativo (Pro/Multi) o Cupo Mensual (Básico) */}
         <Card className="bg-card/45 border-border/80 shadow-sm hover:border-primary/30 transition-colors">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-1.5 sm:pb-2 px-3.5 sm:px-6 pt-3.5 sm:pt-6">
-            <span className="text-[10px] sm:text-[11px] font-semibold text-muted-foreground uppercase tracking-wider leading-tight">
+            <span className="text-xs sm:text-[13px] font-bold text-muted-foreground uppercase tracking-wider leading-tight">
               {isBasicPlan ? "Cupo Mensual" : "Facturación"}
             </span>
             <div className="w-6 h-6 sm:w-7 sm:h-7 rounded-lg bg-sky-500/10 border border-sky-500/20 flex items-center justify-center shrink-0">
@@ -1576,7 +1576,7 @@ export default function DashboardPage() {
           }
         >
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-1.5 sm:pb-2 px-3.5 sm:px-6 pt-3.5 sm:pt-6">
-            <span className="text-[10px] sm:text-[11px] font-semibold text-muted-foreground uppercase tracking-wider leading-tight">
+            <span className="text-xs sm:text-[13px] font-bold text-muted-foreground uppercase tracking-wider leading-tight">
               Estado de Stock
             </span>
             <div
