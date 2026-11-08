@@ -823,8 +823,17 @@ export default function SuperAdminUsersPage() {
 
       {/* MODAL DE EDICIÓN Y GESTIÓN (Para SuperAdmin) */}
       {showManageModal && selectedUser && (
-        <div className="fixed inset-0 bg-background/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-          <div className="bg-card border border-border rounded-2xl shadow-2xl max-w-md w-full p-6 space-y-4 animate-in fade-in-50 zoom-in-95 duration-150 relative text-left">
+        <div
+          onClick={() => {
+            setShowManageModal(false);
+            setSelectedUser(null);
+          }}
+          className="fixed inset-0 bg-background/80 backdrop-blur-sm z-50 flex items-center justify-center p-4 cursor-pointer"
+        >
+          <div
+            onClick={(e) => e.stopPropagation()}
+            className="bg-card border border-border rounded-2xl shadow-2xl max-w-md w-full p-6 space-y-4 animate-in fade-in-50 zoom-in-95 duration-150 relative text-left cursor-default"
+          >
             <Button
               onClick={() => setShowManageModal(false)}
               variant="ghost"

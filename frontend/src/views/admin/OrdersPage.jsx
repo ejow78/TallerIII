@@ -163,6 +163,20 @@ export default function OrdersPage() {
     loadData();
   }, []);
 
+  // Cerrar modales con la tecla Escape
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if (e.key === "Escape") {
+        setShowDetailModal(false);
+        setShowDiagModal(false);
+        setShowEditReceptionModal(false);
+        setShowChargePosModal(false);
+      }
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, []);
+
   // Abrir Modal de Detalle Completo ("Ojito")
   const handleOpenDetailModal = (order) => {
     setDetailOrder(order);
@@ -171,6 +185,12 @@ export default function OrdersPage() {
 
   // Abrir Modal de Diagnóstico y Presupuesto
   const handleOpenDiagModal = (order) => {
+    if (order.budget?.approved) {
+      toast.info("Presupuesto ya aprobado", {
+        description: "Esta orden ya fue aprobada por el cliente y su diagnóstico no puede ser modificado.",
+      });
+      return;
+    }
     setDiagOrder(order);
     setDiagText(order.diagnosis || "");
     setDiagStatus(order.status === "en_reparacion" ? "reparacion" : order.status || "diagnostico");
@@ -1019,10 +1039,17 @@ export default function OrdersPage() {
                         variant="outline"
                         size="sm"
                         onClick={() => handleOpenDiagModal(o)}
-                        className="flex-1 min-w-0 h-7 sm:h-8 px-2 text-[11px] sm:text-xs font-bold border-primary/30 text-primary hover:bg-primary/10 rounded-lg flex items-center justify-center gap-1 cursor-pointer"
+                        disabled={Boolean(o.budget?.approved)}
+                        className={cn(
+                          "flex-1 min-w-0 h-7 sm:h-8 px-2 text-[11px] sm:text-xs font-bold rounded-lg flex items-center justify-center gap-1",
+                          o.budget?.approved
+                            ? "opacity-50 cursor-not-allowed border-border text-muted-foreground"
+                            : "border-primary/30 text-primary hover:bg-primary/10 cursor-pointer"
+                        )}
+                        title={o.budget?.approved ? "Presupuesto ya aprobado por el cliente" : "Cargar o editar diagnóstico y presupuesto"}
                       >
                         <Stethoscope className="w-3.5 h-3.5 shrink-0" />
-                        <span className="truncate">Diagnóstico</span>
+                        <span className="truncate">{o.budget?.approved ? "Aprobado" : "Diagnóstico"}</span>
                       </Button>
                       <Button
                         variant="outline"
@@ -1322,8 +1349,14 @@ export default function OrdersPage() {
 
       {/* MODAL DE DETALLE COMPLETO DE LA ORDEN ("OJITO") */}
       {showDetailModal && detailOrder && (
-        <div className="fixed inset-0 z-50 bg-background/80 backdrop-blur-sm flex items-center justify-center p-3 sm:p-4">
-          <Card className="bg-card border-border/80 shadow-2xl w-full max-w-2xl max-h-[92vh] flex flex-col overflow-hidden animate-in zoom-in-95 duration-150">
+        <div
+          onClick={() => setShowDetailModal(false)}
+          className="fixed inset-0 z-50 bg-background/80 backdrop-blur-sm flex items-center justify-center p-3 sm:p-4 cursor-pointer"
+        >
+          <Card
+            onClick={(e) => e.stopPropagation()}
+            className="bg-card border-border/80 shadow-2xl w-full max-w-2xl max-h-[92vh] flex flex-col overflow-hidden animate-in zoom-in-95 duration-150 cursor-default"
+          >
             {/* Cabecera del Modal */}
             <CardHeader className="border-b border-border/70 p-4 sm:p-5 flex flex-row items-start justify-between gap-3 shrink-0 bg-muted/15">
               <div className="space-y-1">
@@ -1380,14 +1413,6 @@ export default function OrdersPage() {
                       <User className="w-3.5 h-3.5" />
                       Datos del Cliente
                     </span>
-                    <button
-                      type="button"
-                      onClick={() => handleSendWhatsApp(detailOrder)}
-                      className="text-[10px] font-bold text-emerald-400 hover:underline inline-flex items-center gap-1 cursor-pointer"
-                    >
-                      <MessageCircle className="w-3 h-3" />
-                      WhatsApp
-                    </button>
                   </div>
                   <div className="space-y-1">
                     <p className="text-sm font-bold text-foreground">
@@ -1619,18 +1644,31 @@ export default function OrdersPage() {
                     Portal Público
                   </a>
                 </Button>
-                <Button
-                  type="button"
-                  size="sm"
-                  onClick={() => {
-                    setShowDetailModal(false);
-                    handleOpenDiagModal(detailOrder);
-                  }}
-                  className="h-8 bg-primary hover:bg-primary/90 text-primary-foreground text-xs font-bold rounded-lg flex items-center gap-1.5 cursor-pointer"
-                >
-                  <Stethoscope className="w-3.5 h-3.5" />
-                  Editar Diagnóstico
-                </Button>
+                {!detailOrder.budget?.approved ? (
+                  <Button
+                    type="button"
+                    size="sm"
+                    onClick={() => {
+                      setShowDetailModal(false);
+                      handleOpenDiagModal(detailOrder);
+                    }}
+                    className="h-8 bg-primary hover:bg-primary/90 text-primary-foreground text-xs font-bold rounded-lg flex items-center gap-1.5 cursor-pointer"
+                  >
+                    <Stethoscope className="w-3.5 h-3.5" />
+                    Editar Diagnóstico
+                  </Button>
+                ) : (
+                  <Button
+                    type="button"
+                    size="sm"
+                    disabled
+                    className="h-8 bg-muted text-muted-foreground border border-border/70 text-xs font-semibold rounded-lg flex items-center gap-1.5 cursor-not-allowed opacity-60"
+                    title="El diagnóstico y presupuesto ya fue aprobado por el cliente (bloqueado para modificaciones)"
+                  >
+                    <CheckCircle className="w-3.5 h-3.5 text-emerald-400" />
+                    Presupuesto Aprobado
+                  </Button>
+                )}
               </div>
             </div>
           </Card>
@@ -1639,8 +1677,14 @@ export default function OrdersPage() {
 
       {/* MODAL DE DIAGNÓSTICO Y PRESUPUESTO */}
       {showDiagModal && diagOrder && (
-        <div className="fixed inset-0 z-50 bg-background/80 backdrop-blur-sm flex items-center justify-center p-3 sm:p-4">
-          <Card className="bg-card border-border/80 shadow-2xl w-full max-w-2xl max-h-[92vh] overflow-y-auto animate-in zoom-in-95 duration-150">
+        <div
+          onClick={() => setShowDiagModal(false)}
+          className="fixed inset-0 z-50 bg-background/80 backdrop-blur-sm flex items-center justify-center p-3 sm:p-4 cursor-pointer"
+        >
+          <Card
+            onClick={(e) => e.stopPropagation()}
+            className="bg-card border-border/80 shadow-2xl w-full max-w-2xl max-h-[92vh] overflow-y-auto animate-in zoom-in-95 duration-150 cursor-default"
+          >
             <CardHeader className="border-b border-border pb-4 flex flex-row items-center justify-between">
               <div>
                 <CardTitle className="font-outfit text-lg font-bold text-foreground flex items-center gap-2">
@@ -1896,8 +1940,14 @@ export default function OrdersPage() {
 
       {/* MODAL EDITAR DATOS DE RECEPCIÓN (FEATURE 3) */}
       {showEditReceptionModal && editReceptionOrder && (
-        <div className="fixed inset-0 z-50 bg-background/80 backdrop-blur-sm flex items-center justify-center p-3 sm:p-4">
-          <Card className="bg-card border-border/80 shadow-2xl w-full max-w-lg max-h-[92vh] overflow-y-auto animate-in zoom-in-95 duration-150">
+        <div
+          onClick={() => setShowEditReceptionModal(false)}
+          className="fixed inset-0 z-50 bg-background/80 backdrop-blur-sm flex items-center justify-center p-3 sm:p-4 cursor-pointer"
+        >
+          <Card
+            onClick={(e) => e.stopPropagation()}
+            className="bg-card border-border/80 shadow-2xl w-full max-w-lg max-h-[92vh] overflow-y-auto animate-in zoom-in-95 duration-150 cursor-default"
+          >
             <CardHeader className="border-b border-border pb-4 flex flex-row items-center justify-between">
               <div>
                 <CardTitle className="font-outfit text-lg font-bold text-foreground flex items-center gap-2">
@@ -2023,8 +2073,14 @@ export default function OrdersPage() {
 
       {/* MODAL REGISTRAR COBRO DE ORDEN EN CAJA POS (FEATURE 2) */}
       {showChargePosModal && chargeOrder && (
-        <div className="fixed inset-0 z-50 bg-background/80 backdrop-blur-sm flex items-center justify-center p-3 sm:p-4">
-          <Card className="bg-card border-border/80 shadow-2xl w-full max-w-md overflow-hidden animate-in zoom-in-95 duration-150">
+        <div
+          onClick={() => setShowChargePosModal(false)}
+          className="fixed inset-0 z-50 bg-background/80 backdrop-blur-sm flex items-center justify-center p-3 sm:p-4 cursor-pointer"
+        >
+          <Card
+            onClick={(e) => e.stopPropagation()}
+            className="bg-card border-border/80 shadow-2xl w-full max-w-md overflow-hidden animate-in zoom-in-95 duration-150 cursor-default"
+          >
             <CardHeader className="border-b border-border pb-4 flex flex-row items-center justify-between">
               <div>
                 <CardTitle className="font-outfit text-base sm:text-lg font-bold text-foreground flex items-center gap-2">

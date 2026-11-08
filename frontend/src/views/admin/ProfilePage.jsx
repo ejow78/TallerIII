@@ -404,8 +404,14 @@ export default function ProfilePage() {
 
       {/* MODAL DE SUCURSAL (Creación / Edición) */}
       {showModal && (
-        <div className="fixed inset-0 bg-background/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-          <div className="bg-card border border-border rounded-xl shadow-2xl max-w-md w-full p-6 space-y-4 animate-in fade-in-50 zoom-in-95 duration-150">
+        <div
+          onClick={() => setShowModal(false)}
+          className="fixed inset-0 bg-background/80 backdrop-blur-sm z-50 flex items-center justify-center p-4 cursor-pointer"
+        >
+          <div
+            onClick={(e) => e.stopPropagation()}
+            className="bg-card border border-border rounded-xl shadow-2xl max-w-md w-full p-6 space-y-4 animate-in fade-in-50 zoom-in-95 duration-150 cursor-default"
+          >
             <div className="flex items-center justify-between border-b border-border/50 pb-3">
               <h3 className="font-outfit text-base font-bold text-foreground">
                 {modalMode === "create" ? "Registrar Nueva Sucursal" : "Editar Detalles de Sucursal"}
@@ -501,8 +507,14 @@ export default function ProfilePage() {
 
       {/* MODAL DE PLANES (Comparador de Precios) */}
       {showPlansModal && (
-        <div className="fixed inset-0 bg-background/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-          <div className="bg-card border border-border rounded-xl shadow-2xl max-w-4xl w-full p-6 space-y-6 animate-in fade-in-50 zoom-in-95 duration-150 relative">
+        <div
+          onClick={() => setShowPlansModal(false)}
+          className="fixed inset-0 bg-background/80 backdrop-blur-sm z-50 flex items-center justify-center p-4 cursor-pointer"
+        >
+          <div
+            onClick={(e) => e.stopPropagation()}
+            className="bg-card border border-border rounded-xl shadow-2xl max-w-4xl w-full p-6 space-y-6 animate-in fade-in-50 zoom-in-95 duration-150 relative cursor-default"
+          >
             <Button
               onClick={() => setShowPlansModal(false)}
               variant="ghost"

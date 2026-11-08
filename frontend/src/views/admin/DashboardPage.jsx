@@ -1000,8 +1000,14 @@ export default function DashboardPage() {
 
         {/* MODAL 1: VER DETALLE DE TALLER (SUCURSALES Y CUENTAS) */}
         {viewingOrg && (
-          <div className="fixed inset-0 bg-background/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-            <div className="bg-card border border-border rounded-2xl shadow-2xl max-w-3xl w-full max-h-[88vh] overflow-y-auto p-6 space-y-6 animate-in fade-in-50 zoom-in-95 duration-150 relative text-left">
+          <div
+            onClick={() => setViewingOrg(null)}
+            className="fixed inset-0 bg-background/80 backdrop-blur-sm z-50 flex items-center justify-center p-4 cursor-pointer"
+          >
+            <div
+              onClick={(e) => e.stopPropagation()}
+              className="bg-card border border-border rounded-2xl shadow-2xl max-w-3xl w-full max-h-[88vh] overflow-y-auto p-6 space-y-6 animate-in fade-in-50 zoom-in-95 duration-150 relative text-left cursor-default"
+            >
               <div className="flex items-start justify-between border-b border-border/60 pb-4 gap-4">
                 <div className="space-y-1">
                   <div className="flex items-center gap-2.5 flex-wrap">
@@ -1286,8 +1292,14 @@ export default function DashboardPage() {
 
         {/* MODAL 2: EDITAR TALLER, PLAN Y LICENCIA */}
         {editingOrg && (
-          <div className="fixed inset-0 bg-background/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-            <div className="bg-card border border-border rounded-2xl shadow-2xl max-w-md w-full p-6 space-y-4 animate-in fade-in-50 zoom-in-95 duration-150 relative text-left">
+          <div
+            onClick={() => setEditingOrg(null)}
+            className="fixed inset-0 bg-background/80 backdrop-blur-sm z-50 flex items-center justify-center p-4 cursor-pointer"
+          >
+            <div
+              onClick={(e) => e.stopPropagation()}
+              className="bg-card border border-border rounded-2xl shadow-2xl max-w-md w-full p-6 space-y-4 animate-in fade-in-50 zoom-in-95 duration-150 relative text-left cursor-default"
+            >
               <Button
                 variant="ghost"
                 size="icon"

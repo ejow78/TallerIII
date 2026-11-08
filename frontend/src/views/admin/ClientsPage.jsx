@@ -596,8 +596,14 @@ export default function ClientsPage() {
 
       {/* MODAL CREAR / EDITAR CLIENTE */}
       {showClientModal && (
-        <div className="fixed inset-0 z-50 bg-background/80 backdrop-blur-sm flex items-center justify-center p-3 sm:p-4">
-          <Card className="bg-card border-border/80 shadow-2xl max-w-md w-full p-5 sm:p-6 space-y-4 animate-in zoom-in-95 duration-150 relative">
+        <div
+          onClick={() => setShowClientModal(false)}
+          className="fixed inset-0 z-50 bg-background/80 backdrop-blur-sm flex items-center justify-center p-3 sm:p-4 cursor-pointer"
+        >
+          <Card
+            onClick={(e) => e.stopPropagation()}
+            className="bg-card border-border/80 shadow-2xl max-w-md w-full p-5 sm:p-6 space-y-4 animate-in zoom-in-95 duration-150 relative cursor-default"
+          >
             <div className="flex items-start justify-between border-b border-border/60 pb-3">
               <div className="space-y-0.5 text-left">
                 <CardTitle className="font-outfit text-base sm:text-lg font-bold text-foreground flex items-center gap-2">
@@ -724,8 +730,17 @@ export default function ClientsPage() {
 
       {/* Modal / Diálogo para visualización de Órdenes del Cliente */}
       {showOrdersModal && selectedClientForOrders && (
-        <div className="fixed inset-0 z-50 bg-background/80 backdrop-blur-sm flex items-center justify-center p-3 sm:p-4">
-          <Card className="bg-card border-border/80 max-w-2xl w-full max-h-[85vh] overflow-y-auto shadow-2xl p-4 sm:p-6 space-y-4 animate-in zoom-in-95 duration-150">
+        <div
+          onClick={() => {
+            setShowOrdersModal(false);
+            setSelectedClientForOrders(null);
+          }}
+          className="fixed inset-0 z-50 bg-background/80 backdrop-blur-sm flex items-center justify-center p-3 sm:p-4 cursor-pointer"
+        >
+          <Card
+            onClick={(e) => e.stopPropagation()}
+            className="bg-card border-border/80 max-w-2xl w-full max-h-[85vh] overflow-y-auto shadow-2xl p-4 sm:p-6 space-y-4 animate-in zoom-in-95 duration-150 cursor-default"
+          >
             <div className="flex items-center justify-between border-b border-border/60 pb-3">
               <div className="space-y-1 text-left">
                 <CardTitle className="font-outfit text-base font-bold text-foreground flex items-center gap-2 border-0 pb-0">
