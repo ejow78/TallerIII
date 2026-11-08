@@ -162,20 +162,13 @@ export default function LandingPage() {
   return (
     <div className="flex-grow flex flex-col">
       {/* Sección Hero Split con Ventana en Perspectiva 3D */}
-      <section className="relative py-12 lg:py-16 px-6 flex items-center justify-center overflow-hidden min-h-[calc(100vh-4rem)]">
-        {/* Glow Ambiental */}
-        <div className="absolute top-1/2 left-1/3 -translate-x-1/2 -translate-y-1/2 w-[550px] h-[350px] bg-primary/10 rounded-full blur-[120px] pointer-events-none" />
-        <div className="absolute top-1/2 right-1/4 translate-x-1/3 -translate-y-1/2 w-[480px] h-[380px] bg-primary/15 rounded-full blur-[130px] pointer-events-none" />
+      <section className="relative py-12 lg:py-16 px-6 flex items-center justify-center overflow-hidden min-h-[calc(100vh-4rem)] bg-[linear-gradient(to_right,rgba(255,255,255,0.025)_1px,transparent_1px),linear-gradient(to_bottom,rgba(255,255,255,0.025)_1px,transparent_1px)] bg-[size:48px_48px]">
 
         <div className="relative z-10 max-w-[1380px] w-full mx-auto grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-10 items-center">
           {/* Columna Izquierda: Propuesta de Valor & CTA */}
           <div className="lg:col-span-5 text-center lg:text-left space-y-6">
             <h1 className="font-outfit text-4xl sm:text-5xl lg:text-[58px] xl:text-[62px] font-extrabold text-foreground tracking-tight leading-[1.06]">
-              Tu taller técnico, más{" "}
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-sky-400">
-                transparente
-              </span>{" "}
-              que nunca
+              Tu taller, todas tus operaciones en un solo lugar
             </h1>
 
             <p className="text-muted-foreground text-sm sm:text-base max-w-lg mx-auto lg:mx-0 font-light leading-relaxed">
@@ -405,13 +398,8 @@ export default function LandingPage() {
               </CardFooter>
             </Card>
 
-            {/* Tier 2: Taller Pro (Highlighted/Popular) */}
-            <Card className="pricing-card w-[84vw] max-w-[340px] shrink-0 snap-center md:w-auto md:max-w-none md:shrink flex flex-col justify-between min-h-[480px] overflow-visible bg-card/60 border-primary/50 hover:border-primary transition-all duration-200 hover:-translate-y-1 relative ring-1 ring-primary/20 shadow-lg shadow-primary/5">
-              <div className="absolute -top-3 left-1/2 -translate-x-1/2 z-10">
-                <Badge className="bg-primary hover:bg-primary text-primary-foreground font-semibold text-[10px] uppercase tracking-wider px-2.5 py-0.5">
-                  Más Popular
-                </Badge>
-              </div>
+            {/* Tier 2: Taller Pro */}
+            <Card className="pricing-card w-[84vw] max-w-[340px] shrink-0 snap-center md:w-auto md:max-w-none md:shrink flex flex-col justify-between min-h-[480px] overflow-visible bg-card/45 border-border/60 hover:border-border transition-all duration-200 hover:-translate-y-1">
               <CardHeader className="space-y-2">
                 <CardTitle className="font-outfit text-xl font-bold text-foreground">Taller Pro</CardTitle>
                 <CardDescription className="text-xs text-muted-foreground font-light">
@@ -447,10 +435,11 @@ export default function LandingPage() {
                   </li>
                 </ul>
               </CardContent>
-              <CardFooter className="pt-4 border-t border-border/30 bg-primary/5">
+              <CardFooter className="pt-4 border-t border-border/30 bg-muted/20">
                 <Button
                   asChild
-                  className="w-full bg-primary hover:bg-primary/90 text-primary-foreground font-bold py-2 rounded-lg cursor-pointer"
+                  className="w-full bg-secondary hover:bg-secondary/90 text-secondary-foreground font-semibold py-2 rounded-lg cursor-pointer"
+                  variant="outline"
                 >
                   <a href={registerUrl}>Suscribirse Ahora</a>
                 </Button>

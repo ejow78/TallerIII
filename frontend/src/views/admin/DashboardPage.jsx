@@ -29,6 +29,7 @@ import {
 } from "recharts";
 import {
   AlertCircle,
+  AlertTriangle,
   PackageCheck,
   Wrench,
   ArrowUpRight,
@@ -87,14 +88,38 @@ const statusChartConfig = {
 };
 
 const STATUS_META = {
-  ingresado: { label: "Ingresado", color: "#94a3b8", badge: "secondary" },
-  diagnostico: { label: "En Diagnóstico", color: "#f59e0b", badge: "outline" },
-  presupuestado: { label: "Presupuestado", color: "#a855f7", badge: "outline" },
-  en_reparacion: { label: "En Reparación", color: "#38bdf8", badge: "default" },
-  reparacion: { label: "En Reparación", color: "#38bdf8", badge: "default" },
-  listo: { label: "Listo p/ Retirar", color: "#10b981", badge: "success" },
-  entregado: { label: "Entregado", color: "#059669", badge: "success" },
-  rechazado: { label: "Rechazado", color: "#ef4444", badge: "destructive" },
+  ingresado: {
+    label: "Ingresado",
+    colorClass: "bg-sky-500/10 text-sky-400 border-sky-500/25",
+  },
+  diagnostico: {
+    label: "En Diagnóstico",
+    colorClass: "bg-purple-500/10 text-purple-400 border-purple-500/25",
+  },
+  presupuestado: {
+    label: "Presupuestado",
+    colorClass: "bg-amber-500/10 text-amber-400 border-amber-500/25",
+  },
+  en_reparacion: {
+    label: "En Reparación",
+    colorClass: "bg-indigo-500/10 text-indigo-400 border-indigo-500/25",
+  },
+  reparacion: {
+    label: "En Reparación",
+    colorClass: "bg-indigo-500/10 text-indigo-400 border-indigo-500/25",
+  },
+  listo: {
+    label: "Listo",
+    colorClass: "bg-emerald-500/10 text-emerald-400 border-emerald-500/25",
+  },
+  entregado: {
+    label: "Entregado",
+    colorClass: "bg-muted text-muted-foreground border-border",
+  },
+  rechazado: {
+    label: "Rechazado",
+    colorClass: "bg-red-500/10 text-red-400 border-red-500/25",
+  },
 };
 
 export default function DashboardPage() {
@@ -1422,15 +1447,28 @@ export default function DashboardPage() {
   const totalItemsCount = inventory.length;
   const categoriesCount = new Set(inventory.map((item) => item.category).filter(Boolean)).size;
 
+  const outOfStockItems = isBasicPlan
+    ? []
+    : inventory.filter((item) => (item.quantity || 0) <= 0);
+  const outOfStockCount = outOfStockItems.length;
+
   const lowStockItems = isBasicPlan
     ? []
     : inventory.filter(
-        (item) => item.quantity <= (item.minQuantity || item.min_quantity || 0)
+        (item) =>
+          (item.quantity || 0) > 0 &&
+          (item.quantity || 0) <= (item.minQuantity || item.min_quantity || 0)
       );
   const lowStockCount = lowStockItems.length;
+  const stockHasAlert = outOfStockCount > 0 || lowStockCount > 0;
+  const isCriticalNoStock = outOfStockCount > 0;
+  const allAlertItems = [...outOfStockItems, ...lowStockItems];
+
   const lowStockDetail =
-    !isBasicPlan && lowStockCount > 0
-      ? `${lowStockCount} repuestos requieren reposición`
+    !isBasicPlan && stockHasAlert
+      ? isCriticalNoStock
+        ? `${outOfStockCount} sin stock • ${lowStockCount} por reponer`
+        : `${lowStockCount} repuestos requieren reposición`
       : `${totalItemsCount} insumos en ${categoriesCount} categorías`;
 
   return (
@@ -1530,8 +1568,10 @@ export default function DashboardPage() {
         {/* Card 4: Stock & Alertas */}
         <Card
           className={
-            lowStockCount > 0
+            isCriticalNoStock
               ? "bg-destructive/5 border-destructive/25 shadow-sm"
+              : lowStockCount > 0
+              ? "bg-amber-500/5 border-amber-500/25 shadow-sm"
               : "bg-card/45 border-border/80 shadow-sm"
           }
         >
@@ -1541,13 +1581,17 @@ export default function DashboardPage() {
             </span>
             <div
               className={
-                lowStockCount > 0
+                isCriticalNoStock
                   ? "w-6 h-6 sm:w-7 sm:h-7 rounded-lg bg-destructive/15 border border-destructive/30 flex items-center justify-center shrink-0"
+                  : lowStockCount > 0
+                  ? "w-6 h-6 sm:w-7 sm:h-7 rounded-lg bg-amber-500/15 border border-amber-500/30 flex items-center justify-center shrink-0"
                   : "w-6 h-6 sm:w-7 sm:h-7 rounded-lg bg-muted border border-border flex items-center justify-center shrink-0"
               }
             >
-              {lowStockCount > 0 ? (
+              {isCriticalNoStock ? (
                 <AlertCircle className="h-3 w-3 sm:h-3.5 sm:w-3.5 text-destructive" />
+              ) : lowStockCount > 0 ? (
+                <AlertTriangle className="h-3 w-3 sm:h-3.5 sm:w-3.5 text-amber-400" />
               ) : (
                 <Package className="h-3 w-3 sm:h-3.5 sm:w-3.5 text-muted-foreground" />
               )}
@@ -1556,17 +1600,25 @@ export default function DashboardPage() {
           <CardContent className="px-3.5 sm:px-6 pb-3.5 sm:pb-6">
             <span
               className={
-                lowStockCount > 0
+                isCriticalNoStock
                   ? "text-2xl sm:text-3xl font-outfit font-black text-destructive block"
+                  : lowStockCount > 0
+                  ? "text-2xl sm:text-3xl font-outfit font-black text-amber-400 block"
                   : "text-2xl sm:text-3xl font-outfit font-black text-foreground block"
               }
             >
-              {lowStockCount > 0 ? `${lowStockCount} Alertas` : `${totalItemsCount} Ítems`}
+              {isCriticalNoStock
+                ? `${outOfStockCount + lowStockCount} Alertas`
+                : lowStockCount > 0
+                ? `${lowStockCount} Por Reponer`
+                : `${totalItemsCount} Ítems`}
             </span>
             <span
               className={
-                lowStockCount > 0
+                isCriticalNoStock
                   ? "text-[10px] sm:text-[11px] text-destructive/90 block font-medium mt-1 leading-tight line-clamp-2"
+                  : lowStockCount > 0
+                  ? "text-[10px] sm:text-[11px] text-amber-400/90 block font-medium mt-1 leading-tight line-clamp-2"
                   : "text-[10px] sm:text-[11px] text-muted-foreground block font-medium mt-1 leading-tight line-clamp-2"
               }
             >
@@ -1950,12 +2002,13 @@ export default function DashboardPage() {
                               {o.deviceModel}
                             </td>
                             <td className="py-3 text-right">
-                              <Badge
-                                variant={stMeta.badge}
-                                className="text-[9px] uppercase font-bold py-0.5 px-2 border"
+                              <span
+                                className={`text-[10px] uppercase font-bold py-0.5 px-2.5 rounded-md border inline-block ${
+                                  stMeta.colorClass || "bg-secondary text-secondary-foreground border-border"
+                                }`}
                               >
                                 {stMeta.label}
-                              </Badge>
+                              </span>
                             </td>
                           </tr>
                         );
@@ -2022,32 +2075,49 @@ export default function DashboardPage() {
                   </p>
                 </div>
               </div>
-            ) : lowStockItems.length > 0 ? (
-              lowStockItems.slice(0, 5).map((item) => (
-                <div
-                  key={item._id}
-                  className="rounded-xl bg-destructive/10 border border-destructive/25 text-foreground p-3.5 flex items-start gap-2.5 text-left"
-                >
-                  <AlertCircle className="h-4 w-4 text-destructive shrink-0 mt-0.5" />
-                  <div className="min-w-0 flex-1 space-y-1">
-                    <div className="flex items-start justify-between gap-2">
-                      <span className="text-xs font-bold font-outfit leading-snug text-foreground">
-                        {item.name}
-                      </span>
-                      <Badge
-                        variant="destructive"
-                        className="text-[9px] font-bold py-0.5 px-1.5 uppercase tracking-wider shrink-0 select-none whitespace-nowrap"
-                      >
-                        Stock: {item.quantity}
-                      </Badge>
+            ) : allAlertItems.length > 0 ? (
+              allAlertItems.slice(0, 5).map((item) => {
+                const isZeroStock = (item.quantity || 0) <= 0;
+                return (
+                  <div
+                    key={item._id}
+                    className={`rounded-xl p-3.5 flex items-start gap-2.5 text-left border ${
+                      isZeroStock
+                        ? "bg-destructive/10 border-destructive/25 text-foreground"
+                        : "bg-amber-500/10 border-amber-500/25 text-foreground"
+                    }`}
+                  >
+                    {isZeroStock ? (
+                      <AlertCircle className="h-4 w-4 text-destructive shrink-0 mt-0.5" />
+                    ) : (
+                      <AlertTriangle className="h-4 w-4 text-amber-400 shrink-0 mt-0.5" />
+                    )}
+                    <div className="min-w-0 flex-1 space-y-1">
+                      <div className="flex items-start justify-between gap-2">
+                        <span className="text-xs font-bold font-outfit leading-snug text-foreground">
+                          {item.name}
+                        </span>
+                        {isZeroStock ? (
+                          <Badge
+                            variant="destructive"
+                            className="text-[9px] font-bold py-0.5 px-1.5 uppercase tracking-wider shrink-0 select-none whitespace-nowrap"
+                          >
+                            Stock: 0
+                          </Badge>
+                        ) : (
+                          <span className="text-[9px] font-bold py-0.5 px-1.5 uppercase tracking-wider shrink-0 select-none whitespace-nowrap rounded bg-amber-500/20 text-amber-400 border border-amber-500/30">
+                            Stock: {item.quantity}
+                          </span>
+                        )}
+                      </div>
+                      <p className="text-[11px] text-muted-foreground leading-relaxed">
+                        Mínimo sugerido: {item.minQuantity || item.min_quantity} u. •{" "}
+                        {item.category || "General"}
+                      </p>
                     </div>
-                    <p className="text-[11px] text-muted-foreground leading-relaxed">
-                      Mínimo sugerido: {item.minQuantity || item.min_quantity} u. •{" "}
-                      {item.category || "General"}
-                    </p>
                   </div>
-                </div>
-              ))
+                );
+              })
             ) : (
               <div className="text-center py-10 flex flex-col items-center justify-center h-full">
                 <div className="w-10 h-10 rounded-full bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center mb-3">

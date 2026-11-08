@@ -103,7 +103,7 @@ export default function DashboardLayout() {
 
   const [venues, setVenues] = useState([]);
   const [activeVenue, setActiveVenue] = useState(null);
-  const [sidebarStats, setSidebarStats] = useState({ activeOrders: 0, lowStock: 0, contactMessagesCount: 0 });
+  const [sidebarStats, setSidebarStats] = useState({ activeOrders: 0, lowStock: 0, outOfStock: 0, contactMessagesCount: 0 });
 
   const effectivePlan = normalizePlan(activeVenue?.subscriptionPlan || user.subscriptionPlan);
 
@@ -141,11 +141,16 @@ export default function DashboardLayout() {
           const activeOrders = (ordersData || []).filter(
             (o) => o.status !== "entregado" && o.status !== "rechazado"
           ).length;
+          const outOfStock = (inventoryData || []).filter(
+            (item) => (item.quantity || 0) <= 0
+          ).length;
           const lowStock = (inventoryData || []).filter(
-            (item) => item.quantity <= (item.minQuantity || item.min_quantity || 0)
+            (item) =>
+              (item.quantity || 0) > 0 &&
+              (item.quantity || 0) <= (item.minQuantity || item.min_quantity || 0)
           ).length;
 
-          setSidebarStats({ activeOrders, lowStock });
+          setSidebarStats({ activeOrders, lowStock, outOfStock });
         } catch (err) {
           console.error("Error al cargar datos de navegación:", err.message);
         }
@@ -430,13 +435,21 @@ export default function DashboardLayout() {
                             <span>Inventario de Insumos</span>
                           </NavLink>
                         </SidebarMenuButton>
-                        {hasPOSAccess(effectivePlan) && sidebarStats.lowStock > 0 && (
+                        {hasPOSAccess(effectivePlan) && (sidebarStats.lowStock > 0 || sidebarStats.outOfStock > 0) && (
                           <SidebarMenuBadge
-                            title={`${sidebarStats.lowStock} ítems con bajo stock`}
-                            className="bg-destructive/15 text-destructive border border-destructive/30 rounded-md text-[10px] font-mono font-bold px-1.5 flex items-center gap-0.5"
+                            title={
+                              sidebarStats.outOfStock > 0
+                                ? `${sidebarStats.outOfStock} sin stock • ${sidebarStats.lowStock} bajo stock`
+                                : `${sidebarStats.lowStock} ítems para reposición`
+                            }
+                            className={`rounded-md text-[10px] font-mono font-bold px-1.5 flex items-center gap-1 border ${
+                              sidebarStats.outOfStock > 0
+                                ? "bg-destructive/15 text-destructive border-destructive/30"
+                                : "bg-amber-500/15 text-amber-400 border-amber-500/30"
+                            }`}
                           >
-                            <AlertTriangle className="w-2.5 h-2.5" />
-                            {sidebarStats.lowStock}
+                            <AlertTriangle className={`w-2.5 h-2.5 ${sidebarStats.outOfStock > 0 ? "text-destructive" : "text-amber-400"}`} />
+                            {sidebarStats.outOfStock > 0 ? sidebarStats.outOfStock + sidebarStats.lowStock : sidebarStats.lowStock}
                           </SidebarMenuBadge>
                         )}
                       </SidebarMenuItem>
@@ -545,7 +558,7 @@ export default function DashboardLayout() {
         {/* Área Principal */}
         <SidebarInset className="flex-1 flex flex-col min-w-0 h-dvh max-h-dvh overflow-hidden bg-background">
           {/* Cabecera Superior */}
-          <header className="h-14 sm:h-16 border-b border-border/80 flex items-center justify-between px-3 sm:px-6 bg-card/20 backdrop-blur-sm shrink-0 z-40 gap-2">
+          <header className="sticky top-0 z-50 h-14 sm:h-16 border-b border-border/80 flex items-center justify-between px-3 sm:px-6 bg-background/95 backdrop-blur-md shrink-0 gap-2">
             <div className="flex items-center gap-2 sm:gap-4 min-w-0 flex-1">
               <SidebarTrigger className="text-muted-foreground hover:text-foreground cursor-pointer shrink-0" />
               <Separator orientation="vertical" className="h-4 !self-center shrink-0" />
