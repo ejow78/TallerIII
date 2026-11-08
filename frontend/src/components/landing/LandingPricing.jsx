@@ -182,7 +182,7 @@ export function LandingPricing({
             <button
               key={idx}
               onClick={() => scrollToPlan(idx)}
-              className={`transition-all duration-300 rounded-full cursor-pointer h-2 ${
+              className={`transition-colors duration-200 rounded-full cursor-pointer h-2 ${
                 activePlanIndex === idx
                   ? "w-8 bg-primary"
                   : "w-2 bg-muted-foreground/30 hover:bg-muted-foreground/60"

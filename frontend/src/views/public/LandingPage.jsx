@@ -45,12 +45,24 @@ export default function LandingPage() {
           setActivePlanIndex(1);
         }
       }
-      window.scrollTo(0, 0);
     };
-    const timer = setTimeout(centerProCard, 100);
+
+    let idleId = null;
+    let timerId = null;
+
+    if (typeof window !== "undefined" && "requestIdleCallback" in window) {
+      idleId = window.requestIdleCallback(centerProCard, { timeout: 1500 });
+    } else {
+      timerId = setTimeout(centerProCard, 1000);
+    }
 
     return () => {
-      clearTimeout(timer);
+      if (idleId && typeof window !== "undefined" && "cancelIdleCallback" in window) {
+        window.cancelIdleCallback(idleId);
+      }
+      if (timerId) {
+        clearTimeout(timerId);
+      }
     };
   }, []);
 
