@@ -263,7 +263,6 @@ export default function TrackingPage() {
     ? STEPS.findIndex(s => s.key === statusKey || (s.key === "reparacion" && statusKey === "en_reparacion")) 
     : 0;
   const currentStepIndex = foundIndex >= 0 ? foundIndex : 0;
-  const isEntregado = statusKey === "entregado";
 
   // Ícono dinámico del dispositivo
   const getDeviceIcon = (type = "") => {
@@ -292,8 +291,8 @@ export default function TrackingPage() {
             <Skeleton className="h-56 w-full rounded-2xl" />
           </div>
           <div className="space-y-6">
-            <Skeleton className="h-44 w-full rounded-2xl" />
             <Skeleton className="h-60 w-full rounded-2xl" />
+            <Skeleton className="h-44 w-full rounded-2xl" />
           </div>
         </div>
       </div>
@@ -338,10 +337,10 @@ export default function TrackingPage() {
         </Link>
       </div>
 
-      {/* BENTO HERO: Tarjeta Principal del Dispositivo, Acciones y Estados */}
+      {/* BENTO HERO: Tarjeta Principal del Dispositivo, Acción de Descarga y Estados */}
       <Card className="bg-card/50 backdrop-blur-md border-border/70 p-5 sm:p-6 rounded-2xl shadow-sm space-y-6">
         
-        {/* Fila Superior: Datos de la orden, botón de descarga y estado */}
+        {/* Fila Superior: Datos de la orden y botón de descarga */}
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 border-b border-border/50 pb-5">
           <div className="flex items-center gap-3.5">
             <div className="w-12 h-12 rounded-2xl bg-primary/10 border border-primary/20 flex items-center justify-center text-primary shrink-0 shadow-inner">
@@ -375,8 +374,8 @@ export default function TrackingPage() {
             </div>
           </div>
 
-          {/* Acciones Superiores: Botón Descargar Comprobante y Badge de Estado */}
-          <div className="flex flex-wrap items-center gap-2.5 self-start sm:self-auto">
+          {/* Acción Superior: Botón Descargar Comprobante */}
+          <div className="self-start sm:self-auto">
             <Button
               variant="outline"
               size="sm"
@@ -386,22 +385,6 @@ export default function TrackingPage() {
               <Download className="w-3.5 h-3.5 text-primary" />
               <span>Descargar Comprobante</span>
             </Button>
-
-            <Badge
-              variant="outline"
-              className={cn(
-                "text-xs font-bold px-3.5 h-9 uppercase tracking-wider rounded-xl flex items-center gap-2 shadow-sm",
-                isEntregado
-                  ? "bg-emerald-500/10 text-emerald-400 border-emerald-500/30"
-                  : "bg-primary/10 text-primary border-primary/30"
-              )}
-            >
-              <span className={cn(
-                "w-2 h-2 rounded-full",
-                isEntregado ? "bg-emerald-400" : "bg-primary animate-pulse"
-              )} />
-              {STEPS[currentStepIndex]?.label || order.status}
-            </Badge>
           </div>
         </div>
 
@@ -558,70 +541,10 @@ export default function TrackingPage() {
 
         </div>
 
-        {/* COLUMNA DERECHA (1/3): Taller Responsable y Presupuesto */}
+        {/* COLUMNA DERECHA (1/3): Presupuesto Primero (Más Importante) y Taller Responsable */}
         <div className="space-y-6">
 
-          {/* BENTO CARD: Taller Responsable (Arriba y con tamaño compacto y armónico) */}
-          <Card className="bg-card/50 backdrop-blur-md border-border/70 p-5 rounded-2xl shadow-sm space-y-3.5">
-            <div className="flex items-center gap-2.5 border-b border-border/50 pb-3">
-              <div className="w-8 h-8 rounded-lg bg-primary/10 border border-primary/20 flex items-center justify-center text-primary shrink-0">
-                <Store className="w-4 h-4" />
-              </div>
-              <div>
-                <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider block">
-                  Taller Responsable
-                </span>
-                <h3 className="font-outfit text-sm font-bold text-foreground leading-tight">
-                  {venueName}
-                </h3>
-              </div>
-            </div>
-
-            <div className="space-y-3 text-xs">
-              {parsedVenue.address && (
-                <div className="flex items-start gap-2.5">
-                  <MapPin className="w-4 h-4 text-primary shrink-0 mt-0.5" />
-                  <div className="flex-1 min-w-0">
-                    <p className="text-foreground/90 font-medium leading-snug">
-                      {parsedVenue.address}
-                    </p>
-                    <a
-                      href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(parsedVenue.address)}`}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="inline-flex items-center gap-1 text-[11px] text-primary hover:underline font-semibold mt-0.5 cursor-pointer"
-                    >
-                      <span>Ver mapa</span>
-                      <ExternalLink className="w-3 h-3" />
-                    </a>
-                  </div>
-                </div>
-              )}
-
-              {parsedVenue.hours && (
-                <div className="flex items-start gap-2.5 pt-2 border-t border-border/30">
-                  <Clock className="w-4 h-4 text-emerald-400 shrink-0 mt-0.5" />
-                  <p className="text-foreground/80 font-medium leading-snug flex-1">
-                    {parsedVenue.hours}
-                  </p>
-                </div>
-              )}
-
-              {venuePhone && (
-                <div className="flex items-center gap-2.5 pt-2 border-t border-border/30">
-                  <Phone className="w-4 h-4 text-sky-400 shrink-0" />
-                  <a
-                    href={`tel:${venuePhone.replace(/\s+/g, '')}`}
-                    className="text-foreground/90 font-semibold hover:text-primary transition-colors text-xs"
-                  >
-                    {venuePhone}
-                  </a>
-                </div>
-              )}
-            </div>
-          </Card>
-
-          {/* BENTO CARD: Presupuesto Oficial */}
+          {/* BENTO CARD: Presupuesto Oficial (Cotización en Primer Lugar) */}
           <Card className="bg-card/50 backdrop-blur-md border-border/70 p-5 sm:p-6 rounded-2xl shadow-sm space-y-4">
             <div className="flex items-center gap-2.5 border-b border-border/50 pb-3">
               <div className="w-8 h-8 rounded-lg bg-primary/10 border border-primary/20 flex items-center justify-center text-primary shrink-0">
@@ -729,6 +652,66 @@ export default function TrackingPage() {
                 </Badge>
               </div>
             )}
+          </Card>
+
+          {/* BENTO CARD: Taller Responsable / Sucursal (Compacto y debajo de Cotización) */}
+          <Card className="bg-card/50 backdrop-blur-md border-border/70 p-5 rounded-2xl shadow-sm space-y-3.5">
+            <div className="flex items-center gap-2.5 border-b border-border/50 pb-3">
+              <div className="w-8 h-8 rounded-lg bg-primary/10 border border-primary/20 flex items-center justify-center text-primary shrink-0">
+                <Store className="w-4 h-4" />
+              </div>
+              <div>
+                <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider block">
+                  Taller Responsable
+                </span>
+                <h3 className="font-outfit text-sm font-bold text-foreground leading-tight">
+                  {venueName}
+                </h3>
+              </div>
+            </div>
+
+            <div className="space-y-3 text-xs">
+              {parsedVenue.address && (
+                <div className="flex items-start gap-2.5">
+                  <MapPin className="w-4 h-4 text-primary shrink-0 mt-0.5" />
+                  <div className="flex-1 min-w-0">
+                    <p className="text-foreground/90 font-medium leading-snug">
+                      {parsedVenue.address}
+                    </p>
+                    <a
+                      href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(parsedVenue.address)}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center gap-1 text-[11px] text-primary hover:underline font-semibold mt-0.5 cursor-pointer"
+                    >
+                      <span>Ver mapa</span>
+                      <ExternalLink className="w-3 h-3" />
+                    </a>
+                  </div>
+                </div>
+              )}
+
+              {parsedVenue.hours && (
+                <div className="flex items-start gap-2.5 pt-2 border-t border-border/30">
+                  <Clock className="w-4 h-4 text-emerald-400 shrink-0 mt-0.5" />
+                  <p className="text-foreground/80 font-medium leading-snug flex-1">
+                    {parsedVenue.hours}
+                  </p>
+                </div>
+              )}
+
+              {venuePhone && (
+                <div className="flex items-center gap-2.5 pt-2 border-t border-border/30">
+                  <Phone className="w-4 h-4 text-sky-400 shrink-0" />
+                  <a
+                    href={`tel:${venuePhone.replace(/\s+/g, '')}`}
+                    className="text-foreground/90 font-semibold hover:text-primary transition-colors text-xs"
+                  >
+                    {venuePhone}
+                  </a>
+                </div>
+              )}
+            </div>
           </Card>
 
         </div>
