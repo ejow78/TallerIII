@@ -1,175 +1,47 @@
-import { parseVenueAddress, formatVenueAddress } from '@/utils/venueHelper';
-import { useState, useEffect } from "react";
-import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { toast } from "sonner";
-import {
-  Store,
-  Save,
-  Clock,
-  CheckCircle,
-  Plus,
-  Edit,
-  X,
-  RefreshCw,
-} from "lucide-react";
-import { api, normalizePlan, hasMultiTallerAccess, getLocalUser, saveLocalUser } from "@/services/api";
+import { Store } from "lucide-react";
+import { useProfileWorkshop } from "@/components/profile/useProfileWorkshop";
+import { ActiveVenueFormCard } from "@/components/profile/ActiveVenueFormCard";
+import { OrganizationVenuesCard } from "@/components/profile/OrganizationVenuesCard";
+import { SubscriptionCard } from "@/components/profile/SubscriptionCard";
+import { VenueModal } from "@/components/profile/VenueModal";
+import { SubscriptionPlansModal } from "@/components/profile/SubscriptionPlansModal";
 
 export default function ProfilePage() {
-  const initialUser = getLocalUser();
-  const [venueName, setVenueName] = useState("");
-  const [address, setAddress] = useState("");
-  const [hours, setHours] = useState("");
-  const [phone, setPhone] = useState("");
-  const [email, setEmail] = useState("");
-  const [venues, setVenues] = useState([]);
-  const [subscriptionPlan, setSubscriptionPlan] = useState(
-    normalizePlan(initialUser.subscriptionPlan)
-  );
-  const [subscriptionStatus, setSubscriptionStatus] = useState(
-    initialUser.subscriptionStatus || "activo"
-  );
-
-  const [showPlansModal, setShowPlansModal] = useState(false);
-
-  // Estados de Modal de Sucursal
-  const [showModal, setShowModal] = useState(false);
-  const [modalMode, setModalMode] = useState("create"); // "create" o "edit"
-  const [editingVenueId, setEditingVenueId] = useState(null);
-  const [modalName, setModalName] = useState("");
-  const [modalEmail, setModalEmail] = useState("");
-  const [modalPhone, setModalPhone] = useState("");
-  const [modalAddress, setModalAddress] = useState("");
-  const [modalHours, setModalHours] = useState("");
-
-  const fetchProfile = async () => {
-    try {
-      const data = await api.auth.getProfile();
-      setVenueName(data.name || "");
-      const parsedVenueData = parseVenueAddress(data.address || "");
-      setAddress(parsedVenueData.address);
-      setHours(parsedVenueData.hours);
-      setPhone(data.phone || "");
-      setEmail(data.email || "");
-      if (data.subscriptionPlan) {
-        setSubscriptionPlan(normalizePlan(data.subscriptionPlan));
-      }
-      if (data.subscriptionStatus) {
-        setSubscriptionStatus(data.subscriptionStatus);
-      }
-
-      // Cargar todas las sucursales de la organización
-      const venuesData = await api.auth.getVenues();
-      setVenues(venuesData);
-    } catch (error) {
-      toast.error("Error al cargar perfil del taller", {
-        description: error.message || "Por favor, intente nuevamente."
-      });
-    }
-  };
-
-  useEffect(() => {
-    let isMounted = true;
-    const loadProfile = async () => {
-      if (!isMounted) return;
-      await fetchProfile();
-    };
-    loadProfile();
-    return () => {
-      isMounted = false;
-    };
-  }, []);
-
-  const handleSave = async (e) => {
-    e.preventDefault();
-    try {
-      const fullAddress = formatVenueAddress(address, hours);
-      await api.auth.updateProfile({ name: venueName, address: fullAddress, phone, email });
-      toast.success("¡Configuración del Taller Guardada!", {
-        description: `Los datos de la sucursal "${venueName}" han sido actualizados con éxito.`,
-      });
-      fetchProfile();
-    } catch (error) {
-      toast.error("Error al guardar configuración", {
-        description: error.message || "No se pudieron guardar los cambios."
-      });
-    }
-  };
-
-  const handleOpenCreateModal = () => {
-    setModalMode("create");
-    setEditingVenueId(null);
-    setModalName("");
-    setModalEmail("");
-    setModalPhone("");
-    setModalAddress("");
-    setModalHours("");
-    setShowModal(true);
-  };
-
-  const handleOpenEditModal = (venue) => {
-    setModalMode("edit");
-    setEditingVenueId(venue._id);
-    setModalName(venue.name || "");
-    setModalEmail(venue.email || "");
-    setModalPhone(venue.phone || "");
-    const parsedModalVenue = parseVenueAddress(venue.address || "");
-    setModalAddress(parsedModalVenue.address);
-    setModalHours(parsedModalVenue.hours);
-    setShowModal(true);
-  };
-
-  const handleModalSubmit = async (e) => {
-    e.preventDefault();
-    try {
-      const fullModalAddress = formatVenueAddress(modalAddress, modalHours);
-      if (modalMode === "create") {
-        await api.auth.createVenue({
-          name: modalName,
-          email: modalEmail,
-          phone: modalPhone,
-          address: fullModalAddress,
-        });
-        toast.success("Nueva sucursal creada con éxito");
-      } else {
-        await api.auth.updateVenue(editingVenueId, {
-          name: modalName,
-          email: modalEmail,
-          phone: modalPhone,
-          address: fullModalAddress,
-        });
-        toast.success("Datos de sucursal actualizados con éxito");
-      }
-      setShowModal(false);
-      fetchProfile();
-    } catch (err) {
-      toast.error("Error al procesar la sucursal", { description: err.message });
-    }
-  };
-
-  const handleSwitchActiveVenue = async (venueId) => {
-    try {
-      const updatedUser = await api.auth.switchVenue(venueId);
-      
-      // Actualizar sesión guardada
-      const localUser = getLocalUser();
-      saveLocalUser({ ...localUser, venueId: updatedUser.venueId });
-      
-      toast.success("Sucursal activa cambiada", {
-        description: "El panel de control se actualizará con el contexto de la nueva sucursal."
-      });
-
-      // Forzar reload suave para recargar sidebar, órdenes e inventario
-      setTimeout(() => {
-        window.location.reload();
-      }, 600);
-    } catch (err) {
-      toast.error("Error al cambiar de sucursal", { description: err.message });
-    }
-  };
+  const {
+    venueName,
+    setVenueName,
+    address,
+    setAddress,
+    hours,
+    setHours,
+    phone,
+    setPhone,
+    email,
+    setEmail,
+    venues,
+    subscriptionPlan,
+    subscriptionStatus,
+    showPlansModal,
+    setShowPlansModal,
+    showModal,
+    setShowModal,
+    modalMode,
+    modalName,
+    setModalName,
+    modalEmail,
+    setModalEmail,
+    modalPhone,
+    setModalPhone,
+    modalAddress,
+    setModalAddress,
+    modalHours,
+    setModalHours,
+    handleSave,
+    handleOpenCreateModal,
+    handleOpenEditModal,
+    handleModalSubmit,
+    handleSwitchActiveVenue,
+  } = useProfileWorkshop();
 
   return (
     <div className="space-y-6">
@@ -185,521 +57,64 @@ export default function ProfilePage() {
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-
         {/* Columna Izquierda (2/3): Datos principales del taller */}
         <div className="lg:col-span-2 space-y-6">
-
-          {/* Card 1: Datos de la Sucursal Activa */}
-          <Card className="bg-card/40 border-border p-6 shadow-xl backdrop-blur-sm">
-            <CardHeader className="p-0 pb-5 border-b border-border/50">
-              <CardTitle className="font-outfit text-base font-bold text-foreground flex items-center gap-2 border-0 pb-0">
-                Datos del Establecimiento Activo
-              </CardTitle>
-              <CardDescription className="text-xs text-muted-foreground">
-                Información de contacto que se mostrará en los recibos y el seguimiento del cliente.
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="p-0 pt-6">
-              <form onSubmit={handleSave} className="space-y-4">
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  <div className="space-y-1.5">
-                    <Label htmlFor="venue-name" className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider block">Nombre del Taller</Label>
-                    <Input
-                      id="venue-name"
-                      type="text"
-                      required
-                      value={venueName}
-                      onChange={(e) => setVenueName(e.target.value)}
-                      placeholder="RepairIT Tucumán Centro"
-                      className="bg-background/85 border-border focus-visible:ring-1 focus-visible:ring-primary text-xs"
-                    />
-                  </div>
-                  <div className="space-y-1.5">
-                    <Label htmlFor="venue-email" className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider block">Email de Contacto</Label>
-                    <Input
-                      id="venue-email"
-                      type="email"
-                      inputMode="email"
-                      autoCapitalize="none"
-                      required
-                      value={email}
-                      onChange={(e) => setEmail(e.target.value)}
-                      placeholder="tucuman@repairit.cloud"
-                      className="bg-background/85 border-border focus-visible:ring-1 focus-visible:ring-primary text-xs"
-                    />
-                  </div>
-                </div>
-
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  <div className="space-y-1.5">
-                    <Label htmlFor="venue-phone" className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider block">Teléfono Comercial</Label>
-                    <Input
-                      id="venue-phone"
-                      type="tel"
-                      inputMode="tel"
-                      required
-                      value={phone}
-                      onChange={(e) => setPhone(e.target.value)}
-                      placeholder="+54 381 4223344"
-                      className="bg-background/85 border-border focus-visible:ring-1 focus-visible:ring-primary text-xs"
-                    />
-                  </div>
-                  <div className="space-y-1.5">
-                    <Label htmlFor="venue-address" className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider block">Dirección Física</Label>
-                    <Input
-                      id="venue-address"
-                      type="text"
-                      required
-                      value={address}
-                      onChange={(e) => setAddress(e.target.value)}
-                      placeholder="San Martín 650, San Miguel de Tucumán"
-                      className="bg-background/85 border-border focus-visible:ring-1 focus-visible:ring-primary text-xs"
-                    />
-                  </div>
-                </div>
-
-                <div className="space-y-1.5">
-                  <Label htmlFor="venue-hours" className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider block flex items-center gap-1.5">
-                    <Clock className="w-3.5 h-3.5 text-primary" />
-                    Horarios de Atención
-                  </Label>
-                  <Input
-                    id="venue-hours"
-                    type="text"
-                    value={hours}
-                    onChange={(e) => setHours(e.target.value)}
-                    placeholder="Ej. Lunes a Viernes de 9:00 a 18:00 hs • Sábados de 9:00 a 13:00 hs"
-                    className="bg-background/85 border-border focus-visible:ring-1 focus-visible:ring-primary text-xs"
-                  />
-                  <p className="text-[11px] text-muted-foreground font-light">
-                    Estos horarios se mostrarán a tus clientes en el portal de seguimiento online y en los comprobantes.
-                  </p>
-                </div>
-
-                <div className="flex justify-end pt-2">
-                  <Button
-                    type="submit"
-                    className="bg-primary hover:bg-primary/90 text-primary-foreground font-bold text-xs py-2 px-6 rounded-md transition-all cursor-pointer flex items-center gap-2 select-none"
-                  >
-                    <Save className="w-4 h-4" />
-                    Guardar Cambios
-                  </Button>
-                </div>
-              </form>
-            </CardContent>
-          </Card>
-
-          {/* Card de Sucursales de la Organización */}
-          <Card className="bg-card/30 border-border p-6 shadow-xl backdrop-blur-sm space-y-4">
-            <div className="border-b border-border/50 pb-3 flex items-center justify-between">
-              <div>
-                <CardTitle className="font-outfit text-base font-bold text-foreground">
-                  Sucursales de la Organización
-                </CardTitle>
-                <CardDescription className="text-xs text-muted-foreground mt-1">
-                  Gestioná o alterná las sedes de servicio de tu negocio.
-                </CardDescription>
-              </div>
-              {hasMultiTallerAccess(subscriptionPlan) && (
-                <Button
-                  onClick={handleOpenCreateModal}
-                  className="bg-primary/10 border border-primary/20 hover:bg-primary/20 text-primary text-[10px] font-extrabold uppercase py-1.5 px-3 rounded flex items-center gap-1 shrink-0 cursor-pointer"
-                >
-                  <Plus className="w-3.5 h-3.5" />
-                  Agregar Sucursal
-                </Button>
-              )}
-            </div>
-            <CardContent className="p-0">
-              {!hasMultiTallerAccess(subscriptionPlan) ? (
-                <div className="flex flex-col items-center justify-center py-8 px-4 text-center space-y-3 bg-muted/5 rounded-lg border border-dashed border-border/50">
-                  <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center text-primary">
-                    <Store className="w-5 h-5" />
-                  </div>
-                  <div className="space-y-2 flex flex-col items-center">
-                    <h4 className="font-outfit text-sm font-bold text-foreground">Gestión de Sucursales Limitada</h4>
-                    <p className="text-xs text-muted-foreground max-w-sm font-light leading-relaxed mb-1">
-                      Mejorá tu plan al nivel <span className="text-primary font-semibold">Multi-Taller Pro</span> para poder gestionar y alternar entre múltiples sucursales de tu negocio.
-                    </p>
-                    <Button
-                      onClick={() => setShowPlansModal(true)}
-                      size="sm"
-                      className="bg-primary/20 hover:bg-primary/30 text-primary border border-primary/25 font-bold text-[10px] uppercase py-1.5 px-4 rounded-md cursor-pointer transition-all shrink-0 mt-1"
-                    >
-                      Ver Planes Disponibles
-                    </Button>
-                  </div>
-                </div>
-              ) : venues.length > 0 ? (
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  {venues.map((v) => {
-                    const isActive = v.name === venueName;
-                    return (
-                      <div
-                        key={v._id}
-                        className={`p-4 rounded-lg border text-xs space-y-2 flex flex-col justify-between ${
-                          isActive
-                            ? "bg-primary/5 border-primary/45 shadow-sm"
-                            : "bg-card/20 border-border/50"
-                        }`}
-                      >
-                        <div className="space-y-1">
-                          <div className="flex items-start justify-between gap-2">
-                            <span className="font-bold text-foreground truncate text-sm">{v.name}</span>
-                            {isActive && (
-                              <Badge className="bg-primary/15 text-primary border border-primary/30 text-[8px] font-bold uppercase py-0.5 px-1 shrink-0">
-                                Activa
-                              </Badge>
-                            )}
-                          </div>
-                          {(() => {
-                            const parsed = parseVenueAddress(v.address);
-                            return (
-                              <>
-                                <p className="text-muted-foreground font-light leading-tight">{parsed.address || "Sin dirección"}</p>
-                                {parsed.hours && (
-                                  <p className="text-emerald-400 font-medium text-[11px] flex items-center gap-1">
-                                    <Clock className="w-3 h-3 shrink-0" />
-                                    <span>{parsed.hours}</span>
-                                  </p>
-                                )}
-                              </>
-                            );
-                          })()}
-                          <p className="text-muted-foreground font-mono text-[10px]">Tel: {v.phone}</p>
-                          <p className="text-muted-foreground font-mono text-[10px] truncate">{v.email}</p>
-                        </div>
-
-                        <div className="flex items-center justify-between border-t border-border/25 pt-2.5 mt-1 gap-2">
-                          <Button
-                            onClick={() => handleOpenEditModal(v)}
-                            variant="ghost"
-                            size="sm"
-                            className="h-7 text-xs font-medium text-muted-foreground hover:text-foreground flex items-center gap-1.5 px-2 hover:bg-muted/50 cursor-pointer"
-                          >
-                            <Edit className="w-3.5 h-3.5" />
-                            Editar
-                          </Button>
-
-                          {!isActive && (
-                            <Button
-                              onClick={() => handleSwitchActiveVenue(v._id)}
-                              variant="outline"
-                              size="sm"
-                              className="h-7 text-[10px] font-bold uppercase border-border/60 hover:bg-primary hover:text-primary-foreground hover:border-primary flex items-center gap-1 px-2.5 cursor-pointer"
-                            >
-                              <RefreshCw className="w-3 h-3" />
-                              Activar
-                            </Button>
-                          )}
-                        </div>
-                      </div>
-                    );
-                  })}
-                </div>
-              ) : (
-                <div className="text-center py-6 text-xs text-muted-foreground font-light">
-                  No hay sucursales adicionales registradas.
-                </div>
-              )}
-            </CardContent>
-          </Card>
-
+          <ActiveVenueFormCard
+            venueName={venueName}
+            setVenueName={setVenueName}
+            email={email}
+            setEmail={setEmail}
+            phone={phone}
+            setPhone={setPhone}
+            address={address}
+            setAddress={setAddress}
+            hours={hours}
+            setHours={setHours}
+            onSubmit={handleSave}
+          />
+          <OrganizationVenuesCard
+            venues={venues}
+            activeVenueName={venueName}
+            subscriptionPlan={subscriptionPlan}
+            onOpenCreateModal={handleOpenCreateModal}
+            onOpenEditModal={handleOpenEditModal}
+            onSwitchActiveVenue={handleSwitchActiveVenue}
+            onOpenPlansModal={() => setShowPlansModal(true)}
+          />
         </div>
 
         {/* Columna Derecha (1/3): Suscripción */}
         <div className="space-y-6">
-
-          {/* Card 2: Suscripción */}
-          <Card className="bg-card/25 border-border p-6 shadow-sm space-y-4">
-            <h3 className="font-outfit text-base font-bold text-foreground border-b border-border pb-3 flex items-center gap-2">
-              Suscripción
-            </h3>
-
-            <div className="space-y-3.5 text-xs font-light">
-              <div className="flex items-center justify-between">
-                <span className="text-muted-foreground">Plan Licenciado</span>
-                <Badge className="bg-primary hover:bg-primary text-primary-foreground text-[10px] font-extrabold uppercase">
-                  {subscriptionPlan || "Taller Básico"}
-                </Badge>
-              </div>
-              <div className="flex items-center justify-between border-t border-border/30 pt-2.5">
-                <span className="text-muted-foreground">Vencimiento</span>
-                <span className="text-foreground font-mono font-medium">31/12/2026</span>
-              </div>
-              <div className="flex items-center justify-between border-t border-border/30 pt-2.5">
-                <span className="text-muted-foreground">Estado del Pago</span>
-                <span className={subscriptionStatus === "activo" ? "text-emerald-400 font-bold flex items-center gap-1.5" : "text-destructive font-bold flex items-center gap-1.5"}>
-                  <CheckCircle className={subscriptionStatus === "activo" ? "w-3.5 h-3.5 fill-emerald-400/10" : "w-3.5 h-3.5 fill-destructive/10"} />
-                  {subscriptionStatus === "activo" ? "Al Día" : "Inactivo"}
-                </span>
-              </div>
-            </div>
-
-            <div className="pt-2 border-t border-border/30">
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => setShowPlansModal(true)}
-                className="w-full text-[10px] font-bold uppercase border-border/80 hover:bg-card/50 transition-all cursor-pointer"
-              >
-                Ver / Cambiar Plan
-              </Button>
-            </div>
-          </Card>
-
+          <SubscriptionCard
+            subscriptionPlan={subscriptionPlan}
+            subscriptionStatus={subscriptionStatus}
+            onOpenPlansModal={() => setShowPlansModal(true)}
+          />
         </div>
-
       </div>
 
-      {/* MODAL DE SUCURSAL (Creación / Edición) */}
-      {showModal && (
-        <div
-          onClick={() => setShowModal(false)}
-          className="fixed inset-0 bg-background/80 backdrop-blur-sm z-50 flex items-center justify-center p-4 cursor-pointer"
-        >
-          <div
-            onClick={(e) => e.stopPropagation()}
-            className="bg-card border border-border rounded-xl shadow-2xl max-w-md w-full p-6 space-y-4 animate-in fade-in-50 zoom-in-95 duration-150 cursor-default"
-          >
-            <div className="flex items-center justify-between border-b border-border/50 pb-3">
-              <h3 className="font-outfit text-base font-bold text-foreground">
-                {modalMode === "create" ? "Registrar Nueva Sucursal" : "Editar Detalles de Sucursal"}
-              </h3>
-              <Button
-                variant="ghost"
-                size="icon"
-                onClick={() => setShowModal(false)}
-                className="h-8 w-8 text-muted-foreground hover:text-foreground cursor-pointer"
-              >
-                <X className="w-4 h-4" />
-              </Button>
-            </div>
+      <VenueModal
+        isOpen={showModal}
+        onClose={() => setShowModal(false)}
+        modalMode={modalMode}
+        modalName={modalName}
+        setModalName={setModalName}
+        modalAddress={modalAddress}
+        setModalAddress={setModalAddress}
+        modalHours={modalHours}
+        setModalHours={setModalHours}
+        modalPhone={modalPhone}
+        setModalPhone={setModalPhone}
+        modalEmail={modalEmail}
+        setModalEmail={setModalEmail}
+        onSubmit={handleModalSubmit}
+      />
 
-            <form onSubmit={handleModalSubmit} className="space-y-4">
-              <div className="space-y-1.5">
-                <Label htmlFor="modal-name" className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider block">Nombre del Taller / Sucursal</Label>
-                <Input
-                  id="modal-name"
-                  type="text"
-                  required
-                  value={modalName}
-                  onChange={(e) => setModalName(e.target.value)}
-                  placeholder="Ej. RepairIT - Yerba Buena"
-                  className="bg-background/85 border-border focus-visible:ring-1 focus-visible:ring-primary text-xs"
-                />
-              </div>
-
-              <div className="space-y-1.5">
-                <Label htmlFor="modal-address" className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider block">Dirección Física</Label>
-                <Input
-                  id="modal-address"
-                  type="text"
-                  required
-                  value={modalAddress}
-                  onChange={(e) => setModalAddress(e.target.value)}
-                  placeholder="Ej. Av. Aconquija 1300, Yerba Buena"
-                  className="bg-background/85 border-border focus-visible:ring-1 focus-visible:ring-primary text-xs"
-                />
-              </div>
-
-              <div className="space-y-1.5">
-                <Label htmlFor="modal-hours" className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider block flex items-center gap-1.5">
-                  <Clock className="w-3.5 h-3.5 text-primary" />
-                  Horarios de Atención
-                </Label>
-                <Input
-                  id="modal-hours"
-                  type="text"
-                  value={modalHours}
-                  onChange={(e) => setModalHours(e.target.value)}
-                  placeholder="Ej. Lunes a Viernes de 08:30 a 18:30 hs • Sábados de 09:00 a 13:00 hs"
-                  className="bg-background/85 border-border focus-visible:ring-1 focus-visible:ring-primary text-xs"
-                />
-              </div>
-
-              <div className="grid grid-cols-2 gap-3">
-                <div className="space-y-1.5">
-                  <Label htmlFor="modal-phone" className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider block">Teléfono de Contacto</Label>
-                  <Input
-                    id="modal-phone"
-                    type="tel"
-                    inputMode="tel"
-                    required
-                    value={modalPhone}
-                    onChange={(e) => setModalPhone(e.target.value)}
-                    placeholder="Ej. +54 381 4889900"
-                    className="bg-background/85 border-border focus-visible:ring-1 focus-visible:ring-primary text-xs"
-                  />
-                </div>
-                <div className="space-y-1.5">
-                  <Label htmlFor="modal-email" className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider block">Email Comercial</Label>
-                  <Input
-                    id="modal-email"
-                    type="email"
-                    inputMode="email"
-                    autoCapitalize="none"
-                    required
-                    value={modalEmail}
-                    onChange={(e) => setModalEmail(e.target.value)}
-                    placeholder="Ej. yerbabuena@repairit.cloud"
-                    className="bg-background/85 border-border focus-visible:ring-1 focus-visible:ring-primary text-xs"
-                  />
-                </div>
-              </div>
-
-              <div className="flex justify-end gap-3 pt-2 border-t border-border/40">
-                <Button
-                  type="button"
-                  variant="outline"
-                  onClick={() => setShowModal(false)}
-                  className="text-xs border-border/80 text-muted-foreground hover:text-foreground cursor-pointer"
-                >
-                  Cancelar
-                </Button>
-                <Button
-                  type="submit"
-                  className="bg-primary hover:bg-primary/90 text-primary-foreground font-bold text-xs py-2 px-5 rounded-md cursor-pointer flex items-center gap-1.5"
-                >
-                  <Save className="w-3.5 h-3.5" />
-                  {modalMode === "create" ? "Crear Sucursal" : "Guardar Cambios"}
-                </Button>
-              </div>
-            </form>
-          </div>
-        </div>
-      )}
-
-      {/* MODAL DE PLANES (Comparador de Precios) */}
-      {showPlansModal && (
-        <div
-          onClick={() => setShowPlansModal(false)}
-          className="fixed inset-0 bg-background/80 backdrop-blur-sm z-50 flex items-center justify-center p-4 cursor-pointer"
-        >
-          <div
-            onClick={(e) => e.stopPropagation()}
-            className="bg-card border border-border rounded-xl shadow-2xl max-w-4xl w-full p-6 space-y-6 animate-in fade-in-50 zoom-in-95 duration-150 relative cursor-default"
-          >
-            <Button
-              onClick={() => setShowPlansModal(false)}
-              variant="ghost"
-              size="icon"
-              className="absolute top-4 right-4 text-muted-foreground hover:text-foreground cursor-pointer rounded-full h-8 w-8"
-            >
-              <X className="w-4 h-4" />
-            </Button>
-
-            <div className="text-center space-y-1.5">
-              <h3 className="font-outfit text-xl font-bold text-foreground">
-                Planes de Suscripción RepairIT
-              </h3>
-              <p className="text-xs text-muted-foreground max-w-md mx-auto font-light">
-                Elija el plan que mejor se adapte al tamaño y necesidades de su taller de reparación técnica.
-              </p>
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 pt-2">
-              
-              {/* Plan Básico */}
-              <div className={`border rounded-xl p-5 flex flex-col justify-between space-y-4 transition-all ${
-                subscriptionPlan === "Taller Básico"
-                  ? "border-primary/50 bg-primary/5 ring-1 ring-primary/20"
-                  : "border-border/60 bg-card/25"
-              }`}>
-                <div className="space-y-3">
-                  <div className="flex items-center justify-between">
-                    <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Taller Básico</span>
-                    {subscriptionPlan === "Taller Básico" && (
-                      <Badge className="bg-primary/20 text-primary hover:bg-primary/20 text-[8px] font-bold uppercase border border-primary/30">Activo</Badge>
-                    )}
-                  </div>
-                  <div>
-                    <span className="font-outfit text-2xl font-black text-foreground">$7.500</span>
-                    <span className="text-[10px] text-muted-foreground font-light"> ARS / mes</span>
-                  </div>
-                  <ul className="text-[11px] text-muted-foreground font-light space-y-2 border-t border-border/40 pt-3">
-                    <li className="flex items-center gap-2">✓ 1 Sucursal operativa</li>
-                    <li className="flex items-center gap-2">✓ Hasta 100 órdenes al mes</li>
-                    <li className="flex items-center gap-2">✓ Clientes, stock y comprobantes QR</li>
-                    <li className="flex items-center gap-2 text-muted-foreground/60">✕ Sin Control de Caja (POS)</li>
-                    <li className="flex items-center gap-2 text-muted-foreground/60">✕ Sin Métricas ni Gráficos</li>
-                  </ul>
-                </div>
-              </div>
-
-              {/* Plan Taller Pro */}
-              <div className={`border rounded-xl p-5 flex flex-col justify-between space-y-4 transition-all relative overflow-hidden ${
-                subscriptionPlan === "Taller Pro"
-                  ? "border-primary/50 bg-primary/5 ring-1 ring-primary/20"
-                  : "border-border/60 bg-card/25"
-              }`}>
-                <div className="absolute top-0 right-0 bg-primary text-primary-foreground text-[8px] font-black uppercase py-0.5 px-3 rounded-bl-lg tracking-wider">Popular</div>
-                <div className="space-y-3">
-                  <div className="flex items-center justify-between">
-                    <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Taller Pro</span>
-                    {subscriptionPlan === "Taller Pro" && (
-                      <Badge className="bg-primary/20 text-primary hover:bg-primary/20 text-[8px] font-bold uppercase border border-primary/30">Activo</Badge>
-                    )}
-                  </div>
-                  <div>
-                    <span className="font-outfit text-2xl font-black text-foreground">$14.900</span>
-                    <span className="text-[10px] text-muted-foreground font-light"> ARS / mes</span>
-                  </div>
-                  <ul className="text-[11px] text-muted-foreground font-light space-y-2 border-t border-border/40 pt-3">
-                    <li className="flex items-center gap-2 text-primary font-bold">✓ Órdenes e inventario ilimitados</li>
-                    <li className="flex items-center gap-2 text-primary font-bold">✓ Control de Caja y Punto de Venta (POS)</li>
-                    <li className="flex items-center gap-2 text-foreground font-medium">✓ Métricas y gráficos financieros</li>
-                    <li className="flex items-center gap-2">✓ Alertas de stock y exportación CSV</li>
-                    <li className="flex items-center gap-2">✓ 1 Sucursal operativa completa</li>
-                  </ul>
-                </div>
-              </div>
-
-              {/* Plan Multi-Taller Pro */}
-              <div className={`border rounded-xl p-5 flex flex-col justify-between space-y-4 transition-all ${
-                subscriptionPlan === "Multi-Taller Pro"
-                  ? "border-primary/50 bg-primary/5 ring-1 ring-primary/20"
-                  : "border-border/60 bg-card/25"
-              }`}>
-                <div className="space-y-3">
-                  <div className="flex items-center justify-between">
-                    <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Multi-Taller Pro</span>
-                    {subscriptionPlan === "Multi-Taller Pro" && (
-                      <Badge className="bg-primary/20 text-primary hover:bg-primary/20 text-[8px] font-bold uppercase border border-primary/30">Activo</Badge>
-                    )}
-                  </div>
-                  <div>
-                    <span className="font-outfit text-2xl font-black text-foreground">$29.900</span>
-                    <span className="text-[10px] text-muted-foreground font-light"> ARS / mes</span>
-                  </div>
-                  <ul className="text-[11px] text-muted-foreground font-light space-y-2 border-t border-border/40 pt-3">
-                    <li className="flex items-center gap-2 text-primary font-bold">✓ Gestión de múltiples sucursales</li>
-                    <li className="flex items-center gap-2 text-primary font-bold">✓ Cuentas de acceso para técnicos</li>
-                    <li className="flex items-center gap-2 text-foreground font-medium">✓ Incluye Caja POS y Métricas Pro</li>
-                    <li className="flex items-center gap-2">✓ Órdenes e inventario ilimitados</li>
-                    <li className="flex items-center gap-2">✓ Selector rápido de sede y soporte</li>
-                  </ul>
-                </div>
-              </div>
-
-            </div>
-
-            <div className="text-center pt-2 border-t border-border/40">
-              <Button
-                onClick={() => {
-                  setShowPlansModal(false);
-                  toast.info("Contacto con Soporte", {
-                    description: "Para cambiar su suscripción de taller, por favor comuníquese a soporte@repairit.cloud o con su asesor comercial."
-                  });
-                }}
-                className="bg-primary hover:bg-primary/90 text-primary-foreground font-bold text-xs py-2 px-6 rounded-lg cursor-pointer transition-all shadow-md shadow-primary/15"
-              >
-                Solicitar Cambio de Plan
-              </Button>
-            </div>
-          </div>
-        </div>
-      )}
+      <SubscriptionPlansModal
+        isOpen={showPlansModal}
+        onClose={() => setShowPlansModal(false)}
+        subscriptionPlan={subscriptionPlan}
+      />
     </div>
   );
 }
