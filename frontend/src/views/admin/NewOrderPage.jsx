@@ -14,7 +14,6 @@ import {
   UserCheck,
   Smartphone,
   User,
-  Printer,
   X,
   ArrowLeft,
 } from "lucide-react";
@@ -369,7 +368,7 @@ export default function NewOrderPage() {
                     required
                     value={clientDni}
                     onChange={(e) => setClientDni(e.target.value)}
-                    placeholder="Ej. 38.450.123"
+                    placeholder="Ej. 38450123"
                     className="bg-background/85 border-border focus-visible:ring-1 focus-visible:ring-primary text-xs font-mono h-9 rounded-lg"
                   />
                 </div>
@@ -387,7 +386,7 @@ export default function NewOrderPage() {
                     required
                     value={clientPhone}
                     onChange={(e) => setClientPhone(e.target.value)}
-                    placeholder="+54 381 5551234"
+                    placeholder="Ej. 381 555-1234"
                     className="bg-background/85 border-border focus-visible:ring-1 focus-visible:ring-primary text-xs h-9 rounded-lg"
                   />
                 </div>
@@ -457,12 +456,12 @@ export default function NewOrderPage() {
                   onChange={(e) => setDeviceType(e.target.value)}
                   className="w-full h-9 bg-background/85 border border-border rounded-lg px-3 py-1 text-xs text-foreground focus:outline-none focus:ring-1 focus:ring-primary"
                 >
-                  <option value="Smartphone">Smartphone / Celular</option>
-                  <option value="Notebook">Notebook / Laptop</option>
-                  <option value="Tablet">Tablet / iPad</option>
-                  <option value="PC Escritorio">PC Escritorio / Gamer</option>
-                  <option value="Consola">Consola de Videojuegos</option>
-                  <option value="Monitor / Periférico">Monitor / Impresora</option>
+                  <option value="Smartphone">Smartphone</option>
+                  <option value="Notebook">Notebook</option>
+                  <option value="Tablet">Tablet</option>
+                  <option value="PC Escritorio">PC Escritorio</option>
+                  <option value="Consola">Consola</option>
+                  <option value="Monitor">Monitor</option>
                   <option value="Otro">Otro Dispositivo</option>
                 </select>
               </div>
@@ -479,7 +478,7 @@ export default function NewOrderPage() {
                   required
                   value={deviceModel}
                   onChange={(e) => setDeviceModel(e.target.value)}
-                  placeholder="Ej. iPhone 14 Pro / Lenovo Legion 5"
+                  placeholder="Ej. iPhone 14 Pro, Samsung S23, Lenovo Legion..."
                   className="bg-background/85 border-border focus-visible:ring-1 focus-visible:ring-primary text-xs h-9 rounded-lg"
                 />
               </div>
@@ -498,7 +497,7 @@ export default function NewOrderPage() {
                   type="text"
                   value={accessories}
                   onChange={(e) => setAccessories(e.target.value)}
-                  placeholder="Ej. Cargador original, funda (o vacío si ninguno)"
+                  placeholder="Ej. Cargador, funda (opcional)"
                   className="bg-background/85 border-border focus-visible:ring-1 focus-visible:ring-primary text-xs h-9 rounded-lg"
                 />
               </div>
@@ -514,7 +513,7 @@ export default function NewOrderPage() {
                   type="text"
                   value={cosmeticCondition}
                   onChange={(e) => setCosmeticCondition(e.target.value)}
-                  placeholder="Ej. Rayón en tapa trasera, vidrio templado sano"
+                  placeholder="Ej. Rayón leve en tapa, pantalla impecable"
                   className="bg-background/85 border-border focus-visible:ring-1 focus-visible:ring-primary text-xs h-9 rounded-lg"
                 />
               </div>
@@ -556,22 +555,18 @@ export default function NewOrderPage() {
                 </Label>
               </div>
 
-              <div className="flex items-start sm:items-center space-x-3 bg-primary/5 p-3 rounded-xl border border-primary/20">
+              <div className="hidden sm:flex items-start space-x-2.5 bg-background/50 p-3 rounded-lg border border-border/60">
                 <Checkbox
                   id="auto-print"
                   checked={autoPrint}
                   onCheckedChange={(checked) => setAutoPrint(checked === true)}
-                  className="mt-0.5 sm:mt-0 shrink-0 data-[state=checked]:bg-primary data-[state=checked]:border-primary"
+                  className="mt-0.5 data-[state=checked]:bg-primary data-[state=checked]:border-primary"
                 />
                 <Label
                   htmlFor="auto-print"
-                  className="text-xs font-semibold text-foreground leading-snug cursor-pointer select-none flex-1 min-w-0"
+                  className="text-xs font-normal text-muted-foreground leading-snug cursor-pointer select-none"
                 >
-                  <span className="inline-flex items-center gap-1.5 text-primary mr-1 font-bold">
-                    <Printer className="w-3.5 h-3.5 shrink-0 inline" />
-                    Imprimir Comprobante QR:
-                  </span>
-                  Abrir ventana de comprobante A4 automáticamente al registrar
+                  Abrir ventana para imprimir el comprobante
                 </Label>
               </div>
             </div>
