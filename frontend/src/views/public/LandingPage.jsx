@@ -31,6 +31,8 @@ import {
   Plus,
   Zap,
 } from "lucide-react";
+import { GridPattern } from "@/components/ui/grid-pattern";
+import { cn } from "@/lib/utils";
 
 export default function LandingPage() {
   const [isMobile, setIsMobile] = useState(false);
@@ -179,10 +181,31 @@ export default function LandingPage() {
 
   return (
     <div className="flex-grow flex flex-col">
-      {/* SECCIÓN 1: HERO PRINCIPAL CON TEXTURA DE PRECISIÓN TÉCNICA */}
+      {/* SECCIÓN 1: HERO PRINCIPAL CON TEXTURA GRID PATTERN */}
       <section className="relative py-14 lg:py-20 px-6 flex items-center justify-center overflow-hidden min-h-[calc(100vh-4rem)]">
-        {/* Textura Dot Pattern con desvanecimiento radial de bordes */}
-        <div className="absolute inset-0 bg-[radial-gradient(rgba(255,255,255,0.07)_1px,transparent_1px)] bg-[size:28px_28px] [mask-image:radial-gradient(ellipse_70%_60%_at_50%_35%,#000_65%,transparent_100%)] pointer-events-none" />
+        {/* Fondo GridPattern técnico con desvanecimiento radial */}
+        <GridPattern
+          width={40}
+          height={40}
+          x={-1}
+          y={-1}
+          squares={[
+            [4, 3],
+            [2, 1],
+            [7, 3],
+            [10, 2],
+            [12, 6],
+            [15, 4],
+            [18, 5],
+            [8, 7],
+            [14, 8],
+            [20, 2],
+            [24, 5],
+          ]}
+          className={cn(
+            "stroke-white/[0.07] fill-white/[0.03] [mask-image:radial-gradient(ellipse_80%_70%_at_50%_35%,white,transparent_80%)]",
+          )}
+        />
 
         <div className="relative z-10 max-w-[1380px] w-full mx-auto grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-10 items-center">
           {/* Columna Izquierda: Propuesta de Valor & CTA */}
