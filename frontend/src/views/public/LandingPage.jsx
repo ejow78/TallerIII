@@ -253,18 +253,18 @@ export default function LandingPage() {
               className="group relative w-full max-w-[840px] rounded-xl border border-border/80 bg-card/80 shadow-2xl ring-1 ring-border/50 overflow-hidden select-none cursor-zoom-in transition-all duration-300 hover:border-primary/50 hover:shadow-primary/10 hover:shadow-2xl"
             >
               {/* Barra superior estilo navegador */}
-              <div className="flex items-center justify-between px-3.5 py-2.5 bg-card/95 border-b border-border/70 select-none">
-                <div className="flex items-center gap-1.5">
+              <div className="flex items-center justify-between px-3 sm:px-4 py-2 sm:py-2.5 bg-card/95 border-b border-border/70 select-none">
+                <div className="flex items-center gap-1.5 shrink-0 min-w-[50px] sm:min-w-[60px]">
                   <div className="w-2.5 h-2.5 rounded-full bg-rose-500/70" />
                   <div className="w-2.5 h-2.5 rounded-full bg-amber-500/70" />
                   <div className="w-2.5 h-2.5 rounded-full bg-emerald-500/70" />
                 </div>
-                <div className="flex items-center gap-1.5 px-3 py-0.5 rounded-md bg-background/60 border border-border/50 text-[11px] font-mono text-muted-foreground/80">
-                  <Lock className="w-3 h-3 text-emerald-400" />
-                  <span>app.repairit.cloud/dashboard</span>
+                <div className="flex items-center gap-1.5 px-2.5 sm:px-3 py-0.5 sm:py-1 rounded-md bg-background/60 border border-border/50 text-[10px] sm:text-[11px] font-mono text-muted-foreground/80 whitespace-nowrap overflow-hidden">
+                  <Lock className="w-2.5 h-2.5 sm:w-3 sm:h-3 text-emerald-400 shrink-0" />
+                  <span className="truncate">app.repairit.cloud/dashboard</span>
                 </div>
-                <div className="flex items-center gap-1 text-[11px] font-medium text-primary opacity-0 group-hover:opacity-100 transition-opacity">
-                  <Maximize2 className="w-3 h-3" />
+                <div className="flex items-center justify-end gap-1 text-[11px] font-medium text-primary opacity-0 group-hover:opacity-100 transition-opacity shrink-0 min-w-[50px] sm:min-w-[60px]">
+                  <Maximize2 className="w-3 h-3 shrink-0" />
                   <span className="hidden sm:inline">Ampliar</span>
                 </div>
               </div>
@@ -411,10 +411,10 @@ export default function LandingPage() {
                 </div>
 
                 {/* Stepper horizontal con círculos estilo Tracking */}
-                <div className="grid grid-cols-3 sm:grid-cols-6 gap-3 sm:gap-2 pt-0.5 text-center items-center">
+                <div className="grid grid-cols-3 sm:grid-cols-6 gap-3 sm:gap-2 pt-0.5 text-center items-start">
                   {/* Step 1: Ingresado */}
                   <div className="flex flex-col items-center text-center">
-                    <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-primary/20 text-primary border border-primary/30 flex items-center justify-center text-xs font-bold">
+                    <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-primary/20 text-primary border border-primary/30 flex items-center justify-center text-xs font-bold shrink-0">
                       <CheckCircle2 className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
                     </div>
                     <span className="text-[10px] sm:text-[11px] mt-1.5 leading-tight font-medium text-foreground/90">
@@ -423,7 +423,7 @@ export default function LandingPage() {
                   </div>
                   {/* Step 2: En Diagnóstico */}
                   <div className="flex flex-col items-center text-center">
-                    <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-primary/20 text-primary border border-primary/30 flex items-center justify-center text-xs font-bold">
+                    <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-primary/20 text-primary border border-primary/30 flex items-center justify-center text-xs font-bold shrink-0">
                       <CheckCircle2 className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
                     </div>
                     <span className="text-[10px] sm:text-[11px] mt-1.5 leading-tight font-medium text-foreground/90">
@@ -432,7 +432,7 @@ export default function LandingPage() {
                   </div>
                   {/* Step 3: Presupuestado (Activo con glow primario) */}
                   <div className="flex flex-col items-center text-center">
-                    <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-primary text-primary-foreground font-black flex items-center justify-center text-xs shadow-md shadow-primary/30 ring-2 sm:ring-4 ring-primary/20 scale-105">
+                    <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-primary text-primary-foreground font-black flex items-center justify-center text-xs shadow-md shadow-primary/30 ring-2 sm:ring-4 ring-primary/20 shrink-0">
                       3
                     </div>
                     <span className="text-[10px] sm:text-[11px] mt-1.5 leading-tight font-bold text-primary">
@@ -441,7 +441,7 @@ export default function LandingPage() {
                   </div>
                   {/* Step 4: En Reparación */}
                   <div className="flex flex-col items-center text-center">
-                    <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-muted text-muted-foreground/40 border border-border/40 flex items-center justify-center text-xs font-bold">
+                    <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-muted text-muted-foreground/40 border border-border/40 flex items-center justify-center text-xs font-bold shrink-0">
                       4
                     </div>
                     <span className="text-[10px] sm:text-[11px] mt-1.5 leading-tight font-light text-muted-foreground/60">
@@ -450,7 +450,7 @@ export default function LandingPage() {
                   </div>
                   {/* Step 5: Listo para Retirar */}
                   <div className="flex flex-col items-center text-center">
-                    <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-muted text-muted-foreground/40 border border-border/40 flex items-center justify-center text-xs font-bold">
+                    <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-muted text-muted-foreground/40 border border-border/40 flex items-center justify-center text-xs font-bold shrink-0">
                       5
                     </div>
                     <span className="text-[10px] sm:text-[11px] mt-1.5 leading-tight font-light text-muted-foreground/60">
@@ -459,7 +459,7 @@ export default function LandingPage() {
                   </div>
                   {/* Step 6: Entregado */}
                   <div className="flex flex-col items-center text-center">
-                    <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-muted text-muted-foreground/40 border border-border/40 flex items-center justify-center text-xs font-bold">
+                    <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-muted text-muted-foreground/40 border border-border/40 flex items-center justify-center text-xs font-bold shrink-0">
                       6
                     </div>
                     <span className="text-[10px] sm:text-[11px] mt-1.5 leading-tight font-light text-muted-foreground/60">
