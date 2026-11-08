@@ -35,8 +35,7 @@ import {
   AlertCircle,
   ShieldCheck,
   Download,
-  Phone,
-  ExternalLink
+  Phone
 } from "lucide-react";
 
 // Lista de estados en orden secuencial
@@ -428,14 +427,14 @@ export default function TrackingPage() {
 
       </Card>
 
-      {/* GRID BENTO PRINCIPAL (2 Columnas en Desktop) */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 items-start">
+      {/* GRID BENTO PRINCIPAL (2 Columnas Simétricas en Desktop) */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
 
         {/* COLUMNA IZQUIERDA (2/3): Informe Técnico e Historial */}
-        <div className="md:col-span-2 space-y-6">
+        <div className="md:col-span-2 flex flex-col gap-6">
 
           {/* BENTO CARD: Informe Técnico y Revisión */}
-          <Card className="bg-card/50 backdrop-blur-md border-border/70 p-5 sm:p-6 rounded-2xl shadow-sm space-y-5">
+          <Card className="bg-card/50 backdrop-blur-md border-border/70 p-5 sm:p-6 rounded-2xl shadow-sm space-y-4">
             <div className="flex items-center gap-2.5 border-b border-border/50 pb-3">
               <div className="w-8 h-8 rounded-lg bg-primary/10 border border-primary/20 flex items-center justify-center text-primary shrink-0">
                 <Stethoscope className="w-4 h-4" />
@@ -502,47 +501,49 @@ export default function TrackingPage() {
             </div>
           </Card>
 
-          {/* BENTO CARD: Historial de Movimientos */}
-          <Card className="bg-card/50 backdrop-blur-md border-border/70 p-5 sm:p-6 rounded-2xl shadow-sm space-y-4">
-            <div className="flex items-center gap-2.5 border-b border-border/50 pb-3">
-              <div className="w-8 h-8 rounded-lg bg-primary/10 border border-primary/20 flex items-center justify-center text-primary shrink-0">
-                <Clock className="w-4 h-4" />
+          {/* BENTO CARD: Historial de Movimientos (Alineación simétrica) */}
+          <Card className="bg-card/50 backdrop-blur-md border-border/70 p-5 sm:p-6 rounded-2xl shadow-sm space-y-4 flex-1 flex flex-col justify-between">
+            <div>
+              <div className="flex items-center gap-2.5 border-b border-border/50 pb-3">
+                <div className="w-8 h-8 rounded-lg bg-primary/10 border border-primary/20 flex items-center justify-center text-primary shrink-0">
+                  <Clock className="w-4 h-4" />
+                </div>
+                <div>
+                  <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider block">
+                    Trazabilidad
+                  </span>
+                  <h3 className="font-outfit text-sm font-bold text-foreground leading-tight">
+                    Historial de Movimientos
+                  </h3>
+                </div>
               </div>
-              <div>
-                <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider block">
-                  Trazabilidad
-                </span>
-                <h3 className="font-outfit text-sm font-bold text-foreground leading-tight">
-                  Historial de Movimientos
-                </h3>
-              </div>
-            </div>
 
-            <div className="space-y-3 pt-1">
-              {Array.isArray(order.history) && order.history.length > 0 ? (
-                order.history.map((log, idx) => (
-                  <div
-                    key={idx}
-                    className="flex flex-col sm:flex-row sm:items-baseline gap-1.5 sm:gap-3 text-xs border-b border-border/30 pb-2.5 last:border-0 last:pb-0"
-                  >
-                    <span className="font-mono text-[11px] font-semibold text-muted-foreground shrink-0 bg-muted/30 px-2 py-0.5 rounded border border-border/30 w-fit">
-                      {log.date}
-                    </span>
-                    <p className="text-foreground/90 font-light leading-relaxed">
-                      {log.text}
-                    </p>
-                  </div>
-                ))
-              ) : (
-                <p className="text-xs text-muted-foreground font-light">Sin registros de movimientos.</p>
-              )}
+              <div className="space-y-3 pt-3">
+                {Array.isArray(order.history) && order.history.length > 0 ? (
+                  order.history.map((log, idx) => (
+                    <div
+                      key={idx}
+                      className="flex flex-col sm:flex-row sm:items-baseline gap-1.5 sm:gap-3 text-xs border-b border-border/30 pb-2.5 last:border-0 last:pb-0"
+                    >
+                      <span className="font-mono text-[11px] font-semibold text-muted-foreground shrink-0 bg-muted/30 px-2 py-0.5 rounded border border-border/30 w-fit">
+                        {log.date}
+                      </span>
+                      <p className="text-foreground/90 font-light leading-relaxed">
+                        {log.text}
+                      </p>
+                    </div>
+                  ))
+                ) : (
+                  <p className="text-xs text-muted-foreground font-light">Sin registros de movimientos.</p>
+                )}
+              </div>
             </div>
           </Card>
 
         </div>
 
         {/* COLUMNA DERECHA (1/3): Presupuesto Primero (Más Importante) y Taller Responsable */}
-        <div className="space-y-6">
+        <div className="flex flex-col gap-6">
 
           {/* BENTO CARD: Presupuesto Oficial (Cotización en Primer Lugar) */}
           <Card className="bg-card/50 backdrop-blur-md border-border/70 p-5 sm:p-6 rounded-2xl shadow-sm space-y-4">
@@ -654,63 +655,54 @@ export default function TrackingPage() {
             )}
           </Card>
 
-          {/* BENTO CARD: Taller Responsable / Sucursal (Compacto y debajo de Cotización) */}
-          <Card className="bg-card/50 backdrop-blur-md border-border/70 p-5 rounded-2xl shadow-sm space-y-3.5">
-            <div className="flex items-center gap-2.5 border-b border-border/50 pb-3">
-              <div className="w-8 h-8 rounded-lg bg-primary/10 border border-primary/20 flex items-center justify-center text-primary shrink-0">
-                <Store className="w-4 h-4" />
+          {/* BENTO CARD: Taller Responsable / Sucursal (Alineación simétrica y sin mapa) */}
+          <Card className="bg-card/50 backdrop-blur-md border-border/70 p-5 rounded-2xl shadow-sm space-y-3.5 flex-1 flex flex-col justify-between">
+            <div>
+              <div className="flex items-center gap-2.5 border-b border-border/50 pb-3">
+                <div className="w-8 h-8 rounded-lg bg-primary/10 border border-primary/20 flex items-center justify-center text-primary shrink-0">
+                  <Store className="w-4 h-4" />
+                </div>
+                <div>
+                  <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider block">
+                    Taller Responsable
+                  </span>
+                  <h3 className="font-outfit text-sm font-bold text-foreground leading-tight">
+                    {venueName}
+                  </h3>
+                </div>
               </div>
-              <div>
-                <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider block">
-                  Taller Responsable
-                </span>
-                <h3 className="font-outfit text-sm font-bold text-foreground leading-tight">
-                  {venueName}
-                </h3>
-              </div>
-            </div>
 
-            <div className="space-y-3 text-xs">
-              {parsedVenue.address && (
-                <div className="flex items-start gap-2.5">
-                  <MapPin className="w-4 h-4 text-primary shrink-0 mt-0.5" />
-                  <div className="flex-1 min-w-0">
-                    <p className="text-foreground/90 font-medium leading-snug">
+              <div className="space-y-3 pt-1 text-xs">
+                {parsedVenue.address && (
+                  <div className="flex items-start gap-2.5">
+                    <MapPin className="w-4 h-4 text-primary shrink-0 mt-0.5" />
+                    <p className="text-foreground/90 font-medium leading-relaxed flex-1">
                       {parsedVenue.address}
                     </p>
+                  </div>
+                )}
+
+                {parsedVenue.hours && (
+                  <div className="flex items-start gap-2.5 pt-2 border-t border-border/30">
+                    <Clock className="w-4 h-4 text-emerald-400 shrink-0 mt-0.5" />
+                    <p className="text-foreground/80 font-medium leading-relaxed flex-1">
+                      {parsedVenue.hours}
+                    </p>
+                  </div>
+                )}
+
+                {venuePhone && (
+                  <div className="flex items-center gap-2.5 pt-2 border-t border-border/30">
+                    <Phone className="w-4 h-4 text-sky-400 shrink-0" />
                     <a
-                      href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(parsedVenue.address)}`}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="inline-flex items-center gap-1 text-[11px] text-primary hover:underline font-semibold mt-0.5 cursor-pointer"
+                      href={`tel:${venuePhone.replace(/\s+/g, '')}`}
+                      className="text-foreground/90 font-semibold hover:text-primary transition-colors text-xs"
                     >
-                      <span>Ver mapa</span>
-                      <ExternalLink className="w-3 h-3" />
+                      {venuePhone}
                     </a>
                   </div>
-                </div>
-              )}
-
-              {parsedVenue.hours && (
-                <div className="flex items-start gap-2.5 pt-2 border-t border-border/30">
-                  <Clock className="w-4 h-4 text-emerald-400 shrink-0 mt-0.5" />
-                  <p className="text-foreground/80 font-medium leading-snug flex-1">
-                    {parsedVenue.hours}
-                  </p>
-                </div>
-              )}
-
-              {venuePhone && (
-                <div className="flex items-center gap-2.5 pt-2 border-t border-border/30">
-                  <Phone className="w-4 h-4 text-sky-400 shrink-0" />
-                  <a
-                    href={`tel:${venuePhone.replace(/\s+/g, '')}`}
-                    className="text-foreground/90 font-semibold hover:text-primary transition-colors text-xs"
-                  >
-                    {venuePhone}
-                  </a>
-                </div>
-              )}
+                )}
+              </div>
             </div>
           </Card>
 
