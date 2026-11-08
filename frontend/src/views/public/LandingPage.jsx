@@ -30,12 +30,16 @@ import {
   Minus,
   Plus,
   Zap,
+  Lock,
+  Maximize2,
+  X,
 } from "lucide-react";
 import { GridPattern } from "@/components/ui/grid-pattern";
 import { cn } from "@/lib/utils";
 
 export default function LandingPage() {
   const [isMobile, setIsMobile] = useState(false);
+  const [isDashboardModalOpen, setIsDashboardModalOpen] = useState(false);
   const pricingCarouselRef = useRef(null);
   const [activePlanIndex, setActivePlanIndex] = useState(1); // 0: Inicial, 1: Pro, 2: Multi-Sucursal
 
@@ -73,6 +77,22 @@ export default function LandingPage() {
       clearTimeout(timer);
     };
   }, []);
+
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if (e.key === "Escape") {
+        setIsDashboardModalOpen(false);
+      }
+    };
+    if (isDashboardModalOpen) {
+      window.addEventListener("keydown", handleKeyDown);
+      document.body.style.overflow = "hidden";
+    }
+    return () => {
+      window.removeEventListener("keydown", handleKeyDown);
+      document.body.style.overflow = "unset";
+    };
+  }, [isDashboardModalOpen]);
 
   const scrollToPlan = (index) => {
     if (pricingCarouselRef.current) {
@@ -242,15 +262,44 @@ export default function LandingPage() {
             </div>
           </div>
 
-          {/* Columna Derecha: Captura Real del Panel de Control */}
+          {/* Columna Derecha: Captura Real del Panel de Control con Frame de Navegador & Zoom */}
           <div className="lg:col-span-7 flex items-center justify-center">
-            <div className="relative w-full max-w-[840px] rounded-xl border border-border/80 bg-card/60 shadow-2xl ring-1 ring-border/50 overflow-hidden select-none">
-              <img
-                src="/hero-dashboard.png"
-                alt="Panel de Control de RepairIT con métricas, gráficos e inventario en vivo"
-                className="w-full h-auto block object-cover"
-                loading="eager"
-              />
+            <div
+              onClick={() => setIsDashboardModalOpen(true)}
+              className="group relative w-full max-w-[840px] rounded-xl border border-border/80 bg-card/80 shadow-2xl ring-1 ring-border/50 overflow-hidden select-none cursor-zoom-in transition-all duration-300 hover:border-primary/50 hover:shadow-primary/10 hover:shadow-2xl"
+            >
+              {/* Barra superior estilo navegador */}
+              <div className="flex items-center justify-between px-3.5 py-2.5 bg-card/95 border-b border-border/70 select-none">
+                <div className="flex items-center gap-1.5">
+                  <div className="w-2.5 h-2.5 rounded-full bg-rose-500/70" />
+                  <div className="w-2.5 h-2.5 rounded-full bg-amber-500/70" />
+                  <div className="w-2.5 h-2.5 rounded-full bg-emerald-500/70" />
+                </div>
+                <div className="flex items-center gap-1.5 px-3 py-0.5 rounded-md bg-background/60 border border-border/50 text-[11px] font-mono text-muted-foreground/80">
+                  <Lock className="w-3 h-3 text-emerald-400" />
+                  <span>app.repairit.cloud/dashboard</span>
+                </div>
+                <div className="flex items-center gap-1 text-[11px] font-medium text-primary opacity-0 group-hover:opacity-100 transition-opacity">
+                  <Maximize2 className="w-3 h-3" />
+                  <span className="hidden sm:inline">Ampliar</span>
+                </div>
+              </div>
+
+              {/* Imagen con badge flotante en hover */}
+              <div className="relative">
+                <img
+                  src="/hero-dashboard.png"
+                  alt="Panel de Control de RepairIT con métricas, gráficos e inventario en vivo"
+                  className="w-full h-auto block object-cover"
+                  loading="eager"
+                />
+                <div className="absolute inset-0 bg-background/20 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center pointer-events-none">
+                  <span className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-background/90 text-foreground border border-border/80 text-xs font-semibold shadow-2xl backdrop-blur-md">
+                    <Maximize2 className="w-3.5 h-3.5 text-primary" />
+                    <span>Hacé clic para ver el panel en tamaño completo</span>
+                  </span>
+                </div>
+              </div>
             </div>
           </div>
         </div>
@@ -1026,6 +1075,46 @@ export default function LandingPage() {
           </Card>
         </div>
       </section>
+
+      {/* MODAL LIGHTBOX DE PANTALLA COMPLETA PARA EL DASHBOARD */}
+      {isDashboardModalOpen && (
+        <div
+          role="dialog"
+          aria-modal="true"
+          onClick={() => setIsDashboardModalOpen(false)}
+          className="fixed inset-0 z-50 bg-black/85 backdrop-blur-md flex flex-col items-center justify-center p-3 sm:p-6 animate-fade-in cursor-zoom-out"
+        >
+          {/* Barra de control superior */}
+          <div
+            onClick={(e) => e.stopPropagation()}
+            className="w-full max-w-7xl flex items-center justify-between pb-3 text-foreground cursor-default"
+          >
+            <div className="flex items-center gap-2">
+              <span className="font-outfit font-bold text-sm sm:text-base">Panel de Control de RepairIT</span>
+              <span className="text-[11px] font-mono text-muted-foreground hidden sm:inline">• 1920 × 1080 (Resolución Real)</span>
+            </div>
+            <button
+              onClick={() => setIsDashboardModalOpen(false)}
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-card/80 hover:bg-card border border-border/80 text-xs font-semibold text-foreground transition-colors cursor-pointer"
+            >
+              <X className="w-4 h-4" />
+              <span>Cerrar (Esc)</span>
+            </button>
+          </div>
+
+          {/* Contenedor de la imagen en alta resolución */}
+          <div
+            onClick={(e) => e.stopPropagation()}
+            className="relative max-w-7xl w-full max-h-[88vh] rounded-xl border border-border/80 bg-card/90 shadow-2xl overflow-hidden flex items-center justify-center cursor-default"
+          >
+            <img
+              src="/hero-dashboard.png"
+              alt="Panel de Control de RepairIT ampliado"
+              className="w-full h-auto max-h-[88vh] object-contain block select-none"
+            />
+          </div>
+        </div>
+      )}
     </div>
   );
 }
