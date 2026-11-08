@@ -258,17 +258,18 @@ export default function TrackingPortalPage() {
           </div>
         </Card>
 
-        {/* Ayuda: ¿Dónde encuentro mi código de orden? */}
-        <div className="space-y-3 pt-1">
-          <div className="flex items-center justify-center gap-2 text-xs font-semibold text-muted-foreground">
-            <HelpCircle className="w-3.5 h-3.5 text-primary" />
+        {/* Tarjeta Unificada de Ayuda: ¿Dónde encuentro mi código? */}
+        <Card className="bg-card/40 border-border/60 rounded-2xl p-5 sm:p-6 backdrop-blur-sm space-y-4 shadow-sm">
+          <div className="flex items-center gap-2 text-foreground font-semibold text-xs border-b border-border/40 pb-3">
+            <HelpCircle className="w-4 h-4 text-primary shrink-0" />
             <span>¿Dónde encuentro mi código de orden?</span>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-            <div className="bg-card/40 border border-border/60 rounded-xl p-3.5 space-y-1.5 backdrop-blur-sm">
-              <div className="flex items-center gap-2 text-foreground font-semibold text-xs">
-                <FileText className="w-4 h-4 text-primary shrink-0" />
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 text-xs">
+            {/* Opción 1: Ticket */}
+            <div className="space-y-1">
+              <div className="flex items-center gap-1.5 font-semibold text-foreground">
+                <FileText className="w-3.5 h-3.5 text-primary shrink-0" />
                 <span>Ticket Impreso</span>
               </div>
               <p className="text-[11px] text-muted-foreground font-light leading-relaxed">
@@ -276,9 +277,10 @@ export default function TrackingPortalPage() {
               </p>
             </div>
 
-            <div className="bg-card/40 border border-border/60 rounded-xl p-3.5 space-y-1.5 backdrop-blur-sm">
-              <div className="flex items-center gap-2 text-foreground font-semibold text-xs">
-                <Mail className="w-4 h-4 text-primary shrink-0" />
+            {/* Opción 2: Mensaje */}
+            <div className="space-y-1 sm:border-l sm:border-border/40 sm:pl-4">
+              <div className="flex items-center gap-1.5 font-semibold text-foreground">
+                <Mail className="w-3.5 h-3.5 text-primary shrink-0" />
                 <span>WhatsApp o Email</span>
               </div>
               <p className="text-[11px] text-muted-foreground font-light leading-relaxed">
@@ -286,9 +288,10 @@ export default function TrackingPortalPage() {
               </p>
             </div>
 
-            <div className="bg-card/40 border border-border/60 rounded-xl p-3.5 space-y-1.5 backdrop-blur-sm">
-              <div className="flex items-center gap-2 text-foreground font-semibold text-xs">
-                <QrCode className="w-4 h-4 text-primary shrink-0" />
+            {/* Opción 3: QR */}
+            <div className="space-y-1 sm:border-l sm:border-border/40 sm:pl-4">
+              <div className="flex items-center gap-1.5 font-semibold text-foreground">
+                <QrCode className="w-3.5 h-3.5 text-primary shrink-0" />
                 <span>Código QR</span>
               </div>
               <p className="text-[11px] text-muted-foreground font-light leading-relaxed">
@@ -296,10 +299,10 @@ export default function TrackingPortalPage() {
               </p>
             </div>
           </div>
-        </div>
+        </Card>
 
         {/* Volver al inicio */}
-        <div className="text-center pt-2">
+        <div className="text-center pt-1">
           <a
             href={window.location.hostname.includes("repairit.cloud") ? "https://repairit.cloud" : "/"}
             className="inline-flex items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground font-medium transition-colors"
