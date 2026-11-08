@@ -264,7 +264,7 @@ export const api = {
       if (!user.venueId || user.venueId === "undefined") {
         return {
           name: "Sucursal Central",
-          address: "Av. Sarmiento 1234, San Miguel de Tucumán",
+          address: "Av. Sarmiento 1234, San Miguel de Tucumán [Horario: Lunes a Viernes de 9:00 a 18:00 hs • Sábados de 9:00 a 13:00 hs]",
           phone: "+54 381 4223344",
           email: "central@repairit.cloud",
           subscriptionPlan: normalizePlan(user.subscriptionPlan),
@@ -281,7 +281,7 @@ export const api = {
       if (error || !data) {
         return {
           name: "Sucursal Central",
-          address: "Av. Sarmiento 1234, San Miguel de Tucumán",
+          address: "Av. Sarmiento 1234, San Miguel de Tucumán [Horario: Lunes a Viernes de 9:00 a 18:00 hs • Sábados de 9:00 a 13:00 hs]",
           phone: "+54 381 4223344",
           email: "central@repairit.cloud",
           subscriptionPlan: normalizePlan(user.subscriptionPlan),
@@ -738,7 +738,7 @@ export const api = {
           },
           venueId: {
             name: "Sucursal Central (Demo)",
-            address: "Av. Sarmiento 1234, San Miguel de Tucumán"
+            address: "Av. Sarmiento 1234, San Miguel de Tucumán [Horario: Lunes a Viernes de 9:00 a 18:00 hs • Sábados de 9:00 a 13:00 hs]"
           },
           budget: {
             items: [
@@ -800,7 +800,7 @@ export const api = {
           },
           venueId: {
             name: "Sucursal Central (Demo)",
-            address: "Av. Sarmiento 1234, San Miguel de Tucumán"
+            address: "Av. Sarmiento 1234, San Miguel de Tucumán [Horario: Lunes a Viernes de 9:00 a 18:00 hs • Sábados de 9:00 a 13:00 hs]"
           },
           budget: {
             items: [
