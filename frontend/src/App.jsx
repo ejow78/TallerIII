@@ -65,7 +65,7 @@ export default function App() {
 
           const hash = window.location.hash;
           const isAuthHash = hash.includes("access_token") || hash.includes("refresh_token") || hash.includes("error") || hash.includes("type=");
-          const isAllowedAuthPath = pathname === "/login" || pathname === "/register" || pathname === "/registro" || pathname === "/recuperar-password" || pathname === "/olvide-password" || pathname === "/reset-password";
+          const isAllowedAuthPath = pathname === "/login" || pathname === "/register" || pathname === "/registro" || pathname === "/recover-password" || pathname === "/recuperar-password" || pathname === "/olvide-password" || pathname === "/reset-password";
 
           if ((hash && !isAuthHash) || (!isAllowedAuthPath && !pathname.startsWith("/dashboard"))) {
             const targetPath = isAllowedAuthPath ? "" : pathname;
@@ -283,8 +283,9 @@ export default function App() {
             <Route path="login" element={<LoginPage />} />
             <Route path="register" element={<RegisterPage />} />
             <Route path="registro" element={<Navigate to="/register" replace />} />
-            <Route path="recuperar-password" element={<ForgotPasswordPage />} />
-            <Route path="olvide-password" element={<ForgotPasswordPage />} />
+            <Route path="recover-password" element={<ForgotPasswordPage />} />
+            <Route path="recuperar-password" element={<Navigate to="/recover-password" replace />} />
+            <Route path="olvide-password" element={<Navigate to="/recover-password" replace />} />
             <Route path="reset-password" element={<ResetPasswordPage />} />
             <Route path="privacidad" element={<PrivacyPage />} />
             <Route path="terminos" element={<TermsPage />} />

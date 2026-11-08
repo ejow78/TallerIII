@@ -9,6 +9,7 @@ export default function PublicLayout() {
     "/login", 
     "/register", 
     "/registro", 
+    "/recover-password", 
     "/recuperar-password", 
     "/olvide-password", 
     "/reset-password"
