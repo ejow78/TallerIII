@@ -494,12 +494,9 @@ export default function LandingPage() {
 
                   {/* Sub-card Historial de Movimientos (Trazabilidad en Vivo) */}
                   <div className="p-3 sm:p-3.5 rounded-xl bg-card/60 border border-border/60 flex flex-col justify-between space-y-2">
-                    <div className="flex items-center justify-between border-b border-border/40 pb-1.5">
+                    <div className="flex items-center border-b border-border/40 pb-1.5">
                       <span className="text-[10px] font-bold text-sky-400 uppercase tracking-wider flex items-center gap-1.5">
                         <Clock className="w-3.5 h-3.5" /> Historial de Movimientos
-                      </span>
-                      <span className="flex items-center gap-1 text-[9px] font-mono text-emerald-400 font-semibold bg-emerald-500/10 px-1.5 py-0.5 rounded border border-emerald-500/20">
-                        <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" /> En Vivo
                       </span>
                     </div>
                     <div className="space-y-1.5 text-xs flex-grow">
