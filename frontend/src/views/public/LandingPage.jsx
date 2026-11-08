@@ -197,12 +197,9 @@ export default function LandingPage() {
             </div>
           </div>
 
-          {/* Columna Derecha: Captura Real del Panel de Control en Perspectiva 3D */}
-          <div
-            className="lg:col-span-7 flex items-center justify-center"
-            style={{ perspective: "1300px" }}
-          >
-            <div className="relative w-full max-w-[820px] rounded-xl border border-white/15 bg-[#111113] shadow-[-28px_32px_70px_rgba(0,0,0,0.75)] ring-1 ring-primary/20 transition-transform duration-500 ease-out hover:[transform:rotateY(-4deg)_rotateX(1.5deg)_scale(1.01)] lg:[transform:rotateY(-13deg)_rotateX(5deg)_rotateZ(0.5deg)] overflow-hidden select-none">
+          {/* Columna Derecha: Captura Real del Panel de Control */}
+          <div className="lg:col-span-7 flex items-center justify-center">
+            <div className="relative w-full max-w-[840px] rounded-xl border border-border/80 bg-card/60 shadow-2xl ring-1 ring-border/50 overflow-hidden select-none">
               <img
                 src="/hero-dashboard.png"
                 alt="Panel de Control de RepairIT con métricas, gráficos e inventario en vivo"
