@@ -9,6 +9,7 @@ import {
   Activity,
   DollarSign,
   Check,
+  CheckCircle2,
   Search,
   QrCode,
   Smartphone,
@@ -271,7 +272,7 @@ export default function LandingPage() {
               {/* Imagen con badge flotante en hover */}
               <div className="relative">
                 <img
-                  src="/hero-dashboard.png"
+                  src="/hero-dashboard.png?v=2"
                   alt="Panel de Control de RepairIT con métricas, gráficos e inventario en vivo"
                   className="w-full h-auto block object-cover"
                   loading="eager"
@@ -396,9 +397,9 @@ export default function LandingPage() {
                     </div>
                     <div className="min-w-0">
                       <span className="text-[9px] font-mono uppercase tracking-wider text-muted-foreground block">
-                        ORDEN #RT-9L4X7V3B
+                        ORDEN #DEMO-ID
                       </span>
-                      <span className="font-outfit font-bold text-xs sm:text-sm text-foreground truncate block">
+                      <span className="font-outfit font-bold text-xs sm:text-sm text-foreground block">
                         Notebook Lenovo ThinkPad E14 Gen 2
                       </span>
                     </div>
@@ -410,48 +411,60 @@ export default function LandingPage() {
                 </div>
 
                 {/* Stepper horizontal con círculos estilo Tracking */}
-                <div className="grid grid-cols-6 gap-1 pt-0.5 text-center items-center">
+                <div className="grid grid-cols-3 sm:grid-cols-6 gap-3 sm:gap-2 pt-0.5 text-center items-center">
                   {/* Step 1: Ingresado */}
-                  <div className="flex flex-col items-center gap-1">
-                    <div className="w-6 h-6 rounded-full bg-primary/20 text-primary border border-primary/40 flex items-center justify-center text-[10px] font-bold">
-                      ✓
+                  <div className="flex flex-col items-center text-center">
+                    <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-primary/20 text-primary border border-primary/30 flex items-center justify-center text-xs font-bold">
+                      <CheckCircle2 className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
                     </div>
-                    <span className="text-[9px] font-medium text-muted-foreground truncate max-w-full">Ingresado</span>
+                    <span className="text-[10px] sm:text-[11px] mt-1.5 leading-tight font-medium text-foreground/90">
+                      Ingresado
+                    </span>
                   </div>
                   {/* Step 2: En Diagnóstico */}
-                  <div className="flex flex-col items-center gap-1">
-                    <div className="w-6 h-6 rounded-full bg-primary/20 text-primary border border-primary/40 flex items-center justify-center text-[10px] font-bold">
-                      ✓
+                  <div className="flex flex-col items-center text-center">
+                    <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-primary/20 text-primary border border-primary/30 flex items-center justify-center text-xs font-bold">
+                      <CheckCircle2 className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
                     </div>
-                    <span className="text-[9px] font-medium text-muted-foreground truncate max-w-full">Diagnóstico</span>
+                    <span className="text-[10px] sm:text-[11px] mt-1.5 leading-tight font-medium text-foreground/90">
+                      En Diagnóstico
+                    </span>
                   </div>
                   {/* Step 3: Presupuestado (Activo con glow primario) */}
-                  <div className="flex flex-col items-center gap-1">
-                    <div className="w-6 h-6 rounded-full bg-primary text-primary-foreground font-bold flex items-center justify-center text-[10px] shadow-sm shadow-primary/50 ring-2 ring-primary/30">
+                  <div className="flex flex-col items-center text-center">
+                    <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-primary text-primary-foreground font-black flex items-center justify-center text-xs shadow-md shadow-primary/30 ring-2 sm:ring-4 ring-primary/20 scale-105">
                       3
                     </div>
-                    <span className="text-[9px] font-bold text-primary truncate max-w-full">Presupuestado</span>
+                    <span className="text-[10px] sm:text-[11px] mt-1.5 leading-tight font-bold text-primary">
+                      Presupuestado
+                    </span>
                   </div>
                   {/* Step 4: En Reparación */}
-                  <div className="flex flex-col items-center gap-1">
-                    <div className="w-6 h-6 rounded-full bg-muted/40 text-muted-foreground/60 border border-border/40 flex items-center justify-center text-[10px]">
+                  <div className="flex flex-col items-center text-center">
+                    <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-muted text-muted-foreground/40 border border-border/40 flex items-center justify-center text-xs font-bold">
                       4
                     </div>
-                    <span className="text-[9px] text-muted-foreground/60 truncate max-w-full">Reparación</span>
+                    <span className="text-[10px] sm:text-[11px] mt-1.5 leading-tight font-light text-muted-foreground/60">
+                      En Reparación
+                    </span>
                   </div>
                   {/* Step 5: Listo para Retirar */}
-                  <div className="flex flex-col items-center gap-1">
-                    <div className="w-6 h-6 rounded-full bg-muted/40 text-muted-foreground/60 border border-border/40 flex items-center justify-center text-[10px]">
+                  <div className="flex flex-col items-center text-center">
+                    <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-muted text-muted-foreground/40 border border-border/40 flex items-center justify-center text-xs font-bold">
                       5
                     </div>
-                    <span className="text-[9px] text-muted-foreground/60 truncate max-w-full">Listo Retiro</span>
+                    <span className="text-[10px] sm:text-[11px] mt-1.5 leading-tight font-light text-muted-foreground/60">
+                      Listo para Retirar
+                    </span>
                   </div>
                   {/* Step 6: Entregado */}
-                  <div className="flex flex-col items-center gap-1">
-                    <div className="w-6 h-6 rounded-full bg-muted/40 text-muted-foreground/60 border border-border/40 flex items-center justify-center text-[10px]">
+                  <div className="flex flex-col items-center text-center">
+                    <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-muted text-muted-foreground/40 border border-border/40 flex items-center justify-center text-xs font-bold">
                       6
                     </div>
-                    <span className="text-[9px] text-muted-foreground/60 truncate max-w-full">Entregado</span>
+                    <span className="text-[10px] sm:text-[11px] mt-1.5 leading-tight font-light text-muted-foreground/60">
+                      Entregado
+                    </span>
                   </div>
                 </div>
 
@@ -1240,7 +1253,7 @@ export default function LandingPage() {
             className="relative max-w-7xl w-full max-h-[88vh] rounded-xl border border-border/80 bg-card/90 shadow-2xl overflow-hidden flex items-center justify-center cursor-default"
           >
             <img
-              src="/hero-dashboard.png"
+              src="/hero-dashboard.png?v=2"
               alt="Panel de Control de RepairIT ampliado"
               className="w-full h-auto max-h-[88vh] object-contain block select-none"
             />
