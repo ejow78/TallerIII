@@ -33,6 +33,9 @@ import {
   Lock,
   Maximize2,
   Download,
+  Laptop,
+  Stethoscope,
+  FileText,
   X,
 } from "lucide-react";
 import { GridPattern } from "@/components/ui/grid-pattern";
@@ -410,11 +413,11 @@ export default function LandingPage() {
                 <div className="flex items-center justify-between gap-3 border-b border-border/50 pb-3">
                   <div className="flex items-center gap-2.5 min-w-0">
                     <div className="w-8 h-8 rounded-lg bg-primary/10 border border-primary/25 flex items-center justify-center text-primary shrink-0">
-                      <Smartphone className="w-4 h-4" />
+                      <Laptop className="w-4 h-4" />
                     </div>
                     <div className="min-w-0">
                       <span className="text-[9px] font-mono uppercase tracking-wider text-muted-foreground block">
-                        ORDEN #ORD-1084
+                        ORDEN #RT-9L4X7V3B
                       </span>
                       <span className="font-outfit font-bold text-xs sm:text-sm text-foreground truncate block">
                         Notebook Lenovo ThinkPad E14 Gen 2
@@ -474,29 +477,37 @@ export default function LandingPage() {
                 </div>
 
                 {/* Sub-cards de Diagnóstico y Presupuesto simétricas */}
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 pt-1">
-                  <div className="p-3 rounded-lg bg-card/60 border border-border/60 space-y-1.5">
-                    <div className="flex items-center gap-1.5">
-                      <Wrench className="w-3.5 h-3.5 text-primary" />
-                      <span className="text-[10px] font-mono uppercase tracking-wider text-muted-foreground font-semibold">
-                        Informe Técnico
-                      </span>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
+                  {/* Sub-card Diagnóstico con pill púrpura e icono estetoscopio */}
+                  <div className="p-3 sm:p-3.5 rounded-xl bg-card/60 border border-border/60 space-y-2 flex flex-col justify-between">
+                    <span className="text-[10px] font-bold text-purple-400 uppercase tracking-wider flex items-center gap-1.5">
+                      <Stethoscope className="w-3.5 h-3.5" /> Diagnóstico del Técnico Especialista
+                    </span>
+                    <div className="bg-purple-500/5 p-2.5 rounded-lg border border-purple-500/20 text-xs text-foreground font-light leading-relaxed flex-grow">
+                      Falla en circuito primario de alimentación 19V. Cortocircuito en mosfet de entrada y chip IC PMIC dañados.
                     </div>
-                    <p className="text-[11px] text-foreground font-light leading-snug">
-                      Falla en circuito primario de alimentación 19V. Cortocircuito en mosfet de entrada dañado.
-                    </p>
                   </div>
-                  <div className="p-3 rounded-lg bg-card/60 border border-border/60 flex flex-col justify-between space-y-2">
-                    <div className="flex items-center justify-between">
-                      <span className="text-[10px] font-mono uppercase tracking-wider text-muted-foreground font-semibold">
-                        Presupuesto Total
-                      </span>
-                      <span className="font-outfit font-extrabold text-sm text-primary">
+
+                  {/* Sub-card Cotización antes de aprobar */}
+                  <div className="p-3 sm:p-3.5 rounded-xl bg-card/60 border border-border/60 flex flex-col justify-between space-y-2.5">
+                    <div className="space-y-1.5 text-xs">
+                      <div className="flex justify-between items-start text-xs border-b border-border/30 pb-1.5">
+                        <span className="text-foreground/85 font-light pr-2 leading-tight">Reemplazo de Mosfet e IC Regulador PMIC</span>
+                        <span className="font-mono font-bold text-primary shrink-0">$18.500</span>
+                      </div>
+                      <div className="flex justify-between items-start text-xs">
+                        <span className="text-foreground/85 font-light pr-2 leading-tight">Mantenimiento térmico y limpieza de placa madre</span>
+                        <span className="font-mono font-bold text-primary shrink-0">$6.500</span>
+                      </div>
+                    </div>
+                    <div className="flex justify-between items-baseline pt-1 border-t border-border/50">
+                      <span className="text-xs font-bold text-muted-foreground uppercase tracking-wider">Total</span>
+                      <span className="font-outfit font-black text-lg text-primary font-mono">
                         $25.000
                       </span>
                     </div>
-                    <div className="flex items-center justify-center gap-1.5 py-1 px-2 rounded-md bg-primary/10 text-primary border border-primary/25 text-[10px] font-semibold">
-                      <ShieldCheck className="w-3 h-3" />
+                    <div className="flex items-center justify-center gap-1.5 py-2 px-3 rounded-lg bg-primary hover:bg-primary/95 text-primary-foreground text-xs font-bold shadow-md shadow-primary/20 cursor-pointer">
+                      <ShieldCheck className="w-3.5 h-3.5" />
                       <span>Aprobar Presupuesto Online</span>
                     </div>
                   </div>
@@ -518,33 +529,59 @@ export default function LandingPage() {
                 </p>
               </div>
 
-              {/* Micro-UI: Presupuesto validado con estilo Tracking */}
-              <div className="rounded-xl bg-background/90 border border-border/70 p-4 space-y-3 font-sans shadow-inner select-none">
-                <div className="flex items-center justify-between border-b border-border/50 pb-2">
-                  <span className="text-[10px] font-mono uppercase tracking-wider text-muted-foreground font-semibold">
-                    COTIZACIÓN OFICIAL
-                  </span>
-                  <span className="text-[10px] font-bold text-emerald-400 bg-emerald-500/10 border border-emerald-500/25 px-2 py-0.5 rounded">
-                    Aprobado
-                  </span>
-                </div>
-                <div className="space-y-1.5 text-xs">
-                  <div className="flex justify-between items-center text-muted-foreground">
-                    <span className="text-[11px]">Reemplazo de Mosfet e IC</span>
-                    <span className="font-mono text-primary font-medium text-[11px]">$18.500</span>
+              {/* Micro-UI: Idéntica a la tarjeta de Cotización aceptada en TrackingPage */}
+              <div className="rounded-xl bg-background/90 border border-border/70 p-4 sm:p-5 space-y-4 font-sans shadow-inner select-none">
+                {/* Header idéntico a TrackingPage */}
+                <div className="flex items-center gap-2.5 border-b border-border/50 pb-3">
+                  <div className="w-8 h-8 rounded-lg bg-primary/10 border border-primary/20 flex items-center justify-center text-primary shrink-0">
+                    <FileText className="w-4 h-4" />
                   </div>
-                  <div className="flex justify-between items-center text-muted-foreground">
-                    <span className="text-[11px]">Mantenimiento y limpieza placa</span>
-                    <span className="font-mono text-primary font-medium text-[11px]">$6.500</span>
+                  <div>
+                    <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider block">
+                      Cotización
+                    </span>
+                    <h4 className="font-outfit text-sm font-bold text-foreground leading-tight">
+                      Presupuesto Oficial
+                    </h4>
                   </div>
                 </div>
-                <div className="border-t border-border/50 pt-2 flex items-baseline justify-between">
-                  <span className="text-[11px] font-semibold text-foreground">TOTAL:</span>
-                  <span className="font-outfit font-black text-xl text-primary">$25.000</span>
+
+                {/* Desglose idéntico al seguimiento */}
+                <div className="space-y-2 text-xs">
+                  <div className="flex justify-between items-start text-xs border-b border-border/30 pb-2">
+                    <span className="text-foreground/80 font-light pr-2 leading-tight">
+                      Reemplazo de Mosfet e IC Regulador PMIC
+                    </span>
+                    <span className="font-mono font-bold text-primary shrink-0">
+                      $18.500
+                    </span>
+                  </div>
+                  <div className="flex justify-between items-start text-xs">
+                    <span className="text-foreground/80 font-light pr-2 leading-tight">
+                      Mantenimiento térmico y limpieza de placa madre
+                    </span>
+                    <span className="font-mono font-bold text-primary shrink-0">
+                      $6.500
+                    </span>
+                  </div>
                 </div>
-                <div className="rounded-lg bg-emerald-500/10 border border-emerald-500/25 p-2 text-center text-emerald-400 text-[10px] font-semibold flex items-center justify-center gap-1.5">
-                  <ShieldCheck className="w-3.5 h-3.5 shrink-0" />
-                  <span>Aprobado con DNI 38.450.123 (Juan Pérez)</span>
+
+                <div className="flex justify-between items-baseline pt-2 border-t border-border/50">
+                  <span className="text-xs font-bold text-muted-foreground uppercase tracking-wider">Total</span>
+                  <span className="text-xl font-black font-outfit text-primary font-mono">
+                    $25.000
+                  </span>
+                </div>
+
+                {/* Banner verde idéntico al tracking cuando se aprueba */}
+                <div className="bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 p-3 rounded-xl text-xs font-bold flex items-center gap-2.5 shadow-sm">
+                  <ShieldCheck className="w-4 h-4 shrink-0 text-emerald-400" />
+                  <div>
+                    <div className="leading-tight">Presupuesto Aprobado</div>
+                    <div className="text-[10px] font-normal text-emerald-400/80">
+                      Aprobado con DNI 38.450.123 • Orden autorizada para reparación.
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
