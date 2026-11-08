@@ -1485,127 +1485,127 @@ export default function DashboardPage() {
       </div>
 
       {/* Grid de 4 Tarjetas de Métricas Clave */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-5">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
         {/* Card 1: Órdenes Activas */}
-        <Card className="bg-card/45 border-border/80 shadow-sm hover:border-primary/30 transition-colors">
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-1.5 sm:pb-2 px-3.5 sm:px-6 pt-3.5 sm:pt-6">
+        <Card className="bg-card/45 border-border/80 shadow-sm hover:border-primary/30 transition-colors p-4 sm:p-5 flex flex-col justify-between">
+          <div className="flex items-center justify-between gap-2">
             <span className="text-xs sm:text-[13px] font-bold text-muted-foreground uppercase tracking-wider leading-tight">
               Órdenes Activas
             </span>
-            <div className="w-6 h-6 sm:w-7 sm:h-7 rounded-lg bg-primary/10 border border-primary/20 flex items-center justify-center shrink-0">
-              <Wrench className="h-3 w-3 sm:h-3.5 sm:w-3.5 text-primary" />
+            <div className="w-8 h-8 rounded-lg bg-primary/10 border border-primary/20 flex items-center justify-center shrink-0">
+              <Wrench className="h-4 w-4 text-primary" />
             </div>
-          </CardHeader>
-          <CardContent className="px-3.5 sm:px-6 pb-3.5 sm:pb-6">
-            <span className="text-2xl sm:text-3xl font-outfit font-black text-foreground block">
+          </div>
+          <div className="mt-3.5 space-y-1.5">
+            <span className="text-3xl sm:text-4xl font-outfit font-black text-foreground block tracking-tight leading-none">
               {activeOrdersCount}
             </span>
-            <span className="text-[10px] sm:text-[11px] text-primary block font-medium mt-1 leading-tight line-clamp-2">
+            <span className="text-xs text-primary block font-medium leading-snug line-clamp-1">
               {activeOrdersDetail}
             </span>
-          </CardContent>
+          </div>
         </Card>
 
         {/* Card 2: Equipos Entregados */}
-        <Card className="bg-card/45 border-border/80 shadow-sm hover:border-emerald-500/30 transition-colors">
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-1.5 sm:pb-2 px-3.5 sm:px-6 pt-3.5 sm:pt-6">
+        <Card className="bg-card/45 border-border/80 shadow-sm hover:border-emerald-500/30 transition-colors p-4 sm:p-5 flex flex-col justify-between">
+          <div className="flex items-center justify-between gap-2">
             <span className="text-xs sm:text-[13px] font-bold text-muted-foreground uppercase tracking-wider leading-tight">
               Equipos Entregados
             </span>
-            <div className="w-6 h-6 sm:w-7 sm:h-7 rounded-lg bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center shrink-0">
-              <PackageCheck className="h-3 w-3 sm:h-3.5 sm:w-3.5 text-emerald-400" />
+            <div className="w-8 h-8 rounded-lg bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center shrink-0">
+              <PackageCheck className="h-4 w-4 text-emerald-400" />
             </div>
-          </CardHeader>
-          <CardContent className="px-3.5 sm:px-6 pb-3.5 sm:pb-6">
-            <span className="text-2xl sm:text-3xl font-outfit font-black text-foreground block">
+          </div>
+          <div className="mt-3.5 space-y-1.5">
+            <span className="text-3xl sm:text-4xl font-outfit font-black text-foreground block tracking-tight leading-none">
               {deliveredCount}
             </span>
-            <span className="text-[10px] sm:text-[11px] text-emerald-400 block font-medium mt-1 leading-tight line-clamp-2">
+            <span className="text-xs text-emerald-400 block font-medium leading-snug line-clamp-1">
               {readyToPickupCount > 0
                 ? `+ ${readyToPickupCount} listos esperando retiro`
                 : "Dispositivos retirados por clientes"}
             </span>
-          </CardContent>
+          </div>
         </Card>
 
         {/* Card 3: Balance Operativo (Pro/Multi) o Cupo Mensual (Básico) */}
-        <Card className="bg-card/45 border-border/80 shadow-sm hover:border-primary/30 transition-colors">
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-1.5 sm:pb-2 px-3.5 sm:px-6 pt-3.5 sm:pt-6">
+        <Card className="bg-card/45 border-border/80 shadow-sm hover:border-primary/30 transition-colors p-4 sm:p-5 flex flex-col justify-between">
+          <div className="flex items-center justify-between gap-2">
             <span className="text-xs sm:text-[13px] font-bold text-muted-foreground uppercase tracking-wider leading-tight">
               {isBasicPlan ? "Cupo Mensual" : "Facturación"}
             </span>
-            <div className="w-6 h-6 sm:w-7 sm:h-7 rounded-lg bg-sky-500/10 border border-sky-500/20 flex items-center justify-center shrink-0">
+            <div className="w-8 h-8 rounded-lg bg-sky-500/10 border border-sky-500/20 flex items-center justify-center shrink-0">
               {isBasicPlan ? (
-                <Clock className="h-3 w-3 sm:h-3.5 sm:w-3.5 text-sky-400" />
+                <Clock className="h-4 w-4 text-sky-400" />
               ) : (
-                <DollarSign className="h-3 w-3 sm:h-3.5 sm:w-3.5 text-sky-400" />
+                <DollarSign className="h-4 w-4 text-sky-400" />
               )}
             </div>
-          </CardHeader>
-          <CardContent className="px-3.5 sm:px-6 pb-3.5 sm:pb-6">
+          </div>
+          <div className="mt-3.5 space-y-1.5">
             {isBasicPlan ? (
               <>
-                <span className="text-2xl sm:text-3xl font-outfit font-black text-foreground block tabular-nums">
+                <span className="text-3xl sm:text-4xl font-outfit font-black text-foreground block tracking-tight leading-none tabular-nums">
                   {monthlyOrdersCount} <span className="text-sm font-normal text-muted-foreground">/ 100</span>
                 </span>
-                <span className="text-[10px] sm:text-[11px] text-muted-foreground block font-medium mt-1 leading-tight line-clamp-2">
+                <span className="text-xs text-muted-foreground block font-medium leading-snug line-clamp-1">
                   Órdenes registradas este mes (Plan Básico)
                 </span>
               </>
             ) : (
               <>
-                <span className="text-xl sm:text-3xl font-outfit font-black text-foreground block tabular-nums truncate">
+                <span className="text-2xl sm:text-4xl font-outfit font-black text-foreground block tracking-tight leading-none tabular-nums truncate">
                   ${totalRevenue.toLocaleString("es-AR")}
                 </span>
-                <span className="text-[10px] sm:text-[11px] text-muted-foreground block font-medium mt-1 leading-tight line-clamp-2">
+                <span className="text-xs text-muted-foreground block font-medium leading-snug line-clamp-1">
                   {sales.length} ventas POS • ${approvedBudgetsRevenue.toLocaleString("es-AR")} en órdenes
                 </span>
               </>
             )}
-          </CardContent>
+          </div>
         </Card>
 
         {/* Card 4: Stock & Alertas */}
         <Card
-          className={
+          className={`p-4 sm:p-5 flex flex-col justify-between transition-colors shadow-sm ${
             isCriticalNoStock
-              ? "bg-destructive/5 border-destructive/25 shadow-sm"
+              ? "bg-destructive/5 border-destructive/25"
               : lowStockCount > 0
-              ? "bg-amber-500/5 border-amber-500/25 shadow-sm"
-              : "bg-card/45 border-border/80 shadow-sm"
-          }
+              ? "bg-amber-500/5 border-amber-500/25"
+              : "bg-card/45 border-border/80"
+          }`}
         >
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-1.5 sm:pb-2 px-3.5 sm:px-6 pt-3.5 sm:pt-6">
+          <div className="flex items-center justify-between gap-2">
             <span className="text-xs sm:text-[13px] font-bold text-muted-foreground uppercase tracking-wider leading-tight">
               Estado de Stock
             </span>
             <div
-              className={
+              className={`w-8 h-8 rounded-lg flex items-center justify-center shrink-0 border ${
                 isCriticalNoStock
-                  ? "w-6 h-6 sm:w-7 sm:h-7 rounded-lg bg-destructive/15 border border-destructive/30 flex items-center justify-center shrink-0"
+                  ? "bg-destructive/15 border-destructive/30"
                   : lowStockCount > 0
-                  ? "w-6 h-6 sm:w-7 sm:h-7 rounded-lg bg-amber-500/15 border border-amber-500/30 flex items-center justify-center shrink-0"
-                  : "w-6 h-6 sm:w-7 sm:h-7 rounded-lg bg-muted border border-border flex items-center justify-center shrink-0"
-              }
+                  ? "bg-amber-500/15 border-amber-500/30"
+                  : "bg-muted border-border"
+              }`}
             >
               {isCriticalNoStock ? (
-                <AlertCircle className="h-3 w-3 sm:h-3.5 sm:w-3.5 text-destructive" />
+                <AlertCircle className="h-4 w-4 text-destructive" />
               ) : lowStockCount > 0 ? (
-                <AlertTriangle className="h-3 w-3 sm:h-3.5 sm:w-3.5 text-amber-400" />
+                <AlertTriangle className="h-4 w-4 text-amber-400" />
               ) : (
-                <Package className="h-3 w-3 sm:h-3.5 sm:w-3.5 text-muted-foreground" />
+                <Package className="h-4 w-4 text-muted-foreground" />
               )}
             </div>
-          </CardHeader>
-          <CardContent className="px-3.5 sm:px-6 pb-3.5 sm:pb-6">
+          </div>
+          <div className="mt-3.5 space-y-1.5">
             <span
-              className={
+              className={`text-3xl sm:text-4xl font-outfit font-black block tracking-tight leading-none truncate ${
                 isCriticalNoStock
-                  ? "text-2xl sm:text-3xl font-outfit font-black text-destructive block"
+                  ? "text-destructive"
                   : lowStockCount > 0
-                  ? "text-2xl sm:text-3xl font-outfit font-black text-amber-400 block"
-                  : "text-2xl sm:text-3xl font-outfit font-black text-foreground block"
-              }
+                  ? "text-amber-400"
+                  : "text-foreground"
+              }`}
             >
               {isCriticalNoStock
                 ? `${outOfStockCount + lowStockCount} Alertas`
@@ -1614,17 +1614,17 @@ export default function DashboardPage() {
                 : `${totalItemsCount} Ítems`}
             </span>
             <span
-              className={
+              className={`text-xs block font-medium leading-snug line-clamp-1 ${
                 isCriticalNoStock
-                  ? "text-[10px] sm:text-[11px] text-destructive/90 block font-medium mt-1 leading-tight line-clamp-2"
+                  ? "text-destructive/90"
                   : lowStockCount > 0
-                  ? "text-[10px] sm:text-[11px] text-amber-400/90 block font-medium mt-1 leading-tight line-clamp-2"
-                  : "text-[10px] sm:text-[11px] text-muted-foreground block font-medium mt-1 leading-tight line-clamp-2"
-              }
+                  ? "text-amber-400/90"
+                  : "text-muted-foreground"
+              }`}
             >
               {lowStockDetail}
             </span>
-          </CardContent>
+          </div>
         </Card>
       </div>
 
