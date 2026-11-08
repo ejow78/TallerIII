@@ -271,12 +271,15 @@ export default function LandingPage() {
 
               {/* Imagen con badge flotante en hover */}
               <div className="relative">
-                <img
-                  src="/hero-dashboard.png?v=2"
-                  alt="Panel de Control de RepairIT con métricas, gráficos e inventario en vivo"
-                  className="w-full h-auto block object-cover"
-                  loading="eager"
-                />
+                <picture>
+                  <source srcSet="/hero-dashboard.webp?v=2" type="image/webp" />
+                  <img
+                    src="/hero-dashboard.png?v=2"
+                    alt="Panel de Control de RepairIT con métricas, gráficos e inventario en vivo"
+                    className="w-full h-auto block object-cover"
+                    loading="eager"
+                  />
+                </picture>
                 <div className="absolute inset-0 bg-background/20 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center pointer-events-none">
                   <span className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-background/90 text-foreground border border-border/80 text-xs font-semibold shadow-2xl backdrop-blur-md">
                     <Maximize2 className="w-3.5 h-3.5 text-primary" />
@@ -1252,11 +1255,14 @@ export default function LandingPage() {
             onClick={(e) => e.stopPropagation()}
             className="relative max-w-7xl w-full max-h-[88vh] rounded-xl border border-border/80 bg-card/90 shadow-2xl overflow-hidden flex items-center justify-center cursor-default"
           >
-            <img
-              src="/hero-dashboard.png?v=2"
-              alt="Panel de Control de RepairIT ampliado"
-              className="w-full h-auto max-h-[88vh] object-contain block select-none"
-            />
+            <picture className="w-full h-full flex items-center justify-center">
+              <source srcSet="/hero-dashboard.webp?v=2" type="image/webp" />
+              <img
+                src="/hero-dashboard.png?v=2"
+                alt="Panel de Control de RepairIT ampliado"
+                className="w-full h-auto max-h-[88vh] object-contain block select-none"
+              />
+            </picture>
           </div>
         </div>
       )}
