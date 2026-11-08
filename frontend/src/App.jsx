@@ -294,7 +294,6 @@ export default function App() {
             <Route path="reset-password" element={<ResetPasswordPage />} />
             <Route path="privacidad" element={<PrivacyPage />} />
             <Route path="terminos" element={<TermsPage />} />
-            <Route path="*" element={<NotFoundPage />} />
           </Route>
 
           {/* Entorno Administrativo (dashboard.repairit.cloud) */}
@@ -309,18 +308,10 @@ export default function App() {
             <Route path="consultas" element={<SuperAdminUsersPage />} />
             <Route path="cuentas" element={<VenueAccountsPage />} />
             <Route path="caja" element={<POSPage />} />
-            <Route path="*" element={<NotFoundPage />} />
           </Route>
 
-          {/* Fallback global 404 */}
-          <Route
-            path="*"
-            element={
-              <PublicLayout>
-                <NotFoundPage />
-              </PublicLayout>
-            }
-          />
+          {/* Fallback global 404 Standalone (Sin Navbar ni Footer) */}
+          <Route path="*" element={<NotFoundPage />} />
 
         </Routes>
       </Suspense>

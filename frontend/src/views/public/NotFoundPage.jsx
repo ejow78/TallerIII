@@ -1,27 +1,17 @@
 import { useEffect } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { GridPattern } from "@/components/ui/grid-pattern";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
-import { Home, Search, ArrowLeft } from "lucide-react";
+import { ArrowLeft } from "lucide-react";
 
 export default function NotFoundPage() {
-  const navigate = useNavigate();
-
   useEffect(() => {
     document.title = "RepairIT - 404 Página no encontrada";
   }, []);
 
-  const handleBack = () => {
-    if (window.history.length > 1) {
-      navigate(-1);
-    } else {
-      navigate("/");
-    }
-  };
-
   return (
-    <div className="relative min-h-[calc(100vh-4rem)] py-16 px-6 flex items-center justify-center overflow-hidden">
+    <div className="relative min-h-screen w-full bg-background text-foreground flex flex-col items-center justify-center overflow-hidden px-6">
       {/* Fondo GridPattern idéntico al Hero con desvanecimiento radial */}
       <GridPattern
         width={40}
@@ -47,13 +37,9 @@ export default function NotFoundPage() {
       />
 
       <div className="relative z-10 max-w-xl w-full mx-auto text-center space-y-8 animate-fade-in">
-        {/* Código de Error y Etiqueta Técnica */}
-        <div className="space-y-3">
-          <p className="text-xs font-mono tracking-widest text-muted-foreground uppercase">
-            Error 404 • Recurso no encontrado
-          </p>
-
-          <h1 className="font-outfit text-7xl sm:text-9xl font-black text-foreground tracking-tight select-none">
+        {/* Número 404 */}
+        <div>
+          <h1 className="font-outfit text-8xl sm:text-9xl font-black text-foreground tracking-tight select-none">
             4<span className="text-primary">0</span>4
           </h1>
         </div>
@@ -68,42 +54,17 @@ export default function NotFoundPage() {
           </p>
         </div>
 
-        {/* Acciones Rápidas */}
-        <div className="pt-2 flex flex-col sm:flex-row items-center justify-center gap-3">
+        {/* Único botón: Regresar que devuelve al inicio */}
+        <div className="pt-2 flex justify-center">
           <Button
             asChild
-            className="w-full sm:w-auto h-11 px-6 rounded-lg text-sm font-semibold flex items-center justify-center gap-2 shadow-lg"
+            className="h-11 px-6 rounded-lg text-sm font-semibold flex items-center justify-center gap-2 shadow-lg cursor-pointer"
           >
             <Link to="/">
-              <Home className="w-4 h-4" />
-              <span>Volver al Inicio</span>
+              <ArrowLeft className="w-4 h-4" />
+              <span>Regresar al Inicio</span>
             </Link>
           </Button>
-
-          <Button
-            asChild
-            variant="outline"
-            className="w-full sm:w-auto h-11 px-5 rounded-lg text-sm font-medium border-border/80 bg-card/60 hover:bg-card text-foreground flex items-center justify-center gap-2"
-          >
-            <Link to="/consulta">
-              <Search className="w-4 h-4 text-muted-foreground" />
-              <span>Consultar Orden</span>
-            </Link>
-          </Button>
-
-          <Button
-            variant="ghost"
-            onClick={handleBack}
-            className="w-full sm:w-auto h-11 px-4 text-sm font-medium text-muted-foreground hover:text-foreground flex items-center justify-center gap-2"
-          >
-            <ArrowLeft className="w-4 h-4" />
-            <span>Regresar</span>
-          </Button>
-        </div>
-
-        {/* Nota al pie técnica */}
-        <div className="pt-6 border-t border-border/40 text-xs text-muted-foreground/70 font-mono">
-          RepairIT Cloud Operating System • Soporte: soporte@repairit.cloud
         </div>
       </div>
     </div>
