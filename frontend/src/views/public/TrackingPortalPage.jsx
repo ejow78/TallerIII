@@ -11,7 +11,8 @@ import {
   X, 
   FileText, 
   Mail, 
-  ArrowLeft 
+  ArrowLeft,
+  HelpCircle
 } from "lucide-react";
 import { GridPattern } from "@/components/ui/grid-pattern";
 import { cn } from "@/lib/utils";
@@ -257,39 +258,44 @@ export default function TrackingPortalPage() {
           </div>
         </Card>
 
-        {/* Micro-tarjetas Bento Informativas: Dónde encontrar el código */}
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-          
-          <div className="bg-card/40 border border-border/60 rounded-xl p-3.5 space-y-1.5 backdrop-blur-sm">
-            <div className="flex items-center gap-2 text-foreground font-semibold text-xs">
-              <FileText className="w-4 h-4 text-primary shrink-0" />
-              <span>Comprobante</span>
-            </div>
-            <p className="text-[11px] text-muted-foreground font-light leading-relaxed">
-              En el encabezado de tu ticket físico impreso al ingresar el equipo.
-            </p>
+        {/* Ayuda: ¿Dónde encuentro mi código de orden? */}
+        <div className="space-y-3 pt-1">
+          <div className="flex items-center justify-center gap-2 text-xs font-semibold text-muted-foreground">
+            <HelpCircle className="w-3.5 h-3.5 text-primary" />
+            <span>¿Dónde encuentro mi código de orden?</span>
           </div>
 
-          <div className="bg-card/40 border border-border/60 rounded-xl p-3.5 space-y-1.5 backdrop-blur-sm">
-            <div className="flex items-center gap-2 text-foreground font-semibold text-xs">
-              <Mail className="w-4 h-4 text-primary shrink-0" />
-              <span>Mensaje o Email</span>
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+            <div className="bg-card/40 border border-border/60 rounded-xl p-3.5 space-y-1.5 backdrop-blur-sm">
+              <div className="flex items-center gap-2 text-foreground font-semibold text-xs">
+                <FileText className="w-4 h-4 text-primary shrink-0" />
+                <span>Ticket Impreso</span>
+              </div>
+              <p className="text-[11px] text-muted-foreground font-light leading-relaxed">
+                Figura en el encabezado del comprobante físico entregado al ingresar el equipo.
+              </p>
             </div>
-            <p className="text-[11px] text-muted-foreground font-light leading-relaxed">
-              En el WhatsApp o correo de bienvenida recibido del taller.
-            </p>
-          </div>
 
-          <div className="bg-card/40 border border-border/60 rounded-xl p-3.5 space-y-1.5 backdrop-blur-sm">
-            <div className="flex items-center gap-2 text-foreground font-semibold text-xs">
-              <QrCode className="w-4 h-4 text-primary shrink-0" />
-              <span>Código QR</span>
+            <div className="bg-card/40 border border-border/60 rounded-xl p-3.5 space-y-1.5 backdrop-blur-sm">
+              <div className="flex items-center gap-2 text-foreground font-semibold text-xs">
+                <Mail className="w-4 h-4 text-primary shrink-0" />
+                <span>WhatsApp o Email</span>
+              </div>
+              <p className="text-[11px] text-muted-foreground font-light leading-relaxed">
+                En el mensaje o correo de confirmación que te envió el taller al recibir tu equipo.
+              </p>
             </div>
-            <p className="text-[11px] text-muted-foreground font-light leading-relaxed">
-              Tocá el ícono de cámara en el buscador para escanearlo al instante.
-            </p>
-          </div>
 
+            <div className="bg-card/40 border border-border/60 rounded-xl p-3.5 space-y-1.5 backdrop-blur-sm">
+              <div className="flex items-center gap-2 text-foreground font-semibold text-xs">
+                <QrCode className="w-4 h-4 text-primary shrink-0" />
+                <span>Código QR</span>
+              </div>
+              <p className="text-[11px] text-muted-foreground font-light leading-relaxed">
+                Tocá el ícono de cámara en el buscador para escanearlo directo desde tu ticket.
+              </p>
+            </div>
+          </div>
         </div>
 
         {/* Volver al inicio */}
