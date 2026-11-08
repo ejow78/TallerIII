@@ -564,78 +564,88 @@ export default function LandingPage() {
             </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 sm:gap-8 items-stretch">
+          {/* Comparativa horizontal (carrusel deslizable en móvil, 2 columnas en desktop) */}
+          <div className="flex md:grid md:grid-cols-2 gap-6 sm:gap-8 items-stretch overflow-x-auto md:overflow-x-visible snap-x snap-mandatory scroll-smooth -mx-6 px-6 md:mx-0 md:px-0 [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden">
             {/* Columna 1: Taller Tradicional */}
-            <div className="rounded-2xl bg-card/45 border border-border/70 p-6 sm:p-8 flex flex-col justify-between space-y-6 hover:border-border transition-colors">
-              <div className="space-y-4">
-                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-md bg-muted/60 text-muted-foreground border border-border/60 text-xs font-semibold uppercase tracking-wider">
-                  <span>Taller Tradicional</span>
-                </div>
-                <h3 className="font-outfit text-xl font-bold text-foreground">
-                  El desorden operativo de siempre
-                </h3>
+            <Card className="w-[86vw] max-w-[440px] shrink-0 snap-center md:w-auto md:max-w-none md:shrink flex flex-col justify-between bg-card/45 border-border/60 hover:border-border transition-all duration-200">
+              <CardHeader className="space-y-1.5 pb-2">
+                <CardTitle className="font-outfit text-xl sm:text-2xl font-bold text-muted-foreground">
+                  Taller Tradicional
+                </CardTitle>
+                <CardDescription className="text-xs text-muted-foreground font-light">
+                  El desorden operativo del día a día
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4 flex-grow">
+                <div className="border-t border-border/40 my-2" />
                 <ul className="space-y-3.5 text-xs text-muted-foreground font-light leading-relaxed">
                   <li className="flex items-start gap-2.5">
-                    <span className="text-destructive font-bold shrink-0">✕</span>
+                    <span className="text-destructive font-bold shrink-0 mt-0.5">✕</span>
                     <span>Papelitos de recepción extraviados o con letra ilegible.</span>
                   </li>
                   <li className="flex items-start gap-2.5">
-                    <span className="text-destructive font-bold shrink-0">✕</span>
+                    <span className="text-destructive font-bold shrink-0 mt-0.5">✕</span>
                     <span>Teléfono y WhatsApp saturados de clientes preguntando si su equipo ya está listo.</span>
                   </li>
                   <li className="flex items-start gap-2.5">
-                    <span className="text-destructive font-bold shrink-0">✕</span>
+                    <span className="text-destructive font-bold shrink-0 mt-0.5">✕</span>
                     <span>Discusiones al retirar: «Yo nunca autoricé ese costo ni ese cambio de repuesto».</span>
                   </li>
                   <li className="flex items-start gap-2.5">
-                    <span className="text-destructive font-bold shrink-0">✕</span>
-                    <span>Stock a ojo: te enterás de que te falta un módulo con el cliente esperando en el mostrador.</span>
+                    <span className="text-destructive font-bold shrink-0 mt-0.5">✕</span>
+                    <span>Stock a ojo: te enterás de que te falta un repuesto con el cliente esperando en el mostrador.</span>
                   </li>
                   <li className="flex items-start gap-2.5">
-                    <span className="text-destructive font-bold shrink-0">✕</span>
+                    <span className="text-destructive font-bold shrink-0 mt-0.5">✕</span>
                     <span>Cierres de caja confusos al final del día sin saber cuánto fue en efectivo o digital.</span>
                   </li>
                 </ul>
-              </div>
-            </div>
+              </CardContent>
+            </Card>
 
             {/* Columna 2: Con RepairIT */}
-            <div className="rounded-2xl bg-card/45 border border-border/70 p-6 sm:p-8 flex flex-col justify-between space-y-6 hover:border-border transition-colors">
-              <div className="space-y-4">
-                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-md bg-primary/10 text-primary border border-primary/25 text-xs font-semibold uppercase tracking-wider">
-                  <span>Con RepairIT</span>
-                </div>
-                <h3 className="font-outfit text-xl font-bold text-foreground">
-                  Control profesional en cada etapa
-                </h3>
+            <Card className="w-[86vw] max-w-[440px] shrink-0 snap-center md:w-auto md:max-w-none md:shrink flex flex-col justify-between bg-card/60 border-primary/40 shadow-lg shadow-primary/5 hover:border-primary/60 transition-all duration-200">
+              <CardHeader className="space-y-1.5 pb-2">
+                <CardTitle className="font-outfit text-xl sm:text-2xl font-bold text-foreground flex items-center gap-1.5">
+                  <span className="text-muted-foreground font-medium">Con</span>
+                  <span className="font-black tracking-tight text-foreground">
+                    Repair<span className="text-primary">IT</span>
+                  </span>
+                </CardTitle>
+                <CardDescription className="text-xs text-muted-foreground font-light">
+                  Control profesional y trazabilidad en cada etapa
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4 flex-grow">
+                <div className="border-t border-border/40 my-2" />
                 <ul className="space-y-3.5 text-xs text-foreground font-medium leading-relaxed">
                   <li className="flex items-start gap-2.5">
-                    <span className="text-primary font-bold shrink-0">✓</span>
+                    <Check className="w-4 h-4 text-primary shrink-0 mt-0.5" />
                     <span>Comprobante digital y físico con código QR único para el equipo y el cliente.</span>
                   </li>
                   <li className="flex items-start gap-2.5">
-                    <span className="text-primary font-bold shrink-0">✓</span>
+                    <Check className="w-4 h-4 text-primary shrink-0 mt-0.5" />
                     <span>Seguimiento online automático: el cliente consulta solo desde su celular.</span>
                   </li>
                   <li className="flex items-start gap-2.5">
-                    <span className="text-primary font-bold shrink-0">✓</span>
+                    <Check className="w-4 h-4 text-primary shrink-0 mt-0.5" />
                     <span>Presupuesto detallado aprobado con DNI en el portal de seguimiento antes de comenzar la reparación.</span>
                   </li>
                   <li className="flex items-start gap-2.5">
-                    <span className="text-primary font-bold shrink-0">✓</span>
+                    <Check className="w-4 h-4 text-primary shrink-0 mt-0.5" />
                     <span>Stock en tiempo real con alertas de reposición antes de quedarte en cero.</span>
                   </li>
                   <li className="flex items-start gap-2.5">
-                    <span className="text-primary font-bold shrink-0">✓</span>
-                    <span>Caja cuadrada con desglose instantáneo de cobros en efectivo, tarjetas y transferencias bancarias.</span>
+                    <Check className="w-4 h-4 text-primary shrink-0 mt-0.5" />
+                    <span>Cierre y balance diario de caja con desglose instantáneo de cobros en efectivo, tarjetas y transferencias bancarias.</span>
                   </li>
                 </ul>
-              </div>
-            </div>
+              </CardContent>
+            </Card>
           </div>
 
           {/* CTA centrado debajo de la comparativa */}
-          <div className="flex flex-col items-center justify-center pt-2 space-y-2.5">
+          <div className="flex flex-col items-center justify-center pt-2">
             <Button
               asChild
               size="lg"
@@ -646,9 +656,6 @@ export default function LandingPage() {
                 <ArrowRight className="w-4 h-4" />
               </a>
             </Button>
-            <span className="text-[11px] text-muted-foreground font-light">
-              Sin tarjeta de crédito requerida • 14 días de prueba gratuita
-            </span>
           </div>
         </div>
       </section>
@@ -681,8 +688,8 @@ export default function LandingPage() {
               </CardHeader>
               <CardContent className="space-y-6 flex-grow">
                 <div className="flex items-baseline gap-1.5">
-                  <span className="text-4xl font-extrabold text-foreground font-outfit">Gratis</span>
-                  <span className="text-muted-foreground text-xs font-light">/ mes</span>
+                  <span className="text-4xl font-extrabold text-foreground font-outfit">$7.500</span>
+                  <span className="text-muted-foreground text-xs font-light">ARS / mes</span>
                 </div>
                 <div className="border-t border-border/40 my-4" />
                 <ul className="space-y-3 text-xs text-muted-foreground font-light">
@@ -714,13 +721,16 @@ export default function LandingPage() {
                   className="w-full bg-secondary hover:bg-secondary/90 text-secondary-foreground font-semibold py-2 rounded-lg cursor-pointer"
                   variant="outline"
                 >
-                  <a href={registerUrl}>Comenzar gratis</a>
+                  <a href={registerUrl}>Elegir Plan Básico</a>
                 </Button>
               </CardFooter>
             </Card>
 
             {/* Tier 2: Taller Pro */}
-            <Card className="pricing-card w-[84vw] max-w-[340px] shrink-0 snap-center md:w-auto md:max-w-none md:shrink flex flex-col justify-between min-h-[480px] overflow-visible bg-card/45 border-border/60 hover:border-border transition-all duration-200 hover:-translate-y-1">
+            <Card className="pricing-card w-[84vw] max-w-[340px] shrink-0 snap-center md:w-auto md:max-w-none md:shrink flex flex-col justify-between min-h-[480px] overflow-visible bg-card/65 border-primary/50 ring-1 ring-primary/25 shadow-xl shadow-primary/10 hover:border-primary transition-all duration-200 hover:-translate-y-1 relative">
+              <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-primary text-primary-foreground text-[10px] font-black uppercase py-1 px-3.5 rounded-full tracking-wider shadow-md">
+                Recomendado
+              </div>
               <CardHeader className="space-y-2">
                 <CardTitle className="font-outfit text-xl font-bold text-foreground">Taller Pro</CardTitle>
                 <CardDescription className="text-xs text-muted-foreground font-light">
@@ -759,8 +769,7 @@ export default function LandingPage() {
               <CardFooter className="pt-4 border-t border-border/30 bg-muted/20">
                 <Button
                   asChild
-                  className="w-full bg-secondary hover:bg-secondary/90 text-secondary-foreground font-semibold py-2 rounded-lg cursor-pointer"
-                  variant="outline"
+                  className="w-full bg-primary hover:bg-primary/90 text-primary-foreground font-bold py-2 rounded-lg cursor-pointer shadow-md shadow-primary/20"
                 >
                   <a href={registerUrl}>Suscribirse Ahora</a>
                 </Button>

@@ -606,8 +606,8 @@ export default function ProfilePage() {
                     )}
                   </div>
                   <div>
-                    <span className="font-outfit text-2xl font-black text-foreground">Gratis</span>
-                    <span className="text-[10px] text-muted-foreground font-light"> / para siempre</span>
+                    <span className="font-outfit text-2xl font-black text-foreground">$7.500</span>
+                    <span className="text-[10px] text-muted-foreground font-light"> ARS / mes</span>
                   </div>
                   <ul className="text-[11px] text-muted-foreground font-light space-y-2 border-t border-border/40 pt-3">
                     <li className="flex items-center gap-2">✓ 1 Sucursal operativa</li>
