@@ -77,7 +77,7 @@ export default function TrackingPage() {
     }
   }, [id]);
 
-  // Descargar / Imprimir Ficha PDF
+  // Descargar / Imprimir Ficha Comprobante
   const handleDownloadPdf = () => {
     if (!order) return;
 
@@ -292,8 +292,8 @@ export default function TrackingPage() {
             <Skeleton className="h-56 w-full rounded-2xl" />
           </div>
           <div className="space-y-6">
-            <Skeleton className="h-60 w-full rounded-2xl" />
             <Skeleton className="h-44 w-full rounded-2xl" />
+            <Skeleton className="h-60 w-full rounded-2xl" />
           </div>
         </div>
       </div>
@@ -338,10 +338,10 @@ export default function TrackingPage() {
         </Link>
       </div>
 
-      {/* BENTO HERO: Tarjeta Principal del Dispositivo y Estados */}
+      {/* BENTO HERO: Tarjeta Principal del Dispositivo, Acciones y Estados */}
       <Card className="bg-card/50 backdrop-blur-md border-border/70 p-5 sm:p-6 rounded-2xl shadow-sm space-y-6">
         
-        {/* Fila Superior: Datos de la orden y estado */}
+        {/* Fila Superior: Datos de la orden, botón de descarga y estado */}
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 border-b border-border/50 pb-5">
           <div className="flex items-center gap-3.5">
             <div className="w-12 h-12 rounded-2xl bg-primary/10 border border-primary/20 flex items-center justify-center text-primary shrink-0 shadow-inner">
@@ -375,11 +375,22 @@ export default function TrackingPage() {
             </div>
           </div>
 
-          <div className="self-start sm:self-auto">
+          {/* Acciones Superiores: Botón Descargar Comprobante y Badge de Estado */}
+          <div className="flex flex-wrap items-center gap-2.5 self-start sm:self-auto">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={handleDownloadPdf}
+              className="text-xs font-semibold rounded-xl border-border/70 hover:bg-muted/40 flex items-center gap-1.5 h-9 px-3.5 cursor-pointer shadow-sm transition-all"
+            >
+              <Download className="w-3.5 h-3.5 text-primary" />
+              <span>Descargar Comprobante</span>
+            </Button>
+
             <Badge
               variant="outline"
               className={cn(
-                "text-xs font-bold px-3.5 py-1.5 uppercase tracking-wider rounded-xl flex items-center gap-2 shadow-sm",
+                "text-xs font-bold px-3.5 h-9 uppercase tracking-wider rounded-xl flex items-center gap-2 shadow-sm",
                 isEntregado
                   ? "bg-emerald-500/10 text-emerald-400 border-emerald-500/30"
                   : "bg-primary/10 text-primary border-primary/30"
@@ -394,7 +405,7 @@ export default function TrackingPage() {
           </div>
         </div>
 
-        {/* Estados del Servicio limpios y horizontales (sin barras de progreso ni cajas pesadas) */}
+        {/* Estados del Servicio limpios y horizontales */}
         <div className="pt-1">
           <div className="grid grid-cols-3 sm:grid-cols-6 gap-3 sm:gap-2">
             {STEPS.map((step, idx) => {
@@ -547,135 +558,11 @@ export default function TrackingPage() {
 
         </div>
 
-        {/* COLUMNA DERECHA (1/3): Presupuesto y Taller Responsable */}
+        {/* COLUMNA DERECHA (1/3): Taller Responsable y Presupuesto */}
         <div className="space-y-6">
 
-          {/* BENTO CARD: Presupuesto Oficial, Aprobación y Descarga Integrada */}
-          <Card className="bg-card/50 backdrop-blur-md border-border/70 p-5 sm:p-6 rounded-2xl shadow-sm flex flex-col justify-between space-y-4">
-            <div>
-              <div className="flex items-center gap-2.5 border-b border-border/50 pb-3">
-                <div className="w-8 h-8 rounded-lg bg-primary/10 border border-primary/20 flex items-center justify-center text-primary shrink-0">
-                  <FileText className="w-4 h-4" />
-                </div>
-                <div>
-                  <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider block">
-                    Cotización
-                  </span>
-                  <h3 className="font-outfit text-sm font-bold text-foreground leading-tight">
-                    Presupuesto Oficial
-                  </h3>
-                </div>
-              </div>
-
-              {order.budget && order.budget.items?.length > 0 ? (
-                <div className="space-y-4 pt-3">
-                  <div className="space-y-2">
-                    {order.budget.items.map((item, idx) => (
-                      <div key={idx} className="flex justify-between items-start text-xs border-b border-border/30 pb-2 last:border-0 last:pb-0">
-                        <span className="text-foreground/80 font-light pr-2 leading-tight">{item.desc}</span>
-                        <span className="font-mono font-bold text-primary shrink-0">
-                          ${Number(item.price || 0).toLocaleString("es-AR")}
-                        </span>
-                      </div>
-                    ))}
-                  </div>
-
-                  <div className="flex justify-between items-baseline pt-2 border-t border-border/50">
-                    <span className="text-xs font-bold text-muted-foreground uppercase tracking-wider">Total</span>
-                    <span className="text-xl font-black font-outfit text-primary font-mono">
-                      ${order.budget.items.reduce((s, i) => s + (Number(i.price) || 0), 0).toLocaleString("es-AR")}
-                    </span>
-                  </div>
-
-                  {order.budget.approved ? (
-                    <div className="bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 p-3 rounded-xl text-xs font-bold flex items-center gap-2.5 shadow-sm">
-                      <ShieldCheck className="w-4 h-4 shrink-0 text-emerald-400" />
-                      <div>
-                        <div className="leading-tight">Presupuesto Aprobado</div>
-                        <div className="text-[10px] font-normal text-emerald-400/80">Orden autorizada para reparación.</div>
-                      </div>
-                    </div>
-                  ) : (
-                    <AlertDialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-                      <AlertDialogTrigger asChild>
-                        <Button className="w-full bg-primary hover:bg-primary/95 text-primary-foreground font-bold text-xs py-2.5 rounded-xl shadow-md cursor-pointer mt-1">
-                          <ShieldCheck className="w-4 h-4 mr-1.5" />
-                          Aprobar Presupuesto Online
-                        </Button>
-                      </AlertDialogTrigger>
-                      <AlertDialogContent className="bg-card border-border shadow-2xl max-w-md">
-                        <AlertDialogHeader>
-                          <AlertDialogTitle className="font-outfit text-base font-bold text-foreground flex items-center gap-2">
-                            <ShieldCheck className="w-5 h-5 text-primary" />
-                            Aprobación de Presupuesto
-                          </AlertDialogTitle>
-                          <AlertDialogDescription className="text-muted-foreground text-xs font-light space-y-1">
-                            <span>Autorizás la realización del servicio técnico por un total de <strong className="text-foreground font-bold">${order.budget.items.reduce((s, i) => s + (Number(i.price) || 0), 0).toLocaleString("es-AR")}</strong>.</span>
-                          </AlertDialogDescription>
-                        </AlertDialogHeader>
-
-                        <div className="space-y-2 py-2 border-y border-border/40 my-2">
-                          <label className="text-xs font-semibold text-foreground block">
-                            Confirmación de identidad (DNI del titular):
-                          </label>
-                          <Input
-                            type="text"
-                            inputMode="numeric"
-                            pattern="[0-9]*"
-                            placeholder="Ingresá tu DNI sin puntos..."
-                            value={dniInput}
-                            onChange={(e) => setDniInput(e.target.value)}
-                            onKeyDown={(e) => { if (e.key === "Enter") handleApproveBudget(); }}
-                            className="bg-background/80 border-border text-xs h-9 font-mono"
-                          />
-                          <p className="text-[11px] text-muted-foreground font-light">
-                            Por seguridad, ingresá el número de DNI registrado en la orden para autorizar la reparación.
-                          </p>
-                        </div>
-
-                        <AlertDialogFooter>
-                          <AlertDialogCancel disabled={approving} className="bg-background border-border text-foreground text-xs font-bold rounded-lg cursor-pointer">
-                            Cancelar
-                          </AlertDialogCancel>
-                          <Button
-                            onClick={handleApproveBudget}
-                            disabled={approving}
-                            className="bg-primary hover:bg-primary/90 text-primary-foreground text-xs font-bold rounded-lg cursor-pointer"
-                          >
-                            {approving ? "Verificando..." : "Confirmar Aprobación"}
-                          </Button>
-                        </AlertDialogFooter>
-                      </AlertDialogContent>
-                    </AlertDialog>
-                  )}
-                </div>
-              ) : (
-                <div className="text-center py-6 space-y-2">
-                  <p className="text-xs text-muted-foreground font-light">
-                    Presupuesto pendiente de evaluación por el equipo técnico.
-                  </p>
-                  <Badge variant="secondary" className="text-[9px] font-bold uppercase tracking-wider">
-                    En Evaluación
-                  </Badge>
-                </div>
-              )}
-            </div>
-
-            {/* Acción de Descarga Integrada en el pie de la tarjeta */}
-            <div className="pt-3 border-t border-border/40 mt-3">
-              <Button
-                variant="outline"
-                onClick={handleDownloadPdf}
-                className="w-full text-xs font-semibold text-muted-foreground hover:text-foreground hover:bg-muted/30 border-border/60 rounded-xl py-2.5 h-auto flex items-center justify-center gap-2 cursor-pointer transition-all"
-              >
-                <Download className="w-3.5 h-3.5 text-primary" />
-                <span>Descargar Comprobante PDF</span>
-              </Button>
-            </div>
-          </Card>
-
-          {/* BENTO CARD: Taller Responsable / Sucursal (Espacioso y con bloques individuales) */}
-          <Card className="bg-card/50 backdrop-blur-md border-border/70 p-5 sm:p-6 rounded-2xl shadow-sm space-y-4">
+          {/* BENTO CARD: Taller Responsable (Arriba y con tamaño compacto y armónico) */}
+          <Card className="bg-card/50 backdrop-blur-md border-border/70 p-5 rounded-2xl shadow-sm space-y-3.5">
             <div className="flex items-center gap-2.5 border-b border-border/50 pb-3">
               <div className="w-8 h-8 rounded-lg bg-primary/10 border border-primary/20 flex items-center justify-center text-primary shrink-0">
                 <Store className="w-4 h-4" />
@@ -690,26 +577,21 @@ export default function TrackingPage() {
               </div>
             </div>
 
-            <div className="space-y-3">
+            <div className="space-y-3 text-xs">
               {parsedVenue.address && (
-                <div className="bg-muted/20 border border-border/40 rounded-xl p-3.5 space-y-1.5">
-                  <div className="flex items-center gap-2">
-                    <MapPin className="w-4 h-4 text-primary shrink-0" />
-                    <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">
-                      Dirección Física
-                    </span>
-                  </div>
-                  <p className="text-xs text-foreground/90 font-medium leading-relaxed pl-6">
-                    {parsedVenue.address}
-                  </p>
-                  <div className="pl-6 pt-1">
+                <div className="flex items-start gap-2.5">
+                  <MapPin className="w-4 h-4 text-primary shrink-0 mt-0.5" />
+                  <div className="flex-1 min-w-0">
+                    <p className="text-foreground/90 font-medium leading-snug">
+                      {parsedVenue.address}
+                    </p>
                     <a
                       href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(parsedVenue.address)}`}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="inline-flex items-center gap-1.5 text-xs text-primary hover:underline font-semibold cursor-pointer"
+                      className="inline-flex items-center gap-1 text-[11px] text-primary hover:underline font-semibold mt-0.5 cursor-pointer"
                     >
-                      <span>Ver en Google Maps</span>
+                      <span>Ver mapa</span>
                       <ExternalLink className="w-3 h-3" />
                     </a>
                   </div>
@@ -717,38 +599,136 @@ export default function TrackingPage() {
               )}
 
               {parsedVenue.hours && (
-                <div className="bg-muted/20 border border-border/40 rounded-xl p-3.5 space-y-1.5">
-                  <div className="flex items-center gap-2">
-                    <Clock className="w-4 h-4 text-emerald-400 shrink-0" />
-                    <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">
-                      Horarios de Atención
-                    </span>
-                  </div>
-                  <p className="text-xs text-foreground/90 font-medium leading-relaxed pl-6">
+                <div className="flex items-start gap-2.5 pt-2 border-t border-border/30">
+                  <Clock className="w-4 h-4 text-emerald-400 shrink-0 mt-0.5" />
+                  <p className="text-foreground/80 font-medium leading-snug flex-1">
                     {parsedVenue.hours}
                   </p>
                 </div>
               )}
 
               {venuePhone && (
-                <div className="bg-muted/20 border border-border/40 rounded-xl p-3.5 space-y-1.5">
-                  <div className="flex items-center gap-2">
-                    <Phone className="w-4 h-4 text-sky-400 shrink-0" />
-                    <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">
-                      Teléfono de Contacto
-                    </span>
-                  </div>
-                  <div className="pl-6">
-                    <a
-                      href={`tel:${venuePhone.replace(/\s+/g, '')}`}
-                      className="text-xs text-foreground/90 font-bold hover:text-primary transition-colors inline-block"
-                    >
-                      {venuePhone}
-                    </a>
-                  </div>
+                <div className="flex items-center gap-2.5 pt-2 border-t border-border/30">
+                  <Phone className="w-4 h-4 text-sky-400 shrink-0" />
+                  <a
+                    href={`tel:${venuePhone.replace(/\s+/g, '')}`}
+                    className="text-foreground/90 font-semibold hover:text-primary transition-colors text-xs"
+                  >
+                    {venuePhone}
+                  </a>
                 </div>
               )}
             </div>
+          </Card>
+
+          {/* BENTO CARD: Presupuesto Oficial */}
+          <Card className="bg-card/50 backdrop-blur-md border-border/70 p-5 sm:p-6 rounded-2xl shadow-sm space-y-4">
+            <div className="flex items-center gap-2.5 border-b border-border/50 pb-3">
+              <div className="w-8 h-8 rounded-lg bg-primary/10 border border-primary/20 flex items-center justify-center text-primary shrink-0">
+                <FileText className="w-4 h-4" />
+              </div>
+              <div>
+                <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider block">
+                  Cotización
+                </span>
+                <h3 className="font-outfit text-sm font-bold text-foreground leading-tight">
+                  Presupuesto Oficial
+                </h3>
+              </div>
+            </div>
+
+            {order.budget && order.budget.items?.length > 0 ? (
+              <div className="space-y-4 pt-1">
+                <div className="space-y-2">
+                  {order.budget.items.map((item, idx) => (
+                    <div key={idx} className="flex justify-between items-start text-xs border-b border-border/30 pb-2 last:border-0 last:pb-0">
+                      <span className="text-foreground/80 font-light pr-2 leading-tight">{item.desc}</span>
+                      <span className="font-mono font-bold text-primary shrink-0">
+                        ${Number(item.price || 0).toLocaleString("es-AR")}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+
+                <div className="flex justify-between items-baseline pt-2 border-t border-border/50">
+                  <span className="text-xs font-bold text-muted-foreground uppercase tracking-wider">Total</span>
+                  <span className="text-xl font-black font-outfit text-primary font-mono">
+                    ${order.budget.items.reduce((s, i) => s + (Number(i.price) || 0), 0).toLocaleString("es-AR")}
+                  </span>
+                </div>
+
+                {order.budget.approved ? (
+                  <div className="bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 p-3 rounded-xl text-xs font-bold flex items-center gap-2.5 shadow-sm">
+                    <ShieldCheck className="w-4 h-4 shrink-0 text-emerald-400" />
+                    <div>
+                      <div className="leading-tight">Presupuesto Aprobado</div>
+                      <div className="text-[10px] font-normal text-emerald-400/80">Orden autorizada para reparación.</div>
+                    </div>
+                  </div>
+                ) : (
+                  <AlertDialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+                    <AlertDialogTrigger asChild>
+                      <Button className="w-full bg-primary hover:bg-primary/95 text-primary-foreground font-bold text-xs py-2.5 rounded-xl shadow-md cursor-pointer mt-1">
+                        <ShieldCheck className="w-4 h-4 mr-1.5" />
+                        Aprobar Presupuesto Online
+                      </Button>
+                    </AlertDialogTrigger>
+                    <AlertDialogContent className="bg-card border-border shadow-2xl max-w-md">
+                      <AlertDialogHeader>
+                        <AlertDialogTitle className="font-outfit text-base font-bold text-foreground flex items-center gap-2">
+                          <ShieldCheck className="w-5 h-5 text-primary" />
+                          Aprobación de Presupuesto
+                        </AlertDialogTitle>
+                        <AlertDialogDescription className="text-muted-foreground text-xs font-light space-y-1">
+                          <span>Autorizás la realización del servicio técnico por un total de <strong className="text-foreground font-bold">${order.budget.items.reduce((s, i) => s + (Number(i.price) || 0), 0).toLocaleString("es-AR")}</strong>.</span>
+                        </AlertDialogDescription>
+                      </AlertDialogHeader>
+
+                      <div className="space-y-2 py-2 border-y border-border/40 my-2">
+                        <label className="text-xs font-semibold text-foreground block">
+                          Confirmación de identidad (DNI del titular):
+                        </label>
+                        <Input
+                          type="text"
+                          inputMode="numeric"
+                          pattern="[0-9]*"
+                          placeholder="Ingresá tu DNI sin puntos..."
+                          value={dniInput}
+                          onChange={(e) => setDniInput(e.target.value)}
+                          onKeyDown={(e) => { if (e.key === "Enter") handleApproveBudget(); }}
+                          className="bg-background/80 border-border text-xs h-9 font-mono"
+                        />
+                        <p className="text-[11px] text-muted-foreground font-light">
+                          Por seguridad, ingresá el número de DNI registrado en la orden para autorizar la reparación.
+                        </p>
+                      </div>
+
+                      <AlertDialogFooter>
+                        <AlertDialogCancel disabled={approving} className="bg-background border-border text-foreground text-xs font-bold rounded-lg cursor-pointer">
+                          Cancelar
+                        </AlertDialogCancel>
+                        <Button
+                          onClick={handleApproveBudget}
+                          disabled={approving}
+                          className="bg-primary hover:bg-primary/90 text-primary-foreground text-xs font-bold rounded-lg cursor-pointer"
+                        >
+                          {approving ? "Verificando..." : "Confirmar Aprobación"}
+                        </Button>
+                      </AlertDialogFooter>
+                    </AlertDialogContent>
+                  </AlertDialog>
+                )}
+              </div>
+            ) : (
+              <div className="text-center py-6 space-y-2">
+                <p className="text-xs text-muted-foreground font-light">
+                  Presupuesto pendiente de evaluación por el equipo técnico.
+                </p>
+                <Badge variant="secondary" className="text-[9px] font-bold uppercase tracking-wider">
+                  En Evaluación
+                </Badge>
+              </div>
+            )}
           </Card>
 
         </div>
