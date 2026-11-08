@@ -721,6 +721,7 @@ export const api = {
     track: async (code) => {
       const cleanCode = (code || "").trim();
       if (cleanCode.toLowerCase() === "demo-id" || cleanCode.toLowerCase() === "demo") {
+        const isDemoApproved = typeof window !== "undefined" && sessionStorage.getItem("repairit_demo_approved") === "true";
         return {
           id: "demo-id-12345",
           _id: "demo-id-12345",
@@ -729,7 +730,7 @@ export const api = {
           deviceModel: "Lenovo ThinkPad E14 Gen 2",
           issue: "El equipo no enciende tras descarga eléctrica. Parpadea LED de carga.",
           diagnosis: "Falla en circuito primario de alimentación 19V. Cortocircuito en mosfet de entrada y chip IC PMIC dañados.",
-          status: "presupuestado",
+          status: isDemoApproved ? "en_reparacion" : "presupuestado",
           clientId: {
             name: "Juan Pérez (Cliente Demo)",
             dni: "38.450.123",
@@ -746,10 +747,15 @@ export const api = {
               { desc: "Reemplazo de Mosfet e IC Regulador PMIC", price: 18500 },
               { desc: "Mantenimiento térmico y limpieza de placa madre", price: 6500 }
             ],
-            approved: false,
-            dateApproved: null
+            approved: isDemoApproved,
+            dateApproved: isDemoApproved ? new Date().toLocaleDateString("es-AR") : null
           },
-          history: [
+          history: isDemoApproved ? [
+            { date: "24/07/2026 09:30", text: "Equipo ingresado en recepción." },
+            { date: "24/07/2026 11:15", text: "Diagnóstico finalizado por el equipo técnico." },
+            { date: "24/07/2026 11:30", text: "Presupuesto detallado generado y disponible online." },
+            { date: "Hoy " + new Date().toLocaleTimeString("es-AR", { hour: "2-digit", minute: "2-digit" }) + " hs", text: "Presupuesto aprobado online por el cliente (Demo)." }
+          ] : [
             { date: "24/07/2026 09:30", text: "Equipo ingresado en recepción." },
             { date: "24/07/2026 11:15", text: "Diagnóstico finalizado por el equipo técnico." },
             { date: "24/07/2026 11:30", text: "Presupuesto detallado generado y disponible online." }
@@ -784,6 +790,9 @@ export const api = {
     approveBudget: async (code, dni = null) => {
       const cleanCode = (code || "").trim();
       if (cleanCode.toLowerCase() === "demo-id" || cleanCode.toLowerCase() === "demo") {
+        if (typeof window !== "undefined") {
+          sessionStorage.setItem("repairit_demo_approved", "true");
+        }
         return {
           id: "demo-id-12345",
           _id: "demo-id-12345",

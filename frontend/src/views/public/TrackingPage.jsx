@@ -241,13 +241,17 @@ export default function TrackingPage() {
 
     try {
       setApproving(true);
-      await api.orders.approveBudget(order.trackingCode, dniInput.trim());
+      const updatedOrder = await api.orders.approveBudget(order.trackingCode, dniInput.trim());
       toast.success("¡Presupuesto Aprobado!", {
         description: "El taller técnico ha sido notificado y comenzará las tareas de reparación."
       });
       setIsDialogOpen(false);
       setDniInput("");
-      loadOrder();
+      if (updatedOrder && (updatedOrder.trackingCode || updatedOrder.budget)) {
+        setOrder(updatedOrder);
+      } else {
+        await loadOrder();
+      }
     } catch (error) {
       toast.error("No se pudo aprobar el presupuesto", {
         description: error.message || "Verificá que el DNI ingresado sea el correcto."
@@ -255,6 +259,18 @@ export default function TrackingPage() {
     } finally {
       setApproving(false);
     }
+  };
+
+  const isDemo = (order?.trackingCode || id || "").toLowerCase().includes("demo");
+
+  const handleResetDemo = () => {
+    if (typeof window !== "undefined") {
+      sessionStorage.removeItem("repairit_demo_approved");
+    }
+    loadOrder();
+    toast.info("Simulación reiniciada", {
+      description: "El presupuesto de la demo vuelve a estar listo para ser aprobado."
+    });
   };
 
   // Obtener el índice del estado actual
@@ -538,12 +554,23 @@ export default function TrackingPage() {
                 </div>
 
                 {order.budget.approved ? (
-                  <div className="bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 p-3 rounded-xl text-xs font-bold flex items-center gap-2.5 shadow-sm">
-                    <ShieldCheck className="w-4 h-4 shrink-0 text-emerald-400" />
-                    <div>
-                      <div className="leading-tight">Presupuesto Aprobado</div>
-                      <div className="text-[10px] font-normal text-emerald-400/80">Orden autorizada para reparación.</div>
+                  <div className="space-y-2">
+                    <div className="bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 p-3 rounded-xl text-xs font-bold flex items-center gap-2.5 shadow-sm">
+                      <ShieldCheck className="w-4 h-4 shrink-0 text-emerald-400" />
+                      <div>
+                        <div className="leading-tight">Presupuesto Aprobado</div>
+                        <div className="text-[10px] font-normal text-emerald-400/80">Orden autorizada para reparación.</div>
+                      </div>
                     </div>
+                    {isDemo && (
+                      <button
+                        onClick={handleResetDemo}
+                        type="button"
+                        className="text-[10px] text-muted-foreground/80 hover:text-foreground underline w-full text-center py-0.5 transition-colors cursor-pointer"
+                      >
+                        Reiniciar simulación Demo
+                      </button>
+                    )}
                   </div>
                 ) : (
                   <AlertDialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
