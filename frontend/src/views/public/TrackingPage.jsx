@@ -35,7 +35,8 @@ import {
   AlertCircle,
   ShieldCheck,
   Download,
-  Phone
+  Phone,
+  ExternalLink
 } from "lucide-react";
 
 // Lista de estados en orden secuencial
@@ -655,7 +656,7 @@ export default function TrackingPage() {
             )}
           </Card>
 
-          {/* BENTO CARD: Taller Responsable / Sucursal (Alineación simétrica y sin mapa) */}
+          {/* BENTO CARD: Taller Responsable / Sucursal (Alineación simétrica con enlace a mapa) */}
           <Card className="bg-card/50 backdrop-blur-md border-border/70 p-5 rounded-2xl shadow-sm space-y-3.5 flex-1 flex flex-col justify-between">
             <div>
               <div className="flex items-center gap-2.5 border-b border-border/50 pb-3">
@@ -676,9 +677,20 @@ export default function TrackingPage() {
                 {parsedVenue.address && (
                   <div className="flex items-start gap-2.5">
                     <MapPin className="w-4 h-4 text-primary shrink-0 mt-0.5" />
-                    <p className="text-foreground/90 font-medium leading-relaxed flex-1">
-                      {parsedVenue.address}
-                    </p>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-foreground/90 font-medium leading-snug">
+                        {parsedVenue.address}
+                      </p>
+                      <a
+                        href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(parsedVenue.address)}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-flex items-center gap-1 text-[11px] text-primary hover:underline font-semibold mt-1 cursor-pointer"
+                      >
+                        <span>Ver en Google Maps</span>
+                        <ExternalLink className="w-3 h-3" />
+                      </a>
+                    </div>
                   </div>
                 )}
 
