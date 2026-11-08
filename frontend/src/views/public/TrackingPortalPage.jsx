@@ -1,17 +1,20 @@
 import { useState, useRef, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import {
-  Card,
-  CardHeader,
-  CardTitle,
-  CardDescription,
-  CardContent,
-  CardFooter,
-} from "@/components/ui/card";
+import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
-import { QrCode, HelpCircle, ArrowRight, Camera, X } from "lucide-react";
+import { 
+  QrCode, 
+  ArrowRight, 
+  Camera, 
+  X, 
+  FileText, 
+  Mail, 
+  ArrowLeft 
+} from "lucide-react";
+import { GridPattern } from "@/components/ui/grid-pattern";
+import { cn } from "@/lib/utils";
 
 export default function TrackingPortalPage() {
   document.title = "RepairIT | Consulta y Seguimiento de Orden";
@@ -53,16 +56,23 @@ export default function TrackingPortalPage() {
     setScannerOpen(false);
   };
 
+  // Cierre de cámara con Escape
   useEffect(() => {
+    const handleKeyDown = (e) => {
+      if (e.key === "Escape" && scannerOpen) {
+        stopCameraScanner();
+      }
+    };
+    window.addEventListener("keydown", handleKeyDown);
     return () => {
+      window.removeEventListener("keydown", handleKeyDown);
       stopCameraScanner();
     };
-  }, []);
+  }, [scannerOpen]);
 
   const extractCodeFromQr = (rawText) => {
     if (!rawText) return "";
     const trimmed = rawText.trim();
-    // Si el QR contiene la URL de seguimiento (ej: https://tracking.repairit.cloud/seguimiento/RT-XXXX)
     const match = trimmed.match(/\/seguimiento\/([A-Za-z0-9-_]+)/i);
     if (match && match[1]) {
       return match[1].toUpperCase();
@@ -152,117 +162,158 @@ export default function TrackingPortalPage() {
 
   return (
     <div className="min-h-[85vh] flex flex-col justify-center items-center px-4 py-12 relative overflow-hidden bg-background text-foreground">
+      
+      {/* Fondo geométrico sutil con GridPattern */}
+      <GridPattern
+        squares={[
+          [4, 4],
+          [5, 1],
+          [8, 2],
+          [5, 3],
+          [5, 5],
+          [10, 10],
+          [12, 15],
+          [15, 10],
+        ]}
+        className={cn(
+          "[mask-image:radial-gradient(450px_circle_at_center,white,transparent)]",
+          "inset-x-0 inset-y-[-20%] h-[150%] skew-y-12 fill-white/[0.03] stroke-white/[0.04]",
+        )}
+      />
 
-      <div className="w-full max-w-lg relative z-10">
+      <div className="w-full max-w-xl relative z-10 space-y-6">
+        
+        {/* Encabezado sin pill */}
+        <div className="text-center space-y-2">
+          <h1 className="text-2xl sm:text-3xl font-outfit font-black text-foreground tracking-tight">
+            Seguimiento de tu Equipo
+          </h1>
+          <p className="text-xs sm:text-sm text-muted-foreground font-light max-w-md mx-auto leading-relaxed">
+            Ingresá el código de tu orden o escaneá el QR de tu comprobante para ver el estado de tu reparación en tiempo real.
+          </p>
+        </div>
+
         {/* Tarjeta Central de Búsqueda */}
-        <Card className="bg-card/70 border-border/80 shadow-2xl backdrop-blur-md rounded-2xl overflow-hidden">
-          <CardHeader className="pb-5 pt-6 px-6 sm:px-8 border-b border-border/40 space-y-1.5">
-            <CardTitle className="text-xl sm:text-2xl font-outfit font-black text-foreground tracking-tight">
-              Seguimiento de tu Equipo
-            </CardTitle>
-            <CardDescription className="text-xs sm:text-sm text-muted-foreground font-light leading-relaxed">
-              Ingresá el código alfanumérico que te entregó el taller para ver el estado de tu reparación en tiempo real.
-            </CardDescription>
-          </CardHeader>
-
-          <CardContent className="p-6 sm:p-8 space-y-4">
-            <form onSubmit={handleSearch} className="space-y-4">
-              <div className="space-y-2">
-                <label
-                  htmlFor="tracking-input"
-                  className="text-xs font-semibold text-muted-foreground uppercase tracking-wider block"
+        <Card className="bg-card/60 border-border/80 shadow-2xl backdrop-blur-md rounded-2xl overflow-hidden p-6 sm:p-8 space-y-5">
+          <form onSubmit={handleSearch} className="space-y-4">
+            <div className="space-y-2">
+              <label
+                htmlFor="tracking-input"
+                className="text-[11px] font-bold text-muted-foreground uppercase tracking-wider block"
+              >
+                Código de Orden de Servicio
+              </label>
+              <div className="relative">
+                <Input
+                  id="tracking-input"
+                  type="text"
+                  required
+                  value={trackingCode}
+                  onChange={handleInputChange}
+                  placeholder="Ej: RT-8K9M2P4X"
+                  autoFocus
+                  className="w-full bg-background/90 border-border/80 rounded-xl pl-4 pr-12 py-3.5 text-base sm:text-lg font-mono font-bold tracking-wider text-foreground placeholder:font-sans placeholder:text-sm placeholder:font-normal placeholder:tracking-normal focus-visible:ring-2 focus-visible:ring-primary transition-all h-12"
+                />
+                <button
+                  type="button"
+                  onClick={startCameraScanner}
+                  title="Escanear código QR con la cámara"
+                  className="absolute right-2.5 top-1/2 -translate-y-1/2 p-2 rounded-lg text-muted-foreground hover:text-primary hover:bg-primary/10 transition-colors cursor-pointer"
                 >
-                  Código de Seguimiento
-                </label>
-                <div className="relative">
-                  <Input
-                    id="tracking-input"
-                    type="text"
-                    required
-                    value={trackingCode}
-                    onChange={handleInputChange}
-                    placeholder="Ej: RT-8K9M2P4X"
-                    autoFocus
-                    className="w-full bg-background/90 border-border/80 rounded-xl pl-4 pr-12 py-3.5 text-base sm:text-lg font-mono font-bold tracking-wider text-foreground placeholder:font-sans placeholder:text-sm placeholder:font-normal placeholder:tracking-normal focus-visible:ring-2 focus-visible:ring-primary transition-all"
-                  />
-                  <button
-                    type="button"
-                    onClick={startCameraScanner}
-                    title="Escanear código QR con la cámara"
-                    className="absolute right-2.5 top-1/2 -translate-y-1/2 p-1.5 rounded-lg text-muted-foreground hover:text-primary hover:bg-primary/10 transition-colors cursor-pointer"
-                  >
-                    <QrCode className="w-5 h-5" />
-                  </button>
-                </div>
+                  <QrCode className="w-5 h-5" />
+                </button>
               </div>
-
-              <Button
-                type="submit"
-                disabled={loading}
-                className="w-full bg-primary hover:bg-primary/90 text-primary-foreground font-bold text-sm sm:text-base py-3 rounded-xl shadow-lg shadow-primary/20 transition-all flex items-center justify-center gap-2 cursor-pointer"
-              >
-                {loading ? (
-                  <span>Buscando orden...</span>
-                ) : (
-                  <>
-                    <span>Consultar Estado</span>
-                    <ArrowRight className="w-4 h-4" />
-                  </>
-                )}
-              </Button>
-            </form>
-
-            {/* Ejemplo rápido para testing */}
-            <div className="text-center text-xs text-muted-foreground font-medium pt-1">
-              ¿Querés probar? Ingresá{" "}
-              <button
-                type="button"
-                onClick={() => {
-                  setTrackingCode("DEMO-ID");
-                  navigateToOrder("demo-id");
-                }}
-                className="text-primary hover:underline cursor-pointer font-bold inline bg-transparent p-0 border-0"
-              >
-                demo-id
-              </button>{" "}
-              para ver una reparación simulada.
             </div>
 
-            {/* Ayuda: ¿Dónde está el código? */}
-            <div className="rounded-xl bg-card/40 border border-border/60 p-4 space-y-2.5 text-xs text-muted-foreground mt-4">
-              <div className="flex items-center gap-2 font-semibold text-foreground">
-                <HelpCircle className="w-4 h-4 text-primary shrink-0" />
-                <span>¿Dónde encuentro mi código de orden?</span>
-              </div>
-              <ul className="space-y-1.5 pl-6 list-disc font-light text-[11px] sm:text-xs">
-                <li>
-                  En la parte superior de tu <strong>comprobante impreso</strong> (ej: <code>RT-XXXX</code>).
-                </li>
-                <li>
-                  En el mensaje de WhatsApp o correo de bienvenida que te envió el taller al recibir tu equipo.
-                </li>
-                <li>
-                  También podés tocar el ícono de <strong>QR</strong> en el buscador para escanear tu comprobante con la cámara.
-                </li>
-              </ul>
-            </div>
-          </CardContent>
-
-          <CardFooter className="py-3.5 px-6 sm:px-8 border-t border-border/40 bg-card/20 flex justify-center text-xs">
-            <a
-              href={window.location.hostname.includes("repairit.cloud") ? "https://repairit.cloud" : "/"}
-              className="text-xs text-muted-foreground hover:text-foreground hover:underline font-medium transition-colors"
+            <Button
+              type="submit"
+              disabled={loading}
+              className="w-full bg-primary hover:bg-primary/90 text-primary-foreground font-bold text-sm sm:text-base py-3 h-11 rounded-xl shadow-lg shadow-primary/20 transition-all flex items-center justify-center gap-2 cursor-pointer"
             >
-              ← Volver al inicio
-            </a>
-          </CardFooter>
+              {loading ? (
+                <span>Buscando orden...</span>
+              ) : (
+                <>
+                  <span>Consultar Estado</span>
+                  <ArrowRight className="w-4 h-4" />
+                </>
+              )}
+            </Button>
+          </form>
+
+          {/* Acceso rápido a demostración */}
+          <div className="text-center text-xs text-muted-foreground font-medium pt-1">
+            ¿Querés ver una orden de prueba?{" "}
+            <button
+              type="button"
+              onClick={() => {
+                setTrackingCode("DEMO-ID");
+                navigateToOrder("demo-id");
+              }}
+              className="text-primary hover:underline cursor-pointer font-bold inline bg-transparent p-0 border-0"
+            >
+              Probar con demo-id
+            </button>
+          </div>
         </Card>
+
+        {/* Micro-tarjetas Bento Informativas: Dónde encontrar el código */}
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+          
+          <div className="bg-card/40 border border-border/60 rounded-xl p-3.5 space-y-1.5 backdrop-blur-sm">
+            <div className="flex items-center gap-2 text-foreground font-semibold text-xs">
+              <FileText className="w-4 h-4 text-primary shrink-0" />
+              <span>Comprobante</span>
+            </div>
+            <p className="text-[11px] text-muted-foreground font-light leading-relaxed">
+              En el encabezado de tu ticket físico impreso al ingresar el equipo.
+            </p>
+          </div>
+
+          <div className="bg-card/40 border border-border/60 rounded-xl p-3.5 space-y-1.5 backdrop-blur-sm">
+            <div className="flex items-center gap-2 text-foreground font-semibold text-xs">
+              <Mail className="w-4 h-4 text-primary shrink-0" />
+              <span>Mensaje o Email</span>
+            </div>
+            <p className="text-[11px] text-muted-foreground font-light leading-relaxed">
+              En el WhatsApp o correo de bienvenida recibido del taller.
+            </p>
+          </div>
+
+          <div className="bg-card/40 border border-border/60 rounded-xl p-3.5 space-y-1.5 backdrop-blur-sm">
+            <div className="flex items-center gap-2 text-foreground font-semibold text-xs">
+              <QrCode className="w-4 h-4 text-primary shrink-0" />
+              <span>Código QR</span>
+            </div>
+            <p className="text-[11px] text-muted-foreground font-light leading-relaxed">
+              Tocá el ícono de cámara en el buscador para escanearlo al instante.
+            </p>
+          </div>
+
+        </div>
+
+        {/* Volver al inicio */}
+        <div className="text-center pt-2">
+          <a
+            href={window.location.hostname.includes("repairit.cloud") ? "https://repairit.cloud" : "/"}
+            className="inline-flex items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground font-medium transition-colors"
+          >
+            <ArrowLeft className="w-3.5 h-3.5" /> Volver al inicio
+          </a>
+        </div>
+
       </div>
 
       {/* Modal de Cámara para Escaneo de Código QR */}
       {scannerOpen && (
-        <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
-          <div className="bg-card border border-border/80 rounded-2xl shadow-2xl w-full max-w-sm overflow-hidden animate-in zoom-in-95 duration-150">
+        <div
+          onClick={stopCameraScanner}
+          className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4 cursor-pointer"
+        >
+          <div
+            onClick={(e) => e.stopPropagation()}
+            className="bg-card border border-border/80 rounded-2xl shadow-2xl w-full max-w-sm overflow-hidden animate-in zoom-in-95 duration-150 cursor-default"
+          >
             <div className="flex items-center justify-between px-4 py-3 border-b border-border/60">
               <div className="flex items-center gap-2 text-xs font-bold text-foreground">
                 <Camera className="w-4 h-4 text-primary" />
@@ -287,12 +338,12 @@ export default function TrackingPortalPage() {
                 playsInline
               />
               <canvas ref={canvasRef} className="hidden" />
-              {/* Marco guía de escaneo */}
-              <div className="pointer-events-none absolute inset-10 border-2 border-primary/70 rounded-2xl shadow-[0_0_0_9999px_rgba(0,0,0,0.45)]" />
+              {/* Marco guía de escaneo con esquinas acentuadas */}
+              <div className="pointer-events-none absolute inset-10 border-2 border-primary/70 rounded-2xl shadow-[0_0_0_9999px_rgba(0,0,0,0.5)]" />
             </div>
 
             <div className="p-3.5 text-center text-xs text-muted-foreground font-light">
-              Apuntá la cámara al código QR de tu orden de servicio.
+              Apuntá la cámara al código QR de tu orden de servicio para ingresar directo.
             </div>
           </div>
         </div>
