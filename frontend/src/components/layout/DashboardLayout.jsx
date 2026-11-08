@@ -271,7 +271,7 @@ export default function DashboardLayout() {
   };
 
   const navItemClass =
-    "h-8 sm:h-9 px-3 rounded-lg text-xs font-medium text-muted-foreground hover:text-foreground hover:bg-muted/60 data-[active=true]:bg-primary/15 data-[active=true]:text-primary data-[active=true]:font-semibold data-[active=true]:border data-[active=true]:border-primary/25 transition-all";
+    "h-9 sm:h-9.5 px-3 rounded-lg text-[13.5px] font-medium text-muted-foreground hover:text-foreground hover:bg-muted/60 data-[active=true]:bg-primary/15 data-[active=true]:text-primary data-[active=true]:font-semibold data-[active=true]:border data-[active=true]:border-primary/25 transition-all";
 
   return (
     <SidebarProvider className="h-dvh max-h-dvh overflow-hidden">
@@ -297,7 +297,7 @@ export default function DashboardLayout() {
           <SidebarContent className="px-2 py-2 sm:py-4 space-y-1 sm:space-y-2 flex-1 min-h-0 overflow-y-auto scrollbar-none [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
             {isSuperAdmin ? (
               <SidebarGroup>
-                <SidebarGroupLabel className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/60 px-3 mb-1">
+                <SidebarGroupLabel className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground/75 px-3 mb-1.5">
                   Administración Global
                 </SidebarGroupLabel>
                 <SidebarGroupContent>
@@ -309,7 +309,7 @@ export default function DashboardLayout() {
                         className={navItemClass}
                       >
                         <NavLink to="/dashboard" end className="flex items-center gap-3 w-full">
-                          <LayoutDashboard className="w-4 h-4" />
+                          <LayoutDashboard className="w-[18px] h-[18px] shrink-0" />
                           <span>Suscripciones</span>
                         </NavLink>
                       </SidebarMenuButton>
@@ -322,7 +322,7 @@ export default function DashboardLayout() {
                         className={navItemClass}
                       >
                         <NavLink to="/dashboard/usuarios" className="flex items-center gap-3 w-full">
-                          <Users className="w-4 h-4" />
+                          <Users className="w-[18px] h-[18px] shrink-0" />
                           <span>Usuarios</span>
                         </NavLink>
                       </SidebarMenuButton>
@@ -335,7 +335,7 @@ export default function DashboardLayout() {
                         className={navItemClass}
                       >
                         <NavLink to="/dashboard/consultas" className="flex items-center gap-3 w-full">
-                          <MessageSquare className="w-4 h-4" />
+                          <MessageSquare className="w-[18px] h-[18px] shrink-0" />
                           <span>Consultas Web</span>
                         </NavLink>
                       </SidebarMenuButton>
@@ -352,7 +352,7 @@ export default function DashboardLayout() {
               <>
                 {/* Grupo 1: Operaciones Diarias */}
                 <SidebarGroup className="py-1">
-                  <SidebarGroupLabel className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/60 px-3 mb-1">
+                  <SidebarGroupLabel className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground/75 px-3 mb-1.5">
                     Operaciones de Taller
                   </SidebarGroupLabel>
                   <SidebarGroupContent>
@@ -364,7 +364,7 @@ export default function DashboardLayout() {
                           className={navItemClass}
                         >
                           <NavLink to="/dashboard" end className="flex items-center gap-3 w-full">
-                            <LayoutDashboard className="w-4 h-4" />
+                            <LayoutDashboard className="w-[18px] h-[18px] shrink-0" />
                             <span>Inicio</span>
                           </NavLink>
                         </SidebarMenuButton>
@@ -377,7 +377,7 @@ export default function DashboardLayout() {
                           className={navItemClass}
                         >
                           <NavLink to="/dashboard/nuevo-ingreso" className="flex items-center gap-3 w-full">
-                            <PlusCircle className="w-4 h-4" />
+                            <PlusCircle className="w-[18px] h-[18px] shrink-0" />
                             <span>Nuevo Ingreso</span>
                           </NavLink>
                         </SidebarMenuButton>
@@ -390,7 +390,7 @@ export default function DashboardLayout() {
                           className={navItemClass}
                         >
                           <NavLink to="/dashboard/ordenes" className="flex items-center gap-3 w-full">
-                            <ClipboardList className="w-4 h-4" />
+                            <ClipboardList className="w-[18px] h-[18px] shrink-0" />
                             <span>Órdenes de Servicio</span>
                           </NavLink>
                         </SidebarMenuButton>
@@ -408,7 +408,7 @@ export default function DashboardLayout() {
                           className={navItemClass}
                         >
                           <NavLink to="/dashboard/clientes" className="flex items-center gap-3 w-full">
-                            <Users className="w-4 h-4" />
+                            <Users className="w-[18px] h-[18px] shrink-0" />
                             <span>Clientes</span>
                           </NavLink>
                         </SidebarMenuButton>
@@ -419,7 +419,7 @@ export default function DashboardLayout() {
 
                 {/* Grupo 2: Stock y Finanzas */}
                 <SidebarGroup className="py-1">
-                  <SidebarGroupLabel className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/60 px-3 mb-1">
+                  <SidebarGroupLabel className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground/75 px-3 mb-1.5">
                     Stock y Finanzas
                   </SidebarGroupLabel>
                   <SidebarGroupContent>
@@ -431,7 +431,7 @@ export default function DashboardLayout() {
                           className={navItemClass}
                         >
                           <NavLink to="/dashboard/inventario" className="flex items-center gap-3 w-full">
-                            <Package className="w-4 h-4" />
+                            <Package className="w-[18px] h-[18px] shrink-0" />
                             <span>Inventario de Insumos</span>
                           </NavLink>
                         </SidebarMenuButton>
@@ -462,7 +462,7 @@ export default function DashboardLayout() {
                             className={navItemClass}
                           >
                             <NavLink to="/dashboard/caja" className="flex items-center gap-3 w-full">
-                              <ShoppingCart className="w-4 h-4" />
+                              <ShoppingCart className="w-[18px] h-[18px] shrink-0" />
                               <span>Caja</span>
                             </NavLink>
                           </SidebarMenuButton>
@@ -475,7 +475,7 @@ export default function DashboardLayout() {
                 {/* Grupo 3: Configuración y Accesos - Solo visible para Administradores */}
                 {user.role === "admin" && (
                   <SidebarGroup className="py-1">
-                    <SidebarGroupLabel className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/60 px-3 mb-1">
+                    <SidebarGroupLabel className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground/75 px-3 mb-1.5">
                       Administración
                     </SidebarGroupLabel>
                     <SidebarGroupContent>
@@ -487,7 +487,7 @@ export default function DashboardLayout() {
                             className={navItemClass}
                           >
                             <NavLink to="/dashboard/perfil" className="flex items-center gap-3 w-full">
-                              <Settings className="w-4 h-4" />
+                              <Settings className="w-[18px] h-[18px] shrink-0" />
                               <span>Configuración de Taller</span>
                             </NavLink>
                           </SidebarMenuButton>
@@ -501,7 +501,7 @@ export default function DashboardLayout() {
                               className={navItemClass}
                             >
                               <NavLink to="/dashboard/cuentas" className="flex items-center gap-3 w-full">
-                                <KeyRound className="w-4 h-4" />
+                                <KeyRound className="w-[18px] h-[18px] shrink-0" />
                                 <span>Cuentas de Acceso</span>
                               </NavLink>
                             </SidebarMenuButton>
@@ -531,11 +531,11 @@ export default function DashboardLayout() {
                         .toUpperCase()
                     : "TL"}
                 </div>
-                <div className="text-xs truncate min-w-0">
+                <div className="text-[13px] truncate min-w-0">
                   <span className="text-foreground font-bold block leading-none truncate">
                     {isSuperAdmin ? "Plataforma Central" : activeVenue ? activeVenue.name : "Cargando Taller..."}
                   </span>
-                  <span className="text-muted-foreground block text-[10px] mt-1 truncate">
+                  <span className="text-muted-foreground block text-[11px] mt-0.5 truncate">
                     {isSuperAdmin
                       ? "Super Admin"
                       : `${user.name || "Usuario"} (${user.role === "admin" ? "Admin" : "Técnico"})`}
