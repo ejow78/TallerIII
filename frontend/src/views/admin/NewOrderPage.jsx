@@ -18,7 +18,7 @@ import {
   ArrowLeft,
 } from "lucide-react";
 import { sendOrderCreatedEmail } from "@/services/emailService";
-import { printOrderReceipt, getOrderWhatsAppUrl } from "@/utils/printHelper";
+import { printOrderReceipt } from "@/utils/printHelper";
 
 export default function NewOrderPage() {
   const navigate = useNavigate();
@@ -27,13 +27,23 @@ export default function NewOrderPage() {
   // Clientes existentes para autocompletado rápido
   const [existingClients, setExistingClients] = useState([]);
   const [clientSearch, setClientSearch] = useState("");
-  const [selectedExistingClient, setSelectedExistingClient] = useState(null);
+  const [selectedExistingClient, setSelectedExistingClient] = useState(
+    () => location.state?.client || null
+  );
 
   // Estados del formulario
-  const [clientName, setClientName] = useState("");
-  const [clientDni, setClientDni] = useState("");
-  const [clientPhone, setClientPhone] = useState("");
-  const [clientEmail, setClientEmail] = useState("");
+  const [clientName, setClientName] = useState(
+    () => location.state?.client?.name || ""
+  );
+  const [clientDni, setClientDni] = useState(
+    () => location.state?.client?.dni || ""
+  );
+  const [clientPhone, setClientPhone] = useState(
+    () => location.state?.client?.phone || ""
+  );
+  const [clientEmail, setClientEmail] = useState(
+    () => location.state?.client?.email || ""
+  );
   const [deviceType, setDeviceType] = useState("Smartphone");
   const [deviceModel, setDeviceModel] = useState("");
   const [accessories, setAccessories] = useState("");
@@ -72,14 +82,8 @@ export default function NewOrderPage() {
   }, []);
 
   useEffect(() => {
-    if (location.state?.client) {
-      const c = location.state.client;
-      if (c.name) setClientName(c.name);
-      if (c.dni) setClientDni(c.dni);
-      if (c.phone) setClientPhone(c.phone);
-      if (c.email) setClientEmail(c.email);
-      setSelectedExistingClient(c);
-      toast.info(`Datos precargados para cliente: ${c.name}`);
+    if (location.state?.client?.name) {
+      toast.info(`Datos precargados para cliente: ${location.state.client.name}`);
     }
   }, [location.state]);
 

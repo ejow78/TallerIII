@@ -1,5 +1,5 @@
-import { useState, useEffect } from "react";
-import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
+import { useState, useEffect, useCallback } from "react";
+import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
@@ -18,7 +18,6 @@ import {
   Info
 } from "lucide-react";
 import { api, getLocalUser, hasMultiTallerAccess } from "@/services/api";
-import { supabase } from "@/services/supabaseClient";
 
 export default function VenueAccountsPage() {
   const user = getLocalUser();
@@ -37,7 +36,7 @@ export default function VenueAccountsPage() {
   const [showPassword, setShowPassword] = useState(false);
   const [submitting, setSubmitting] = useState(false);
 
-  const fetchData = async () => {
+  const fetchData = useCallback(async () => {
     if (!isMultiTaller) {
       setLoading(false);
       return;
@@ -59,11 +58,19 @@ export default function VenueAccountsPage() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [isMultiTaller]);
 
   useEffect(() => {
-    fetchData();
-  }, []);
+    let isMounted = true;
+    const load = async () => {
+      if (!isMounted) return;
+      await fetchData();
+    };
+    load();
+    return () => {
+      isMounted = false;
+    };
+  }, [fetchData]);
 
   const handleCreate = async (e) => {
     e.preventDefault();

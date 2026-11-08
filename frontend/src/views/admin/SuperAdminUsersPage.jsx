@@ -37,9 +37,9 @@ import { toast } from "sonner";
 
 export default function SuperAdminUsersPage() {
   const location = useLocation();
-  const isConsultasRoute = location.pathname === "/dashboard/consultas";
   const [loading, setLoading] = useState(true);
-  const [activeTab, setActiveTab] = useState(isConsultasRoute ? "consultas" : "usuarios"); // "usuarios" | "consultas"
+  const activeTab =
+    location.pathname === "/dashboard/consultas" ? "consultas" : "usuarios";
   const [users, setUsers] = useState([]);
   const [organizations, setOrganizations] = useState([]);
   const [contactMessages, setContactMessages] = useState([]);
@@ -80,11 +80,15 @@ export default function SuperAdminUsersPage() {
   };
 
   useEffect(() => {
-    setActiveTab(location.pathname === "/dashboard/consultas" ? "consultas" : "usuarios");
-  }, [location.pathname]);
-
-  useEffect(() => {
-    loadData();
+    let isMounted = true;
+    const fetchSuperAdminData = async () => {
+      if (!isMounted) return;
+      await loadData();
+    };
+    fetchSuperAdminData();
+    return () => {
+      isMounted = false;
+    };
   }, []);
 
   const handleRoleChange = async (userId, newRole) => {

@@ -191,7 +191,7 @@ export default function DashboardLayout() {
     return () => {
       isMounted = false;
     };
-  }, [isSuperAdmin, location.pathname, user.subscriptionPlan]);
+  }, [isSuperAdmin, location.pathname, user]);
 
   useEffect(() => {
     if (!token && window.location.hostname.includes("repairit.cloud")) {

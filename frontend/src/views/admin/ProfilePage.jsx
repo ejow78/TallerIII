@@ -72,7 +72,15 @@ export default function ProfilePage() {
   };
 
   useEffect(() => {
-    fetchProfile();
+    let isMounted = true;
+    const loadProfile = async () => {
+      if (!isMounted) return;
+      await fetchProfile();
+    };
+    loadProfile();
+    return () => {
+      isMounted = false;
+    };
   }, []);
 
   const handleSave = async (e) => {

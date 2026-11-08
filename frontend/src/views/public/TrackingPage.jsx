@@ -1,6 +1,6 @@
 import { parseVenueAddress } from '@/utils/venueHelper';
 import { useParams, Link } from "react-router-dom";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -76,7 +76,7 @@ export default function TrackingPage() {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [approving, setApproving] = useState(false);
 
-  const loadOrder = async () => {
+  const loadOrder = useCallback(async () => {
     try {
       setLoading(true);
       const data = await api.orders.track(id);
@@ -87,14 +87,21 @@ export default function TrackingPage() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [id]);
 
   useEffect(() => {
     document.title = id ? `RepairIT - Seguimiento ${id}` : "RepairIT - Seguimiento de Orden";
-    if (id) {
-      loadOrder();
-    }
-  }, [id]);
+    if (!id) return;
+    let isMounted = true;
+    const fetchOrder = async () => {
+      if (!isMounted) return;
+      await loadOrder();
+    };
+    fetchOrder();
+    return () => {
+      isMounted = false;
+    };
+  }, [id, loadOrder]);
 
   // Descargar / Imprimir Ficha Comprobante
   const handleDownloadPdf = () => {
