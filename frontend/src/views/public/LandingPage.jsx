@@ -307,7 +307,7 @@ export default function LandingPage() {
             {/* Paso 1 */}
             <div className="relative rounded-2xl bg-card/40 border border-border/70 p-6 sm:p-7 space-y-4 hover:border-border transition-colors">
               <div className="flex items-center justify-between">
-                <span className="font-mono text-xs font-bold text-primary bg-primary/10 border border-primary/25 px-2.5 py-1 rounded-md">
+                <span className="font-mono text-xs font-bold text-primary uppercase tracking-wider">
                   Paso 01
                 </span>
                 <QrCode className="w-5 h-5 text-muted-foreground" />
@@ -323,7 +323,7 @@ export default function LandingPage() {
             {/* Paso 2 */}
             <div className="relative rounded-2xl bg-card/40 border border-border/70 p-6 sm:p-7 space-y-4 hover:border-border transition-colors">
               <div className="flex items-center justify-between">
-                <span className="font-mono text-xs font-bold text-sky-400 bg-sky-500/10 border border-sky-500/25 px-2.5 py-1 rounded-md">
+                <span className="font-mono text-xs font-bold text-sky-400 uppercase tracking-wider">
                   Paso 02
                 </span>
                 <Smartphone className="w-5 h-5 text-muted-foreground" />
@@ -339,7 +339,7 @@ export default function LandingPage() {
             {/* Paso 3 */}
             <div className="relative rounded-2xl bg-card/40 border border-border/70 p-6 sm:p-7 space-y-4 hover:border-border transition-colors">
               <div className="flex items-center justify-between">
-                <span className="font-mono text-xs font-bold text-emerald-400 bg-emerald-500/10 border border-emerald-500/25 px-2.5 py-1 rounded-md">
+                <span className="font-mono text-xs font-bold text-emerald-400 uppercase tracking-wider">
                   Paso 03
                 </span>
                 <Receipt className="w-5 h-5 text-muted-foreground" />
