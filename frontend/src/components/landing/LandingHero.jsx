@@ -95,6 +95,10 @@ export function LandingHero({ registerUrl, trackingUrl, onOpenModal }) {
                   alt="Panel de Control de RepairIT con métricas, gráficos e inventario en vivo"
                   className="w-full h-auto block object-cover"
                   loading="eager"
+                  fetchPriority="high"
+                  decoding="async"
+                  width={840}
+                  height={480}
                 />
               </picture>
               <div className="absolute inset-0 bg-background/20 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center pointer-events-none">

@@ -10,10 +10,17 @@
     <meta name="theme-color" content="#09090b" />
     <link rel="canonical" href="https://repairit.cloud/" />
 
-    <!-- Tipografía con Personalidad: Bricolage Grotesque (Títulos) + Inter (Cuerpo) -->
+    <!-- Preload LCP Hero Image -->
+    <link rel="preload" as="image" href="/hero-dashboard.webp?v=2" type="image/webp" fetchpriority="high" />
+
+    <!-- Tipografía con Personalidad: Bricolage Grotesque (Títulos) + Inter (Cuerpo) no bloqueante -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600..800&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+    <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600..800&family=Inter:wght@300;400;500;600;700&display=swap" />
+    <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600..800&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" media="print" onload="this.media='all'" />
+    <noscript>
+      <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600..800&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+    </noscript>
 
     <!-- Open Graph / Redes Sociales (WhatsApp, Facebook, LinkedIn) -->
     <meta property="og:type" content="website" />
@@ -70,8 +77,9 @@
     </script>
   </head>
   <body>
-    <div id="root">
-      <div style="opacity: 0; position: absolute; pointer-events: none; height: 0; overflow: hidden;" aria-hidden="true">
+    <div id="root"></div>
+    <noscript>
+      <div style="padding: 20px; font-family: sans-serif;">
         <h1>RepairIT - Software de Servicio Técnico y Gestión para Talleres</h1>
         <p>Plataforma integral para talleres de servicio técnico, electrónica y reparación. Controlá órdenes de servicio, presupuestos, clientes y stock en tiempo real con seguimiento público para clientes.</p>
         <h2>Funcionalidades para Talleres</h2>
@@ -83,7 +91,7 @@
           <li>Planes para técnicos independientes y talleres multi-sucursal</li>
         </ul>
       </div>
-    </div>
+    </noscript>
     <script type="module" src="/src/main.jsx"></script>
   </body>
 </html>
