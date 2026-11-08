@@ -4,7 +4,6 @@ import { useState, useEffect } from "react";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Progress } from "@/components/ui/progress";
 import { Skeleton } from "@/components/ui/skeleton";
 import {
   AlertDialog,
@@ -264,7 +263,6 @@ export default function TrackingPage() {
     ? STEPS.findIndex(s => s.key === statusKey || (s.key === "reparacion" && statusKey === "en_reparacion")) 
     : 0;
   const currentStepIndex = foundIndex >= 0 ? foundIndex : 0;
-  const progressPercent = order ? (currentStepIndex / (STEPS.length - 1)) * 100 : 0;
   const isEntregado = statusKey === "entregado";
 
   // Ícono dinámico del dispositivo
@@ -340,8 +338,8 @@ export default function TrackingPage() {
         </Link>
       </div>
 
-      {/* BENTO HERO: Tarjeta Principal del Dispositivo y Progreso */}
-      <Card className="bg-card/50 backdrop-blur-md border-border/70 p-5 sm:p-6 rounded-2xl shadow-sm space-y-6">
+      {/* BENTO HERO: Tarjeta Principal del Dispositivo y Estados */}
+      <Card className="bg-card/50 backdrop-blur-md border-border/70 p-5 sm:p-6 rounded-2xl shadow-sm space-y-5">
         
         {/* Fila Superior: Datos de la orden y estado */}
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 border-b border-border/50 pb-5">
@@ -349,22 +347,20 @@ export default function TrackingPage() {
             <div className="w-12 h-12 rounded-2xl bg-primary/10 border border-primary/20 flex items-center justify-center text-primary shrink-0 shadow-inner">
               <DeviceIcon className="w-6 h-6" />
             </div>
-            <div>
-              <div className="flex items-center gap-2">
-                <span className="text-[10px] text-muted-foreground uppercase font-mono tracking-wider font-bold">
+            <div className="space-y-1">
+              {/* Código de Orden agrandado y destacado */}
+              <div className="flex flex-wrap items-center gap-2">
+                <span className="font-mono text-xs sm:text-sm font-bold text-primary bg-primary/10 border border-primary/25 px-2.5 py-0.5 rounded-lg inline-flex items-center tracking-wider uppercase">
                   Orden #{order.trackingCode}
                 </span>
                 {order.created_at && (
-                  <>
-                    <span className="text-muted-foreground/40 text-[10px]">&bull;</span>
-                    <span className="text-[10px] text-muted-foreground font-mono">
-                      {new Date(order.created_at).toLocaleDateString("es-AR", {
-                        day: "2-digit",
-                        month: "2-digit",
-                        year: "numeric"
-                      })}
-                    </span>
-                  </>
+                  <span className="text-xs text-muted-foreground font-mono">
+                    Ingresado: {new Date(order.created_at).toLocaleDateString("es-AR", {
+                      day: "2-digit",
+                      month: "2-digit",
+                      year: "numeric"
+                    })}
+                  </span>
                 )}
               </div>
               <h1 className="font-outfit text-xl sm:text-2xl font-bold text-foreground tracking-tight">
@@ -395,53 +391,51 @@ export default function TrackingPage() {
           </div>
         </div>
 
-        {/* Stepper Bento Flow */}
-        <div className="space-y-3.5">
-          <div className="flex items-center justify-between text-xs">
-            <span className="text-muted-foreground font-medium">Progreso del Servicio</span>
-            <span className="text-primary font-mono font-bold">{Math.round(progressPercent)}%</span>
-          </div>
-
-          {/* Barra de progreso continua */}
-          <Progress value={progressPercent} className="h-2 bg-muted/60 [&>div]:bg-primary rounded-full" />
-
-          {/* Stepper detallado en pantalla mediana/grande */}
-          <div className="hidden md:grid grid-cols-6 gap-2 pt-2">
+        {/* Estados del Servicio en Bento Grid (sin barra de progreso ni porcentaje) */}
+        <div className="pt-1">
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-2 sm:gap-2.5">
             {STEPS.map((step, idx) => {
               const isDone = idx < currentStepIndex;
               const isCurrent = idx === currentStepIndex;
               return (
-                <div key={step.key} className="flex flex-col items-center text-center">
-                  <div className={cn(
-                    "w-7 h-7 rounded-full text-[11px] font-bold flex items-center justify-center transition-all",
-                    isCurrent 
-                      ? "bg-primary text-primary-foreground ring-4 ring-primary/20 shadow-md scale-105 font-black" 
-                      : isDone 
-                        ? "bg-primary/20 text-primary border border-primary/30" 
-                        : "bg-muted/50 text-muted-foreground/50 border border-border/50"
-                  )}>
-                    {isDone ? <CheckCircle2 className="w-4 h-4" /> : idx + 1}
+                <div
+                  key={step.key}
+                  className={cn(
+                    "flex flex-col items-center justify-center text-center p-2.5 rounded-xl border transition-all",
+                    isCurrent
+                      ? "bg-primary/10 border-primary/40 shadow-sm"
+                      : isDone
+                        ? "bg-muted/30 border-border/60"
+                        : "bg-muted/10 border-border/30 opacity-60"
+                  )}
+                >
+                  <div
+                    className={cn(
+                      "w-6 h-6 rounded-full text-[11px] font-bold flex items-center justify-center transition-all",
+                      isCurrent
+                        ? "bg-primary text-primary-foreground font-black shadow-md ring-2 ring-primary/30"
+                        : isDone
+                          ? "bg-primary/20 text-primary border border-primary/30"
+                          : "bg-muted text-muted-foreground/50 border border-border/50"
+                    )}
+                  >
+                    {isDone ? <CheckCircle2 className="w-3.5 h-3.5" /> : idx + 1}
                   </div>
-                  <span className={cn(
-                    "text-[11px] mt-1.5 transition-colors leading-tight",
-                    isCurrent 
-                      ? "font-bold text-primary" 
-                      : isDone 
-                        ? "font-semibold text-foreground/90" 
-                        : "font-light text-muted-foreground/60"
-                  )}>
+                  <span
+                    className={cn(
+                      "text-[11px] mt-1.5 leading-tight font-medium",
+                      isCurrent
+                        ? "font-bold text-primary"
+                        : isDone
+                          ? "text-foreground font-semibold"
+                          : "text-muted-foreground/60"
+                    )}
+                  >
                     {step.label}
                   </span>
                 </div>
               );
             })}
-          </div>
-
-          {/* Vista móvil compacta de pasos */}
-          <div className="flex md:hidden justify-between text-[11px] text-muted-foreground font-light pt-1">
-            <span>Inicio</span>
-            <span className="font-bold text-primary">{STEPS[currentStepIndex]?.label}</span>
-            <span>Entrega</span>
           </div>
         </div>
 
@@ -521,7 +515,7 @@ export default function TrackingPage() {
             </div>
           </Card>
 
-          {/* BENTO CARD: Historial de Trazabilidad */}
+          {/* BENTO CARD: Historial de Trazabilidad (como estaba originalmente, limpio y tabular) */}
           <Card className="bg-card/50 backdrop-blur-md border-border/70 p-5 sm:p-6 rounded-2xl shadow-sm space-y-4">
             <div className="flex items-center gap-2.5 border-b border-border/50 pb-3">
               <div className="w-8 h-8 rounded-lg bg-primary/10 border border-primary/20 flex items-center justify-center text-primary shrink-0">
@@ -532,27 +526,24 @@ export default function TrackingPage() {
                   Trazabilidad
                 </span>
                 <h3 className="font-outfit text-sm font-bold text-foreground leading-tight">
-                  Línea de Tiempo del Servicio
+                  Historial de Movimientos
                 </h3>
               </div>
             </div>
 
-            <div className="relative pl-6 pt-2 space-y-4 before:absolute before:left-[11px] before:top-3 before:bottom-3 before:w-0.5 before:bg-border/70">
+            <div className="space-y-3 pt-1">
               {Array.isArray(order.history) && order.history.length > 0 ? (
                 order.history.map((log, idx) => (
-                  <div key={idx} className="relative flex items-start gap-3">
-                    <div className={cn(
-                      "absolute -left-6 top-1 w-2.5 h-2.5 rounded-full ring-4 ring-background shrink-0",
-                      idx === order.history.length - 1 ? "bg-primary ring-primary/20" : "bg-muted-foreground/60"
-                    )} />
-                    <div className="space-y-0.5 flex-1 min-w-0">
-                      <span className="font-mono text-[10px] font-semibold text-muted-foreground bg-muted/40 px-2 py-0.5 rounded-md inline-block">
-                        {log.date}
-                      </span>
-                      <p className="text-xs text-foreground/90 font-medium leading-relaxed mt-1">
-                        {log.text}
-                      </p>
-                    </div>
+                  <div
+                    key={idx}
+                    className="flex flex-col sm:flex-row sm:items-baseline gap-1.5 sm:gap-3 text-xs border-b border-border/30 pb-2.5 last:border-0 last:pb-0"
+                  >
+                    <span className="font-mono text-[11px] font-semibold text-muted-foreground shrink-0 bg-muted/30 px-2 py-0.5 rounded border border-border/30 w-fit">
+                      {log.date}
+                    </span>
+                    <p className="text-foreground/90 font-light leading-relaxed">
+                      {log.text}
+                    </p>
                   </div>
                 ))
               ) : (
@@ -563,121 +554,135 @@ export default function TrackingPage() {
 
         </div>
 
-        {/* COLUMNA DERECHA (1/3): Presupuesto, Taller Responsable y Acciones */}
+        {/* COLUMNA DERECHA (1/3): Presupuesto y Taller Responsable */}
         <div className="space-y-6">
 
-          {/* BENTO CARD: Presupuesto Oficial y Aprobación */}
-          <Card className="bg-card/50 backdrop-blur-md border-border/70 p-5 rounded-2xl shadow-sm space-y-4">
-            <div className="flex items-center gap-2.5 border-b border-border/50 pb-3">
-              <div className="w-8 h-8 rounded-lg bg-primary/10 border border-primary/20 flex items-center justify-center text-primary shrink-0">
-                <FileText className="w-4 h-4" />
+          {/* BENTO CARD: Presupuesto Oficial, Aprobación y Descarga Integrada */}
+          <Card className="bg-card/50 backdrop-blur-md border-border/70 p-5 sm:p-6 rounded-2xl shadow-sm flex flex-col justify-between space-y-4">
+            <div>
+              <div className="flex items-center gap-2.5 border-b border-border/50 pb-3">
+                <div className="w-8 h-8 rounded-lg bg-primary/10 border border-primary/20 flex items-center justify-center text-primary shrink-0">
+                  <FileText className="w-4 h-4" />
+                </div>
+                <div>
+                  <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider block">
+                    Cotización
+                  </span>
+                  <h3 className="font-outfit text-sm font-bold text-foreground leading-tight">
+                    Presupuesto Oficial
+                  </h3>
+                </div>
               </div>
-              <div>
-                <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider block">
-                  Cotización
-                </span>
-                <h3 className="font-outfit text-sm font-bold text-foreground leading-tight">
-                  Presupuesto Oficial
-                </h3>
-              </div>
+
+              {order.budget && order.budget.items?.length > 0 ? (
+                <div className="space-y-4 pt-3">
+                  <div className="space-y-2">
+                    {order.budget.items.map((item, idx) => (
+                      <div key={idx} className="flex justify-between items-start text-xs border-b border-border/30 pb-2 last:border-0 last:pb-0">
+                        <span className="text-foreground/80 font-light pr-2 leading-tight">{item.desc}</span>
+                        <span className="font-mono font-bold text-primary shrink-0">
+                          ${Number(item.price || 0).toLocaleString("es-AR")}
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+
+                  <div className="flex justify-between items-baseline pt-2 border-t border-border/50">
+                    <span className="text-xs font-bold text-muted-foreground uppercase tracking-wider">Total</span>
+                    <span className="text-xl font-black font-outfit text-primary font-mono">
+                      ${order.budget.items.reduce((s, i) => s + (Number(i.price) || 0), 0).toLocaleString("es-AR")}
+                    </span>
+                  </div>
+
+                  {order.budget.approved ? (
+                    <div className="bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 p-3 rounded-xl text-xs font-bold flex items-center gap-2.5 shadow-sm">
+                      <ShieldCheck className="w-4 h-4 shrink-0 text-emerald-400" />
+                      <div>
+                        <div className="leading-tight">Presupuesto Aprobado</div>
+                        <div className="text-[10px] font-normal text-emerald-400/80">Orden autorizada para reparación.</div>
+                      </div>
+                    </div>
+                  ) : (
+                    <AlertDialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+                      <AlertDialogTrigger asChild>
+                        <Button className="w-full bg-primary hover:bg-primary/95 text-primary-foreground font-bold text-xs py-2.5 rounded-xl shadow-md cursor-pointer mt-1">
+                          <ShieldCheck className="w-4 h-4 mr-1.5" />
+                          Aprobar Presupuesto Online
+                        </Button>
+                      </AlertDialogTrigger>
+                      <AlertDialogContent className="bg-card border-border shadow-2xl max-w-md">
+                        <AlertDialogHeader>
+                          <AlertDialogTitle className="font-outfit text-base font-bold text-foreground flex items-center gap-2">
+                            <ShieldCheck className="w-5 h-5 text-primary" />
+                            Aprobación de Presupuesto
+                          </AlertDialogTitle>
+                          <AlertDialogDescription className="text-muted-foreground text-xs font-light space-y-1">
+                            <span>Autorizás la realización del servicio técnico por un total de <strong className="text-foreground font-bold">${order.budget.items.reduce((s, i) => s + (Number(i.price) || 0), 0).toLocaleString("es-AR")}</strong>.</span>
+                          </AlertDialogDescription>
+                        </AlertDialogHeader>
+
+                        <div className="space-y-2 py-2 border-y border-border/40 my-2">
+                          <label className="text-xs font-semibold text-foreground block">
+                            Confirmación de identidad (DNI del titular):
+                          </label>
+                          <Input
+                            type="text"
+                            inputMode="numeric"
+                            pattern="[0-9]*"
+                            placeholder="Ingresá tu DNI sin puntos..."
+                            value={dniInput}
+                            onChange={(e) => setDniInput(e.target.value)}
+                            onKeyDown={(e) => { if (e.key === "Enter") handleApproveBudget(); }}
+                            className="bg-background/80 border-border text-xs h-9 font-mono"
+                          />
+                          <p className="text-[11px] text-muted-foreground font-light">
+                            Por seguridad, ingresá el número de DNI registrado en la orden para autorizar la reparación.
+                          </p>
+                        </div>
+
+                        <AlertDialogFooter>
+                          <AlertDialogCancel disabled={approving} className="bg-background border-border text-foreground text-xs font-bold rounded-lg cursor-pointer">
+                            Cancelar
+                          </AlertDialogCancel>
+                          <Button
+                            onClick={handleApproveBudget}
+                            disabled={approving}
+                            className="bg-primary hover:bg-primary/90 text-primary-foreground text-xs font-bold rounded-lg cursor-pointer"
+                          >
+                            {approving ? "Verificando..." : "Confirmar Aprobación"}
+                          </Button>
+                        </AlertDialogFooter>
+                      </AlertDialogContent>
+                    </AlertDialog>
+                  )}
+                </div>
+              ) : (
+                <div className="text-center py-6 space-y-2">
+                  <p className="text-xs text-muted-foreground font-light">
+                    Presupuesto pendiente de evaluación por el equipo técnico.
+                  </p>
+                  <Badge variant="secondary" className="text-[9px] font-bold uppercase tracking-wider">
+                    En Evaluación
+                  </Badge>
+                </div>
+              )}
             </div>
 
-            {order.budget && order.budget.items?.length > 0 ? (
-              <div className="space-y-4">
-                <div className="space-y-2">
-                  {order.budget.items.map((item, idx) => (
-                    <div key={idx} className="flex justify-between items-start text-xs border-b border-border/30 pb-2 last:border-0 last:pb-0">
-                      <span className="text-foreground/80 font-light pr-2 leading-tight">{item.desc}</span>
-                      <span className="font-mono font-bold text-primary shrink-0">
-                        ${Number(item.price || 0).toLocaleString("es-AR")}
-                      </span>
-                    </div>
-                  ))}
-                </div>
-
-                <div className="flex justify-between items-baseline pt-2 border-t border-border/50">
-                  <span className="text-xs font-bold text-muted-foreground uppercase tracking-wider">Total</span>
-                  <span className="text-xl font-black font-outfit text-primary font-mono">
-                    ${order.budget.items.reduce((s, i) => s + (Number(i.price) || 0), 0).toLocaleString("es-AR")}
-                  </span>
-                </div>
-
-                {order.budget.approved ? (
-                  <div className="bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 p-3 rounded-xl text-xs font-bold flex items-center gap-2.5 shadow-sm">
-                    <ShieldCheck className="w-4 h-4 shrink-0 text-emerald-400" />
-                    <div>
-                      <div className="leading-tight">Presupuesto Aprobado</div>
-                      <div className="text-[10px] font-normal text-emerald-400/80">Orden autorizada para reparación.</div>
-                    </div>
-                  </div>
-                ) : (
-                  <AlertDialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-                    <AlertDialogTrigger asChild>
-                      <Button className="w-full bg-primary hover:bg-primary/95 text-primary-foreground font-bold text-xs py-2.5 rounded-xl shadow-md cursor-pointer mt-1">
-                        <ShieldCheck className="w-4 h-4 mr-1.5" />
-                        Aprobar Presupuesto Online
-                      </Button>
-                    </AlertDialogTrigger>
-                    <AlertDialogContent className="bg-card border-border shadow-2xl max-w-md">
-                      <AlertDialogHeader>
-                        <AlertDialogTitle className="font-outfit text-base font-bold text-foreground flex items-center gap-2">
-                          <ShieldCheck className="w-5 h-5 text-primary" />
-                          Aprobación de Presupuesto
-                        </AlertDialogTitle>
-                        <AlertDialogDescription className="text-muted-foreground text-xs font-light space-y-1">
-                          <span>Autorizás la realización del servicio técnico por un total de <strong className="text-foreground font-bold">${order.budget.items.reduce((s, i) => s + (Number(i.price) || 0), 0).toLocaleString("es-AR")}</strong>.</span>
-                        </AlertDialogDescription>
-                      </AlertDialogHeader>
-
-                      <div className="space-y-2 py-2 border-y border-border/40 my-2">
-                        <label className="text-xs font-semibold text-foreground block">
-                          Confirmación de identidad (DNI del titular):
-                        </label>
-                        <Input
-                          type="text"
-                          inputMode="numeric"
-                          pattern="[0-9]*"
-                          placeholder="Ingresá tu DNI sin puntos..."
-                          value={dniInput}
-                          onChange={(e) => setDniInput(e.target.value)}
-                          onKeyDown={(e) => { if (e.key === "Enter") handleApproveBudget(); }}
-                          className="bg-background/80 border-border text-xs h-9 font-mono"
-                        />
-                        <p className="text-[11px] text-muted-foreground font-light">
-                          Por seguridad, ingresá el número de DNI registrado en la orden para autorizar la reparación.
-                        </p>
-                      </div>
-
-                      <AlertDialogFooter>
-                        <AlertDialogCancel disabled={approving} className="bg-background border-border text-foreground text-xs font-bold rounded-lg cursor-pointer">
-                          Cancelar
-                        </AlertDialogCancel>
-                        <Button
-                          onClick={handleApproveBudget}
-                          disabled={approving}
-                          className="bg-primary hover:bg-primary/90 text-primary-foreground text-xs font-bold rounded-lg cursor-pointer"
-                        >
-                          {approving ? "Verificando..." : "Confirmar Aprobación"}
-                        </Button>
-                      </AlertDialogFooter>
-                    </AlertDialogContent>
-                  </AlertDialog>
-                )}
-              </div>
-            ) : (
-              <div className="text-center py-6 space-y-2">
-                <p className="text-xs text-muted-foreground font-light">
-                  Presupuesto pendiente de evaluación por el equipo técnico.
-                </p>
-                <Badge variant="secondary" className="text-[9px] font-bold uppercase tracking-wider">
-                  En Evaluación
-                </Badge>
-              </div>
-            )}
+            {/* Acción de Descarga Integrada en el pie de la tarjeta */}
+            <div className="pt-3 border-t border-border/40 mt-3">
+              <Button
+                variant="outline"
+                onClick={handleDownloadPdf}
+                className="w-full text-xs font-semibold text-muted-foreground hover:text-foreground hover:bg-muted/30 border-border/60 rounded-xl py-2.5 h-auto flex items-center justify-center gap-2 cursor-pointer transition-all"
+              >
+                <Download className="w-3.5 h-3.5 text-primary" />
+                <span>Descargar Comprobante PDF</span>
+              </Button>
+            </div>
           </Card>
 
-          {/* BENTO CARD: Taller Responsable / Sucursal (Dedicado) */}
-          <Card className="bg-card/50 backdrop-blur-md border-border/70 p-5 rounded-2xl shadow-sm space-y-4">
+          {/* BENTO CARD: Taller Responsable / Sucursal (Espacioso y con bloques individuales) */}
+          <Card className="bg-card/50 backdrop-blur-md border-border/70 p-5 sm:p-6 rounded-2xl shadow-sm space-y-4">
             <div className="flex items-center gap-2.5 border-b border-border/50 pb-3">
               <div className="w-8 h-8 rounded-lg bg-primary/10 border border-primary/20 flex items-center justify-center text-primary shrink-0">
                 <Store className="w-4 h-4" />
@@ -692,22 +697,24 @@ export default function TrackingPage() {
               </div>
             </div>
 
-            <div className="space-y-3.5 text-xs">
+            <div className="space-y-3">
               {parsedVenue.address && (
-                <div className="flex items-start gap-2.5">
-                  <MapPin className="w-4 h-4 text-primary shrink-0 mt-0.5" />
-                  <div className="space-y-1">
-                    <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider block">
+                <div className="bg-muted/20 border border-border/40 rounded-xl p-3.5 space-y-1.5">
+                  <div className="flex items-center gap-2">
+                    <MapPin className="w-4 h-4 text-primary shrink-0" />
+                    <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">
                       Dirección Física
                     </span>
-                    <p className="text-foreground/90 font-medium leading-snug">
-                      {parsedVenue.address}
-                    </p>
+                  </div>
+                  <p className="text-xs text-foreground/90 font-medium leading-relaxed pl-6">
+                    {parsedVenue.address}
+                  </p>
+                  <div className="pl-6 pt-1">
                     <a
                       href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(parsedVenue.address)}`}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="inline-flex items-center gap-1 text-[11px] text-primary hover:underline font-semibold cursor-pointer pt-0.5"
+                      className="inline-flex items-center gap-1.5 text-xs text-primary hover:underline font-semibold cursor-pointer"
                     >
                       <span>Ver en Google Maps</span>
                       <ExternalLink className="w-3 h-3" />
@@ -717,29 +724,31 @@ export default function TrackingPage() {
               )}
 
               {parsedVenue.hours && (
-                <div className="flex items-start gap-2.5 pt-1 border-t border-border/30">
-                  <Clock className="w-4 h-4 text-emerald-400 shrink-0 mt-0.5" />
-                  <div className="space-y-0.5">
-                    <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider block">
+                <div className="bg-muted/20 border border-border/40 rounded-xl p-3.5 space-y-1.5">
+                  <div className="flex items-center gap-2">
+                    <Clock className="w-4 h-4 text-emerald-400 shrink-0" />
+                    <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">
                       Horarios de Atención
                     </span>
-                    <p className="text-foreground/90 font-medium leading-snug">
-                      {parsedVenue.hours}
-                    </p>
                   </div>
+                  <p className="text-xs text-foreground/90 font-medium leading-relaxed pl-6">
+                    {parsedVenue.hours}
+                  </p>
                 </div>
               )}
 
               {venuePhone && (
-                <div className="flex items-start gap-2.5 pt-1 border-t border-border/30">
-                  <Phone className="w-4 h-4 text-sky-400 shrink-0 mt-0.5" />
-                  <div className="space-y-0.5">
-                    <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider block">
+                <div className="bg-muted/20 border border-border/40 rounded-xl p-3.5 space-y-1.5">
+                  <div className="flex items-center gap-2">
+                    <Phone className="w-4 h-4 text-sky-400 shrink-0" />
+                    <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">
                       Teléfono de Contacto
                     </span>
+                  </div>
+                  <div className="pl-6">
                     <a
                       href={`tel:${venuePhone.replace(/\s+/g, '')}`}
-                      className="text-foreground/90 font-semibold hover:text-primary transition-colors block"
+                      className="text-xs text-foreground/90 font-bold hover:text-primary transition-colors inline-block"
                     >
                       {venuePhone}
                     </a>
@@ -748,16 +757,6 @@ export default function TrackingPage() {
               )}
             </div>
           </Card>
-
-          {/* BENTO ACTION: Descargar Comprobante / Ficha PDF */}
-          <Button
-            variant="outline"
-            onClick={handleDownloadPdf}
-            className="w-full text-xs font-semibold text-muted-foreground hover:text-foreground hover:bg-card/80 border-border/70 rounded-xl py-3 h-auto flex items-center justify-center gap-2 cursor-pointer shadow-sm transition-all"
-          >
-            <Download className="w-4 h-4 text-primary" />
-            <span>Descargar Comprobante PDF</span>
-          </Button>
 
         </div>
 
