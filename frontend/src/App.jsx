@@ -16,6 +16,7 @@ const ForgotPasswordPage = lazy(() => import("@/views/admin/ForgotPasswordPage")
 const ResetPasswordPage = lazy(() => import("@/views/admin/ResetPasswordPage"));
 const PrivacyPage = lazy(() => import("@/views/public/PrivacyPage"));
 const TermsPage = lazy(() => import("@/views/public/TermsPage"));
+const NotFoundPage = lazy(() => import("@/views/public/NotFoundPage"));
 
 // Vistas Privadas (Dashboard)
 const DashboardPage = lazy(() => import("@/views/admin/DashboardPage"));
@@ -35,7 +36,13 @@ const RouteFallback = () => (
 );
 
 export default function App() {
-  const [sessionLoading, setSessionLoading] = useState(true);
+  const [sessionLoading, setSessionLoading] = useState(() => {
+    if (typeof window === "undefined") return true;
+    const token = sessionStorage.getItem("repairit_token") || localStorage.getItem("repairit_token");
+    const path = window.location.pathname;
+    const isAuthOrDash = path.startsWith("/dashboard") || path === "/login" || path === "/register" || path === "/reset-password";
+    return Boolean(token || isAuthOrDash);
+  });
 
   useEffect(() => {
     // Detección inteligente de subdominio en producción
@@ -246,8 +253,6 @@ export default function App() {
         console.error("Error al cargar autenticación:", err);
         setSessionLoading(false);
       });
-    } else {
-      setSessionLoading(false);
     }
 
     return () => {
@@ -289,6 +294,7 @@ export default function App() {
             <Route path="reset-password" element={<ResetPasswordPage />} />
             <Route path="privacidad" element={<PrivacyPage />} />
             <Route path="terminos" element={<TermsPage />} />
+            <Route path="*" element={<NotFoundPage />} />
           </Route>
 
           {/* Entorno Administrativo (dashboard.repairit.cloud) */}
@@ -303,7 +309,18 @@ export default function App() {
             <Route path="consultas" element={<SuperAdminUsersPage />} />
             <Route path="cuentas" element={<VenueAccountsPage />} />
             <Route path="caja" element={<POSPage />} />
+            <Route path="*" element={<NotFoundPage />} />
           </Route>
+
+          {/* Fallback global 404 */}
+          <Route
+            path="*"
+            element={
+              <PublicLayout>
+                <NotFoundPage />
+              </PublicLayout>
+            }
+          />
 
         </Routes>
       </Suspense>
