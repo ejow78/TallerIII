@@ -738,7 +738,8 @@ export const api = {
           },
           venueId: {
             name: "Sucursal Central (Demo)",
-            address: "Av. Sarmiento 1234, San Miguel de Tucumán [Horario: Lunes a Viernes de 9:00 a 18:00 hs • Sábados de 9:00 a 13:00 hs]"
+            address: "Av. Sarmiento 1234, San Miguel de Tucumán [Horario: Lunes a Viernes de 9:00 a 18:00 hs • Sábados de 9:00 a 13:00 hs]",
+            phone: "+54 381 400-0000"
           },
           budget: {
             items: [

@@ -1,15 +1,13 @@
 import { parseVenueAddress } from '@/utils/venueHelper';
 import { useParams, Link } from "react-router-dom";
 import { useState, useEffect } from "react";
-import { Card, CardContent } from "@/components/ui/card";
+import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Alert, AlertTitle, AlertDescription } from "@/components/ui/alert";
 import {
   AlertDialog,
-  AlertDialogAction,
   AlertDialogCancel,
   AlertDialogContent,
   AlertDialogDescription,
@@ -22,17 +20,24 @@ import { toast } from "sonner";
 import { api } from "@/services/api";
 import { escapeHtml, printHtml } from "@/utils/printHelper";
 import { Input } from "@/components/ui/input";
+import { cn } from "@/lib/utils";
 import { 
   ArrowLeft,
+  Store,
   MapPin, 
   CheckCircle2, 
   Clock, 
   FileText, 
   Stethoscope, 
   Laptop, 
+  Smartphone,
+  Tablet,
+  Cpu,
   AlertCircle,
   ShieldCheck,
-  Download
+  Download,
+  Phone,
+  ExternalLink
 } from "lucide-react";
 
 // Lista de estados en orden secuencial
@@ -254,20 +259,44 @@ export default function TrackingPage() {
   };
 
   // Obtener el índice del estado actual
-  const foundIndex = order ? STEPS.findIndex(s => s.key === order.status || (s.key === "reparacion" && order.status === "en_reparacion")) : 0;
+  const statusKey = (order?.status || "").toLowerCase().trim();
+  const foundIndex = order 
+    ? STEPS.findIndex(s => s.key === statusKey || (s.key === "reparacion" && statusKey === "en_reparacion")) 
+    : 0;
   const currentStepIndex = foundIndex >= 0 ? foundIndex : 0;
   const progressPercent = order ? (currentStepIndex / (STEPS.length - 1)) * 100 : 0;
+  const isEntregado = statusKey === "entregado";
+
+  // Ícono dinámico del dispositivo
+  const getDeviceIcon = (type = "") => {
+    const t = type.toLowerCase();
+    if (t.includes("celular") || t.includes("smartphone") || t.includes("teléfono") || t.includes("telefono") || t.includes("iphone") || t.includes("samsung")) {
+      return Smartphone;
+    }
+    if (t.includes("tablet") || t.includes("ipad")) {
+      return Tablet;
+    }
+    if (t.includes("notebook") || t.includes("laptop") || t.includes("macbook") || t.includes("pc") || t.includes("computadora")) {
+      return Laptop;
+    }
+    return Cpu;
+  };
 
   // Renderizador de Skeleton de carga
   if (loading) {
     return (
-      <div className="flex-1 max-w-4xl w-full mx-auto px-6 py-12 space-y-6 animate-fade-in">
-        <Skeleton className="h-6 w-28" />
-        <Skeleton className="h-28 w-full rounded-2xl" />
-        <Skeleton className="h-24 w-full rounded-2xl" />
+      <div className="flex-1 max-w-5xl w-full mx-auto px-4 sm:px-6 py-10 space-y-6 animate-fade-in">
+        <Skeleton className="h-6 w-32 rounded-lg" />
+        <Skeleton className="h-36 w-full rounded-2xl" />
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <Skeleton className="md:col-span-2 h-64 w-full rounded-2xl" />
-          <Skeleton className="h-64 w-full rounded-2xl" />
+          <div className="md:col-span-2 space-y-6">
+            <Skeleton className="h-56 w-full rounded-2xl" />
+            <Skeleton className="h-56 w-full rounded-2xl" />
+          </div>
+          <div className="space-y-6">
+            <Skeleton className="h-60 w-full rounded-2xl" />
+            <Skeleton className="h-44 w-full rounded-2xl" />
+          </div>
         </div>
       </div>
     );
@@ -276,13 +305,13 @@ export default function TrackingPage() {
   if (!order) {
     return (
       <div className="flex-1 max-w-md w-full mx-auto px-6 py-20 text-center space-y-5 animate-fade-in">
-        <div className="w-12 h-12 rounded-2xl bg-destructive/10 border border-destructive/20 flex items-center justify-center mx-auto text-destructive">
-          <AlertCircle className="w-6 h-6" />
+        <div className="w-14 h-14 rounded-2xl bg-destructive/10 border border-destructive/20 flex items-center justify-center mx-auto text-destructive shadow-sm">
+          <AlertCircle className="w-7 h-7" />
         </div>
-        <div className="space-y-1">
-          <h2 className="font-outfit text-lg font-bold text-foreground">Orden no encontrada</h2>
-          <p className="text-xs text-muted-foreground font-light">
-            No se encontró información para el código <span className="font-mono font-bold text-foreground">"{id}"</span>.
+        <div className="space-y-1.5">
+          <h2 className="font-outfit text-xl font-bold text-foreground">Orden no encontrada</h2>
+          <p className="text-xs text-muted-foreground font-light leading-relaxed">
+            No se encontró información para el código <span className="font-mono font-bold text-foreground">"{id}"</span>. Comprobá el código o consultá a tu taller.
           </p>
         </div>
         <Button asChild variant="outline" className="text-xs font-bold rounded-xl px-5 h-9">
@@ -293,246 +322,443 @@ export default function TrackingPage() {
   }
 
   const clientName = order.clientId?.name || "Cliente";
+  const DeviceIcon = getDeviceIcon(order.deviceType);
+  const parsedVenue = parseVenueAddress(order.venueId?.address);
+  const venueName = order.venueId?.name || "Taller RepairIT";
+  const venuePhone = order.venueId?.phone;
 
   return (
-    <div className="flex-1 max-w-4xl w-full mx-auto px-5 py-8 space-y-6 animate-fade-in">
+    <div className="flex-1 max-w-5xl w-full mx-auto px-4 sm:px-6 py-8 space-y-6 animate-fade-in">
 
-      {/* Botón de retorno a consulta */}
-      <div>
+      {/* Botón superior de retorno */}
+      <div className="flex items-center justify-between">
         <Link
           to="/consulta"
           className="inline-flex items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground transition-colors font-medium cursor-pointer"
         >
-          <ArrowLeft className="w-3.5 h-3.5" /> Ver otro seguimiento
+          <ArrowLeft className="w-3.5 h-3.5" /> Volver al portal de consulta
         </Link>
       </div>
 
-      {/* Tarjeta Principal de Resumen del Dispositivo */}
-      <Card className="bg-card/40 border-border/70 p-6 rounded-2xl shadow-sm">
+      {/* BENTO HERO: Tarjeta Principal del Dispositivo y Progreso */}
+      <Card className="bg-card/50 backdrop-blur-md border-border/70 p-5 sm:p-6 rounded-2xl shadow-sm space-y-6">
+        
+        {/* Fila Superior: Datos de la orden y estado */}
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 border-b border-border/50 pb-5">
-          <div className="flex items-center gap-3">
-            <div className="w-11 h-11 rounded-xl bg-primary/10 border border-primary/20 flex items-center justify-center text-primary shrink-0">
-              <Laptop className="w-5 h-5" />
+          <div className="flex items-center gap-3.5">
+            <div className="w-12 h-12 rounded-2xl bg-primary/10 border border-primary/20 flex items-center justify-center text-primary shrink-0 shadow-inner">
+              <DeviceIcon className="w-6 h-6" />
             </div>
             <div>
-              <span className="text-[10px] text-muted-foreground uppercase font-mono tracking-wider font-semibold">Orden #{order.trackingCode}</span>
-              <h1 className="font-outfit text-xl font-bold text-foreground">
+              <div className="flex items-center gap-2">
+                <span className="text-[10px] text-muted-foreground uppercase font-mono tracking-wider font-bold">
+                  Orden #{order.trackingCode}
+                </span>
+                {order.created_at && (
+                  <>
+                    <span className="text-muted-foreground/40 text-[10px]">&bull;</span>
+                    <span className="text-[10px] text-muted-foreground font-mono">
+                      {new Date(order.created_at).toLocaleDateString("es-AR", {
+                        day: "2-digit",
+                        month: "2-digit",
+                        year: "numeric"
+                      })}
+                    </span>
+                  </>
+                )}
+              </div>
+              <h1 className="font-outfit text-xl sm:text-2xl font-bold text-foreground tracking-tight">
                 {order.deviceType} {order.deviceModel}
               </h1>
+              <p className="text-xs text-muted-foreground font-light">
+                Titular: <span className="font-medium text-foreground">{clientName}</span>
+              </p>
             </div>
           </div>
 
-          <Badge variant="outline" className="text-xs font-bold px-3 py-1 bg-primary/10 text-primary border-primary/20 uppercase tracking-wider self-start sm:self-auto rounded-lg">
-            {STEPS[currentStepIndex]?.label || order.status}
-          </Badge>
+          <div className="self-start sm:self-auto">
+            <Badge
+              variant="outline"
+              className={cn(
+                "text-xs font-bold px-3.5 py-1.5 uppercase tracking-wider rounded-xl flex items-center gap-2 shadow-sm",
+                isEntregado
+                  ? "bg-emerald-500/10 text-emerald-400 border-emerald-500/30"
+                  : "bg-primary/10 text-primary border-primary/30"
+              )}
+            >
+              <span className={cn(
+                "w-2 h-2 rounded-full",
+                isEntregado ? "bg-emerald-400" : "bg-primary animate-pulse"
+              )} />
+              {STEPS[currentStepIndex]?.label || order.status}
+            </Badge>
+          </div>
         </div>
 
-        {/* Línea de Progreso Limpia */}
-        <div className="pt-5 space-y-3">
-          <div className="flex justify-between items-center text-xs">
-            <span className="text-muted-foreground font-light">Progreso del servicio</span>
+        {/* Stepper Bento Flow */}
+        <div className="space-y-3.5">
+          <div className="flex items-center justify-between text-xs">
+            <span className="text-muted-foreground font-medium">Progreso del Servicio</span>
+            <span className="text-primary font-mono font-bold">{Math.round(progressPercent)}%</span>
           </div>
-          
-          <Progress value={progressPercent} className="h-2 bg-muted [&>div]:bg-primary rounded-full" />
 
-          {/* Pasos limpios horizontal */}
-          <div className="hidden sm:flex justify-between pt-1 text-[11px]">
+          {/* Barra de progreso continua */}
+          <Progress value={progressPercent} className="h-2 bg-muted/60 [&>div]:bg-primary rounded-full" />
+
+          {/* Stepper detallado en pantalla mediana/grande */}
+          <div className="hidden md:grid grid-cols-6 gap-2 pt-2">
             {STEPS.map((step, idx) => {
-              const isDone = idx <= currentStepIndex;
+              const isDone = idx < currentStepIndex;
+              const isCurrent = idx === currentStepIndex;
               return (
-                <span key={step.key} className={`font-medium ${isDone ? "text-foreground font-semibold" : "text-muted-foreground/60"}`}>
-                  {step.label}
-                </span>
+                <div key={step.key} className="flex flex-col items-center text-center">
+                  <div className={cn(
+                    "w-7 h-7 rounded-full text-[11px] font-bold flex items-center justify-center transition-all",
+                    isCurrent 
+                      ? "bg-primary text-primary-foreground ring-4 ring-primary/20 shadow-md scale-105 font-black" 
+                      : isDone 
+                        ? "bg-primary/20 text-primary border border-primary/30" 
+                        : "bg-muted/50 text-muted-foreground/50 border border-border/50"
+                  )}>
+                    {isDone ? <CheckCircle2 className="w-4 h-4" /> : idx + 1}
+                  </div>
+                  <span className={cn(
+                    "text-[11px] mt-1.5 transition-colors leading-tight",
+                    isCurrent 
+                      ? "font-bold text-primary" 
+                      : isDone 
+                        ? "font-semibold text-foreground/90" 
+                        : "font-light text-muted-foreground/60"
+                  )}>
+                    {step.label}
+                  </span>
+                </div>
               );
             })}
           </div>
+
+          {/* Vista móvil compacta de pasos */}
+          <div className="flex md:hidden justify-between text-[11px] text-muted-foreground font-light pt-1">
+            <span>Inicio</span>
+            <span className="font-bold text-primary">{STEPS[currentStepIndex]?.label}</span>
+            <span>Entrega</span>
+          </div>
         </div>
+
       </Card>
 
-      {/* Grid de 2 Columnas: Detalle Técnico + Presupuesto */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+      {/* GRID BENTO PRINCIPAL (2 Columnas en Desktop) */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 items-start">
 
-        {/* Columna Principal (2/3): Diagnóstico e Historial */}
-        <div className="md:col-span-2 space-y-5">
-          
-          {/* Falla Reportada y Diagnóstico en 1 sola tarjeta limpia */}
-          <Card className="bg-card/40 border-border/70 p-5 rounded-2xl shadow-sm space-y-4">
-            
-            <div className="space-y-1.5">
-              <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider block">Falla Reportada</span>
-              <p className="text-xs text-foreground/90 font-light bg-muted/20 p-3 rounded-xl border border-border/40 leading-relaxed">
-                {order.issue}
-              </p>
-            </div>
+        {/* COLUMNA IZQUIERDA (2/3): Informe Técnico e Historial */}
+        <div className="md:col-span-2 space-y-6">
 
-            {order.diagnosis && (
-              <div className="space-y-1.5 pt-2 border-t border-border/50">
-                <span className="text-[10px] font-bold text-purple-400 uppercase tracking-wider flex items-center gap-1.5">
-                  <Stethoscope className="w-3.5 h-3.5" /> Diagnóstico del Técnico
-                </span>
-                <p className="text-xs text-foreground font-light bg-purple-500/5 p-3 rounded-xl border border-purple-500/20 leading-relaxed">
-                  {order.diagnosis}
-                </p>
+          {/* BENTO CARD: Informe Técnico y Revisión */}
+          <Card className="bg-card/50 backdrop-blur-md border-border/70 p-5 sm:p-6 rounded-2xl shadow-sm space-y-5">
+            <div className="flex items-center gap-2.5 border-b border-border/50 pb-3">
+              <div className="w-8 h-8 rounded-lg bg-primary/10 border border-primary/20 flex items-center justify-center text-primary shrink-0">
+                <Stethoscope className="w-4 h-4" />
               </div>
-            )}
-
-            {(() => {
-              const parsedV = parseVenueAddress(order.venueId?.address);
-              return (
-                <div className="pt-3 border-t border-border/50 space-y-2 text-xs">
-                  <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-muted-foreground text-[11px]">
-                    <span>Cliente: <strong className="text-foreground font-medium">{clientName}</strong></span>
-                    <span>&bull;</span>
-                    <span>Taller: <strong className="text-foreground font-medium">{order.venueId?.name || "Taller Central"}</strong></span>
-                  </div>
-
-                  {(parsedV.address || parsedV.hours) && (
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 pt-1 text-[11px] bg-muted/20 p-2.5 rounded-xl border border-border/40">
-                      {parsedV.address && (
-                        <div className="flex items-start gap-1.5 text-muted-foreground">
-                          <MapPin className="w-3.5 h-3.5 text-primary shrink-0 mt-0.5" />
-                          <span><strong className="text-foreground font-medium">Dirección:</strong> {parsedV.address}</span>
-                        </div>
-                      )}
-                      {parsedV.hours && (
-                        <div className="flex items-start gap-1.5 text-muted-foreground">
-                          <Clock className="w-3.5 h-3.5 text-emerald-400 shrink-0 mt-0.5" />
-                          <span><strong className="text-foreground font-medium">Horarios:</strong> {parsedV.hours}</span>
-                        </div>
-                      )}
-                    </div>
-                  )}
-                </div>
-              );
-            })()}
-          </Card>
-
-          {/* Historial Compacto */}
-          <Card className="bg-card/40 border-border/70 p-5 rounded-2xl shadow-sm space-y-3">
-            <h3 className="text-xs font-bold text-muted-foreground uppercase tracking-wider flex items-center gap-1.5">
-              <Clock className="w-3.5 h-3.5 text-primary" /> Historial de Trazabilidad
-            </h3>
-            
-            <div className="space-y-3 pt-1">
-              {order.history.map((log, idx) => (
-                <div key={idx} className="flex items-start gap-2.5 text-xs border-b border-border/30 pb-2 last:border-0 last:pb-0">
-                  <span className="font-mono text-[10px] text-muted-foreground shrink-0 mt-0.5">{log.date}</span>
-                  <p className="text-foreground/90 font-light leading-snug">{log.text}</p>
-                </div>
-              ))}
+              <div>
+                <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider block">
+                  Servicio Técnico
+                </span>
+                <h3 className="font-outfit text-sm font-bold text-foreground leading-tight">
+                  Informe & Diagnóstico
+                </h3>
+              </div>
             </div>
-          </Card>
 
-        </div>
-
-        {/* Columna Derecha (1/3): Presupuesto y Aprobación */}
-        <div className="space-y-5">
-          <Card className="bg-card/40 border-border/70 p-5 rounded-2xl shadow-sm flex flex-col justify-between h-full space-y-4">
-            
-            <div className="space-y-3.5">
-              <h3 className="text-xs font-bold text-muted-foreground uppercase tracking-wider flex items-center gap-1.5 border-b border-border/50 pb-2.5">
-                <FileText className="w-3.5 h-3.5 text-primary" /> Presupuesto
-              </h3>
-
-              {order.budget ? (
-                <div className="space-y-3.5">
-                  <div className="space-y-2">
-                    {order.budget.items.map((item, idx) => (
-                      <div key={idx} className="flex justify-between items-start text-xs border-b border-border/30 pb-1.5">
-                        <span className="text-foreground/80 font-light pr-2 leading-tight">{item.desc}</span>
-                        <span className="font-mono font-bold text-primary shrink-0">${item.price.toLocaleString("es-AR")}</span>
-                      </div>
-                    ))}
-                  </div>
-
-                  <div className="flex justify-between items-baseline pt-1">
-                    <span className="text-xs font-bold text-muted-foreground uppercase">Total</span>
-                    <span className="text-lg font-black font-outfit text-primary font-mono">
-                      ${order.budget.items.reduce((s, i) => s + i.price, 0).toLocaleString("es-AR")}
-                    </span>
-                  </div>
-
-                  {order.budget.approved ? (
-                    <div className="bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 p-2.5 rounded-xl text-xs font-bold flex items-center gap-2">
-                      <ShieldCheck className="w-4 h-4 shrink-0" />
-                      <span>Presupuesto Aprobado</span>
-                    </div>
-                  ) : (
-                    <AlertDialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-                      <AlertDialogTrigger asChild>
-                        <Button className="w-full bg-primary hover:bg-primary/95 text-primary-foreground font-bold text-xs py-2.5 rounded-xl shadow-md cursor-pointer mt-1">
-                          Aprobar Presupuesto
-                        </Button>
-                      </AlertDialogTrigger>
-                      <AlertDialogContent className="bg-card border-border shadow-2xl max-w-md">
-                        <AlertDialogHeader>
-                          <AlertDialogTitle className="font-outfit text-base font-bold text-foreground flex items-center gap-2">
-                            <ShieldCheck className="w-5 h-5 text-primary" />
-                            Aprobación de Presupuesto
-                          </AlertDialogTitle>
-                          <AlertDialogDescription className="text-muted-foreground text-xs font-light space-y-1">
-                            <span>Autorizas la realización del servicio por un total de <strong className="text-foreground font-bold">${order.budget.items.reduce((s, i) => s + i.price, 0).toLocaleString("es-AR")}</strong>.</span>
-                          </AlertDialogDescription>
-                        </AlertDialogHeader>
-
-                        <div className="space-y-2 py-2 border-y border-border/40 my-2">
-                          <label className="text-xs font-semibold text-foreground block">
-                            Confirmación de identidad (DNI del titular):
-                          </label>
-                          <Input
-                            type="text"
-                            inputMode="numeric"
-                            pattern="[0-9]*"
-                            placeholder="Ingresá tu DNI sin puntos..."
-                            value={dniInput}
-                            onChange={(e) => setDniInput(e.target.value)}
-                            onKeyDown={(e) => { if (e.key === "Enter") handleApproveBudget(); }}
-                            className="bg-background/80 border-border text-xs h-9 font-mono"
-                          />
-                          <p className="text-[11px] text-muted-foreground font-light">
-                            Por seguridad, ingresá el número de DNI registrado en la orden para autorizar la reparación.
-                          </p>
-                        </div>
-
-                        <AlertDialogFooter>
-                          <AlertDialogCancel disabled={approving} className="bg-background border-border text-foreground text-xs font-bold rounded-lg cursor-pointer">
-                            Cancelar
-                          </AlertDialogCancel>
-                          <Button
-                            onClick={handleApproveBudget}
-                            disabled={approving}
-                            className="bg-primary hover:bg-primary/90 text-primary-foreground text-xs font-bold rounded-lg cursor-pointer"
-                          >
-                            {approving ? "Verificando..." : "Confirmar Aprobación"}
-                          </Button>
-                        </AlertDialogFooter>
-                      </AlertDialogContent>
-                    </AlertDialog>
-                  )}
+            <div className="space-y-4">
+              {/* Falla Reportada */}
+              <div className="space-y-1.5">
+                <span className="text-[11px] font-bold text-muted-foreground uppercase tracking-wider block">
+                  Falla Declarada en Recepción
+                </span>
+                <div className="bg-muted/20 p-3.5 rounded-xl border border-border/40 text-xs text-foreground/90 font-light leading-relaxed">
+                  {order.issue || "Sin falla declarada al momento del ingreso."}
                 </div>
-              ) : (
-                <div className="text-center py-6 space-y-2">
-                  <p className="text-xs text-muted-foreground font-light">
-                    Presupuesto pendiente de evaluación por el equipo técnico.
-                  </p>
-                  <Badge variant="secondary" className="text-[9px] font-bold uppercase tracking-wider">
-                    En Evaluación
-                  </Badge>
+              </div>
+
+              {/* Diagnóstico del Especialista */}
+              <div className="space-y-1.5">
+                <span className="text-[11px] font-bold text-purple-400 uppercase tracking-wider flex items-center gap-1.5">
+                  <Stethoscope className="w-3.5 h-3.5" /> Diagnóstico del Técnico Especialista
+                </span>
+                {order.diagnosis ? (
+                  <div className="bg-purple-500/5 p-3.5 rounded-xl border border-purple-500/20 text-xs text-foreground font-light leading-relaxed">
+                    {order.diagnosis}
+                  </div>
+                ) : (
+                  <div className="bg-muted/15 p-3.5 rounded-xl border border-border/40 text-xs text-muted-foreground font-light italic flex items-center gap-2">
+                    <Clock className="w-4 h-4 text-muted-foreground/60 shrink-0" />
+                    <span>El dispositivo se encuentra en evaluación diagnóstica en el laboratorio técnico.</span>
+                  </div>
+                )}
+              </div>
+
+              {/* Accesorios y Estado Estético si existen */}
+              {(order.accessories || order.cosmeticCondition) && (
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2 border-t border-border/40 text-xs">
+                  {order.accessories && (
+                    <div className="bg-muted/20 p-2.5 rounded-xl border border-border/40">
+                      <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider block">
+                        Accesorios Recibidos
+                      </span>
+                      <span className="text-foreground font-medium text-xs mt-0.5 block">{order.accessories}</span>
+                    </div>
+                  )}
+                  {order.cosmeticCondition && (
+                    <div className="bg-muted/20 p-2.5 rounded-xl border border-border/40">
+                      <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider block">
+                        Estado Estético
+                      </span>
+                      <span className="text-foreground font-medium text-xs mt-0.5 block">{order.cosmeticCondition}</span>
+                    </div>
+                  )}
                 </div>
               )}
             </div>
+          </Card>
 
-            <div className="pt-3 border-t border-border/40">
-              <Button
-                variant="ghost"
-                onClick={handleDownloadPdf}
-                className="w-full text-xs font-semibold text-muted-foreground hover:text-foreground flex items-center justify-center gap-1.5 h-8 cursor-pointer"
-              >
-                <Download className="w-3.5 h-3.5" /> Descargar Ficha PDF
-              </Button>
+          {/* BENTO CARD: Historial de Trazabilidad */}
+          <Card className="bg-card/50 backdrop-blur-md border-border/70 p-5 sm:p-6 rounded-2xl shadow-sm space-y-4">
+            <div className="flex items-center gap-2.5 border-b border-border/50 pb-3">
+              <div className="w-8 h-8 rounded-lg bg-primary/10 border border-primary/20 flex items-center justify-center text-primary shrink-0">
+                <Clock className="w-4 h-4" />
+              </div>
+              <div>
+                <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider block">
+                  Trazabilidad
+                </span>
+                <h3 className="font-outfit text-sm font-bold text-foreground leading-tight">
+                  Línea de Tiempo del Servicio
+                </h3>
+              </div>
             </div>
 
+            <div className="relative pl-6 pt-2 space-y-4 before:absolute before:left-[11px] before:top-3 before:bottom-3 before:w-0.5 before:bg-border/70">
+              {Array.isArray(order.history) && order.history.length > 0 ? (
+                order.history.map((log, idx) => (
+                  <div key={idx} className="relative flex items-start gap-3">
+                    <div className={cn(
+                      "absolute -left-6 top-1 w-2.5 h-2.5 rounded-full ring-4 ring-background shrink-0",
+                      idx === order.history.length - 1 ? "bg-primary ring-primary/20" : "bg-muted-foreground/60"
+                    )} />
+                    <div className="space-y-0.5 flex-1 min-w-0">
+                      <span className="font-mono text-[10px] font-semibold text-muted-foreground bg-muted/40 px-2 py-0.5 rounded-md inline-block">
+                        {log.date}
+                      </span>
+                      <p className="text-xs text-foreground/90 font-medium leading-relaxed mt-1">
+                        {log.text}
+                      </p>
+                    </div>
+                  </div>
+                ))
+              ) : (
+                <p className="text-xs text-muted-foreground font-light">Sin registros de movimientos.</p>
+              )}
+            </div>
           </Card>
+
+        </div>
+
+        {/* COLUMNA DERECHA (1/3): Presupuesto, Taller Responsable y Acciones */}
+        <div className="space-y-6">
+
+          {/* BENTO CARD: Presupuesto Oficial y Aprobación */}
+          <Card className="bg-card/50 backdrop-blur-md border-border/70 p-5 rounded-2xl shadow-sm space-y-4">
+            <div className="flex items-center gap-2.5 border-b border-border/50 pb-3">
+              <div className="w-8 h-8 rounded-lg bg-primary/10 border border-primary/20 flex items-center justify-center text-primary shrink-0">
+                <FileText className="w-4 h-4" />
+              </div>
+              <div>
+                <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider block">
+                  Cotización
+                </span>
+                <h3 className="font-outfit text-sm font-bold text-foreground leading-tight">
+                  Presupuesto Oficial
+                </h3>
+              </div>
+            </div>
+
+            {order.budget && order.budget.items?.length > 0 ? (
+              <div className="space-y-4">
+                <div className="space-y-2">
+                  {order.budget.items.map((item, idx) => (
+                    <div key={idx} className="flex justify-between items-start text-xs border-b border-border/30 pb-2 last:border-0 last:pb-0">
+                      <span className="text-foreground/80 font-light pr-2 leading-tight">{item.desc}</span>
+                      <span className="font-mono font-bold text-primary shrink-0">
+                        ${Number(item.price || 0).toLocaleString("es-AR")}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+
+                <div className="flex justify-between items-baseline pt-2 border-t border-border/50">
+                  <span className="text-xs font-bold text-muted-foreground uppercase tracking-wider">Total</span>
+                  <span className="text-xl font-black font-outfit text-primary font-mono">
+                    ${order.budget.items.reduce((s, i) => s + (Number(i.price) || 0), 0).toLocaleString("es-AR")}
+                  </span>
+                </div>
+
+                {order.budget.approved ? (
+                  <div className="bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 p-3 rounded-xl text-xs font-bold flex items-center gap-2.5 shadow-sm">
+                    <ShieldCheck className="w-4 h-4 shrink-0 text-emerald-400" />
+                    <div>
+                      <div className="leading-tight">Presupuesto Aprobado</div>
+                      <div className="text-[10px] font-normal text-emerald-400/80">Orden autorizada para reparación.</div>
+                    </div>
+                  </div>
+                ) : (
+                  <AlertDialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+                    <AlertDialogTrigger asChild>
+                      <Button className="w-full bg-primary hover:bg-primary/95 text-primary-foreground font-bold text-xs py-2.5 rounded-xl shadow-md cursor-pointer mt-1">
+                        <ShieldCheck className="w-4 h-4 mr-1.5" />
+                        Aprobar Presupuesto Online
+                      </Button>
+                    </AlertDialogTrigger>
+                    <AlertDialogContent className="bg-card border-border shadow-2xl max-w-md">
+                      <AlertDialogHeader>
+                        <AlertDialogTitle className="font-outfit text-base font-bold text-foreground flex items-center gap-2">
+                          <ShieldCheck className="w-5 h-5 text-primary" />
+                          Aprobación de Presupuesto
+                        </AlertDialogTitle>
+                        <AlertDialogDescription className="text-muted-foreground text-xs font-light space-y-1">
+                          <span>Autorizás la realización del servicio técnico por un total de <strong className="text-foreground font-bold">${order.budget.items.reduce((s, i) => s + (Number(i.price) || 0), 0).toLocaleString("es-AR")}</strong>.</span>
+                        </AlertDialogDescription>
+                      </AlertDialogHeader>
+
+                      <div className="space-y-2 py-2 border-y border-border/40 my-2">
+                        <label className="text-xs font-semibold text-foreground block">
+                          Confirmación de identidad (DNI del titular):
+                        </label>
+                        <Input
+                          type="text"
+                          inputMode="numeric"
+                          pattern="[0-9]*"
+                          placeholder="Ingresá tu DNI sin puntos..."
+                          value={dniInput}
+                          onChange={(e) => setDniInput(e.target.value)}
+                          onKeyDown={(e) => { if (e.key === "Enter") handleApproveBudget(); }}
+                          className="bg-background/80 border-border text-xs h-9 font-mono"
+                        />
+                        <p className="text-[11px] text-muted-foreground font-light">
+                          Por seguridad, ingresá el número de DNI registrado en la orden para autorizar la reparación.
+                        </p>
+                      </div>
+
+                      <AlertDialogFooter>
+                        <AlertDialogCancel disabled={approving} className="bg-background border-border text-foreground text-xs font-bold rounded-lg cursor-pointer">
+                          Cancelar
+                        </AlertDialogCancel>
+                        <Button
+                          onClick={handleApproveBudget}
+                          disabled={approving}
+                          className="bg-primary hover:bg-primary/90 text-primary-foreground text-xs font-bold rounded-lg cursor-pointer"
+                        >
+                          {approving ? "Verificando..." : "Confirmar Aprobación"}
+                        </Button>
+                      </AlertDialogFooter>
+                    </AlertDialogContent>
+                  </AlertDialog>
+                )}
+              </div>
+            ) : (
+              <div className="text-center py-6 space-y-2">
+                <p className="text-xs text-muted-foreground font-light">
+                  Presupuesto pendiente de evaluación por el equipo técnico.
+                </p>
+                <Badge variant="secondary" className="text-[9px] font-bold uppercase tracking-wider">
+                  En Evaluación
+                </Badge>
+              </div>
+            )}
+          </Card>
+
+          {/* BENTO CARD: Taller Responsable / Sucursal (Dedicado) */}
+          <Card className="bg-card/50 backdrop-blur-md border-border/70 p-5 rounded-2xl shadow-sm space-y-4">
+            <div className="flex items-center gap-2.5 border-b border-border/50 pb-3">
+              <div className="w-8 h-8 rounded-lg bg-primary/10 border border-primary/20 flex items-center justify-center text-primary shrink-0">
+                <Store className="w-4 h-4" />
+              </div>
+              <div>
+                <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider block">
+                  Taller Responsable
+                </span>
+                <h3 className="font-outfit text-sm font-bold text-foreground leading-tight">
+                  {venueName}
+                </h3>
+              </div>
+            </div>
+
+            <div className="space-y-3.5 text-xs">
+              {parsedVenue.address && (
+                <div className="flex items-start gap-2.5">
+                  <MapPin className="w-4 h-4 text-primary shrink-0 mt-0.5" />
+                  <div className="space-y-1">
+                    <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider block">
+                      Dirección Física
+                    </span>
+                    <p className="text-foreground/90 font-medium leading-snug">
+                      {parsedVenue.address}
+                    </p>
+                    <a
+                      href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(parsedVenue.address)}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center gap-1 text-[11px] text-primary hover:underline font-semibold cursor-pointer pt-0.5"
+                    >
+                      <span>Ver en Google Maps</span>
+                      <ExternalLink className="w-3 h-3" />
+                    </a>
+                  </div>
+                </div>
+              )}
+
+              {parsedVenue.hours && (
+                <div className="flex items-start gap-2.5 pt-1 border-t border-border/30">
+                  <Clock className="w-4 h-4 text-emerald-400 shrink-0 mt-0.5" />
+                  <div className="space-y-0.5">
+                    <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider block">
+                      Horarios de Atención
+                    </span>
+                    <p className="text-foreground/90 font-medium leading-snug">
+                      {parsedVenue.hours}
+                    </p>
+                  </div>
+                </div>
+              )}
+
+              {venuePhone && (
+                <div className="flex items-start gap-2.5 pt-1 border-t border-border/30">
+                  <Phone className="w-4 h-4 text-sky-400 shrink-0 mt-0.5" />
+                  <div className="space-y-0.5">
+                    <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider block">
+                      Teléfono de Contacto
+                    </span>
+                    <a
+                      href={`tel:${venuePhone.replace(/\s+/g, '')}`}
+                      className="text-foreground/90 font-semibold hover:text-primary transition-colors block"
+                    >
+                      {venuePhone}
+                    </a>
+                  </div>
+                </div>
+              )}
+            </div>
+          </Card>
+
+          {/* BENTO ACTION: Descargar Comprobante / Ficha PDF */}
+          <Button
+            variant="outline"
+            onClick={handleDownloadPdf}
+            className="w-full text-xs font-semibold text-muted-foreground hover:text-foreground hover:bg-card/80 border-border/70 rounded-xl py-3 h-auto flex items-center justify-center gap-2 cursor-pointer shadow-sm transition-all"
+          >
+            <Download className="w-4 h-4 text-primary" />
+            <span>Descargar Comprobante PDF</span>
+          </Button>
+
         </div>
 
       </div>
