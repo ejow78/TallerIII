@@ -32,6 +32,7 @@ import {
   Zap,
   Lock,
   Maximize2,
+  Download,
   X,
 } from "lucide-react";
 import { GridPattern } from "@/components/ui/grid-pattern";
@@ -403,28 +404,102 @@ export default function LandingPage() {
                 </p>
               </div>
 
-              {/* Micro-UI: Vista simulada de la consulta pública */}
-              <div className="rounded-xl bg-background/80 border border-border/70 p-4 space-y-3 font-sans">
-                <div className="flex items-center justify-between text-xs border-b border-border/50 pb-2.5">
-                  <span className="font-mono text-muted-foreground">Orden: <strong>#ORD-1084</strong></span>
-                  <span className="rounded-md bg-emerald-500/10 text-emerald-400 border border-emerald-500/25 px-2 py-0.5 text-[10px] font-bold uppercase">
-                    Listo
-                  </span>
-                </div>
-                <div className="flex items-center justify-between text-xs">
-                  <div>
-                    <span className="font-bold text-foreground block">iPhone 14 Pro Max</span>
-                    <span className="text-[11px] text-muted-foreground">Cambio de Módulo Display • Garantía 90 días</span>
+              {/* Micro-UI: Vista simulada idéntica al diseño Bento de Tracking */}
+              <div className="rounded-xl bg-background/90 border border-border/70 p-4 sm:p-5 space-y-4 font-sans select-none shadow-inner">
+                {/* Header de Orden estilo Tracking */}
+                <div className="flex items-center justify-between gap-3 border-b border-border/50 pb-3">
+                  <div className="flex items-center gap-2.5 min-w-0">
+                    <div className="w-8 h-8 rounded-lg bg-primary/10 border border-primary/25 flex items-center justify-center text-primary shrink-0">
+                      <Smartphone className="w-4 h-4" />
+                    </div>
+                    <div className="min-w-0">
+                      <span className="text-[9px] font-mono uppercase tracking-wider text-muted-foreground block">
+                        ORDEN #ORD-1084
+                      </span>
+                      <span className="font-outfit font-bold text-xs sm:text-sm text-foreground truncate block">
+                        Notebook Lenovo ThinkPad E14 Gen 2
+                      </span>
+                    </div>
                   </div>
-                  <span className="text-emerald-400 font-bold font-mono text-sm">$89.000</span>
+                  <div className="hidden sm:flex items-center gap-1.5 text-[10px] font-medium text-muted-foreground bg-card/60 px-2.5 py-1 rounded-md border border-border/60">
+                    <Download className="w-3 h-3 text-primary" />
+                    <span>Comprobante</span>
+                  </div>
                 </div>
-                {/* Stepper horizontal de estados */}
-                <div className="grid grid-cols-2 sm:grid-cols-5 gap-1.5 pt-1 text-center text-[10px] font-semibold text-muted-foreground">
-                  <div className="p-1 rounded bg-muted/60 text-foreground">1. Ingresado</div>
-                  <div className="p-1 rounded bg-muted/60 text-foreground">2. Presupuestado</div>
-                  <div className="p-1 rounded bg-muted/60 text-foreground">3. Reparación</div>
-                  <div className="p-1 rounded bg-emerald-500/15 text-emerald-400 border border-emerald-500/30">4. Listo</div>
-                  <div className="p-1 rounded bg-muted/40 text-muted-foreground border border-border/40">5. Entregado</div>
+
+                {/* Stepper horizontal con círculos estilo Tracking */}
+                <div className="grid grid-cols-6 gap-1 pt-0.5 text-center items-center">
+                  {/* Step 1: Ingresado */}
+                  <div className="flex flex-col items-center gap-1">
+                    <div className="w-6 h-6 rounded-full bg-primary/20 text-primary border border-primary/40 flex items-center justify-center text-[10px] font-bold">
+                      ✓
+                    </div>
+                    <span className="text-[9px] font-medium text-muted-foreground truncate max-w-full">Ingresado</span>
+                  </div>
+                  {/* Step 2: En Diagnóstico */}
+                  <div className="flex flex-col items-center gap-1">
+                    <div className="w-6 h-6 rounded-full bg-primary/20 text-primary border border-primary/40 flex items-center justify-center text-[10px] font-bold">
+                      ✓
+                    </div>
+                    <span className="text-[9px] font-medium text-muted-foreground truncate max-w-full">Diagnóstico</span>
+                  </div>
+                  {/* Step 3: Presupuestado (Activo con glow primario) */}
+                  <div className="flex flex-col items-center gap-1">
+                    <div className="w-6 h-6 rounded-full bg-primary text-primary-foreground font-bold flex items-center justify-center text-[10px] shadow-sm shadow-primary/50 ring-2 ring-primary/30">
+                      3
+                    </div>
+                    <span className="text-[9px] font-bold text-primary truncate max-w-full">Presupuestado</span>
+                  </div>
+                  {/* Step 4: En Reparación */}
+                  <div className="flex flex-col items-center gap-1">
+                    <div className="w-6 h-6 rounded-full bg-muted/40 text-muted-foreground/60 border border-border/40 flex items-center justify-center text-[10px]">
+                      4
+                    </div>
+                    <span className="text-[9px] text-muted-foreground/60 truncate max-w-full">Reparación</span>
+                  </div>
+                  {/* Step 5: Listo para Retirar */}
+                  <div className="flex flex-col items-center gap-1">
+                    <div className="w-6 h-6 rounded-full bg-muted/40 text-muted-foreground/60 border border-border/40 flex items-center justify-center text-[10px]">
+                      5
+                    </div>
+                    <span className="text-[9px] text-muted-foreground/60 truncate max-w-full">Listo Retiro</span>
+                  </div>
+                  {/* Step 6: Entregado */}
+                  <div className="flex flex-col items-center gap-1">
+                    <div className="w-6 h-6 rounded-full bg-muted/40 text-muted-foreground/60 border border-border/40 flex items-center justify-center text-[10px]">
+                      6
+                    </div>
+                    <span className="text-[9px] text-muted-foreground/60 truncate max-w-full">Entregado</span>
+                  </div>
+                </div>
+
+                {/* Sub-cards de Diagnóstico y Presupuesto simétricas */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 pt-1">
+                  <div className="p-3 rounded-lg bg-card/60 border border-border/60 space-y-1.5">
+                    <div className="flex items-center gap-1.5">
+                      <Wrench className="w-3.5 h-3.5 text-primary" />
+                      <span className="text-[10px] font-mono uppercase tracking-wider text-muted-foreground font-semibold">
+                        Informe Técnico
+                      </span>
+                    </div>
+                    <p className="text-[11px] text-foreground font-light leading-snug">
+                      Falla en circuito primario de alimentación 19V. Cortocircuito en mosfet de entrada dañado.
+                    </p>
+                  </div>
+                  <div className="p-3 rounded-lg bg-card/60 border border-border/60 flex flex-col justify-between space-y-2">
+                    <div className="flex items-center justify-between">
+                      <span className="text-[10px] font-mono uppercase tracking-wider text-muted-foreground font-semibold">
+                        Presupuesto Total
+                      </span>
+                      <span className="font-outfit font-extrabold text-sm text-primary">
+                        $25.000
+                      </span>
+                    </div>
+                    <div className="flex items-center justify-center gap-1.5 py-1 px-2 rounded-md bg-primary/10 text-primary border border-primary/25 text-[10px] font-semibold">
+                      <ShieldCheck className="w-3 h-3" />
+                      <span>Aprobar Presupuesto Online</span>
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
@@ -443,22 +518,33 @@ export default function LandingPage() {
                 </p>
               </div>
 
-              {/* Micro-UI: Presupuesto validado */}
-              <div className="rounded-xl bg-background/80 border border-border/70 p-4 space-y-2.5 text-xs font-mono">
-                <div className="flex justify-between text-muted-foreground">
-                  <span>Módulo OLED:</span>
-                  <span className="text-foreground">$89.000</span>
+              {/* Micro-UI: Presupuesto validado con estilo Tracking */}
+              <div className="rounded-xl bg-background/90 border border-border/70 p-4 space-y-3 font-sans shadow-inner select-none">
+                <div className="flex items-center justify-between border-b border-border/50 pb-2">
+                  <span className="text-[10px] font-mono uppercase tracking-wider text-muted-foreground font-semibold">
+                    COTIZACIÓN OFICIAL
+                  </span>
+                  <span className="text-[10px] font-bold text-emerald-400 bg-emerald-500/10 border border-emerald-500/25 px-2 py-0.5 rounded">
+                    Aprobado
+                  </span>
                 </div>
-                <div className="flex justify-between text-muted-foreground">
-                  <span>Mano de Obra:</span>
-                  <span className="text-foreground">$25.000</span>
+                <div className="space-y-1.5 text-xs">
+                  <div className="flex justify-between items-center text-muted-foreground">
+                    <span className="text-[11px]">Reemplazo de Mosfet e IC</span>
+                    <span className="font-mono text-primary font-medium text-[11px]">$18.500</span>
+                  </div>
+                  <div className="flex justify-between items-center text-muted-foreground">
+                    <span className="text-[11px]">Mantenimiento y limpieza placa</span>
+                    <span className="font-mono text-primary font-medium text-[11px]">$6.500</span>
+                  </div>
                 </div>
-                <div className="border-t border-border/50 pt-2 flex justify-between font-bold text-foreground">
-                  <span>Total:</span>
-                  <span className="text-primary">$114.000</span>
+                <div className="border-t border-border/50 pt-2 flex items-baseline justify-between">
+                  <span className="text-[11px] font-semibold text-foreground">TOTAL:</span>
+                  <span className="font-outfit font-black text-xl text-primary">$25.000</span>
                 </div>
-                <div className="rounded bg-emerald-500/10 border border-emerald-500/25 p-2 text-center text-emerald-400 text-[10px] font-bold">
-                  ✓ Aprobado digitalmente por Juan Pérez (DNI 38.450.123)
+                <div className="rounded-lg bg-emerald-500/10 border border-emerald-500/25 p-2 text-center text-emerald-400 text-[10px] font-semibold flex items-center justify-center gap-1.5">
+                  <ShieldCheck className="w-3.5 h-3.5 shrink-0" />
+                  <span>Aprobado con DNI 38.450.123 (Juan Pérez)</span>
                 </div>
               </div>
             </div>
@@ -485,7 +571,7 @@ export default function LandingPage() {
                     <span className="text-[10px] text-amber-400 font-semibold">Stock: 1 (Mín: 3)</span>
                   </div>
                   <span className="rounded bg-amber-500/15 text-amber-400 border border-amber-500/30 text-[9px] font-bold px-1.5 py-0.5 uppercase">
-                    Por Reponer
+                    Bajo Stock
                   </span>
                 </div>
                 <div className="flex items-center justify-between">
@@ -565,7 +651,7 @@ export default function LandingPage() {
           </div>
 
           {/* Comparativa horizontal (carrusel deslizable en móvil, 2 columnas en desktop) */}
-          <div className="flex md:grid md:grid-cols-2 gap-6 sm:gap-8 items-stretch overflow-x-auto md:overflow-x-visible snap-x snap-mandatory scroll-smooth -mx-6 px-6 md:mx-0 md:px-0 [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden">
+          <div className="flex md:grid md:grid-cols-2 gap-6 sm:gap-8 items-stretch overflow-x-auto md:overflow-x-visible snap-x snap-mandatory scroll-smooth -mx-6 px-6 py-6 md:mx-0 md:px-0 md:py-0 [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden">
             {/* Columna 1: Taller Tradicional */}
             <Card className="w-[86vw] max-w-[440px] shrink-0 snap-center md:w-auto md:max-w-none md:shrink flex flex-col justify-between bg-card/45 border-border/60 hover:border-border transition-all duration-200">
               <CardHeader className="space-y-1.5 pb-2">
@@ -604,7 +690,7 @@ export default function LandingPage() {
             </Card>
 
             {/* Columna 2: Con RepairIT */}
-            <Card className="w-[86vw] max-w-[440px] shrink-0 snap-center md:w-auto md:max-w-none md:shrink flex flex-col justify-between bg-card/60 border-primary/40 shadow-lg shadow-primary/5 hover:border-primary/60 transition-all duration-200">
+            <Card className="w-[86vw] max-w-[440px] shrink-0 snap-center md:w-auto md:max-w-none md:shrink flex flex-col justify-between bg-card/45 border-border/60 hover:border-border transition-all duration-200">
               <CardHeader className="space-y-1.5 pb-2">
                 <CardTitle className="font-outfit text-xl sm:text-2xl font-bold text-foreground flex items-center gap-1.5">
                   <span className="text-muted-foreground font-medium">Con</span>
@@ -727,10 +813,7 @@ export default function LandingPage() {
             </Card>
 
             {/* Tier 2: Taller Pro */}
-            <Card className="pricing-card w-[84vw] max-w-[340px] shrink-0 snap-center md:w-auto md:max-w-none md:shrink flex flex-col justify-between min-h-[480px] overflow-visible bg-card/65 border-primary/50 ring-1 ring-primary/25 shadow-xl shadow-primary/10 hover:border-primary transition-all duration-200 hover:-translate-y-1 relative">
-              <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-primary text-primary-foreground text-[10px] font-black uppercase py-1 px-3.5 rounded-full tracking-wider shadow-md">
-                Recomendado
-              </div>
+            <Card className="pricing-card w-[84vw] max-w-[340px] shrink-0 snap-center md:w-auto md:max-w-none md:shrink flex flex-col justify-between min-h-[480px] overflow-visible bg-card/45 border-border/60 hover:border-border transition-all duration-200 hover:-translate-y-1">
               <CardHeader className="space-y-2">
                 <CardTitle className="font-outfit text-xl font-bold text-foreground">Taller Pro</CardTitle>
                 <CardDescription className="text-xs text-muted-foreground font-light">
@@ -769,7 +852,8 @@ export default function LandingPage() {
               <CardFooter className="pt-4 border-t border-border/30 bg-muted/20">
                 <Button
                   asChild
-                  className="w-full bg-primary hover:bg-primary/90 text-primary-foreground font-bold py-2 rounded-lg cursor-pointer shadow-md shadow-primary/20"
+                  className="w-full bg-secondary hover:bg-secondary/90 text-secondary-foreground font-semibold py-2 rounded-lg cursor-pointer"
+                  variant="outline"
                 >
                   <a href={registerUrl}>Suscribirse Ahora</a>
                 </Button>

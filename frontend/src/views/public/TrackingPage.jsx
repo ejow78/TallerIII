@@ -45,7 +45,7 @@ const STEPS = [
   { key: "diagnostico", label: "En Diagnóstico" },
   { key: "presupuestado", label: "Presupuestado" },
   { key: "reparacion", label: "En Reparación" },
-  { key: "listo", label: "Listo para Entregar" },
+  { key: "listo", label: "Listo para Retirar" },
   { key: "entregado", label: "Entregado" }
 ];
 

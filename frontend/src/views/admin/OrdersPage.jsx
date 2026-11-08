@@ -1910,7 +1910,7 @@ export default function OrdersPage() {
                     Presupuestado (Listo para envío al cliente)
                   </option>
                   <option value="reparacion">En Reparación</option>
-                  <option value="listo">Listo para Entregar</option>
+                  <option value="listo">Listo para Retirar</option>
                 </select>
               </div>
 
