@@ -187,10 +187,7 @@ export default function LandingPage() {
         <div className="relative z-10 max-w-[1380px] w-full mx-auto grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-10 items-center">
           {/* Columna Izquierda: Propuesta de Valor & CTA */}
           <div className="lg:col-span-5 text-center lg:text-left space-y-6">
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/10 border border-primary/25 text-primary text-xs font-semibold select-none">
-              <Sparkles className="w-3.5 h-3.5" />
-              <span>Software de Gestión para Talleres Técnicos</span>
-            </div>
+            
 
             <h1 className="font-outfit text-4xl sm:text-5xl lg:text-[56px] xl:text-[60px] font-extrabold text-foreground tracking-tight leading-[1.06]">
               Tu taller, todas tus operaciones en un solo lugar
@@ -240,7 +237,7 @@ export default function LandingPage() {
       <section className="py-20 px-6 bg-card/15 border-t border-border/50 relative z-10">
         <div className="max-w-7xl mx-auto space-y-14">
           <div className="text-center max-w-2xl mx-auto space-y-2.5">
-            <span className="text-[11px] font-bold uppercase tracking-wider text-primary block">
+            <span className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground/75 block">
               El Circuito del Taller
             </span>
             <h2 className="font-outfit text-3xl sm:text-4xl font-bold text-foreground tracking-tight">
@@ -307,7 +304,7 @@ export default function LandingPage() {
       <section id="caracteristicas" className="py-20 px-6 bg-background border-t border-border/50 relative z-10">
         <div className="max-w-7xl mx-auto space-y-12">
           <div className="text-center max-w-2xl mx-auto space-y-2.5">
-            <span className="text-[11px] font-bold uppercase tracking-wider text-primary block">
+            <span className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground/75 block">
               Funcionalidades con Propósito
             </span>
             <h2 className="font-outfit text-3xl sm:text-4xl font-bold text-foreground tracking-tight">
@@ -350,11 +347,12 @@ export default function LandingPage() {
                   <span className="text-emerald-400 font-bold font-mono text-sm">$89.000</span>
                 </div>
                 {/* Stepper horizontal de estados */}
-                <div className="grid grid-cols-4 gap-1.5 pt-1 text-center text-[10px] font-semibold text-muted-foreground">
+                <div className="grid grid-cols-2 sm:grid-cols-5 gap-1.5 pt-1 text-center text-[10px] font-semibold text-muted-foreground">
                   <div className="p-1 rounded bg-muted/60 text-foreground">1. Ingresado</div>
                   <div className="p-1 rounded bg-muted/60 text-foreground">2. Presupuestado</div>
                   <div className="p-1 rounded bg-muted/60 text-foreground">3. Reparación</div>
-                  <div className="p-1 rounded bg-emerald-500/15 text-emerald-400 border border-emerald-500/30">4. Listo ✓</div>
+                  <div className="p-1 rounded bg-emerald-500/15 text-emerald-400 border border-emerald-500/30">4. Listo p/ Retirar</div>
+                  <div className="p-1 rounded bg-muted/40 text-muted-foreground border border-border/40">5. Entregado</div>
                 </div>
               </div>
             </div>
@@ -437,7 +435,7 @@ export default function LandingPage() {
                   <DollarSign className="w-4.5 h-4.5" />
                 </div>
                 <h3 className="font-outfit text-xl font-bold text-foreground">
-                  Caja y Punto de Venta (POS)
+                  Caja y Punto de Venta
                 </h3>
                 <p className="text-xs text-muted-foreground font-light leading-relaxed max-w-xl">
                   Cobros de órdenes y ventas de mostrador con múltiples medios de pago (efectivo, Mercado Pago, transferencia o tarjetas). Cierre de caja diario sin descuadres.
@@ -448,30 +446,30 @@ export default function LandingPage() {
               <div className="rounded-xl bg-background/80 border border-border/70 p-4 grid grid-cols-1 sm:grid-cols-3 gap-3 text-left">
                 <div className="p-3 rounded-lg bg-card/50 border border-border/60">
                   <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground block">
-                    Caja Hoy
+                    Total Cobrado Hoy
                   </span>
                   <span className="font-outfit text-xl font-black text-foreground block mt-1">
                     $837.500
                   </span>
-                  <span className="text-[10px] text-muted-foreground">8 ventas y cobros</span>
+                  <span className="text-[10px] text-muted-foreground">8 cobros registrados</span>
                 </div>
                 <div className="p-3 rounded-lg bg-card/50 border border-border/60">
                   <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground block">
-                    Órdenes en Taller
+                    Efectivo en Caja
                   </span>
-                  <span className="font-outfit text-xl font-black text-primary block mt-1">
-                    5 Activas
+                  <span className="font-outfit text-xl font-black text-emerald-400 block mt-1">
+                    $420.000
                   </span>
-                  <span className="text-[10px] text-primary">2 listas p/ entregar</span>
+                  <span className="text-[10px] text-emerald-400">Ventas de mostrador y señas</span>
                 </div>
                 <div className="p-3 rounded-lg bg-card/50 border border-border/60">
                   <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground block">
-                    Alertas Stock
+                    Digital / Transferencias
                   </span>
-                  <span className="font-outfit text-xl font-black text-amber-400 block mt-1">
-                    3 Por Reponer
+                  <span className="font-outfit text-xl font-black text-sky-400 block mt-1">
+                    $417.500
                   </span>
-                  <span className="text-[10px] text-amber-400">0 insumos en cero</span>
+                  <span className="text-[10px] text-sky-400">Mercado Pago y tarjetas</span>
                 </div>
               </div>
             </div>
@@ -479,94 +477,97 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* SECCIÓN 4: CALCULADORA INTERACTIVA DE RETORNO Y AHORRO PARA EL TALLER */}
+      {/* SECCIÓN 4: COMPARATIVA REAL (TALLER TRADICIONAL VS CON REPAIRIT) */}
       <section className="py-20 px-6 bg-card/15 border-t border-border/50 relative z-10">
-        <div className="max-w-4xl mx-auto space-y-10">
-          <div className="text-center space-y-2.5">
-            <span className="text-[11px] font-bold uppercase tracking-wider text-primary block">
-              Calculadora de Impacto
+        <div className="max-w-5xl mx-auto space-y-12">
+          <div className="text-center max-w-2xl mx-auto space-y-2.5">
+            <span className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground/75 block">
+              La Diferencia en el Día a Día
             </span>
             <h2 className="font-outfit text-3xl sm:text-4xl font-bold text-foreground tracking-tight">
-              ¿Cuánto tiempo y dinero pierde tu taller sin un sistema?
+              Tu taller en orden, sin el caos del papel ni las dudas
             </h2>
-            <p className="text-muted-foreground text-sm font-light max-w-xl mx-auto">
-              Deslizá la barra según la cantidad promedio de reparaciones mensuales que maneja tu taller:
+            <p className="text-muted-foreground text-sm font-light">
+              Dejá atrás los malentendidos con clientes y el descontrol de repuestos en el banco de trabajo.
             </p>
           </div>
 
-          <div className="rounded-2xl bg-card/60 border border-border/80 p-6 sm:p-10 space-y-8 backdrop-blur-md shadow-xl">
-            {/* Slider Interactivo */}
-            <div className="space-y-4">
-              <div className="flex items-center justify-between">
-                <span className="text-xs font-bold uppercase tracking-wider text-muted-foreground">
-                  Equipos recibidos por mes:
-                </span>
-                <span className="font-outfit font-black text-2xl sm:text-3xl text-primary">
-                  {monthlyDevices} <span className="text-xs font-normal text-muted-foreground">equipos / mes</span>
-                </span>
-              </div>
-              <input
-                type="range"
-                min="15"
-                max="250"
-                step="5"
-                value={monthlyDevices}
-                onChange={(e) => setMonthlyDevices(Number(e.target.value))}
-                className="w-full h-2 bg-muted rounded-lg appearance-none cursor-pointer accent-primary"
-              />
-              <div className="flex justify-between text-[11px] text-muted-foreground font-mono">
-                <span>15 equipos</span>
-                <span>120 equipos</span>
-                <span>250 equipos</span>
-              </div>
-            </div>
-
-            {/* Tarjetas reactivas de resultados */}
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-2 border-t border-border/60">
-              <div className="p-4 rounded-xl bg-background/70 border border-border/70 text-center space-y-1">
-                <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground block">
-                  Tiempo Ahorrado
-                </span>
-                <span className="font-outfit text-3xl font-black text-sky-400 block">
-                  ~{savedHours} hs
-                </span>
-                <span className="text-[11px] text-muted-foreground block">
-                  Menos llamadas y mensajes al mes
-                </span>
-              </div>
-
-              <div className="p-4 rounded-xl bg-background/70 border border-border/70 text-center space-y-1">
-                <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground block">
-                  Valor del Tiempo Ganado
-                </span>
-                <span className="font-outfit text-3xl font-black text-emerald-400 block">
-                  ${estimatedSavings}
-                </span>
-                <span className="text-[11px] text-muted-foreground block">
-                  En horas productivas de banco técnico
-                </span>
-              </div>
-
-              <div className="p-4 rounded-xl bg-background/70 border border-border/70 text-center space-y-1">
-                <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground block">
-                  Retorno de Inversión
-                </span>
-                <span className="font-outfit text-3xl font-black text-primary block">
-                  Inmediato
-                </span>
-                <span className="text-[11px] text-muted-foreground block">
-                  El plan Pro se paga con 1 sola reparación
-                </span>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 sm:gap-8 items-stretch">
+            {/* Columna 1: Taller Tradicional */}
+            <div className="rounded-2xl bg-destructive/5 border border-destructive/20 p-6 sm:p-8 flex flex-col justify-between space-y-6">
+              <div className="space-y-4">
+                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-md bg-destructive/15 text-destructive text-xs font-bold uppercase tracking-wider">
+                  <span>Taller Tradicional</span>
+                </div>
+                <h3 className="font-outfit text-xl font-bold text-foreground">
+                  El desorden operativo de siempre
+                </h3>
+                <ul className="space-y-3.5 text-xs text-muted-foreground font-light leading-relaxed">
+                  <li className="flex items-start gap-2.5">
+                    <span className="text-destructive font-bold shrink-0">✕</span>
+                    <span>Papelitos de recepción extraviados o con letra ilegible.</span>
+                  </li>
+                  <li className="flex items-start gap-2.5">
+                    <span className="text-destructive font-bold shrink-0">✕</span>
+                    <span>Teléfono y WhatsApp saturados de clientes preguntando si su equipo ya está listo.</span>
+                  </li>
+                  <li className="flex items-start gap-2.5">
+                    <span className="text-destructive font-bold shrink-0">✕</span>
+                    <span>Discusiones al retirar: «Yo nunca autoricé ese costo ni ese cambio de repuesto».</span>
+                  </li>
+                  <li className="flex items-start gap-2.5">
+                    <span className="text-destructive font-bold shrink-0">✕</span>
+                    <span>Stock a ojo: te enterás de que te falta un módulo con el cliente esperando en el mostrador.</span>
+                  </li>
+                  <li className="flex items-start gap-2.5">
+                    <span className="text-destructive font-bold shrink-0">✕</span>
+                    <span>Cierres de caja confusos al final del día sin saber cuánto fue en efectivo o digital.</span>
+                  </li>
+                </ul>
               </div>
             </div>
 
-            <div className="text-center pt-2">
-              <Button
-                asChild
-                className="bg-primary hover:bg-primary/90 text-primary-foreground font-bold px-8 py-3 rounded-lg cursor-pointer"
-              >
-                <a href={registerUrl}>Probar RepairIT Gratis para mi Taller</a>
-              </Button>
+            {/* Columna 2: Con RepairIT */}
+            <div className="rounded-2xl bg-primary/5 border border-primary/25 p-6 sm:p-8 flex flex-col justify-between space-y-6">
+              <div className="space-y-4">
+                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-md bg-primary/15 text-primary text-xs font-bold uppercase tracking-wider">
+                  <span>Con RepairIT</span>
+                </div>
+                <h3 className="font-outfit text-xl font-bold text-foreground">
+                  Control profesional en cada etapa
+                </h3>
+                <ul className="space-y-3.5 text-xs text-foreground font-medium leading-relaxed">
+                  <li className="flex items-start gap-2.5">
+                    <span className="text-primary font-bold shrink-0">✓</span>
+                    <span>Comprobante digital y físico con código QR único para el equipo y el cliente.</span>
+                  </li>
+                  <li className="flex items-start gap-2.5">
+                    <span className="text-primary font-bold shrink-0">✓</span>
+                    <span>Seguimiento online automático: el cliente consulta solo desde su celular.</span>
+                  </li>
+                  <li className="flex items-start gap-2.5">
+                    <span className="text-primary font-bold shrink-0">✓</span>
+                    <span>Presupuesto detallado aprobado con DNI antes de tocar el equipo, con respaldo oficial.</span>
+                  </li>
+                  <li className="flex items-start gap-2.5">
+                    <span className="text-primary font-bold shrink-0">✓</span>
+                    <span>Stock en tiempo real con alertas de reposición antes de quedarte en cero.</span>
+                  </li>
+                  <li className="flex items-start gap-2.5">
+                    <span className="text-primary font-bold shrink-0">✓</span>
+                    <span>Caja cuadrada con desglose instantáneo de efectivo, Mercado Pago y transferencias.</span>
+                  </li>
+                </ul>
+              </div>
+
+              <div className="pt-2">
+                <Button
+                  asChild
+                  className="w-full bg-primary hover:bg-primary/90 text-primary-foreground font-bold py-2.5 rounded-lg cursor-pointer"
+                >
+                  <a href={registerUrl}>Comenzar a ordenar mi taller</a>
+                </Button>
+              </div>
             </div>
           </div>
         </div>
