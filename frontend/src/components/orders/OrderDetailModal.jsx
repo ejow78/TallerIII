@@ -128,17 +128,19 @@ export default function OrderDetailModal({
                   <Smartphone className="w-3.5 h-3.5" />
                   Equipo Recibido
                 </span>
-                <button
-                  type="button"
-                  onClick={() => {
-                    onClose();
-                    onOpenEditReceptionModal(order);
-                  }}
-                  className="text-[10px] font-bold text-primary hover:underline inline-flex items-center gap-1 cursor-pointer"
-                >
-                  <Pencil className="w-3 h-3" />
-                  Editar Recepción
-                </button>
+                {order.status === "ingresado" && (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      onClose();
+                      onOpenEditReceptionModal(order);
+                    }}
+                    className="text-[10px] font-bold text-primary hover:underline inline-flex items-center gap-1 cursor-pointer"
+                  >
+                    <Pencil className="w-3 h-3" />
+                    Editar Recepción
+                  </button>
+                )}
               </div>
               <div className="space-y-1">
                 <p className="text-sm font-bold text-foreground">
