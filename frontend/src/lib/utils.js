@@ -17,3 +17,15 @@ export function normalizeText(str) {
     .replace(/[\u0300-\u036f]/g, "")
     .trim();
 }
+
+/**
+ * Retorna la fecha en formato YYYY-MM-DD en la zona horaria de Argentina (America/Argentina/Buenos_Aires).
+ */
+export function getArgentinaDateString(dateInput) {
+  if (!dateInput) return null;
+  const d = new Date(dateInput);
+  if (isNaN(d.getTime())) return null;
+  return d.toLocaleDateString("sv-SE", {
+    timeZone: "America/Argentina/Buenos_Aires",
+  });
+}

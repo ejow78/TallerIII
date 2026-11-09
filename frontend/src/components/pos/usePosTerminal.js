@@ -1,4 +1,4 @@
-import { normalizeText } from "@/lib/utils";
+import { normalizeText, getArgentinaDateString } from "@/lib/utils";
 import { useState, useEffect, useRef, useMemo, useCallback } from "react";
 import { toast } from "sonner";
 import {
@@ -34,8 +34,9 @@ export function usePosTerminal() {
   // Historial States
   const [sales, setSales] = useState([]);
   const [venues, setVenues] = useState([]);
-  const [selectedVenueFilter, setSelectedVenueFilter] = useState("todas");
-  const [dateRangeFilter, setDateRangeFilter] = useState("hoy"); // "hoy" | "7d" | "mes" | "todo"
+  const [selectedVenueFilter, setSelectedVenueFilter] = useState(() => user?.venueId || "todas");
+  const [dateRangeFilter, setDateRangeFilter] = useState("hoy"); // "hoy" | "7d" | "mes" | "todo" | "dia"
+  const [selectedDate, setSelectedDate] = useState(null); // "YYYY-MM-DD" | null
   const [salesLoading, setSalesLoading] = useState(false);
 
   const searchInputRef = useRef(null);
@@ -56,6 +57,9 @@ export function usePosTerminal() {
         setActiveVenue(venueData);
         if (venueData?.subscriptionPlan) {
           setEffectivePlan(normalizePlan(venueData.subscriptionPlan));
+        }
+        if (venueData?.venue_id) {
+          setSelectedVenueFilter((prev) => (prev === "todas" ? venueData.venue_id : prev));
         }
       } catch (err) {
         console.error("Error al cargar datos del taller:", err);
@@ -422,8 +426,50 @@ export function usePosTerminal() {
     });
   }, [items, searchQuery, categoryFilter]);
 
+  // Mapa de días con ventas para el calendario interactivo
+  const salesDaysMap = useMemo(() => {
+    const map = {};
+    for (const s of sales) {
+      const day = getArgentinaDateString(s.created_at || s.date);
+      if (day) {
+        if (!map[day]) {
+          map[day] = { count: 0, total: 0 };
+        }
+        map[day].count += 1;
+        map[day].total += Number(s.total) || 0;
+      }
+    }
+    return map;
+  }, [sales]);
+
+  const handleSelectSpecificDate = useCallback((dateStr) => {
+    setSelectedDate(dateStr);
+    if (dateStr) {
+      setDateRangeFilter("dia");
+    } else {
+      setDateRangeFilter("hoy");
+    }
+  }, []);
+
+  const handleClearSpecificDate = useCallback(() => {
+    setSelectedDate(null);
+    setDateRangeFilter("hoy");
+  }, []);
+
+  const handleSetDateRangeFilter = useCallback((range) => {
+    setDateRangeFilter(range);
+    setSelectedDate(null);
+  }, []);
+
   // Filtrado por período y arqueo de caja
   const filteredSales = useMemo(() => {
+    if (dateRangeFilter === "dia" && selectedDate) {
+      return sales.filter((s) => {
+        const saleDay = getArgentinaDateString(s.created_at || s.date);
+        return saleDay === selectedDate;
+      });
+    }
+
     const now = new Date();
     const startOfToday = new Date(
       now.getFullYear(),
@@ -448,7 +494,7 @@ export function usePosTerminal() {
       if (dateRangeFilter === "mes") return ts >= startOfMonth;
       return true;
     });
-  }, [sales, dateRangeFilter]);
+  }, [sales, dateRangeFilter, selectedDate]);
 
   const salesBreakdown = useMemo(() => {
     let totalAmount = 0;
@@ -633,7 +679,11 @@ export function usePosTerminal() {
     selectedVenueFilter,
     setSelectedVenueFilter,
     dateRangeFilter,
-    setDateRangeFilter,
+    setDateRangeFilter: handleSetDateRangeFilter,
+    selectedDate,
+    setSelectedDate: handleSelectSpecificDate,
+    clearSelectedDate: handleClearSpecificDate,
+    salesDaysMap,
     salesLoading,
     searchInputRef,
     categories,

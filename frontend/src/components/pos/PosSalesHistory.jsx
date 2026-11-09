@@ -1,6 +1,7 @@
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { PosCalendarPicker } from "./PosCalendarPicker";
 import {
   History,
   Store,
@@ -9,12 +10,31 @@ import {
   Printer,
 } from "lucide-react";
 
+function formatSelectedDayTitle(dateStr) {
+  if (!dateStr) return "";
+  const parts = dateStr.split("-");
+  if (parts.length === 3) {
+    const day = parseInt(parts[2], 10);
+    const months = [
+      "Ene", "Feb", "Mar", "Abr", "May", "Jun",
+      "Jul", "Ago", "Sep", "Oct", "Nov", "Dic"
+    ];
+    const month = months[parseInt(parts[1], 10) - 1] || "";
+    return `${day} de ${month}`;
+  }
+  return dateStr;
+}
+
 export function PosSalesHistory({
   salesLoading = false,
   filteredSales = [],
   salesBreakdown = { totalAmount: 0, cashAmount: 0, digitalAmount: 0, count: 0 },
   dateRangeFilter = "hoy",
   setDateRangeFilter,
+  selectedDate = null,
+  setSelectedDate,
+  clearSelectedDate,
+  salesDaysMap = {},
   isMultiTaller = false,
   isAdmin = false,
   venues = [],
@@ -39,27 +59,36 @@ export function PosSalesHistory({
           </div>
 
           <div className="flex flex-wrap items-center gap-2 self-start sm:self-auto">
-            {/* Píldoras de Rango de Fecha */}
-            <div className="inline-flex rounded-lg border border-border/80 bg-background/60 p-0.5">
-              {[
-                { id: "hoy", label: "Hoy" },
-                { id: "7d", label: "7 Días" },
-                { id: "mes", label: "Este Mes" },
-                { id: "todo", label: "Todo" },
-              ].map((r) => (
-                <button
-                  key={r.id}
-                  type="button"
-                  onClick={() => setDateRangeFilter(r.id)}
-                  className={`px-2.5 py-1 text-[11px] font-semibold rounded-md transition-colors cursor-pointer ${
-                    dateRangeFilter === r.id
-                      ? "bg-primary text-primary-foreground font-bold"
-                      : "text-muted-foreground hover:text-foreground"
-                  }`}
-                >
-                  {r.label}
-                </button>
-              ))}
+            {/* Píldoras de Rango de Fecha y Calendario */}
+            <div className="flex items-center gap-1.5 flex-wrap">
+              <div className="inline-flex rounded-lg border border-border/80 bg-background/60 p-0.5">
+                {[
+                  { id: "hoy", label: "Hoy" },
+                  { id: "7d", label: "7 Días" },
+                  { id: "mes", label: "Este Mes" },
+                  { id: "todo", label: "Todo" },
+                ].map((r) => (
+                  <button
+                    key={r.id}
+                    type="button"
+                    onClick={() => setDateRangeFilter(r.id)}
+                    className={`px-2.5 py-1 text-[11px] font-semibold rounded-md transition-colors cursor-pointer ${
+                      dateRangeFilter === r.id && !selectedDate
+                        ? "bg-primary text-primary-foreground font-bold"
+                        : "text-muted-foreground hover:text-foreground"
+                    }`}
+                  >
+                    {r.label}
+                  </button>
+                ))}
+              </div>
+
+              <PosCalendarPicker
+                selectedDate={selectedDate}
+                onSelectDate={setSelectedDate}
+                onClearDate={clearSelectedDate}
+                salesDaysMap={salesDaysMap}
+              />
             </div>
 
             {isMultiTaller && isAdmin && (
@@ -97,7 +126,7 @@ export function PosSalesHistory({
         <div className="rounded-xl bg-background/80 border border-border/70 p-4 grid grid-cols-1 sm:grid-cols-3 gap-3 text-left">
           <div className="p-3 rounded-lg bg-card/50 border border-border/60">
             <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground block">
-              {dateRangeFilter === "hoy" ? "Total Cobrado Hoy" : "Total del Período"}
+              {selectedDate ? `Total Cobrado (${formatSelectedDayTitle(selectedDate)})` : dateRangeFilter === "hoy" ? "Total Cobrado Hoy" : dateRangeFilter === "7d" ? "Total Últimos 7 Días" : dateRangeFilter === "mes" ? "Total Este Mes" : "Total del Período"}
             </span>
             <span className="font-outfit text-xl sm:text-2xl font-black text-foreground block mt-1">
               $

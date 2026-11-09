@@ -28,6 +28,10 @@ export default function POSPage() {
     setSelectedVenueFilter,
     dateRangeFilter,
     setDateRangeFilter,
+    selectedDate,
+    setSelectedDate,
+    clearSelectedDate,
+    salesDaysMap,
     salesLoading,
     searchInputRef,
     categories,
@@ -107,6 +111,10 @@ export default function POSPage() {
           salesBreakdown={salesBreakdown}
           dateRangeFilter={dateRangeFilter}
           setDateRangeFilter={setDateRangeFilter}
+          selectedDate={selectedDate}
+          setSelectedDate={setSelectedDate}
+          clearSelectedDate={clearSelectedDate}
+          salesDaysMap={salesDaysMap}
           isMultiTaller={isMultiTaller}
           isAdmin={isAdmin}
           venues={venues}
