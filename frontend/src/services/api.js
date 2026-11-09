@@ -670,6 +670,22 @@ export const api = {
 
       const trackingCode = generateTrackingCode();
 
+      const now = new Date();
+      const initialDateStr =
+        now.toLocaleDateString("es-AR", {
+          timeZone: "America/Argentina/Buenos_Aires",
+          day: "2-digit",
+          month: "2-digit",
+          year: "numeric",
+        }) +
+        " " +
+        now.toLocaleTimeString("es-AR", {
+          timeZone: "America/Argentina/Buenos_Aires",
+          hour: "2-digit",
+          minute: "2-digit",
+          hour12: false,
+        });
+
       const { data, error } = await supabase
         .from("orders")
         .insert({
@@ -684,6 +700,7 @@ export const api = {
           date: orderData.date,
           time: orderData.time,
           status: orderData.status || "ingresado",
+          history: [{ date: initialDateStr, text: "Ingresado en recepción" }],
         })
         .select()
         .single();
@@ -729,9 +746,21 @@ export const api = {
       return { message: "Orden eliminada correctamente." };
     },
 
-    updateStatus: async (id, status, text) => {
+    updateStatus: async (id, status, text = null) => {
       const user = getLocalUser();
       const dbStatus = status === "reparacion" ? "en_reparacion" : status;
+
+      const STATUS_TRANSITIONS = {
+        ingresado: "Ingresado en recepción",
+        diagnostico: "Pasa a En Diagnóstico",
+        presupuestado: "Pasa a Presupuestado",
+        en_reparacion: "Pasa a En Reparación",
+        listo: "Pasa a Listo para entrega",
+        entregado: "Pasa a Entregado",
+        cancelado: "Orden Cancelada",
+      };
+
+      const finalStatusText = text || STATUS_TRANSITIONS[dbStatus] || `Pasa a ${dbStatus}`;
 
       // Obtener orden actual para leer su historial
       const { data: order } = await supabase
@@ -757,7 +786,7 @@ export const api = {
           hour12: false,
         });
       
-      history.push({ date: dateStr, text });
+      history.push({ date: dateStr, text: finalStatusText });
 
       const { data, error } = await supabase
         .from("orders")

@@ -245,7 +245,7 @@ export default function OrderDetailModal({
               <div className="space-y-2 pl-2 border-l-2 border-primary/30">
                 {order.history.map((h, idx) => (
                   <div key={idx} className="text-[11px] flex flex-col sm:flex-row sm:items-center sm:justify-between gap-0.5">
-                    <span className="text-foreground font-medium">{h.text}</span>
+                    <span className="text-foreground font-medium">{h.text || "Cambio de estado"}</span>
                     <span className="text-[10px] font-mono text-muted-foreground">{h.date}</span>
                   </div>
                 ))}
