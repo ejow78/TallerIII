@@ -17,6 +17,29 @@ export default function PublicLayout() {
 
   const handleNavClick = (targetUrl) => (e) => {
     e.preventDefault();
+    const isLanding =
+      location.pathname === "/" &&
+      (!window.location.hostname.includes("repairit.cloud") ||
+        window.location.hostname === "repairit.cloud");
+    const hashIndex = targetUrl.indexOf("#");
+    const hash = hashIndex !== -1 ? targetUrl.substring(hashIndex) : "";
+
+    if (isLanding && hash) {
+      const targetId = hash.replace("#", "");
+      const element = document.getElementById(targetId);
+      if (element) {
+        element.scrollIntoView({ behavior: "smooth" });
+        window.history.pushState(null, "", hash);
+        return;
+      }
+    }
+
+    if (isLanding && !hash) {
+      window.scrollTo({ top: 0, behavior: "smooth" });
+      window.history.pushState(null, "", "/");
+      return;
+    }
+
     if (window.location.hostname.includes("repairit.cloud")) {
       window.location.href = targetUrl;
     } else {

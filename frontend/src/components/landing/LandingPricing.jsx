@@ -10,7 +10,7 @@ export function LandingPricing({
   scrollToPlan,
 }) {
   return (
-    <section id="precios" className="py-20 px-6 bg-card/10 border-t border-border/50 relative z-10">
+    <section id="precios" className="py-20 px-6 bg-card/10 border-t border-border/50 relative z-10 scroll-mt-16">
       <div className="max-w-7xl mx-auto space-y-12">
         <div className="text-center max-w-2xl mx-auto space-y-3">
           <h2 className="font-outfit text-3xl font-bold text-foreground tracking-tight">

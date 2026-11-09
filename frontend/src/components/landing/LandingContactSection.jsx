@@ -21,7 +21,7 @@ export function LandingContactSection({
   onSubmit,
 }) {
   return (
-    <section id="contacto" className="py-24 px-6 bg-card/10 border-t border-border/50 relative overflow-hidden z-10">
+    <section id="contacto" className="py-24 px-6 bg-card/10 border-t border-border/50 relative overflow-hidden z-10 scroll-mt-16">
       {/* Fondo técnico GridPattern con desvanecimiento radial suave */}
       <GridPattern
         width={36}

@@ -7,7 +7,7 @@ import {
 
 export function LandingFaq() {
   return (
-    <section id="faq" className="py-20 px-6 bg-background border-t border-border/50 relative z-10">
+    <section id="faq" className="py-20 px-6 bg-background border-t border-border/50 relative z-10 scroll-mt-16">
       <div className="max-w-3xl mx-auto space-y-12">
         <div className="text-center space-y-3">
           <h2 className="font-outfit text-3xl font-bold text-foreground tracking-tight">

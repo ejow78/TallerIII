@@ -13,7 +13,8 @@ import {
 
 export function LandingFeatures() {
   return (
-    <section className="py-20 px-6 bg-card/10 border-t border-border/50 relative z-10">
+    <section id="caracteristicas" className="py-20 px-6 bg-card/10 border-t border-border/50 relative z-10 scroll-mt-16">
+      <div id="funcionalidades" className="scroll-mt-20 absolute -top-10 left-0" />
       <div className="max-w-7xl mx-auto space-y-12">
         <div className="text-center max-w-2xl mx-auto space-y-2.5">
           <span className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground/75 block">
