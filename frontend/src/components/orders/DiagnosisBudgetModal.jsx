@@ -6,6 +6,12 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
 import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import {
   Stethoscope,
   X,
   CheckCircle,
@@ -16,6 +22,7 @@ import {
   Package,
   Plus,
   Save,
+  ChevronDown,
 } from "lucide-react";
 import { api } from "@/services/api";
 import { sendBudgetReadyEmail } from "@/services/emailService";
@@ -23,19 +30,12 @@ import { toast } from "sonner";
 
 export default function DiagnosisBudgetModal({
   order,
-  inventoryItems,
+  inventoryItems = [],
   profile,
   onClose,
   onSuccess,
 }) {
   const [diagText, setDiagText] = useState(() => order?.diagnosis || "");
-  const [diagStatus, setDiagStatus] = useState(() => {
-    const st = (order?.status || "").toLowerCase().trim();
-    if (!st || st === "ingresado" || st === "diagnostico") {
-      return "presupuestado";
-    }
-    return st === "en_reparacion" ? "reparacion" : st;
-  });
   const [budgetItems, setBudgetItems] = useState(() => {
     if (order?.budget && Array.isArray(order.budget.items) && order.budget.items.length > 0) {
       return order.budget.items.map((i) => ({
@@ -48,10 +48,7 @@ export default function DiagnosisBudgetModal({
     return [{ desc: "", price: "", inventoryId: null, stockDeducted: false }];
   });
   const [deductStockOnSave, setDeductStockOnSave] = useState(true);
-  const [selectedInventoryId, setSelectedInventoryId] = useState("");
   const [savingDiag, setSavingDiag] = useState(false);
-
-  if (!order) return null;
 
   const handleAddBudgetItem = () => {
     setBudgetItems([
@@ -81,7 +78,6 @@ export default function DiagnosisBudgetModal({
     } else {
       setBudgetItems([...budgetItems, newItem]);
     }
-    setSelectedInventoryId("");
     toast.info(`Repuesto agregado al presupuesto: ${invItem.name}`);
   };
 
@@ -103,46 +99,60 @@ export default function DiagnosisBudgetModal({
       const processedItems = [];
       for (const i of budgetItems) {
         if (!i.desc || i.desc.trim() === "") continue;
-        const cleanPrice = Math.max(0, Number(i.price) || 0);
-        let deducted = Boolean(i.stockDeducted);
 
-        if (i.inventoryId && !deducted && deductStockOnSave) {
+        let stockDeducted = Boolean(i.stockDeducted);
+
+        if (i.inventoryId && deductStockOnSave && !stockDeducted) {
           try {
             await api.inventory.adjustStock(i.inventoryId, -1);
-            deducted = true;
+            stockDeducted = true;
           } catch (stockErr) {
             console.warn("No se pudo descontar stock del repuesto:", stockErr);
+            toast.warning(`No se pudo descontar stock de "${i.desc}"`);
           }
         }
 
         processedItems.push({
           desc: i.desc.trim(),
-          price: cleanPrice,
-          ...(i.inventoryId ? { inventoryId: i.inventoryId, stockDeducted: deducted } : {}),
+          price: Math.max(0, Number(i.price) || 0),
+          inventoryId: i.inventoryId || null,
+          stockDeducted,
         });
       }
 
       const validBudgetItems = processedItems;
-      const totalBudget = validBudgetItems.reduce((acc, i) => acc + i.price, 0);
+      const totalBudget = validBudgetItems.reduce(
+        (sum, item) => sum + (Number(item.price) || 0),
+        0
+      );
 
       const budgetData =
         validBudgetItems.length > 0
           ? {
               items: validBudgetItems,
               total: totalBudget,
-              approved: order.budget?.approved || false,
+              approved: Boolean(order.budget?.approved),
+              rejected: Boolean(order.budget?.rejected),
               dateApproved: order.budget?.dateApproved || null,
             }
           : null;
 
+      // Pasa automáticamente a "presupuestado" al guardar (a menos que ya esté en reparación o listo)
+      const targetStatus =
+        order?.status === "en_reparacion" ||
+        order?.status === "listo" ||
+        order?.status === "entregado"
+          ? order.status
+          : "presupuestado";
+
       await api.orders.updateDiagnosisAndBudget(order._id, {
         diagnosis: diagText,
         budget: budgetData,
-        status: diagStatus,
+        status: targetStatus,
       });
 
       toast.success("Diagnóstico y Presupuesto guardados", {
-        description: `Se actualizó la orden ${order.trackingCode}.`,
+        description: `La orden ${order.trackingCode} pasó a Presupuestado.`,
       });
 
       const clientEmail = order.clientId?.email;
@@ -177,6 +187,11 @@ export default function DiagnosisBudgetModal({
     }
   };
 
+  const isDiagnosticoStep =
+    (order?.status || "").toLowerCase().trim() === "diagnostico" || !order?.diagnosis;
+
+  const inStockItems = inventoryItems.filter((inv) => (inv.quantity || 0) > 0);
+
   return (
     <div
       onClick={onClose}
@@ -190,7 +205,7 @@ export default function DiagnosisBudgetModal({
           <div>
             <CardTitle className="font-outfit text-lg font-bold text-foreground flex items-center gap-2">
               <Stethoscope className="w-5 h-5 text-primary" />
-              {(order?.status || "").toLowerCase().trim() === "diagnostico" || !order?.diagnosis
+              {isDiagnosticoStep
                 ? "Agregar Diagnóstico y Presupuesto"
                 : "Editar Diagnóstico y Presupuesto"}
             </CardTitle>
@@ -246,27 +261,34 @@ export default function DiagnosisBudgetModal({
                   público
                 </span>
               </div>
-              <Badge
-                variant="outline"
-                className="border-amber-500/40 text-amber-400 font-bold text-[10px]"
-              >
+              <Badge className="bg-amber-500/20 border-amber-500/40 text-amber-400 font-bold text-[10px]">
                 Pendiente
               </Badge>
             </div>
           ) : null}
 
-          {/* Diagnóstico Técnico */}
-          <div className="space-y-2">
+          {/* Falla Declarada de Recepción (Referencia rápida) */}
+          <div className="bg-muted/15 p-3.5 rounded-xl border border-border/60 space-y-1">
+            <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground flex items-center gap-1.5">
+              <FileText className="w-3.5 h-3.5" />
+              Falla Declarada en Recepción
+            </span>
+            <p className="text-xs text-foreground italic">
+              &quot;{order.issue || "Sin detalles específicos"}&quot;
+            </p>
+          </div>
+
+          {/* Informe de Diagnóstico Técnico */}
+          <div className="space-y-1.5">
             <Label
               htmlFor="diag-text"
-              className="text-xs font-bold uppercase tracking-wider text-muted-foreground flex items-center gap-1.5"
+              className="text-xs font-bold uppercase tracking-wider text-muted-foreground"
             >
-              <FileText className="w-3.5 h-3.5 text-primary" />
-              Diagnóstico Técnico del Taller
+              Diagnóstico Técnico Realizado
             </Label>
             <Textarea
               id="diag-text"
-              rows={4}
+              rows={3}
               placeholder="Escribí el diagnóstico técnico (fallas detectadas en inspección, componentes a reemplazar...)"
               value={diagText}
               onChange={(e) => setDiagText(e.target.value)}
@@ -281,32 +303,56 @@ export default function DiagnosisBudgetModal({
                 <DollarSign className="w-3.5 h-3.5 text-primary" />
                 Ítems del Presupuesto (Mano de obra y repuestos)
               </Label>
-              <div className="flex items-center gap-2">
-                {inventoryItems.filter((inv) => inv.quantity > 0).length > 0 && (
-                  <div className="relative">
-                    <select
-                      value={selectedInventoryId}
-                      onChange={(e) => handleAddInventoryBudgetItem(e.target.value)}
-                      className="h-7 bg-background border border-primary/40 text-primary rounded-lg px-2 text-[10px] font-bold focus:outline-none focus:ring-1 focus:ring-primary cursor-pointer"
+              <div className="flex items-center gap-2 flex-wrap">
+                {/* Desplegable estilo OrderStatusDropdown para Repuestos de Stock */}
+                {inStockItems.length > 0 && (
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <Button
+                        type="button"
+                        variant="outline"
+                        size="sm"
+                        className="h-7 border border-primary/40 px-2.5 text-[10px] font-bold text-primary hover:bg-primary/10 rounded-lg flex items-center gap-1 cursor-pointer transition-all"
+                      >
+                        <Package className="w-3 h-3" />
+                        <span>+ Repuesto de Stock</span>
+                        <ChevronDown className="w-3 h-3 opacity-70" />
+                      </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent
+                      align="end"
+                      className="bg-card border-border text-foreground max-h-56 overflow-y-auto w-72 sm:w-80 p-1"
                     >
-                      <option value="">+ Cargar repuesto de Stock</option>
-                      {inventoryItems
-                        .filter((inv) => inv.quantity > 0)
-                        .map((inv) => (
-                          <option key={inv._id} value={inv._id}>
-                            {inv.name} (${Number(inv.price || 0).toLocaleString("es-AR")} •{" "}
-                            {inv.quantity} u.)
-                          </option>
-                        ))}
-                    </select>
-                  </div>
+                      {inStockItems.map((inv) => (
+                        <DropdownMenuItem
+                          key={inv._id}
+                          onClick={() => handleAddInventoryBudgetItem(inv._id)}
+                          className="text-xs cursor-pointer flex justify-between items-center py-2 px-2.5 rounded-md hover:bg-muted"
+                        >
+                          <div className="min-w-0 flex-1 pr-2">
+                            <span className="block truncate font-medium">{inv.name}</span>
+                            <span className="text-[10px] text-muted-foreground font-mono">
+                              {inv.code}
+                            </span>
+                          </div>
+                          <span className="text-[11px] font-mono font-bold text-primary shrink-0">
+                            ${Number(inv.price || 0).toLocaleString("es-AR")}
+                            <span className="text-muted-foreground text-[10px] ml-1">
+                              ({inv.quantity} u.)
+                            </span>
+                          </span>
+                        </DropdownMenuItem>
+                      ))}
+                    </DropdownMenuContent>
+                  </DropdownMenu>
                 )}
+
                 <Button
                   type="button"
                   variant="outline"
                   size="sm"
                   onClick={handleAddBudgetItem}
-                  className="h-7 text-[10px] font-bold border-primary/40 text-primary hover:bg-primary/10 rounded-lg flex items-center gap-1 cursor-pointer shrink-0"
+                  className="h-7 text-[10px] font-bold border-border/80 text-foreground hover:bg-muted rounded-lg flex items-center gap-1 cursor-pointer shrink-0"
                 >
                   <Plus className="w-3 h-3" />
                   Agregar Ítem
@@ -394,27 +440,6 @@ export default function DiagnosisBudgetModal({
             </div>
           </div>
 
-          {/* Cambiar Estado */}
-          <div className="space-y-2 border-t border-border/60 pt-4">
-            <Label
-              htmlFor="diag-status"
-              className="text-xs font-bold uppercase tracking-wider text-muted-foreground"
-            >
-              Actualizar Estado de la Orden
-            </Label>
-            <select
-              id="diag-status"
-              value={diagStatus}
-              onChange={(e) => setDiagStatus(e.target.value)}
-              className="w-full h-9 bg-background border border-border rounded-xl px-3 text-xs font-semibold text-foreground focus:outline-none focus:ring-1 focus:ring-primary"
-            >
-              <option value="diagnostico">En Diagnóstico</option>
-              <option value="presupuestado">Presupuestado</option>
-              <option value="reparacion">En Reparación</option>
-              <option value="listo">Listo para Retirar</option>
-            </select>
-          </div>
-
           {/* Botones de Acción */}
           <div className="flex justify-end gap-3 border-t border-border/60 pt-4">
             <Button
@@ -431,7 +456,11 @@ export default function DiagnosisBudgetModal({
               className="h-9 bg-primary hover:bg-primary/95 text-primary-foreground font-bold text-xs px-5 rounded-xl cursor-pointer shadow-lg shadow-primary/20 flex items-center gap-1.5"
             >
               <Save className="w-3.5 h-3.5" />
-              {savingDiag ? "Guardando..." : "Guardar Diagnóstico"}
+              {savingDiag
+                ? "Guardando..."
+                : isDiagnosticoStep
+                ? "Guardar y Presupuestar"
+                : "Guardar Diagnóstico"}
             </Button>
           </div>
         </form>
