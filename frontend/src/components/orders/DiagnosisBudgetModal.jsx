@@ -298,66 +298,53 @@ export default function DiagnosisBudgetModal({
 
           {/* Presupuesto de Mano de Obra y Repuestos */}
           <div className="space-y-3 border-t border-border/60 pt-4">
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+            <div className="flex items-center justify-between gap-2">
               <Label className="text-xs font-bold uppercase tracking-wider text-muted-foreground flex items-center gap-1.5">
                 <DollarSign className="w-3.5 h-3.5 text-primary" />
                 Ítems del Presupuesto (Mano de obra y repuestos)
               </Label>
-              <div className="flex items-center gap-2 flex-wrap">
-                {/* Desplegable estilo OrderStatusDropdown para Repuestos de Stock */}
-                {inStockItems.length > 0 && (
-                  <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                      <Button
-                        type="button"
-                        variant="outline"
-                        size="sm"
-                        className="h-7 border border-primary/40 px-2.5 text-[10px] font-bold text-primary hover:bg-primary/10 rounded-lg flex items-center gap-1 cursor-pointer transition-all"
-                      >
-                        <Package className="w-3 h-3" />
-                        <span>+ Repuesto de Stock</span>
-                        <ChevronDown className="w-3 h-3 opacity-70" />
-                      </Button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent
-                      align="end"
-                      className="bg-card border-border text-foreground max-h-56 overflow-y-auto w-72 sm:w-80 p-1"
+              {/* Desplegable estilo OrderStatusDropdown para Repuestos de Stock */}
+              {inStockItems.length > 0 && (
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      className="h-7 border border-primary/40 px-2.5 text-[10px] font-bold text-primary hover:bg-primary/10 rounded-lg flex items-center gap-1 cursor-pointer transition-all"
                     >
-                      {inStockItems.map((inv) => (
-                        <DropdownMenuItem
-                          key={inv._id}
-                          onClick={() => handleAddInventoryBudgetItem(inv._id)}
-                          className="text-xs cursor-pointer flex justify-between items-center py-2 px-2.5 rounded-md hover:bg-muted"
-                        >
-                          <div className="min-w-0 flex-1 pr-2">
-                            <span className="block truncate font-medium">{inv.name}</span>
-                            <span className="text-[10px] text-muted-foreground font-mono">
-                              {inv.code}
-                            </span>
-                          </div>
-                          <span className="text-[11px] font-mono font-bold text-primary shrink-0">
-                            ${Number(inv.price || 0).toLocaleString("es-AR")}
-                            <span className="text-muted-foreground text-[10px] ml-1">
-                              ({inv.quantity} u.)
-                            </span>
+                      <Package className="w-3 h-3" />
+                      <span>+ Repuesto de Stock</span>
+                      <ChevronDown className="w-3 h-3 opacity-70" />
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent
+                    align="end"
+                    className="bg-card border-border text-foreground max-h-56 overflow-y-auto w-72 sm:w-80 p-1"
+                  >
+                    {inStockItems.map((inv) => (
+                      <DropdownMenuItem
+                        key={inv._id}
+                        onClick={() => handleAddInventoryBudgetItem(inv._id)}
+                        className="text-xs cursor-pointer flex justify-between items-center py-2 px-2.5 rounded-md hover:bg-muted"
+                      >
+                        <div className="min-w-0 flex-1 pr-2">
+                          <span className="block truncate font-medium">{inv.name}</span>
+                          <span className="text-[10px] text-muted-foreground font-mono">
+                            {inv.code}
                           </span>
-                        </DropdownMenuItem>
-                      ))}
-                    </DropdownMenuContent>
-                  </DropdownMenu>
-                )}
-
-                <Button
-                  type="button"
-                  variant="outline"
-                  size="sm"
-                  onClick={handleAddBudgetItem}
-                  className="h-7 text-[10px] font-bold border-border/80 text-foreground hover:bg-muted rounded-lg flex items-center gap-1 cursor-pointer shrink-0"
-                >
-                  <Plus className="w-3 h-3" />
-                  Agregar Ítem
-                </Button>
-              </div>
+                        </div>
+                        <span className="text-[11px] font-mono font-bold text-primary shrink-0">
+                          ${Number(inv.price || 0).toLocaleString("es-AR")}
+                          <span className="text-muted-foreground text-[10px] ml-1">
+                            ({inv.quantity} u.)
+                          </span>
+                        </span>
+                      </DropdownMenuItem>
+                    ))}
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              )}
             </div>
 
             <div className="space-y-2 max-h-48 overflow-y-auto pr-1">
@@ -410,6 +397,20 @@ export default function DiagnosisBudgetModal({
                   )}
                 </div>
               ))}
+            </div>
+
+            {/* Botón para agregar ítem manual ubicado debajo del ítem o lista */}
+            <div>
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={handleAddBudgetItem}
+                className="h-7 text-xs font-semibold border-border/80 text-foreground hover:bg-muted rounded-lg flex items-center gap-1.5 cursor-pointer"
+              >
+                <Plus className="w-3.5 h-3.5" />
+                Agregar Ítem
+              </Button>
             </div>
 
             {budgetItems.some((i) => i.inventoryId && !i.stockDeducted) && (

@@ -296,7 +296,7 @@ export default function OrderDetailModal({
                 title={
                   order.status === "listo"
                     ? "Cobrar presupuesto en Caja POS y marcar entregado"
-                    : "Disponible cuando la orden esté en estado Listo y tenga presupuesto mayor a $0"
+                    : "Disponible cuando la orden esté en estado Listo para retirar y tenga presupuesto mayor a $0"
                 }
               >
                 <ShoppingCart className="w-3.5 h-3.5" />

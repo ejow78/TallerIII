@@ -31,7 +31,7 @@ export default function OrderStatusDropdown({ orderId, currentStatus, onStatusCh
       break;
     case "listo":
       colorClass = "bg-emerald-500/10 text-emerald-400 border-emerald-500/25 hover:bg-emerald-500/20";
-      statusLabel = "Listo";
+      statusLabel = "Listo para retirar";
       break;
     case "entregado":
       colorClass = "bg-muted text-muted-foreground border-border hover:bg-muted/80";
@@ -83,7 +83,7 @@ export default function OrderStatusDropdown({ orderId, currentStatus, onStatusCh
           onClick={() => onStatusChange(orderId, "listo")}
           className="text-xs cursor-pointer"
         >
-          Listo
+          Listo para retirar
         </DropdownMenuItem>
         <DropdownMenuItem
           onClick={() => onStatusChange(orderId, "entregado")}

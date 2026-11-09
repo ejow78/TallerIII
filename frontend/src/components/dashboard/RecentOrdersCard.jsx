@@ -31,7 +31,7 @@ const STATUS_META = {
     badge: "outline",
   },
   listo: {
-    label: "Listo",
+    label: "Listo para retirar",
     colorClass: "bg-emerald-500/10 text-emerald-400 border-emerald-500/25",
     badge: "outline",
   },

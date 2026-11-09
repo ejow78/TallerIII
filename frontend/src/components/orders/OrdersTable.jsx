@@ -222,7 +222,7 @@ export default function OrdersTable({
                     title={
                       totalB > 0 && o.status === "listo"
                         ? "Cobrar orden en Caja POS y marcar entregado"
-                        : "Disponible cuando la orden esté en estado Listo y tenga presupuesto mayor a $0"
+                        : "Disponible cuando la orden esté en estado Listo para retirar y tenga presupuesto mayor a $0"
                     }
                   >
                     <ShoppingCart className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
@@ -442,7 +442,7 @@ export default function OrdersTable({
                           title={
                             totalB > 0 && o.status === "listo"
                               ? "Cobrar presupuesto en Caja POS y marcar entregado"
-                              : "Disponible cuando la orden esté en estado Listo y tenga presupuesto mayor a $0"
+                              : "Disponible cuando la orden esté en estado Listo para retirar y tenga presupuesto mayor a $0"
                           }
                         >
                           <ShoppingCart className="w-4 h-4" />

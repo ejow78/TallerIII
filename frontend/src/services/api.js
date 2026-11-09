@@ -755,7 +755,7 @@ export const api = {
         diagnostico: "Pasa a En Diagnóstico",
         presupuestado: "Pasa a Presupuestado",
         en_reparacion: "Pasa a En Reparación",
-        listo: "Pasa a Listo para entrega",
+        listo: "Pasa a Listo para retirar",
         entregado: "Pasa a Entregado",
         cancelado: "Orden Cancelada",
       };
@@ -832,7 +832,7 @@ export const api = {
         presupuestado: "Pasa a Presupuestado",
         en_reparacion: "Pasa a En Reparación",
         reparacion: "Pasa a En Reparación",
-        listo: "Pasa a Listo para entrega",
+        listo: "Pasa a Listo para retirar",
         entregado: "Pasa a Entregado",
         cancelado: "Orden Cancelada",
       };
