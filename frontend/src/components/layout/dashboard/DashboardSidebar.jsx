@@ -212,7 +212,7 @@ export function DashboardSidebar({
                     >
                       <NavLink to="/dashboard/inventario" className="flex items-center gap-3 w-full">
                         <Package className="w-[18px] h-[18px] shrink-0" />
-                        <span>Inventario de Insumos</span>
+                        <span>Inventario</span>
                       </NavLink>
                     </SidebarMenuButton>
                     {hasPOSAccess(effectivePlan) &&

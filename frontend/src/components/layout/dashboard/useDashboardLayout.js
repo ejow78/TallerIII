@@ -88,7 +88,7 @@ export function useDashboardLayout() {
     else if (currentPath === "/dashboard/clientes")
       document.title = "RepairIT - Directorio de Clientes";
     else if (currentPath === "/dashboard/inventario")
-      document.title = "RepairIT - Inventario de Insumos";
+      document.title = "RepairIT - Inventario";
     else if (currentPath === "/dashboard/caja")
       document.title = "RepairIT - Control de Caja";
     else if (currentPath === "/dashboard/usuarios")
