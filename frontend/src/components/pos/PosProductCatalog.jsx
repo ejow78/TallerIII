@@ -1,6 +1,7 @@
+import { useState, useRef, useEffect, useCallback } from "react";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import { Search, X, Sparkles } from "lucide-react";
+import { Search, X, Sparkles, ChevronLeft, ChevronRight } from "lucide-react";
 
 export function PosProductCatalog({
   searchInputRef,
@@ -14,6 +15,37 @@ export function PosProductCatalog({
   cart = [],
   onAddToCart,
 }) {
+  const scrollContainerRef = useRef(null);
+  const [canScrollLeft, setCanScrollLeft] = useState(false);
+  const [canScrollRight, setCanScrollRight] = useState(false);
+
+  const checkScroll = useCallback(() => {
+    const el = scrollContainerRef.current;
+    if (!el) return;
+    const { scrollLeft, scrollWidth, clientWidth } = el;
+    setCanScrollLeft(scrollLeft > 4);
+    setCanScrollRight(scrollLeft + clientWidth < scrollWidth - 4);
+  }, []);
+
+  useEffect(() => {
+    const el = scrollContainerRef.current;
+    if (!el) return;
+    checkScroll();
+    el.addEventListener("scroll", checkScroll, { passive: true });
+    window.addEventListener("resize", checkScroll);
+    return () => {
+      el.removeEventListener("scroll", checkScroll);
+      window.removeEventListener("resize", checkScroll);
+    };
+  }, [checkScroll, categories]);
+
+  const handleScroll = (direction) => {
+    const el = scrollContainerRef.current;
+    if (!el) return;
+    const distance = direction === "left" ? -220 : 220;
+    el.scrollBy({ left: distance, behavior: "smooth" });
+  };
+
   return (
     <Card className="xl:col-span-7 bg-card/30 border-border/80 p-5 sm:p-6 shadow-sm space-y-5">
       {/* Buscador + Filtros de Categoría */}
@@ -40,34 +72,68 @@ export function PosProductCatalog({
           )}
         </div>
 
-        {/* Píldoras de Categorías */}
+        {/* Píldoras de Categorías con Navegación y Fade */}
         {categories.length > 0 && (
-          <div className="flex items-center gap-2 overflow-x-auto pb-1 no-scrollbar">
-            <button
-              type="button"
-              onClick={() => setCategoryFilter("todas")}
-              className={`px-3.5 py-1.5 rounded-xl text-xs font-semibold whitespace-nowrap transition-all cursor-pointer border ${
-                categoryFilter === "todas"
-                  ? "bg-primary/15 text-primary border-primary/30 font-bold"
-                  : "bg-background/60 text-muted-foreground border-border/60 hover:text-foreground"
-              }`}
+          <div className="relative group/categories">
+            {/* Botón Scroll Izquierda */}
+            {canScrollLeft && (
+              <div className="absolute left-0 top-0 bottom-0 z-10 flex items-center pr-4 bg-gradient-to-r from-card via-card/90 to-transparent pointer-events-none">
+                <button
+                  type="button"
+                  onClick={() => handleScroll("left")}
+                  className="w-6 h-6 rounded-full bg-background/90 border border-border shadow-md flex items-center justify-center text-foreground hover:bg-muted cursor-pointer transition-transform hover:scale-110 active:scale-95 pointer-events-auto"
+                  title="Categorías anteriores"
+                >
+                  <ChevronLeft className="w-3.5 h-3.5" />
+                </button>
+              </div>
+            )}
+
+            {/* Contenedor de Categorías */}
+            <div
+              ref={scrollContainerRef}
+              className="flex items-center gap-2 overflow-x-auto pb-1 no-scrollbar scroll-smooth"
             >
-              Todos ({totalItemsCount})
-            </button>
-            {categories.map((cat) => (
               <button
-                key={cat}
                 type="button"
-                onClick={() => setCategoryFilter(cat)}
-                className={`px-3.5 py-1.5 rounded-xl text-xs font-semibold whitespace-nowrap transition-all cursor-pointer border ${
-                  categoryFilter === cat
+                onClick={() => setCategoryFilter("todas")}
+                className={`px-3.5 py-1.5 rounded-xl text-xs font-semibold whitespace-nowrap transition-all cursor-pointer border shrink-0 ${
+                  categoryFilter === "todas"
                     ? "bg-primary/15 text-primary border-primary/30 font-bold"
                     : "bg-background/60 text-muted-foreground border-border/60 hover:text-foreground"
                 }`}
               >
-                {cat}
+                Todos ({totalItemsCount})
               </button>
-            ))}
+              {categories.map((cat) => (
+                <button
+                  key={cat}
+                  type="button"
+                  onClick={() => setCategoryFilter(cat)}
+                  className={`px-3.5 py-1.5 rounded-xl text-xs font-semibold whitespace-nowrap transition-all cursor-pointer border shrink-0 ${
+                    categoryFilter === cat
+                      ? "bg-primary/15 text-primary border-primary/30 font-bold"
+                      : "bg-background/60 text-muted-foreground border-border/60 hover:text-foreground"
+                  }`}
+                >
+                  {cat}
+                </button>
+              ))}
+            </div>
+
+            {/* Botón Scroll Derecha + Fade */}
+            {canScrollRight && (
+              <div className="absolute right-0 top-0 bottom-0 z-10 flex items-center pl-4 bg-gradient-to-l from-card via-card/90 to-transparent pointer-events-none">
+                <button
+                  type="button"
+                  onClick={() => handleScroll("right")}
+                  className="w-6 h-6 rounded-full bg-background/90 border border-border shadow-md flex items-center justify-center text-foreground hover:bg-muted cursor-pointer transition-transform hover:scale-110 active:scale-95 pointer-events-auto"
+                  title="Más categorías"
+                >
+                  <ChevronRight className="w-3.5 h-3.5" />
+                </button>
+              </div>
+            )}
           </div>
         )}
       </div>
