@@ -1,6 +1,12 @@
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { PosCalendarPicker } from "./PosCalendarPicker";
 import {
   History,
@@ -8,6 +14,7 @@ import {
   Download,
   AlertCircle,
   Printer,
+  ChevronDown,
 } from "lucide-react";
 
 function formatSelectedDayTitle(dateStr) {
@@ -92,21 +99,41 @@ export function PosSalesHistory({
             </div>
 
             {isMultiTaller && isAdmin && (
-              <div className="flex items-center gap-2">
-                <Store className="w-4 h-4 text-muted-foreground shrink-0" />
-                <select
-                  value={selectedVenueFilter}
-                  onChange={(e) => setSelectedVenueFilter(e.target.value)}
-                  className="h-8 bg-background/85 border border-border rounded-lg px-2.5 text-xs text-foreground focus:outline-none focus:ring-1 focus:ring-primary"
-                >
-                  <option value="todas">Todas las Sucursales</option>
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="h-8 border-border/80 text-xs font-semibold flex items-center gap-1.5 rounded-lg cursor-pointer bg-background/60 text-muted-foreground hover:text-foreground"
+                    title="Filtrar ventas por sucursal"
+                  >
+                    <Store className="w-3.5 h-3.5" />
+                    <span className="max-w-[140px] truncate">
+                      {selectedVenueFilter === "todas"
+                        ? "Todas las Sucursales"
+                        : venues.find((v) => String(v._id) === String(selectedVenueFilter))?.name || "Sucursal"}
+                    </span>
+                    <ChevronDown className="w-3 h-3 opacity-60 ml-0.5" />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="bg-card border-border text-foreground">
+                  <DropdownMenuItem
+                    onClick={() => setSelectedVenueFilter("todas")}
+                    className="text-xs cursor-pointer"
+                  >
+                    Todas las Sucursales
+                  </DropdownMenuItem>
                   {venues.map((v) => (
-                    <option key={v._id} value={v._id}>
+                    <DropdownMenuItem
+                      key={v._id}
+                      onClick={() => setSelectedVenueFilter(v._id)}
+                      className="text-xs cursor-pointer"
+                    >
                       {v.name}
-                    </option>
+                    </DropdownMenuItem>
                   ))}
-                </select>
-              </div>
+                </DropdownMenuContent>
+              </DropdownMenu>
             )}
 
             <Button
