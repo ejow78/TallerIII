@@ -1,3 +1,4 @@
+import { normalizeText } from "@/lib/utils";
 import { useState, useEffect, useRef, useMemo, useCallback } from "react";
 import { toast } from "sonner";
 import {
@@ -409,12 +410,12 @@ export function usePosTerminal() {
   }, [items]);
 
   const filteredItems = useMemo(() => {
-    const q = searchQuery.toLowerCase().trim();
+    const q = normalizeText(searchQuery);
     return items.filter((item) => {
       const matchesSearch =
         !q ||
-        (item.name && item.name.toLowerCase().includes(q)) ||
-        (item.code && item.code.toLowerCase().includes(q));
+        normalizeText(item.name).includes(q) ||
+        normalizeText(item.code).includes(q);
       const matchesCat =
         categoryFilter === "todas" || item.category === categoryFilter;
       return matchesSearch && matchesCat;

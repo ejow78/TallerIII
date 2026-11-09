@@ -1,3 +1,4 @@
+import { normalizeText } from "@/lib/utils";
 import { useState, useEffect, useMemo, useRef, useCallback } from "react";
 import { toast } from "sonner";
 import { api, getLocalUser, cache } from "@/services/api";
@@ -439,12 +440,12 @@ export function useInventoryData() {
 
   const filteredItems = useMemo(() => {
     return items.filter((item) => {
-      const term = searchQuery.toLowerCase().trim();
+      const term = normalizeText(searchQuery);
       const matchesSearch =
         !term ||
-        (item.code && item.code.toLowerCase().includes(term)) ||
-        (item.name && item.name.toLowerCase().includes(term)) ||
-        (item.description && item.description.toLowerCase().includes(term));
+        normalizeText(item.code).includes(term) ||
+        normalizeText(item.name).includes(term) ||
+        normalizeText(item.description).includes(term);
 
       const matchesCategory =
         categoryFilter === "todas" || item.category === categoryFilter;

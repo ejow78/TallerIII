@@ -1,3 +1,4 @@
+import { normalizeText } from "@/lib/utils";
 import { useState, useEffect, useMemo, useCallback } from "react";
 import { toast } from "sonner";
 import { api, getLocalUser, cache } from "@/services/api";
@@ -132,15 +133,15 @@ export function useClientsData() {
   }, []);
 
   const filteredClients = useMemo(() => {
-    const term = searchQuery.toLowerCase().trim();
+    const term = normalizeText(searchQuery);
     if (!term) return clients;
     return clients.filter((c) => {
       const cId = c._id || "";
       return (
-        cId.toLowerCase().includes(term) ||
-        (c.name && c.name.toLowerCase().includes(term)) ||
+        normalizeText(cId).includes(term) ||
+        normalizeText(c.name).includes(term) ||
         (c.dni && c.dni.replace(/\./g, "").includes(term.replace(/\./g, ""))) ||
-        (c.email && c.email.toLowerCase().includes(term)) ||
+        normalizeText(c.email).includes(term) ||
         (c.phone && c.phone.includes(term))
       );
     });

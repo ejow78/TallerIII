@@ -1,3 +1,4 @@
+import { normalizeText } from "@/lib/utils";
 import { useState, useEffect, useMemo, useCallback } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { toast } from "sonner";
@@ -85,12 +86,12 @@ export function useNewOrder() {
 
   // Coincidencias del buscador rápido de clientes
   const matchingClients = useMemo(() => {
-    const q = clientSearch.trim().toLowerCase();
+    const q = normalizeText(clientSearch);
     if (!q) return [];
     return existingClients
       .filter(
         (c) =>
-          (c.name && c.name.toLowerCase().includes(q)) ||
+          normalizeText(c.name).includes(q) ||
           (c.dni && c.dni.replace(/\./g, "").includes(q.replace(/\./g, ""))) ||
           (c.phone && c.phone.includes(q))
       )

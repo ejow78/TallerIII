@@ -1,3 +1,4 @@
+import { normalizeText } from "@/lib/utils";
 import { useState, useEffect, useMemo, useCallback } from "react";
 import { api, getLocalUser, normalizePlan, hasPOSAccess, cache } from "@/services/api";
 import { sendBudgetReadyEmail, sendOrderReadyEmail } from "@/services/emailService";
@@ -361,13 +362,13 @@ export function useOrdersData(onDetailOrderUpdate) {
   const filteredOrders = useMemo(() => {
     return orders.filter((o) => {
       const client = o.clientId || {};
-      const term = searchQuery.toLowerCase().trim();
+      const term = normalizeText(searchQuery);
       const matchesSearch =
-        (o.trackingCode && o.trackingCode.toLowerCase().includes(term)) ||
-        (client.name && client.name.toLowerCase().includes(term)) ||
+        normalizeText(o.trackingCode).includes(term) ||
+        normalizeText(client.name).includes(term) ||
         (client.dni && client.dni.includes(term)) ||
-        (o.deviceModel && o.deviceModel.toLowerCase().includes(term)) ||
-        (o.deviceType && o.deviceType.toLowerCase().includes(term));
+        normalizeText(o.deviceModel).includes(term) ||
+        normalizeText(o.deviceType).includes(term);
 
       const matchesStatus =
         statusFilter === "todos" ||
