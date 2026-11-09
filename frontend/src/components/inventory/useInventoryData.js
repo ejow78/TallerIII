@@ -2,17 +2,9 @@ import { normalizeText } from "@/lib/utils";
 import { useState, useEffect, useMemo, useRef, useCallback } from "react";
 import { toast } from "sonner";
 import { api, getLocalUser, cache } from "@/services/api";
+import { DEFAULT_CATEGORIES, normalizeCategory, getAvailableCategories } from "@/constants/categories";
 
-export const DEFAULT_CATEGORIES = [
-  "Insumos",
-  "Repuestos",
-  "Accesorios",
-  "Herramientas",
-  "Pantallas",
-  "Baterías",
-  "Almacenamiento",
-  "Memorias",
-];
+export { DEFAULT_CATEGORIES };
 
 export function getStockStatus(quantity, minQuantity) {
   if (quantity === 0) {
@@ -151,8 +143,7 @@ export function useInventoryData() {
   }, [items, isModalOpen, openEditModal, openCreateModal]);
 
   const availableCategories = useMemo(() => {
-    const fromItems = items.map((i) => i.category).filter(Boolean);
-    return Array.from(new Set([...DEFAULT_CATEGORIES, ...fromItems]));
+    return getAvailableCategories(items);
   }, [items]);
 
   const adjustQuantity = useCallback(async (id, delta) => {
@@ -269,7 +260,7 @@ export function useInventoryData() {
             backgroundColor: "#0284c7",
             color: "#ffffff",
           },
-          cell: (item) => ({ type: String, value: item.category || "General" }),
+          cell: (item) => ({ type: String, value: normalizeCategory(item.category) }),
           width: 20,
         },
         {
@@ -396,7 +387,7 @@ export function useInventoryData() {
 
           const code = row[0] || `INV-${Math.floor(100 + Math.random() * 900)}`;
           const name = row[1];
-          const category = row[2] || "Insumos";
+          const category = normalizeCategory(row[2] || "Insumos");
           const description = row[3] || "";
           const quantity = Math.max(0, Math.floor(Number(row[4]) || 0));
           const minQuantity = Math.max(0, Math.floor(Number(row[5]) || 0));
@@ -447,8 +438,9 @@ export function useInventoryData() {
         normalizeText(item.name).includes(term) ||
         normalizeText(item.description).includes(term);
 
+      const itemCat = normalizeCategory(item.category);
       const matchesCategory =
-        categoryFilter === "todas" || item.category === categoryFilter;
+        categoryFilter === "todas" || itemCat === categoryFilter;
 
       let matchesStock = true;
       const minQty = item.min_quantity ?? item.minQuantity ?? 0;

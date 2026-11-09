@@ -6,6 +6,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { X, Save, Plus, Minus } from "lucide-react";
 import { toast } from "sonner";
 import { api } from "@/services/api";
+import { normalizeCategory } from "@/constants/categories";
 
 export function InventoryItemModal({
   isOpen,
@@ -17,7 +18,9 @@ export function InventoryItemModal({
   const isEditing = Boolean(item?._id);
 
   const [itemName, setItemName] = useState(() => item?.name || "");
-  const [itemCategory, setItemCategory] = useState(() => item?.category || "Repuestos");
+  const [itemCategory, setItemCategory] = useState(() => normalizeCategory(item?.category || "Repuestos"));
+  const [isCustomCategory, setIsCustomCategory] = useState(false);
+  const [customCategoryInput, setCustomCategoryInput] = useState("");
   const [itemDesc, setItemDesc] = useState(() => item?.description || "");
   const [itemQty, setItemQty] = useState(() => item?.quantity ?? 0);
   const [itemMinQty, setItemMinQty] = useState(
@@ -48,10 +51,12 @@ export function InventoryItemModal({
       const finalCode =
         itemCode.trim() || `INV-${Math.floor(100 + Math.random() * 900)}`;
 
+      const finalCategory = normalizeCategory(isCustomCategory ? customCategoryInput : itemCategory);
+
       if (isEditing) {
         await api.inventory.update(item._id, {
           name: itemName,
-          category: itemCategory,
+          category: finalCategory,
           description: itemDesc,
           quantity: Math.max(0, Number(itemQty) || 0),
           minQuantity: Math.max(0, Number(itemMinQty) || 0),
@@ -64,7 +69,7 @@ export function InventoryItemModal({
       } else {
         await api.inventory.create({
           name: itemName,
-          category: itemCategory,
+          category: finalCategory,
           description: itemDesc,
           quantity: Math.max(0, Number(itemQty) || 0),
           minQuantity: Math.max(0, Number(itemMinQty) || 0),
@@ -153,24 +158,59 @@ export function InventoryItemModal({
             </div>
 
             <div className="space-y-1.5">
-              <Label
-                htmlFor="item-category"
-                className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground"
-              >
-                Categoría
-              </Label>
-              <select
-                id="item-category"
-                value={itemCategory}
-                onChange={(e) => setItemCategory(e.target.value)}
-                className="w-full h-9 rounded-lg border border-border bg-background/85 text-xs px-3 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-primary text-foreground"
-              >
-                {availableCategories.map((cat) => (
-                  <option key={cat} value={cat}>
-                    {cat}
-                  </option>
-                ))}
-              </select>
+              <div className="flex items-center justify-between">
+                <Label
+                  htmlFor="item-category"
+                  className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground"
+                >
+                  Categoría
+                </Label>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setIsCustomCategory((prev) => !prev);
+                    if (!isCustomCategory) {
+                      setCustomCategoryInput("");
+                    }
+                  }}
+                  className="text-[10px] text-primary hover:underline font-semibold cursor-pointer"
+                >
+                  {isCustomCategory ? "Elegir de la lista" : "+ Nueva categoría"}
+                </button>
+              </div>
+
+              {isCustomCategory ? (
+                <Input
+                  id="item-category-custom"
+                  type="text"
+                  autoFocus
+                  placeholder="Escribí la nueva categoría (ej: Consolas, Audio)..."
+                  value={customCategoryInput}
+                  onChange={(e) => setCustomCategoryInput(e.target.value)}
+                  className="bg-background/85 border-border focus-visible:ring-1 focus-visible:ring-primary text-xs h-9 rounded-lg w-full"
+                />
+              ) : (
+                <select
+                  id="item-category"
+                  value={itemCategory}
+                  onChange={(e) => {
+                    if (e.target.value === "__nueva__") {
+                      setIsCustomCategory(true);
+                      setCustomCategoryInput("");
+                    } else {
+                      setItemCategory(e.target.value);
+                    }
+                  }}
+                  className="w-full h-9 rounded-lg border border-border bg-background/85 text-xs px-3 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-primary text-foreground"
+                >
+                  {availableCategories.map((cat) => (
+                    <option key={cat} value={cat}>
+                      {cat}
+                    </option>
+                  ))}
+                  <option value="__nueva__">+ Otra categoría personalizada...</option>
+                </select>
+              )}
             </div>
           </div>
 

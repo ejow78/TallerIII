@@ -1,5 +1,6 @@
 import { useState, useEffect, useMemo } from "react";
 import { api, normalizePlan, hasPOSAccess, cache } from "@/services/api";
+import { normalizeCategory } from "@/constants/categories";
 import { toast } from "sonner";
 
 export function useWorkshopDashboard(user) {
@@ -194,7 +195,7 @@ export function useWorkshopDashboard(user) {
   }).length;
 
   const totalItemsCount = inventory.length;
-  const categoriesCount = new Set(inventory.map((item) => item.category).filter(Boolean)).size;
+  const categoriesCount = new Set(inventory.map((item) => normalizeCategory(item.category)).filter(Boolean)).size;
 
   const outOfStockItems = isBasicPlan
     ? []

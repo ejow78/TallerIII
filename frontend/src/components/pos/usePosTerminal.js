@@ -1,4 +1,5 @@
 import { normalizeText, getArgentinaDateString } from "@/lib/utils";
+import { normalizeCategory } from "@/constants/categories";
 import { useState, useEffect, useRef, useMemo, useCallback } from "react";
 import { toast } from "sonner";
 import {
@@ -409,8 +410,8 @@ export function usePosTerminal() {
   ]);
 
   const categories = useMemo(() => {
-    const cats = items.map((i) => i.category).filter(Boolean);
-    return Array.from(new Set(cats));
+    const cats = items.map((i) => normalizeCategory(i.category)).filter(Boolean);
+    return Array.from(new Set(cats)).sort((a, b) => a.localeCompare(b, "es"));
   }, [items]);
 
   const filteredItems = useMemo(() => {
@@ -420,8 +421,9 @@ export function usePosTerminal() {
         !q ||
         normalizeText(item.name).includes(q) ||
         normalizeText(item.code).includes(q);
+      const itemCat = normalizeCategory(item.category);
       const matchesCat =
-        categoryFilter === "todas" || item.category === categoryFilter;
+        categoryFilter === "todas" || itemCat === categoryFilter;
       return matchesSearch && matchesCat;
     });
   }, [items, searchQuery, categoryFilter]);

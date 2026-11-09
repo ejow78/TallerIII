@@ -1,4 +1,5 @@
 import { supabase } from "./supabaseClient";
+import { normalizeCategory } from "@/constants/categories";
 
 // Generador de código de seguimiento alfanumérico de alta entropía (8 caracteres anti-fuerza bruta)
 const generateTrackingCode = () => {
@@ -996,7 +997,7 @@ export const api = {
           code: itemData.code,
           name: itemData.name,
           description: itemData.description,
-          category: itemData.category,
+          category: normalizeCategory(itemData.category),
           quantity: safeQty,
           min_quantity: safeMinQty,
           price: safePrice,
@@ -1020,7 +1021,7 @@ export const api = {
           code: itemData.code,
           name: itemData.name,
           description: itemData.description,
-          category: itemData.category,
+          category: normalizeCategory(itemData.category),
           quantity: safeQty,
           min_quantity: safeMinQty,
           price: safePrice,
@@ -1081,6 +1082,7 @@ export const api = {
         ...item,
         organization_id: user.organizationId,
         venue_id: user.venueId,
+        category: normalizeCategory(item.category),
         quantity: Math.max(0, Math.floor(Number(item.quantity) || 0)),
         min_quantity: Math.max(0, Math.floor(Number(item.min_quantity ?? item.minQuantity) || 0)),
         price: Math.max(0, Number(item.price) || 0),
