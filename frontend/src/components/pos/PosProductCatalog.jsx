@@ -72,27 +72,25 @@ export function PosProductCatalog({
           )}
         </div>
 
-        {/* Píldoras de Categorías con Navegación y Fade */}
+        {/* Píldoras de Categorías con Navegación Centrada */}
         {categories.length > 0 && (
-          <div className="relative group/categories">
+          <div className="flex items-center gap-1.5 w-full">
             {/* Botón Scroll Izquierda */}
             {canScrollLeft && (
-              <div className="absolute left-0 top-0 bottom-0 z-10 flex items-center pr-4 bg-gradient-to-r from-card via-card/90 to-transparent pointer-events-none">
-                <button
-                  type="button"
-                  onClick={() => handleScroll("left")}
-                  className="w-6 h-6 rounded-full bg-background/90 border border-border shadow-md flex items-center justify-center text-foreground hover:bg-muted cursor-pointer transition-transform hover:scale-110 active:scale-95 pointer-events-auto"
-                  title="Categorías anteriores"
-                >
-                  <ChevronLeft className="w-3.5 h-3.5" />
-                </button>
-              </div>
+              <button
+                type="button"
+                onClick={() => handleScroll("left")}
+                className="w-7 h-7 rounded-lg bg-background/80 hover:bg-muted border border-border/80 text-muted-foreground hover:text-foreground flex items-center justify-center shrink-0 cursor-pointer transition-colors"
+                title="Categorías anteriores"
+              >
+                <ChevronLeft className="w-4 h-4" />
+              </button>
             )}
 
             {/* Contenedor de Categorías */}
             <div
               ref={scrollContainerRef}
-              className="flex items-center gap-2 overflow-x-auto pb-1 no-scrollbar scroll-smooth"
+              className="flex-1 min-w-0 flex items-center gap-2 overflow-x-auto no-scrollbar scroll-smooth py-0.5"
             >
               <button
                 type="button"
@@ -121,18 +119,16 @@ export function PosProductCatalog({
               ))}
             </div>
 
-            {/* Botón Scroll Derecha + Fade */}
+            {/* Botón Scroll Derecha */}
             {canScrollRight && (
-              <div className="absolute right-0 top-0 bottom-0 z-10 flex items-center pl-4 bg-gradient-to-l from-card via-card/90 to-transparent pointer-events-none">
-                <button
-                  type="button"
-                  onClick={() => handleScroll("right")}
-                  className="w-6 h-6 rounded-full bg-background/90 border border-border shadow-md flex items-center justify-center text-foreground hover:bg-muted cursor-pointer transition-transform hover:scale-110 active:scale-95 pointer-events-auto"
-                  title="Más categorías"
-                >
-                  <ChevronRight className="w-3.5 h-3.5" />
-                </button>
-              </div>
+              <button
+                type="button"
+                onClick={() => handleScroll("right")}
+                className="w-7 h-7 rounded-lg bg-background/80 hover:bg-muted border border-border/80 text-muted-foreground hover:text-foreground flex items-center justify-center shrink-0 cursor-pointer transition-colors"
+                title="Más categorías"
+              >
+                <ChevronRight className="w-4 h-4" />
+              </button>
             )}
           </div>
         )}
