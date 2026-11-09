@@ -143,7 +143,7 @@ export function PosCalendarPicker({
 
       {/* Popover del Calendario */}
       {isOpen && (
-        <div className="absolute right-0 sm:left-0 sm:right-auto mt-2 w-72 p-3.5 rounded-xl bg-card border border-border/90 shadow-2xl z-50 animate-in fade-in-0 zoom-in-95 duration-150">
+        <div className="absolute right-0 mt-2 w-72 p-3.5 rounded-xl bg-popover text-popover-foreground border border-border shadow-2xl z-50 animate-in fade-in-0 zoom-in-95 duration-150">
           {/* Cabecera con navegación de Mes y Año */}
           <div className="flex items-center justify-between mb-3">
             <button
