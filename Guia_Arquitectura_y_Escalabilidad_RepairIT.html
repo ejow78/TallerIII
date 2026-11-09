@@ -1,0 +1,454 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Guía de Arquitectura, Alta Concurrencia y Escalabilidad — RepairIT</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap');
+
+    :root {
+      --primary: #0284c7;
+      --primary-dark: #0369a1;
+      --text: #0f172a;
+      --text-muted: #64748b;
+      --border: #e2e8f0;
+      --bg-subtle: #f8fafc;
+      --code-bg: #1e293b;
+      --code-text: #f8fafc;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      color: var(--text);
+      line-height: 1.6;
+      background: #ffffff;
+      padding: 40px;
+      font-size: 14px;
+    }
+
+    @media print {
+      body {
+        padding: 20px;
+        font-size: 12px;
+      }
+      .page-break {
+        page-break-before: always;
+      }
+      .no-print {
+        display: none;
+      }
+    }
+
+    .header-banner {
+      border-bottom: 2px solid var(--border);
+      padding-bottom: 20px;
+      margin-bottom: 30px;
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+    }
+
+    .logo {
+      font-size: 26px;
+      font-weight: 800;
+      letter-spacing: -0.5px;
+      color: #0f172a;
+    }
+
+    .logo span {
+      color: var(--primary);
+    }
+
+    .doc-meta {
+      text-align: right;
+      font-size: 11px;
+      color: var(--text-muted);
+      font-family: 'JetBrains Mono', monospace;
+    }
+
+    h1 {
+      font-size: 24px;
+      font-weight: 800;
+      color: #0f172a;
+      margin-bottom: 8px;
+      letter-spacing: -0.5px;
+    }
+
+    .subtitle {
+      font-size: 14px;
+      color: var(--text-muted);
+      margin-bottom: 25px;
+    }
+
+    h2 {
+      font-size: 17px;
+      font-weight: 700;
+      color: #0f172a;
+      border-left: 4px solid var(--primary);
+      padding-left: 10px;
+      margin-top: 30px;
+      margin-bottom: 12px;
+    }
+
+    h3 {
+      font-size: 14px;
+      font-weight: 600;
+      color: #1e293b;
+      margin-top: 18px;
+      margin-bottom: 8px;
+    }
+
+    p {
+      margin-bottom: 12px;
+      color: #334155;
+    }
+
+    ul, ol {
+      margin-left: 20px;
+      margin-bottom: 15px;
+      color: #334155;
+    }
+
+    li {
+      margin-bottom: 6px;
+    }
+
+    .callout {
+      background: var(--bg-subtle);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 14px 16px;
+      margin: 16px 0;
+    }
+
+    .callout-warning {
+      background: #fffbeb;
+      border-color: #fde68a;
+      color: #92400e;
+    }
+
+    .callout-tip {
+      background: #f0fdf4;
+      border-color: #bbf7d0;
+      color: #166534;
+    }
+
+    .callout strong {
+      display: block;
+      margin-bottom: 4px;
+      font-weight: 700;
+    }
+
+    pre {
+      background: var(--code-bg);
+      color: var(--code-text);
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      padding: 14px;
+      border-radius: 8px;
+      overflow-x: auto;
+      margin: 14px 0;
+      line-height: 1.5;
+    }
+
+    code {
+      font-family: 'JetBrains Mono', monospace;
+      background: #f1f5f9;
+      color: #0f172a;
+      padding: 2px 5px;
+      border-radius: 4px;
+      font-size: 11.5px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 18px 0;
+      font-size: 12px;
+    }
+
+    th, td {
+      border: 1px solid var(--border);
+      padding: 9px 12px;
+      text-align: left;
+    }
+
+    th {
+      background: #f8fafc;
+      font-weight: 700;
+      color: #0f172a;
+    }
+
+    tr:nth-child(even) td {
+      background: #fafafa;
+    }
+
+    .diagram-box {
+      background: #f8fafc;
+      border: 1px dashed #cbd5e1;
+      border-radius: 8px;
+      padding: 16px;
+      margin: 16px 0;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      line-height: 1.6;
+      color: #1e293b;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="header-banner">
+    <div>
+      <div class="logo">Repair<span>IT</span></div>
+      <div style="font-size: 12px; font-weight: 600; color: #64748b; margin-top: 2px;">Taller de Reparación SaaS</div>
+    </div>
+    <div class="doc-meta">
+      <div>DOCUMENTO TÉCNICO DE ARQUITECTURA</div>
+      <div>ALTA CONCURRENCIA & ESCALABILIDAD</div>
+      <div>Fecha: Noviembre 2026 • Versión 1.0</div>
+    </div>
+  </div>
+
+  <h1>Guía de Arquitectura de Sistemas y Escalabilidad</h1>
+  <div class="subtitle">Estrategias de Almacenamiento Multimedia, Migración Self-Hosted, Concurrencia y Pasarelas de Pago</div>
+
+  <!-- 1. MULTIMEDIA -->
+  <h2>1. Almacenamiento de Fotos e Imágenes: ¿Por qué NUNCA en la Base de Datos?</h2>
+  <p>
+    Guardar imágenes como binarios (<code>BYTEA</code>, BLOBs o Base64) directamente en una tabla de PostgreSQL es una práctica desaconsejada en producción por cuatro motivos críticos:
+  </p>
+
+  <div class="callout callout-warning">
+    <strong>Impacto destructivo de guardar imágenes en la base de datos:</strong>
+    <ul>
+      <li><strong>Contaminación de la memoria RAM (Buffer Pool):</strong> PostgreSQL guarda en memoria páginas de datos para responder en microsegundos. Una sola foto de 4 MB expulsa de la RAM el espacio de más de 10.000 filas de órdenes o clientes, forzando a la base de datos a leer de disco mecánico/SSD continuo.</li>
+      <li><strong>Backups inmanejables (Bloat):</strong> 5.000 órdenes con 3 fotos generan más de 45 GB de datos estáticos. El respaldo diario (<code>pg_dump</code>) tardará horas, consumirá terabytes de transferencia y disparará el tamaño de los logs de transacciones (WAL).</li>
+      <li><strong>Saturación de I/O y conexiones:</strong> Cuando un cliente consulta su equipo desde su teléfono, la base de datos debe enviar megabytes por su conexión TCP interna, bloqueando hilos de procesamiento.</li>
+    </ul>
+  </div>
+
+  <h3>La Práctica Estándar de la Industria: Object Storage + CDN + URLs en la DB</h3>
+  <p>
+    La solución estándar adoptada por gigantes de la industria consiste en desacoplar por completo el almacenamiento binario:
+  </p>
+
+  <div class="diagram-box">
+[Técnico / Cliente]
+      │
+      ▼ (1) Sube foto directamente vía Pre-signed URL
+[Object Storage: Cloudflare R2 / AWS S3 / Supabase Storage]
+      │
+      ▼ (2) Retorna la URL pública optimizada (ej: WebP)
+[Frontend RepairIT]
+      │
+      ▼ (3) Guarda únicamente la URL en la base de datos (campo VARCHAR)
+[PostgreSQL: orders.photos = '["https://cdn.repairit.com/photos/a54-front.webp"]']
+      │
+      ▼ (4) Al consultar portal de seguimiento
+[Cliente Final] ◄─── (5) Descarga en &lt;20ms desde servidores perimetrales ─── [Cloudflare CDN]
+  </div>
+
+  <p>
+    <strong>Ventajas:</strong>
+    1) <strong>Costo casi nulo:</strong> Almacenar 100 GB en Cloudflare R2 cuesta \$1.5 USD al mes y <strong>no cobra por tráfico de descarga (egress free)</strong>.
+    2) <strong>Base de datos ligera:</strong> La tabla de órdenes solo almacena textos pequeños de unos pocos bytes.
+    3) <strong>Velocidad extrema:</strong> Las fotos se sirven desde servidores CDN perimetrales a menos de 20 ms del cliente.
+  </p>
+
+  <div class="page-break"></div>
+
+  <!-- 2. INDEPENDENCIA SUPABASE -->
+  <h2>2. Independencia de Supabase & Self-Hosting en un VPS</h2>
+  <p>
+    <strong>Sí, podés dejar de depender de Supabase Cloud en cualquier momento.</strong> Supabase es 100% código abierto y está compuesto por herramientas estándares de software libre.
+  </p>
+
+  <h3>Opción A: Supabase Self-Hosted en tu propio servidor VPS (Recomendada)</h3>
+  <p>
+    Podés desplegar la suite completa de Supabase en un servidor VPS de proveedores como <strong>Hetzner, DigitalOcean o AWS</strong> mediante su <code>docker-compose.yml</code> oficial o a través de plataformas como <strong>Coolify</strong>:
+  </p>
+
+  <table>
+    <thead>
+      <tr>
+        <th>Componente</th>
+        <th>Tecnología</th>
+        <th>Función en RepairIT</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><strong>Base de Datos</strong></td>
+        <td>PostgreSQL 15/16</td>
+        <td>Motor relacional central con extensiones completas.</td>
+      </tr>
+      <tr>
+        <td><strong>Motor API</strong></td>
+        <td>PostgREST (Haskell)</td>
+        <td>Genera automáticamente endpoints REST a partir de tablas y vistas.</td>
+      </tr>
+      <tr>
+        <td><strong>Autenticación</strong></td>
+        <td>GoTrue (Go)</td>
+        <td>Microservicio de registro, login, contraseñas bcrypt y JWT.</td>
+      </tr>
+      <tr>
+        <td><strong>Almacenamiento</strong></td>
+        <td>Storage API (NodeJS)</td>
+        <td>Gestión de archivos binarios hacia disco local o buckets S3/MinIO.</td>
+      </tr>
+      <tr>
+        <td><strong>Gateway & Proxy</strong></td>
+        <td>Kong API Gateway</td>
+        <td>Terminación SSL, control de cabeceras y enrutamiento interno.</td>
+      </tr>
+      <tr>
+        <td><strong>Administración</strong></td>
+        <td>Supabase Studio</td>
+        <td>Panel visual web y editor SQL idéntico a Supabase Cloud.</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="callout callout-tip">
+    <strong>Costo Real:</strong> Un servidor VPS en Hetzner (ej. CPX31 de 4 vCPUs y 8 GB de RAM) cuesta aproximadamente <strong>€14 al mes</strong> y tiene potencia suficiente para gestionar más de 200 talleres concurrentes sin pagar tarifas por usuario.
+  </div>
+
+  <h3>Opción B: PostgreSQL Nativo + Backend Tradicional (Node.js / Fastify / Go)</h3>
+  <p>
+    Si preferís no usar la arquitectura de PostgREST:
+  </p>
+  <ul>
+    <li>Levantar una base de datos PostgreSQL estándar afinando parámetros de memoria (<code>shared_buffers = 25% RAM</code>, <code>work_mem = 16MB</code>).</li>
+    <li>Crear un backend propio en <strong>Node.js (Fastify/NestJS)</strong> o <strong>Go</strong> con un ORM/Query Builder moderno (<strong>Drizzle ORM</strong> o <strong>Prisma</strong>).</li>
+    <li>Reemplazar en el frontend el cliente de <code>@supabase/supabase-js</code> por un cliente HTTP estándar como <code>axios</code> hacia tu dominio API.</li>
+  </ul>
+
+  <!-- 3. ALTA CONCURRENCIA -->
+  <h2>3. Arquitectura para Alta Concurrencia (Miles de Usuarios Simultáneos)</h2>
+  <p>
+    Cuando el sistema crece y cientos de talleres operan al mismo tiempo, los cuellos de botella ocurren en lugares predecibles. A continuación, el plano de arquitectura para evitar caídas:
+  </p>
+
+  <h3>A. Connection Pooling con PgBouncer / Supavisor (Indispensable)</h3>
+  <p>
+    PostgreSQL crea un proceso por cada cliente conectado (~10 MB de RAM por conexión). A las 250 conexiones simultáneas el servidor colapsa por cambio de contexto y falta de memoria.
+  </p>
+  <p>
+    <strong>La solución:</strong> Interpolar <strong>PgBouncer</strong> o <strong>Supavisor</strong> entre los clientes y PostgreSQL. Permite que <strong>5.000 clientes concurrentes</strong> compartan un pool de solo <strong>30 a 50 conexiones físicas reales</strong> a la base de datos.
+  </p>
+
+  <h3>B. Balanceo de Carga Web (Nginx / Cloudflare / Traefik)</h3>
+  <ul>
+    <li><strong>Cloudflare (Capa 1):</strong> Resuelve DNS por Anycast, filtra tráfico malicioso (WAF), mitiga ataques DDoS y sirve en caché todo el frontend estático de Vite (JS, CSS, HTML). El 80% de las peticiones a la plataforma ni siquiera tocan tu servidor.</li>
+    <li><strong>Nginx / Traefik (Capa 2):</strong> Distribuye el tráfico dinámico de la API en modo <em>Round-Robin</em> o <em>Least Connections</em> entre múltiples instancias de la aplicación.</li>
+  </ul>
+
+  <div class="page-break"></div>
+
+  <h3>C. Base de Datos de Alta Disponibilidad: Maestro y Réplicas de Lectura</h3>
+  <p>
+    En un software de talleres, <strong>el 85% al 90% del tráfico son lecturas</strong> (<code>SELECT</code> para ver órdenes, historial, caja, clientes) y solo el 10-15% son escrituras (<code>INSERT</code> o <code>UPDATE</code>).
+  </p>
+
+  <div class="diagram-box">
+                    [Tráfico de Clientes y Técnicos]
+                                   │
+                                   ▼
+                      [Balanceador de Carga / Proxy]
+                                   │
+             ┌─────────────────────┴─────────────────────┐
+             ▼ (Escrituras: INSERT, UPDATE, DELETE)      ▼ (Lecturas: SELECT)
+    [Nodo Maestro (Primary)]                     [Nodos Réplica (Read Only)]
+             │                                   (Sincronización en tiempo real)
+             └────── Streaming Replication ────────────────► [Réplica 1]
+                                                           ► [Réplica 2]
+  </div>
+
+  <ul>
+    <li><strong>Failover Automático con Patroni:</strong> Si el nodo Maestro se apaga o falla el hardware, el clúster con <strong>Patroni y etcd</strong> promueve automáticamente una de las réplicas a nuevo Maestro en menos de 5 segundos sin intervención humana (*Zero Downtime Failover*).</li>
+  </ul>
+
+  <!-- 4. BACKUPS -->
+  <h2>4. Backups en Tiempo Real: Recuperación Punto en el Tiempo (PITR)</h2>
+  <p>
+    Un backup nocturno tradicional (<code>pg_dump</code>) no es suficiente: si el disco falla a las 23:50 hs, se pierden todas las órdenes registradas durante el día.
+  </p>
+  <p>
+    <strong>La solución moderna:</strong> <strong>WAL-G</strong> o <strong>pgBackRest</strong>.
+  </p>
+  <ul>
+    <li>Se toma una copia base semanal.</li>
+    <li>Cada transacción escrita en el registro de escritura anticipada (WAL) se comprime y se envía inmediatamente a un bucket seguro en la nube (ej. AWS S3 en otra región).</li>
+    <li><strong>Recuperación quirúrgica:</strong> Si un operario borra una tabla por error a las 14:15:30 hs, la base de datos se puede restaurar con exactitud de segundos al estado de las <strong>14:15:29 hs</strong>.</li>
+  </ul>
+
+  <!-- 5. PASARELAS DE PAGO -->
+  <h2>5. Integración de Pasarelas de Pago (Mercado Pago / Stripe)</h2>
+  <p>
+    Para procesar cobros automáticos de presupuestos en el portal público o cobrar planes de suscripción de talleres:
+  </p>
+
+  <div class="diagram-box">
+1. Cliente presiona "Aprobar y Pagar Presupuesto" en Portal de Seguimiento.
+2. Backend genera la Preferencia de Pago en Mercado Pago / Stripe con 'external_reference'.
+3. Cliente abona con Tarjeta, Dinero en Cuenta o Transferencia.
+4. Pasarela envía un WEBHOOK asíncrono (HTTP POST) al Backend.
+5. Backend valida firma criptográfica HMAC-SHA256 del webhook.
+6. Se ejecuta transacción atómica en PostgreSQL:
+   - Registra el cobro en la tabla 'sales'.
+   - Actualiza la orden a 'presupuesto_aprobado' o 'entregado'.
+   - Descuenta stock en 'inventory'.
+7. Backend responde HTTP 200 OK a la pasarela.
+  </div>
+
+  <div class="callout callout-tip">
+    <strong>Principio de Idempotencia:</strong> Las pasarelas de pago reintentan enviar el webhook varias veces si la conexión titubea. En la base de datos se debe agregar un índice único <code>payment_id</code> para verificar si ese cobro ya se registró previamente y evitar duplicar cobros o descontar stock dos veces.
+  </div>
+
+  <!-- RESUMEN -->
+  <h2>6. Hoja de Ruta de Infraestructura Recomendada por Etapa</h2>
+  <table>
+    <thead>
+      <tr>
+        <th>Etapa del Proyecto</th>
+        <th>Capacidad de Talleres</th>
+        <th>Infraestructura Sugerida</th>
+        <th>Costo Aprox. Mensual</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><strong>Fase 1: Lanzamiento & MVP</strong></td>
+        <td>1 a 100 talleres</td>
+        <td>Supabase Pro Managed + Vercel / Netlify Frontend + Cloudflare DNS</td>
+        <td>\$25 - \$40 USD</td>
+      </tr>
+      <tr>
+        <td><strong>Fase 2: Consolidación</strong></td>
+        <td>100 a 1.000 talleres</td>
+        <td>VPS Hetzner / DigitalOcean (Coolify / Docker: Postgres + PgBouncer + Cloudflare R2 Storage)</td>
+        <td>\$35 - \$70 USD</td>
+      </tr>
+      <tr>
+        <td><strong>Fase 3: Escala Empresarial</strong></td>
+        <td>+1.000 talleres</td>
+        <td>Clúster Alta Disponibilidad: 2 Nodos Web + Postgres Maestro + 2 Read Replicas (Patroni) + Backups PITR en S3</td>
+        <td>\$180 - \$350 USD</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div style="margin-top: 40px; padding-top: 20px; border-top: 1px solid var(--border); font-size: 11px; color: var(--text-muted); text-align: center;">
+    RepairIT Platform Architecture & Scalability Guide • Preparado para el equipo de desarrollo de RepairIT
+  </div>
+
+</body>
+</html>
