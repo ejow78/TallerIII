@@ -5,9 +5,6 @@ import {
   History,
   Store,
   Download,
-  DollarSign,
-  Wallet,
-  CreditCard,
   AlertCircle,
   Printer,
 } from "lucide-react";
@@ -96,60 +93,55 @@ export function PosSalesHistory({
           </div>
         </div>
 
-        {/* Tarjetas de Desglose / Arqueo de Caja */}
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-2 border-t border-border/50 text-left">
-          <div className="rounded-xl border border-primary/25 bg-primary/5 p-3.5 flex items-center justify-between">
-            <div>
-              <span className="text-[10px] font-bold uppercase tracking-wider text-primary block">
-                Total del Período ({salesBreakdown.count} ops)
-              </span>
-              <span className="text-xl font-black font-outfit text-foreground font-mono mt-0.5 block">
-                $
-                {salesBreakdown.totalAmount.toLocaleString("es-AR", {
-                  minimumFractionDigits: 2,
-                  maximumFractionDigits: 2,
-                })}
-              </span>
-            </div>
-            <div className="w-9 h-9 rounded-lg bg-primary/15 border border-primary/30 flex items-center justify-center text-primary shrink-0">
-              <DollarSign className="w-4 h-4" />
-            </div>
+        {/* Tarjetas de Desglose / Arqueo de Caja (Estilo Features) */}
+        <div className="rounded-xl bg-background/80 border border-border/70 p-4 grid grid-cols-1 sm:grid-cols-3 gap-3 text-left">
+          <div className="p-3 rounded-lg bg-card/50 border border-border/60">
+            <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground block">
+              {dateRangeFilter === "hoy" ? "Total Cobrado Hoy" : "Total del Período"}
+            </span>
+            <span className="font-outfit text-xl sm:text-2xl font-black text-foreground block mt-1">
+              $
+              {salesBreakdown.totalAmount.toLocaleString("es-AR", {
+                minimumFractionDigits: 0,
+                maximumFractionDigits: 2,
+              })}
+            </span>
+            <span className="text-[10px] text-muted-foreground block">
+              {salesBreakdown.count}{" "}
+              {salesBreakdown.count === 1 ? "cobro registrado" : "cobros registrados"}
+            </span>
           </div>
 
-          <div className="rounded-xl border border-emerald-500/25 bg-emerald-500/5 p-3.5 flex items-center justify-between">
-            <div>
-              <span className="text-[10px] font-bold uppercase tracking-wider text-emerald-400 block">
-                Efectivo en Caja
-              </span>
-              <span className="text-xl font-black font-outfit text-emerald-400 font-mono mt-0.5 block">
-                $
-                {salesBreakdown.cashAmount.toLocaleString("es-AR", {
-                  minimumFractionDigits: 2,
-                  maximumFractionDigits: 2,
-                })}
-              </span>
-            </div>
-            <div className="w-9 h-9 rounded-lg bg-emerald-500/15 border border-emerald-500/30 flex items-center justify-center text-emerald-400 shrink-0">
-              <Wallet className="w-4 h-4" />
-            </div>
+          <div className="p-3 rounded-lg bg-card/50 border border-border/60">
+            <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground block">
+              Efectivo en Caja
+            </span>
+            <span className="font-outfit text-xl sm:text-2xl font-black text-emerald-400 block mt-1">
+              $
+              {salesBreakdown.cashAmount.toLocaleString("es-AR", {
+                minimumFractionDigits: 0,
+                maximumFractionDigits: 2,
+              })}
+            </span>
+            <span className="text-[10px] text-emerald-400 block">
+              Ventas de mostrador y señas
+            </span>
           </div>
 
-          <div className="rounded-xl border border-sky-500/25 bg-sky-500/5 p-3.5 flex items-center justify-between">
-            <div>
-              <span className="text-[10px] font-bold uppercase tracking-wider text-sky-400 block">
-                Transferencia / Tarjetas
-              </span>
-              <span className="text-xl font-black font-outfit text-sky-400 font-mono mt-0.5 block">
-                $
-                {salesBreakdown.digitalAmount.toLocaleString("es-AR", {
-                  minimumFractionDigits: 2,
-                  maximumFractionDigits: 2,
-                })}
-              </span>
-            </div>
-            <div className="w-9 h-9 rounded-lg bg-sky-500/15 border border-sky-500/30 flex items-center justify-center text-sky-400 shrink-0">
-              <CreditCard className="w-4 h-4" />
-            </div>
+          <div className="p-3 rounded-lg bg-card/50 border border-border/60">
+            <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground block">
+              Digital / Transferencias
+            </span>
+            <span className="font-outfit text-xl sm:text-2xl font-black text-sky-400 block mt-1">
+              $
+              {salesBreakdown.digitalAmount.toLocaleString("es-AR", {
+                minimumFractionDigits: 0,
+                maximumFractionDigits: 2,
+              })}
+            </span>
+            <span className="text-[10px] text-sky-400 block">
+              Tarjetas y transferencias
+            </span>
           </div>
         </div>
       </Card>
