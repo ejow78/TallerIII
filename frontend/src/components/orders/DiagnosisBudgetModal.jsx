@@ -29,9 +29,13 @@ export default function DiagnosisBudgetModal({
   onSuccess,
 }) {
   const [diagText, setDiagText] = useState(() => order?.diagnosis || "");
-  const [diagStatus, setDiagStatus] = useState(
-    () => (order?.status === "en_reparacion" ? "reparacion" : order?.status || "diagnostico")
-  );
+  const [diagStatus, setDiagStatus] = useState(() => {
+    const st = (order?.status || "").toLowerCase().trim();
+    if (!st || st === "ingresado" || st === "diagnostico") {
+      return "presupuestado";
+    }
+    return st === "en_reparacion" ? "reparacion" : st;
+  });
   const [budgetItems, setBudgetItems] = useState(() => {
     if (order?.budget && Array.isArray(order.budget.items) && order.budget.items.length > 0) {
       return order.budget.items.map((i) => ({
@@ -186,7 +190,9 @@ export default function DiagnosisBudgetModal({
           <div>
             <CardTitle className="font-outfit text-lg font-bold text-foreground flex items-center gap-2">
               <Stethoscope className="w-5 h-5 text-primary" />
-              Diagnóstico y Presupuesto
+              {(order?.status || "").toLowerCase().trim() === "diagnostico" || !order?.diagnosis
+                ? "Agregar Diagnóstico y Presupuesto"
+                : "Editar Diagnóstico y Presupuesto"}
             </CardTitle>
             <span className="text-xs text-muted-foreground">
               Orden N°{" "}
@@ -403,9 +409,7 @@ export default function DiagnosisBudgetModal({
               className="w-full h-9 bg-background border border-border rounded-xl px-3 text-xs font-semibold text-foreground focus:outline-none focus:ring-1 focus:ring-primary"
             >
               <option value="diagnostico">En Diagnóstico</option>
-              <option value="presupuestado">
-                Presupuestado (Listo para envío al cliente)
-              </option>
+              <option value="presupuestado">Presupuestado</option>
               <option value="reparacion">En Reparación</option>
               <option value="listo">Listo para Retirar</option>
             </select>

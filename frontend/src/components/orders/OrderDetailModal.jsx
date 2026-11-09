@@ -128,7 +128,7 @@ export default function OrderDetailModal({
                   <Smartphone className="w-3.5 h-3.5" />
                   Equipo Recibido
                 </span>
-                {order.status === "ingresado" && (
+                {(order.status || "").toLowerCase().trim() === "ingresado" && (
                   <button
                     type="button"
                     onClick={() => {
@@ -346,7 +346,9 @@ export default function OrderDetailModal({
                 className="h-8 bg-primary hover:bg-primary/90 text-primary-foreground text-xs font-bold rounded-lg flex items-center gap-1.5 cursor-pointer"
               >
                 <Stethoscope className="w-3.5 h-3.5" />
-                Editar Diagnóstico
+                {(order.status || "").toLowerCase().trim() === "diagnostico" || !order.diagnosis
+                  ? "Agregar Diagnóstico"
+                  : "Editar Diagnóstico"}
               </Button>
             ) : (
               <Button

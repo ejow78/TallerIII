@@ -826,8 +826,18 @@ export const api = {
           hour12: false,
         });
       
-      const statusText = status ? status.toUpperCase() : "ACTUALIZADO";
-      history.push({ date: dateStr, text: `Diagnóstico / Presupuesto cargado (${statusText})` });
+      const STATUS_TRANSITIONS = {
+        ingresado: "Ingresado en recepción",
+        diagnostico: "Pasa a En Diagnóstico",
+        presupuestado: "Pasa a Presupuestado",
+        en_reparacion: "Pasa a En Reparación",
+        reparacion: "Pasa a En Reparación",
+        listo: "Pasa a Listo para entrega",
+        entregado: "Pasa a Entregado",
+        cancelado: "Orden Cancelada",
+      };
+      const finalHistoryText = STATUS_TRANSITIONS[status] || "Pasa a Presupuestado";
+      history.push({ date: dateStr, text: finalHistoryText });
 
       const updateData = { history };
       if (diagnosis !== undefined) updateData.diagnosis = diagnosis;
