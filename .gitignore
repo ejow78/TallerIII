@@ -60,3 +60,5 @@ docs_local/
 # Documentación interna excluida del repo
 DER.md
 PROCESOS_BPM_BIZAGI.md
+
+tablas.md
