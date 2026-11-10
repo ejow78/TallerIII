@@ -10,6 +10,7 @@ import {
   History,
   MessageCircle,
   Printer,
+  QrCode,
   ShoppingCart,
   Trash2,
   ExternalLink,
@@ -28,6 +29,7 @@ export default function OrderDetailModal({
   onOpenChargePosModal,
   onSendWhatsApp,
   onPrintOrder,
+  onPrintDeviceLabel,
   onDeleteOrder,
   getPublicTrackingUrl,
 }) {
@@ -276,6 +278,17 @@ export default function OrderDetailModal({
             >
               <Printer className="w-3.5 h-3.5" />
               Imprimir
+            </Button>
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              onClick={() => onPrintDeviceLabel?.(order)}
+              className="h-8 text-xs font-semibold border-border rounded-lg flex items-center gap-1.5 cursor-pointer"
+              title="Imprimir etiqueta con QR para pegar al equipo"
+            >
+              <QrCode className="w-3.5 h-3.5" />
+              Etiqueta QR
             </Button>
             {canUsePOS && (
               <Button

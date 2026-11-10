@@ -19,7 +19,6 @@ export default function TrackingPage() {
     isDialogOpen,
     setIsDialogOpen,
     approving,
-    handleDownloadPdf,
     handleApproveBudget,
     handleResetDemo,
     isDemo,
@@ -89,7 +88,6 @@ export default function TrackingPage() {
         order={order}
         clientName={clientName}
         currentStepIndex={currentStepIndex}
-        onDownloadPdf={handleDownloadPdf}
       />
 
       {/* Grid Bento: Informe + Cotización + Taller + Historial */}

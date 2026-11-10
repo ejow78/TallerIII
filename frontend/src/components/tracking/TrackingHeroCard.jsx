@@ -1,6 +1,5 @@
 import { Card } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Download, CheckCircle2, Laptop, Smartphone, Tablet, Cpu } from "lucide-react";
+import { CheckCircle2, Laptop, Smartphone, Tablet, Cpu } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { STEPS } from "./usePublicTracking";
 
@@ -35,11 +34,10 @@ export function TrackingHeroCard({
   order,
   clientName,
   currentStepIndex = 0,
-  onDownloadPdf,
 }) {
   return (
     <Card className="bg-card/50 backdrop-blur-md border-border/70 p-5 sm:p-6 rounded-2xl shadow-sm space-y-6">
-      {/* Fila Superior: Datos de la orden y botón de descarga */}
+      {/* Fila Superior: Datos de la orden */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 border-b border-border/50 pb-5">
         <div className="flex items-center gap-3.5">
           <div className="w-12 h-12 rounded-2xl bg-primary/10 border border-primary/20 flex items-center justify-center text-primary shrink-0 shadow-inner">
@@ -73,19 +71,6 @@ export function TrackingHeroCard({
               <span className="font-medium text-foreground">{clientName}</span>
             </p>
           </div>
-        </div>
-
-        {/* Acción Superior: Botón Descargar Comprobante */}
-        <div className="self-start sm:self-auto">
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={onDownloadPdf}
-            className="text-xs font-semibold rounded-xl border-border/70 hover:bg-muted/40 flex items-center gap-1.5 h-9 px-3.5 cursor-pointer shadow-sm transition-all"
-          >
-            <Download className="w-3.5 h-3.5 text-primary" />
-            <span>Descargar Comprobante</span>
-          </Button>
         </div>
       </div>
 

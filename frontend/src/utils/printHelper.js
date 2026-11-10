@@ -155,7 +155,6 @@ export function printOrderReceipt(order, profile = {}, clientOverride = null) {
           table.data-table { width: 100%; border-collapse: collapse; margin-top: 4px; }
           table.data-table th { background: #f1f5f9; padding: 6px 8px; font-size: 10px; font-weight: 700; color: #475569; text-transform: uppercase; border-bottom: 1px solid #cbd5e1; }
           
-          .terms { font-size: 9px; color: #64748b; line-height: 1.3; text-align: justify; margin-top: 10px; padding: 8px; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 4px; }
           .sign-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 40px; margin-top: 30px; text-align: center; }
           .sign-line { border-top: 1px dashed #64748b; padding-top: 5px; font-size: 10px; font-weight: 600; color: #475569; }
           
@@ -317,10 +316,6 @@ export function printOrderReceipt(order, profile = {}, clientOverride = null) {
             : ""
         }
 
-        <div class="terms">
-          <strong>Condiciones de Servicio:</strong> El cliente autoriza la revisión y diagnóstico del equipo. Los presupuestos tienen una validez de 15 días corridos. Las reparaciones cuentan con una garantía legal de 90 días sobre los repuestos instalados y la mano de obra realizada. Pasados los 60 días desde la notificación de finalización, los equipos no retirados se considerarán abandonados conforme a las normativas comerciales vigentes.
-        </div>
-
         <div class="sign-grid">
           <div>
             <div class="sign-line">Firma del Cliente (Conformidad de Ingreso)</div>
@@ -333,6 +328,150 @@ export function printOrderReceipt(order, profile = {}, clientOverride = null) {
         <div class="footer-info">
           <span>RepairIT &bull; Software de Gestión para Servicio Técnico (repairit.cloud)</span>
           <span>Comprobante Oficial emitido electrónicamente</span>
+        </div>
+      </body>
+    </html>
+  `;
+
+  printHtml(html);
+}
+
+export function printDeviceLabel(order, profile = {}, clientOverride = null) {
+  if (!order) return;
+  const client = clientOverride || order.clientId || {};
+  const venueName = escapeHtml(profile?.name || "RepairIT");
+  const safeTrackingCode = escapeHtml(order.trackingCode || "");
+  const rawTrackingUrl = `https://tracking.repairit.cloud/seguimiento/${encodeURIComponent(
+    order.trackingCode || ""
+  )}`;
+
+  const dateFormatted = escapeHtml(
+    order.created_at
+      ? new Date(order.created_at).toLocaleDateString("es-AR", {
+          timeZone: "America/Argentina/Buenos_Aires",
+          day: "2-digit",
+          month: "2-digit",
+          year: "numeric",
+        })
+      : order.date ||
+          new Date().toLocaleDateString("es-AR", {
+            timeZone: "America/Argentina/Buenos_Aires",
+            day: "2-digit",
+            month: "2-digit",
+            year: "numeric",
+          })
+  );
+
+  const html = `
+    <!DOCTYPE html>
+    <html lang="es">
+      <head>
+        <meta charset="UTF-8">
+        <title>Etiqueta #${safeTrackingCode}</title>
+        <style>
+          @page {
+            margin: 4mm;
+          }
+          * { box-sizing: border-box; }
+          body {
+            font-family: system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            margin: 0;
+            padding: 6px;
+            background: #ffffff;
+            color: #000000;
+          }
+          .label-card {
+            width: 62mm;
+            border: 1.5px dashed #0f172a;
+            border-radius: 6px;
+            padding: 7px 8px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: #ffffff;
+          }
+          .qr-box {
+            flex-shrink: 0;
+            width: 68px;
+            height: 68px;
+            border: 1px solid #cbd5e1;
+            border-radius: 4px;
+            padding: 2px;
+            background: #ffffff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+          }
+          .qr-box img {
+            width: 100%;
+            height: 100%;
+            display: block;
+          }
+          .info-col {
+            flex: 1;
+            min-width: 0;
+            overflow: hidden;
+          }
+          .venue-tag {
+            font-size: 8px;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.4px;
+            color: #475569;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+          }
+          .tracking-code {
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 14px;
+            font-weight: 900;
+            color: #000000;
+            letter-spacing: -0.3px;
+            margin: 1px 0 2px 0;
+            line-height: 1.1;
+          }
+          .device-line {
+            font-size: 9.5px;
+            font-weight: 700;
+            color: #0f172a;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            line-height: 1.2;
+          }
+          .meta-line {
+            font-size: 8.5px;
+            font-weight: 500;
+            color: #334155;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            margin-top: 1px;
+          }
+          @media print {
+            body { padding: 0; }
+          }
+        </style>
+      </head>
+      <body>
+        <div class="label-card">
+          <div class="qr-box">
+            <img
+              src="https://api.qrserver.com/v1/create-qr-code/?size=140x140&margin=0&data=${encodeURIComponent(
+                rawTrackingUrl
+              )}"
+              alt="QR ${safeTrackingCode}"
+            />
+          </div>
+          <div class="info-col">
+            <div class="venue-tag">${venueName} &bull; ${dateFormatted}</div>
+            <div class="tracking-code">#${safeTrackingCode}</div>
+            <div class="device-line">${escapeHtml(order.deviceModel || order.deviceType || "Equipo")}</div>
+            <div class="meta-line">${escapeHtml(client.name || "Cliente")}${
+              client.phone ? ` &bull; ${escapeHtml(client.phone)}` : ""
+            }</div>
+          </div>
         </div>
       </body>
     </html>

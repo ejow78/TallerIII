@@ -5,6 +5,7 @@ import {
   Eye,
   MessageCircle,
   Printer,
+  QrCode,
   Pencil,
   ShoppingCart,
   Trash2,
@@ -25,6 +26,7 @@ export default function OrdersTable({
   onOpenChargePosModal,
   onDeleteOrder,
   onPrintOrder,
+  onPrintDeviceLabel,
   onSendWhatsApp,
   getPublicTrackingUrl,
 }) {
@@ -202,6 +204,15 @@ export default function OrdersTable({
                   title="Imprimir Comprobante"
                 >
                   <Printer className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+                </Button>
+                <Button
+                  variant="outline"
+                  size="icon-sm"
+                  onClick={() => onPrintDeviceLabel?.(o)}
+                  className="h-7 w-7 sm:h-8 sm:w-8 text-muted-foreground hover:text-primary border-border/80 rounded-lg cursor-pointer shrink-0"
+                  title="Imprimir Etiqueta QR para el equipo"
+                >
+                  <QrCode className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
                 </Button>
                 <Button
                   variant="outline"
@@ -420,6 +431,16 @@ export default function OrdersTable({
                         title="Imprimir Comprobante de Recepción"
                       >
                         <Printer className="w-4 h-4" />
+                      </Button>
+
+                      <Button
+                        variant="ghost"
+                        size="icon-sm"
+                        onClick={() => onPrintDeviceLabel?.(o)}
+                        className="h-8 w-8 text-muted-foreground hover:text-primary hover:bg-primary/10 rounded-lg cursor-pointer shrink-0"
+                        title="Imprimir Etiqueta QR para el equipo"
+                      >
+                        <QrCode className="w-4 h-4" />
                       </Button>
 
                       <Button

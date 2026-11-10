@@ -2,7 +2,7 @@ import { normalizeText } from "@/lib/utils";
 import { useState, useEffect, useMemo, useCallback } from "react";
 import { api, getLocalUser, normalizePlan, hasPOSAccess, cache } from "@/services/api";
 import { sendBudgetReadyEmail, sendOrderReadyEmail } from "@/services/emailService";
-import { printOrderReceipt, getOrderWhatsAppUrl } from "@/utils/printHelper";
+import { printOrderReceipt, printDeviceLabel, getOrderWhatsAppUrl } from "@/utils/printHelper";
 import { toast } from "sonner";
 
 export function useOrdersData(onDetailOrderUpdate) {
@@ -84,6 +84,10 @@ export function useOrdersData(onDetailOrderUpdate) {
 
   const handlePrintOrder = useCallback((order) => {
     printOrderReceipt(order, profile);
+  }, [profile]);
+
+  const handlePrintDeviceLabel = useCallback((order) => {
+    printDeviceLabel(order, profile);
   }, [profile]);
 
   const handleSendWhatsApp = useCallback((order) => {
@@ -404,6 +408,7 @@ export function useOrdersData(onDetailOrderUpdate) {
     handleStatusChange,
     handleDeleteOrder,
     handlePrintOrder,
+    handlePrintDeviceLabel,
     handleSendWhatsApp,
     handleExportToExcel,
     filteredOrders,

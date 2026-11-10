@@ -35,6 +35,7 @@ export default function OrdersPage() {
     handleStatusChange,
     handleDeleteOrder,
     handlePrintOrder,
+    handlePrintDeviceLabel,
     handleSendWhatsApp,
     handleExportToExcel,
     filteredOrders,
@@ -79,6 +80,7 @@ export default function OrdersPage() {
           onOpenChargePosModal={setChargeOrder}
           onDeleteOrder={onDeleteOrderWithDetail}
           onPrintOrder={handlePrintOrder}
+          onPrintDeviceLabel={handlePrintDeviceLabel}
           onSendWhatsApp={handleSendWhatsApp}
           getPublicTrackingUrl={getPublicTrackingUrl}
         />
@@ -97,6 +99,7 @@ export default function OrdersPage() {
           onOpenChargePosModal={setChargeOrder}
           onSendWhatsApp={handleSendWhatsApp}
           onPrintOrder={handlePrintOrder}
+          onPrintDeviceLabel={handlePrintDeviceLabel}
           onDeleteOrder={onDeleteOrderWithDetail}
           getPublicTrackingUrl={getPublicTrackingUrl}
         />

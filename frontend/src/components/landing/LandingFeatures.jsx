@@ -1,7 +1,6 @@
 import {
   Activity,
   Laptop,
-  Download,
   CheckCircle2,
   Stethoscope,
   Clock,
@@ -60,10 +59,6 @@ export function LandingFeatures() {
                       Notebook Lenovo ThinkPad E14 Gen 2
                     </span>
                   </div>
-                </div>
-                <div className="hidden sm:flex items-center gap-1.5 text-[10px] font-medium text-muted-foreground bg-card/60 px-2.5 py-1 rounded-md border border-border/60">
-                  <Download className="w-3 h-3 text-primary" />
-                  <span>Comprobante</span>
                 </div>
               </div>
 

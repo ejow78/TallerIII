@@ -1,4 +1,10 @@
 import { supabase } from "./supabaseClient";
+import { parseVenueAddress } from "@/utils/venueHelper";
+
+function cleanWorkshopAddress(rawAddress) {
+  const parsed = parseVenueAddress(rawAddress);
+  return parsed.address || "";
+}
 
 function escapeHtml(value) {
   return String(value ?? "").replace(/[&<>"']/g, (char) => {
@@ -57,9 +63,14 @@ async function sendResendTemplate({ to, templateId, variables }) {
 export async function sendOrderCreatedEmail({
   to,
   clientName,
+  clientDni = "",
+  clientPhone = "",
   orderCode,
+  orderDate = "",
   deviceType,
   deviceModel,
+  accessories = "",
+  cosmetic = "",
   issue,
   workshopName = "RepairIT",
   workshopPhone = "",
@@ -70,13 +81,23 @@ export async function sendOrderCreatedEmail({
     templateId: "orden-ingresada",
     variables: {
       client_name: clientName || "Cliente",
+      client_dni: clientDni || "N/A",
+      client_phone: clientPhone || "N/A",
       order_code: orderCode,
+      order_date: orderDate || new Date().toLocaleDateString("es-AR", {
+        timeZone: "America/Argentina/Buenos_Aires",
+        day: "2-digit",
+        month: "2-digit",
+        year: "numeric",
+      }),
       device_type: deviceType || "Dispositivo",
       device_model: deviceModel || "",
+      accessories: accessories || "Ninguno",
+      cosmetic: cosmetic || "Sin detalles",
       issue: issue || "Revisión general",
       workshop_name: workshopName,
       workshop_phone: workshopPhone,
-      workshop_address: workshopAddress
+      workshop_address: cleanWorkshopAddress(workshopAddress)
     }
   });
 }
@@ -127,7 +148,7 @@ export async function sendBudgetReadyEmail({
       budget_total: budgetTotal,
       workshop_name: workshopName,
       workshop_phone: workshopPhone,
-      workshop_address: workshopAddress
+      workshop_address: cleanWorkshopAddress(workshopAddress)
     }
   });
 }
@@ -155,7 +176,7 @@ export async function sendOrderReadyEmail({
       device_model: deviceModel || "",
       workshop_name: workshopName,
       workshop_phone: workshopPhone,
-      workshop_address: workshopAddress
+      workshop_address: cleanWorkshopAddress(workshopAddress)
     }
   });
 }
