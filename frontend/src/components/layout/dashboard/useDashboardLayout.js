@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback, useMemo } from "react";
 import { useLocation } from "react-router-dom";
 import { toast } from "sonner";
-import { api, normalizePlan } from "@/services/api";
+import { api, normalizePlan, saveLocalUser } from "@/services/api";
 
 export const prefetchRoute = (path) => {
   try {
@@ -138,14 +138,7 @@ export function useDashboardLayout() {
                 ...user,
                 subscriptionPlan: profile.subscriptionPlan,
               };
-              localStorage.setItem(
-                "repairit_user",
-                JSON.stringify(updatedLocal)
-              );
-              sessionStorage.setItem(
-                "repairit_user",
-                JSON.stringify(updatedLocal)
-              );
+              saveLocalUser(updatedLocal);
             }
           }
           if (venuesData) setVenues(venuesData);
@@ -190,8 +183,7 @@ export function useDashboardLayout() {
           "{}"
       );
       const nextUser = { ...localUser, venueId: updatedUser.venueId };
-      localStorage.setItem("repairit_user", JSON.stringify(nextUser));
-      sessionStorage.setItem("repairit_user", JSON.stringify(nextUser));
+      saveLocalUser(nextUser);
       toast.success("Sucursal cambiada correctamente");
       setTimeout(() => {
         window.location.reload();

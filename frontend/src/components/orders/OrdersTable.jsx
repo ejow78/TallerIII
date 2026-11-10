@@ -396,11 +396,21 @@ export default function OrdersTable({
                         variant="outline"
                         size="sm"
                         onClick={() => onOpenDiagModal(o)}
-                        className="h-8 px-2.5 text-xs font-bold border-primary/30 text-primary hover:bg-primary/10 rounded-lg flex items-center gap-1 cursor-pointer shrink-0"
-                        title="Cargar o editar diagnóstico y presupuesto"
+                        disabled={Boolean(o.budget?.approved)}
+                        className={cn(
+                          "h-8 px-2.5 text-xs font-bold rounded-lg flex items-center gap-1 shrink-0",
+                          o.budget?.approved
+                            ? "opacity-50 cursor-not-allowed border-border text-muted-foreground"
+                            : "border-primary/30 text-primary hover:bg-primary/10 cursor-pointer"
+                        )}
+                        title={
+                          o.budget?.approved
+                            ? "Presupuesto ya aprobado por el cliente"
+                            : "Cargar o editar diagnóstico y presupuesto"
+                        }
                       >
                         <Stethoscope className="w-3.5 h-3.5" />
-                        Diagnóstico
+                        {o.budget?.approved ? "Aprobado" : "Diagnóstico"}
                       </Button>
 
                       <Button

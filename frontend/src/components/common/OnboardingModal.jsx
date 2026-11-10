@@ -5,6 +5,7 @@ import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import { supabase } from "@/services/supabaseClient";
+import { saveLocalUser } from "@/services/api";
 
 export default function OnboardingModal({ onComplete }) {
   const [open, setOpen] = useState(false);
@@ -104,11 +105,10 @@ export default function OnboardingModal({ onComplete }) {
           .eq("id", userId);
       }
 
-      // Actualizar localStorage y sessionStorage
+      // Actualizar storage respetando preferencia de sesión (rememberMe)
       const stored = JSON.parse(sessionStorage.getItem("repairit_user") || localStorage.getItem("repairit_user") || "{}");
       stored.name = userName.trim() || stored.name;
-      sessionStorage.setItem("repairit_user", JSON.stringify(stored));
-      localStorage.setItem("repairit_user", JSON.stringify(stored));
+      saveLocalUser(stored);
 
       toast.success("¡Taller configurado con éxito!", {
         description: `Tu taller "${workshopName}" ya está listo para operar.`

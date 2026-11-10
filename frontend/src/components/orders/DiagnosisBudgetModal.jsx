@@ -93,6 +93,10 @@ export default function DiagnosisBudgetModal({
 
   const handleSaveDiagnosis = async (e) => {
     e.preventDefault();
+    if (order?.budget?.approved) {
+      toast.error("El presupuesto ya fue aprobado por el cliente y no puede modificarse.");
+      return;
+    }
     try {
       setSavingDiag(true);
 

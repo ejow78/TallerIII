@@ -147,7 +147,18 @@ export default function App() {
                   .maybeSingle();
 
                 if (!profile) {
-                  // Auto-creación de perfil si no existe en la base de datos
+                  // Si era una cuenta técnica eliminada o huérfana, no recrear como administrador
+                  if (session.user.user_metadata?.role === "tecnico") {
+                    await supabase.auth.signOut();
+                    sessionStorage.removeItem("repairit_token");
+                    sessionStorage.removeItem("repairit_user");
+                    localStorage.removeItem("repairit_token");
+                    localStorage.removeItem("repairit_user");
+                    setSessionLoading(false);
+                    return;
+                  }
+
+                  // Auto-creación de perfil para nuevos propietarios registrados
                   try {
                     const workshopTitle = session.user.user_metadata?.workshop_name || "Taller RepairIT";
                     const personName = session.user.user_metadata?.name || session.user.email.split("@")[0];
@@ -186,13 +197,7 @@ export default function App() {
                     profile = newProf;
                   } catch (createErr) {
                     console.error("Error al autogenerar perfil:", createErr);
-                    profile = {
-                      id: session.user.id,
-                      name: session.user.user_metadata?.name || session.user.email.split("@")[0],
-                      role: "admin",
-                      organization_id: null,
-                      venue_id: null
-                    };
+                    profile = null;
                   }
                 }
 

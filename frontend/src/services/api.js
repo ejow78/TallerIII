@@ -277,6 +277,8 @@ export const api = {
     logout: async () => {
       cache.invalidate();
       await supabase.auth.signOut();
+      sessionStorage.removeItem("repairit_token");
+      sessionStorage.removeItem("repairit_user");
       localStorage.removeItem("repairit_token");
       localStorage.removeItem("repairit_user");
     },
@@ -290,59 +292,13 @@ export const api = {
         throw new Error("La cuenta de SuperAdmin no puede eliminarse desde esta sección.");
       }
 
-      const orgId = user.organizationId;
-      const userId = user._id || user.id;
-
-      // 1. Intentar RPC atómico si está definido en Supabase (borra también auth.users)
+      // Ejecutar RPC atómico en el servidor (elimina datos de la organización y auth.users)
       const { error: rpcError } = await supabase.rpc("delete_own_account");
-
-      // 2. Si el RPC no existe o falló, limpiar en cascada todas las tablas de la organización
       if (rpcError) {
-        if (orgId && orgId !== "undefined") {
-          try {
-            const { data: techAccounts } = await supabase
-              .from("profiles")
-              .select("id")
-              .eq("organization_id", orgId)
-              .eq("role", "tecnico");
-
-            if (Array.isArray(techAccounts)) {
-              for (const tech of techAccounts) {
-                await supabase.rpc("delete_venue_account", { p_user_id: tech.id });
-              }
-            }
-          } catch (e) {
-            console.error("Error al limpiar cuentas técnicas:", e);
-          }
-
-          await supabase.from("sales").delete().eq("organization_id", orgId);
-
-          const { data: orgVenues } = await supabase
-            .from("venues")
-            .select("id")
-            .eq("organization_id", orgId);
-          const venueIds = Array.isArray(orgVenues) ? orgVenues.map((v) => v.id) : [];
-
-          if (venueIds.length > 0) {
-            await supabase.from("orders").delete().in("venue_id", venueIds);
-            await supabase.from("inventory").delete().in("venue_id", venueIds);
-            await supabase.from("clients").delete().in("venue_id", venueIds);
-          }
-
-          await supabase.from("clients").delete().eq("organization_id", orgId);
-          await supabase.from("venues").delete().eq("organization_id", orgId);
-          await supabase.from("profiles").delete().eq("organization_id", orgId);
-
-          const { error: orgDelErr } = await supabase
-            .from("organizations")
-            .delete()
-            .eq("id", orgId);
-          if (orgDelErr) {
-            console.error("Error al eliminar organización:", orgDelErr);
-          }
-        } else if (userId) {
-          await supabase.from("profiles").delete().eq("id", userId);
-        }
+        throw new Error(
+          rpcError.message ||
+            "No se pudo eliminar la cuenta de forma completa en el servidor. Intentá nuevamente o contactá a soporte."
+        );
       }
 
       cache.invalidate();
@@ -861,10 +817,14 @@ export const api = {
       const user = getLocalUser();
       const { data: order } = await supabase
         .from("orders")
-        .select("history")
+        .select("history, budget")
         .eq("id", id)
         .eq("venue_id", user.venueId)
         .single();
+
+      if (order?.budget?.approved) {
+        throw new Error("No se puede modificar un presupuesto que ya fue aprobado por el cliente.");
+      }
 
       const history = Array.isArray(order?.history) ? order.history : [];
       const dateStr =
@@ -968,17 +928,30 @@ export const api = {
       }
 
       const rawClient = rpcData.client || {};
+      const rawVenue = rpcData.venue || {};
       return {
-        ...rpcData,
+        id: rpcData.id,
         _id: rpcData.id,
         trackingCode: rpcData.tracking_code,
         deviceType: rpcData.device_type,
         deviceModel: rpcData.device_model,
+        issue: rpcData.issue || "",
+        diagnosis: rpcData.diagnosis || "",
+        status: rpcData.status || "ingresado",
+        budget: rpcData.budget || null,
+        history: Array.isArray(rpcData.history) ? rpcData.history : [],
+        created_at: rpcData.created_at || null,
+        date: rpcData.date || null,
+        time: rpcData.time || null,
         hasClientDni: Boolean(rawClient.dni || (rpcData.has_client_dni ?? true)),
         clientId: {
           name: rawClient.name || "Cliente",
         },
-        venueId: rpcData.venue,
+        venueId: {
+          name: rawVenue.name || "",
+          address: rawVenue.address || "",
+          phone: rawVenue.phone || "",
+        },
       };
     },
 
@@ -1148,6 +1121,11 @@ export const api = {
     },
 
     adjustStock: async (id, amount) => {
+      const numericAmount = Number(amount);
+      if (!Number.isFinite(numericAmount)) {
+        throw new Error("Cantidad de ajuste de stock inválida.");
+      }
+
       const user = getLocalUser();
       const { data: item } = await supabase
         .from("inventory")
@@ -1156,7 +1134,7 @@ export const api = {
         .eq("venue_id", user.venueId)
         .single();
 
-      const newQty = Math.max(0, (item?.quantity || 0) + amount);
+      const newQty = Math.max(0, (Number(item?.quantity) || 0) + numericAmount);
 
       const { data, error } = await supabase
         .from("inventory")
@@ -1196,7 +1174,8 @@ export const api = {
   sales: {
     getAll: async (venueId = null, options = {}) => {
       const user = getLocalUser();
-      const targetVenue = venueId || user.venueId || "all";
+      const targetVenue =
+        user.role === "tecnico" ? user.venueId : venueId || user.venueId || "all";
       const cacheKey = `sales_${targetVenue}`;
 
       return cache.fetch(cacheKey, async () => {
@@ -1204,10 +1183,12 @@ export const api = {
           .from("sales")
           .select("*, venue:venues(name), profile:profiles(name)");
         
-        if (venueId && venueId !== "todas") {
+        if (user.role === "tecnico") {
+          query = query.eq("venue_id", user.venueId);
+        } else if (venueId && venueId !== "todas") {
           query = query.eq("venue_id", venueId);
         } else if (user.role !== "superadmin") {
-          if (user.subscriptionPlan === "Multi-Taller Pro") {
+          if (user.role === "admin" && user.subscriptionPlan === "Multi-Taller Pro") {
             query = query.eq("organization_id", user.organizationId);
           } else {
             query = query.eq("venue_id", user.venueId);
