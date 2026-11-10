@@ -1,15 +1,35 @@
 /* The section background is transparent: no gray plate/box behind devices.
    Fade mask at the bottom so devices softly dissolve into the dark hero background. */
+.ps-section.ss-fit {
+  -webkit-mask-image: linear-gradient(to bottom, #000 68%, rgba(0, 0, 0, 0.35) 88%, transparent 100%);
+  mask-image: linear-gradient(to bottom, #000 68%, rgba(0, 0, 0, 0.35) 88%, transparent 100%);
+}
+
 .ps-section .ss-stage {
   --gutter: 6px;
   overflow: hidden;
   background: transparent;
-  -webkit-mask-image: linear-gradient(to bottom, #000 calc(100% - 64px), transparent);
-  mask-image: linear-gradient(to bottom, #000 calc(100% - 64px), transparent);
   --ss-canvas: #171717;
   --ss-surface: #171717;
   --ss-chrome: #171717;
   --ss-accent: #4ca5ff;
+}
+
+.ps-section .ss-stage::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 115px;
+  z-index: 30;
+  pointer-events: none;
+  background: linear-gradient(
+    to bottom,
+    transparent 0%,
+    color-mix(in srgb, var(--background, #121212) 65%, transparent) 55%,
+    var(--background, #121212) 100%
+  );
 }
 
 /* Pinned top-left, wide desktop window with higher zoom */
@@ -18,9 +38,9 @@
   top: var(--gutter);
   left: var(--gutter);
   width: 790px;
-  height: 550px;
+  height: 560px;
   background: #171717;
-  border-radius: 12px;
+  border-radius: 12px 12px 0 0;
   box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.08), 0 24px 48px -12px rgba(0, 0, 0, 0.65);
 }
 
@@ -40,9 +60,9 @@
 
 .ps-mock-container {
   position: relative;
-  width: 1280px;
-  height: 880px;
-  transform: scale(0.64);
+  width: 1240px;
+  height: 960px;
+  transform: scale(0.7);
   transform-origin: top left;
   user-select: none;
   pointer-events: none;
@@ -101,7 +121,7 @@
 /* Positioned further to the left over the right side of the window */
 .ps-phone {
   position: absolute;
-  top: 72px;
+  top: 96px;
   right: 54px;
   z-index: 20;
   box-shadow: var(--ss-shadow-satellite), 0 30px 50px -20px rgba(0, 0, 0, 0.55);
@@ -115,14 +135,18 @@
 
 .ps-section .ss-stage[data-layout='compact'] .ps-window {
   width: 520px;
-  height: 355px;
+  height: 360px;
 }
 
 .ps-section .ss-stage[data-layout='compact'] .ps-mock-container {
   transform: scale(0.52);
 }
 
+.ps-section .ss-stage[data-layout='compact']::after {
+  height: 85px;
+}
+
 .ps-section .ss-stage[data-layout='compact'] .ps-phone {
   top: 112px;
-  right: 8px;
+  right: 0px;
 }
