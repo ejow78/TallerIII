@@ -37,7 +37,7 @@
   position: absolute;
   top: var(--gutter);
   left: var(--gutter);
-  width: 790px;
+  width: 805px;
   height: 560px;
   background: #171717;
   border-radius: 12px 12px 0 0;
@@ -60,9 +60,9 @@
 
 .ps-mock-container {
   position: relative;
-  width: 1240px;
-  height: 960px;
-  transform: scale(0.7);
+  width: 1220px;
+  height: 980px;
+  transform: scale(0.66);
   transform-origin: top left;
   user-select: none;
   pointer-events: none;

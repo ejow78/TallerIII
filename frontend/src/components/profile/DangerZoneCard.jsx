@@ -31,7 +31,7 @@ export function DangerZoneCard({ onDeleteAccount, isDeletingAccount }) {
       </h3>
 
       <p className="text-xs text-muted-foreground font-light leading-relaxed">
-        Si eliminás tu cuenta, se borrarán de forma permanente todos los datos del taller, órdenes de servicio, clientes, inventario y sucursales.
+        Si eliminás tu cuenta, se borrarán de forma permanente todos los datos del taller.
       </p>
 
       <div className="pt-2 border-t border-border/30">
@@ -40,9 +40,8 @@ export function DangerZoneCard({ onDeleteAccount, isDeletingAccount }) {
             <Button
               type="button"
               variant="outline"
-              size="sm"
               disabled={isDeletingAccount}
-              className="w-full text-[10px] font-bold uppercase gap-1.5 border-rose-500/30 bg-rose-500/10 text-rose-300 hover:bg-rose-500/20 hover:text-rose-200 hover:border-rose-500/45 transition-all cursor-pointer"
+              className="w-full bg-background hover:bg-red-950/20 text-muted-foreground hover:text-red-400 border-border hover:border-red-950/50 text-xs font-bold py-2 rounded-lg transition-all cursor-pointer flex items-center justify-center gap-2 select-none"
             >
               <Trash2 className="w-3.5 h-3.5" />
               <span>{isDeletingAccount ? "Eliminando cuenta..." : "Eliminar mi cuenta"}</span>
@@ -51,14 +50,14 @@ export function DangerZoneCard({ onDeleteAccount, isDeletingAccount }) {
 
           <AlertDialogContent className="sm:max-w-md border-border">
             <AlertDialogHeader>
-              <AlertDialogMedia className="bg-rose-500/15 text-rose-300 border border-rose-500/25">
+              <AlertDialogMedia className="bg-muted text-muted-foreground border border-border">
                 <AlertTriangle className="w-5 h-5" />
               </AlertDialogMedia>
               <AlertDialogTitle className="font-outfit font-bold text-foreground">
                 ¿Estás seguro de eliminar tu cuenta?
               </AlertDialogTitle>
               <AlertDialogDescription className="text-xs leading-relaxed text-muted-foreground">
-                Si eliminás la cuenta se borrarán <strong className="text-foreground font-semibold">todos los datos</strong> del taller (órdenes de servicio, clientes, inventario, historial de caja, sucursales y cuentas de acceso) y <strong className="text-rose-300 font-semibold">esta acción es irreversible</strong>.
+                Si eliminás la cuenta se borrarán <strong className="text-foreground font-semibold">todos los datos</strong> del taller y <strong className="text-foreground font-semibold">esta acción es irreversible</strong>.
               </AlertDialogDescription>
             </AlertDialogHeader>
 
@@ -73,7 +72,7 @@ export function DangerZoneCard({ onDeleteAccount, isDeletingAccount }) {
                 variant="outline"
                 disabled={isDeletingAccount}
                 onClick={handleConfirm}
-                className="text-xs font-bold border-rose-500/35 bg-rose-500/15 text-rose-200 hover:bg-rose-500/25 hover:text-rose-100 cursor-pointer"
+                className="bg-background hover:bg-red-950/20 text-muted-foreground hover:text-red-400 border-border hover:border-red-950/50 text-xs font-bold transition-all cursor-pointer"
               >
                 {isDeletingAccount ? "Eliminando..." : "Sí, eliminar mi cuenta"}
               </AlertDialogAction>
