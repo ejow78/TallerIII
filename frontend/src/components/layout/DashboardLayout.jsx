@@ -6,7 +6,7 @@ import {
   useSidebar,
 } from "@/components/ui/sidebar";
 import OnboardingModal from "@/components/common/OnboardingModal";
-import { useDashboardLayout } from "./dashboard/useDashboardLayout";
+import { useDashboardLayout, prefetchRoute } from "./dashboard/useDashboardLayout";
 import { DashboardSidebar } from "./dashboard/DashboardSidebar";
 import { DashboardHeader } from "./dashboard/DashboardHeader";
 
@@ -71,6 +71,7 @@ export default function DashboardLayout() {
           sidebarStats={sidebarStats}
           currentPath={currentPath}
           onLogout={handleLogout}
+          prefetchRoute={prefetchRoute}
         />
 
         <SidebarInset className="flex-1 flex flex-col min-w-0 h-dvh max-h-dvh overflow-hidden bg-background">

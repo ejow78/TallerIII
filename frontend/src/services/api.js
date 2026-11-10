@@ -1,28 +1,13 @@
 import { supabase } from "./supabaseClient";
 import { normalizeCategory } from "@/constants/categories";
+import { normalizePlan, hasPOSAccess, hasMultiTallerAccess } from "@/utils/venueHelper";
+
+export { normalizePlan, hasPOSAccess, hasMultiTallerAccess };
 
 // Generador de código de seguimiento alfanumérico de alta entropía (8 caracteres anti-fuerza bruta)
 const generateTrackingCode = () => {
   const chars = "23456789ABCDEFGHJKLMNPQRSTUVWXYZ";
   return "RT-" + Array.from({ length: 8 }, () => chars[Math.floor(Math.random() * chars.length)]).join("");
-};
-
-// Normalizador de nombres de planes oficiales ("Taller Básico", "Taller Pro", "Multi-Taller Pro")
-export const normalizePlan = (plan) => {
-  if (!plan) return "Taller Básico";
-  const p = String(plan).trim().toLowerCase();
-  if (p.includes("multi")) return "Multi-Taller Pro";
-  if (p.includes("pro") || p.includes("premium")) return "Taller Pro";
-  return "Taller Básico";
-};
-
-export const hasPOSAccess = (plan) => {
-  const norm = normalizePlan(plan);
-  return norm === "Taller Pro" || norm === "Multi-Taller Pro";
-};
-
-export const hasMultiTallerAccess = (plan) => {
-  return normalizePlan(plan) === "Multi-Taller Pro";
 };
 
 // Helper para obtener y persistir el usuario en storage de forma consistente

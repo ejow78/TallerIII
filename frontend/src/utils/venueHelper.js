@@ -47,3 +47,22 @@ export function formatVenueAddress(address, hours) {
   if (!cleanHours) return cleanAddr;
   return `${cleanAddr} [Horario: ${cleanHours}]`;
 }
+
+// Normalizador de nombres de planes oficiales ("Taller Básico", "Taller Pro", "Multi-Taller Pro")
+export const normalizePlan = (plan) => {
+  if (!plan) return "Taller Básico";
+  const p = String(plan).trim().toLowerCase();
+  if (p.includes("multi")) return "Multi-Taller Pro";
+  if (p.includes("pro") || p.includes("premium")) return "Taller Pro";
+  return "Taller Básico";
+};
+
+export const hasPOSAccess = (plan) => {
+  const norm = normalizePlan(plan);
+  return norm === "Taller Pro" || norm === "Multi-Taller Pro";
+};
+
+export const hasMultiTallerAccess = (plan) => {
+  return normalizePlan(plan) === "Multi-Taller Pro";
+};
+

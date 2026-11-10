@@ -26,8 +26,9 @@ import {
   AlertTriangle,
   MessageSquare,
 } from "lucide-react";
-import { hasPOSAccess, hasMultiTallerAccess } from "@/services/api";
-import { prefetchRoute } from "./useDashboardLayout";
+import { hasPOSAccess, hasMultiTallerAccess } from "@/utils/venueHelper";
+
+const NOOP = () => {};
 
 const navItemClass =
   "h-9 sm:h-9.5 px-3 rounded-lg text-[13.5px] font-medium text-muted-foreground hover:text-foreground hover:bg-muted/60 data-[active=true]:bg-primary/15 data-[active=true]:text-primary data-[active=true]:font-semibold data-[active=true]:border data-[active=true]:border-primary/25 transition-all";
@@ -41,6 +42,7 @@ export function DashboardSidebar({
   currentPath,
   onLogout,
   collapsible,
+  prefetchRoute = NOOP,
 }) {
   return (
     <Sidebar collapsible={collapsible} className="border-r border-border/70 bg-card/95 backdrop-blur-xl">

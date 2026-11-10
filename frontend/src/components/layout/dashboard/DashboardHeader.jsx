@@ -17,7 +17,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
 import { ChevronDown, Store } from "lucide-react";
-import { hasMultiTallerAccess } from "@/services/api";
+import { hasMultiTallerAccess } from "@/utils/venueHelper";
 
 function getBreadcrumbs(isSuperAdmin, currentPath) {
   if (isSuperAdmin) {
