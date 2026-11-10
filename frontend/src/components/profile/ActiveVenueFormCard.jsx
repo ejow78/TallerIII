@@ -8,7 +8,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
-import { Clock, Save } from "lucide-react";
+import { Save } from "lucide-react";
 
 export function ActiveVenueFormCard({
   venueName,
@@ -115,9 +115,8 @@ export function ActiveVenueFormCard({
           <div className="space-y-1.5">
             <Label
               htmlFor="venue-hours"
-              className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider block flex items-center gap-1.5"
+              className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider block"
             >
-              <Clock className="w-3.5 h-3.5 text-primary" />
               Horarios de Atención
             </Label>
             <Input
