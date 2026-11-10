@@ -1,0 +1,128 @@
+/* The section background is transparent: no gray plate/box behind devices.
+   Fade mask at the bottom so devices softly dissolve into the dark hero background. */
+.ps-section .ss-stage {
+  --gutter: 6px;
+  overflow: hidden;
+  background: transparent;
+  -webkit-mask-image: linear-gradient(to bottom, #000 calc(100% - 64px), transparent);
+  mask-image: linear-gradient(to bottom, #000 calc(100% - 64px), transparent);
+  --ss-canvas: #171717;
+  --ss-surface: #171717;
+  --ss-chrome: #171717;
+  --ss-accent: #4ca5ff;
+}
+
+/* Pinned top-left, wide desktop window with higher zoom */
+.ps-window {
+  position: absolute;
+  top: var(--gutter);
+  left: var(--gutter);
+  width: 790px;
+  height: 550px;
+  background: #171717;
+  border-radius: 12px;
+  box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.08), 0 24px 48px -12px rgba(0, 0, 0, 0.65);
+}
+
+.ps-window .ss-window__bar {
+  background: #171717;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.07);
+}
+
+.ps-window .ss-window__body {
+  position: relative;
+  display: block;
+  width: 100%;
+  height: calc(100% - 38px);
+  overflow: hidden;
+  background: #171717;
+}
+
+.ps-mock-container {
+  position: relative;
+  width: 1280px;
+  height: 880px;
+  transform: scale(0.64);
+  transform-origin: top left;
+  user-select: none;
+  pointer-events: none;
+  background: #171717;
+}
+
+.ps-mock-container [data-slot="sidebar"],
+.ps-mock-container [data-slot="sidebar-footer"],
+.ps-mock-container header {
+  background-color: #171717 !important;
+}
+
+.ps-mock-container th,
+.ps-mock-container td {
+  white-space: nowrap;
+}
+
+.ps-mock-container .overflow-x-auto {
+  overflow-x: hidden !important;
+}
+
+/* Keep the exact desktop layout inside the window even when the page is viewed on mobile */
+.ps-mock-container .md\:hidden {
+  display: none !important;
+}
+
+.ps-mock-container .hidden.md\:block {
+  display: block !important;
+}
+
+.ps-mock-container .sm\:flex-row,
+.ps-mock-container .lg\:flex-row {
+  flex-direction: row !important;
+  align-items: center !important;
+}
+
+.ps-mock-container .lg\:max-w-xs {
+  max-width: 20rem !important;
+}
+
+.ps-gmail-icon {
+  display: grid;
+  place-items: center;
+  width: 38px;
+  height: 38px;
+  background: #ffffff;
+  border-radius: 9px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+}
+
+.ss-notification__icon:has(.ps-gmail-icon) {
+  background: transparent;
+  padding: 0;
+}
+
+/* Positioned further to the left over the right side of the window */
+.ps-phone {
+  position: absolute;
+  top: 72px;
+  right: 54px;
+  z-index: 20;
+  box-shadow: var(--ss-shadow-satellite), 0 30px 50px -20px rgba(0, 0, 0, 0.55);
+}
+
+/* Mobile / compact (< 640px): keeps the exact same desktop panel inside the window,
+   but zooms in both the window and the phone so neither looks tiny on mobile */
+.ps-section .ss-stage[data-layout='compact'] {
+  --gutter: 4px;
+}
+
+.ps-section .ss-stage[data-layout='compact'] .ps-window {
+  width: 520px;
+  height: 355px;
+}
+
+.ps-section .ss-stage[data-layout='compact'] .ps-mock-container {
+  transform: scale(0.52);
+}
+
+.ps-section .ss-stage[data-layout='compact'] .ps-phone {
+  top: 112px;
+  right: 8px;
+}

@@ -40,9 +40,10 @@ export function DashboardSidebar({
   sidebarStats,
   currentPath,
   onLogout,
+  collapsible,
 }) {
   return (
-    <Sidebar className="border-r border-border/70 bg-card/95 backdrop-blur-xl">
+    <Sidebar collapsible={collapsible} className="border-r border-border/70 bg-card/95 backdrop-blur-xl">
       {/* Header Limpio solo con el Logo */}
       <SidebarHeader className="px-4 py-3 sm:p-6 border-b border-border/30 shrink-0">
         <div className="flex items-center justify-between">
