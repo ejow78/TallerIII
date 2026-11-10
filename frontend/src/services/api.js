@@ -281,6 +281,77 @@ export const api = {
       localStorage.removeItem("repairit_user");
     },
 
+    deleteAccount: async () => {
+      const user = getLocalUser();
+      if (user.role === "tecnico") {
+        throw new Error("Los técnicos no tienen permisos para eliminar la cuenta del taller.");
+      }
+      if (user.role === "superadmin") {
+        throw new Error("La cuenta de SuperAdmin no puede eliminarse desde esta sección.");
+      }
+
+      const orgId = user.organizationId;
+      const userId = user._id || user.id;
+
+      // 1. Intentar RPC atómico si está definido en Supabase (borra también auth.users)
+      const { error: rpcError } = await supabase.rpc("delete_own_account");
+
+      // 2. Si el RPC no existe o falló, limpiar en cascada todas las tablas de la organización
+      if (rpcError) {
+        if (orgId && orgId !== "undefined") {
+          try {
+            const { data: techAccounts } = await supabase
+              .from("profiles")
+              .select("id")
+              .eq("organization_id", orgId)
+              .eq("role", "tecnico");
+
+            if (Array.isArray(techAccounts)) {
+              for (const tech of techAccounts) {
+                await supabase.rpc("delete_venue_account", { p_user_id: tech.id });
+              }
+            }
+          } catch (e) {
+            console.error("Error al limpiar cuentas técnicas:", e);
+          }
+
+          await supabase.from("sales").delete().eq("organization_id", orgId);
+
+          const { data: orgVenues } = await supabase
+            .from("venues")
+            .select("id")
+            .eq("organization_id", orgId);
+          const venueIds = Array.isArray(orgVenues) ? orgVenues.map((v) => v.id) : [];
+
+          if (venueIds.length > 0) {
+            await supabase.from("orders").delete().in("venue_id", venueIds);
+            await supabase.from("inventory").delete().in("venue_id", venueIds);
+            await supabase.from("clients").delete().in("venue_id", venueIds);
+          }
+
+          await supabase.from("clients").delete().eq("organization_id", orgId);
+          await supabase.from("venues").delete().eq("organization_id", orgId);
+          await supabase.from("profiles").delete().eq("organization_id", orgId);
+
+          const { error: orgDelErr } = await supabase
+            .from("organizations")
+            .delete()
+            .eq("id", orgId);
+          if (orgDelErr) {
+            console.error("Error al eliminar organización:", orgDelErr);
+          }
+        } else if (userId) {
+          await supabase.from("profiles").delete().eq("id", userId);
+        }
+      }
+
+      cache.invalidate();
+      await supabase.auth.signOut();
+      sessionStorage.clear();
+      localStorage.clear();
+      return { message: "Cuenta eliminada definitivamente." };
+    },
+
     getProfile: async (options = {}) => {
       let user = getLocalUser();
       const profileKey = `profile_${user._id || user.id || user.email || "current"}`;

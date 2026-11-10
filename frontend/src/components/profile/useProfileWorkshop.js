@@ -24,6 +24,7 @@ export function useProfileWorkshop() {
   );
 
   const [showPlansModal, setShowPlansModal] = useState(false);
+  const [isDeletingAccount, setIsDeletingAccount] = useState(false);
 
   // Estados de Modal de Sucursal
   const [showModal, setShowModal] = useState(false);
@@ -195,6 +196,26 @@ export function useProfileWorkshop() {
     }
   }, []);
 
+  const handleDeleteAccount = useCallback(async () => {
+    setIsDeletingAccount(true);
+    try {
+      await api.auth.deleteAccount();
+      toast.success("Cuenta eliminada definitivamente", {
+        description: "Todos los datos del taller fueron borrados con éxito.",
+      });
+      setTimeout(() => {
+        window.location.href = window.location.hostname.includes("repairit.cloud")
+          ? "https://repairit.cloud"
+          : "/";
+      }, 800);
+    } catch (err) {
+      toast.error("Error al eliminar la cuenta", {
+        description: err.message || "Por favor, intentá nuevamente.",
+      });
+      setIsDeletingAccount(false);
+    }
+  }, []);
+
   return {
     venueName,
     setVenueName,
@@ -224,10 +245,12 @@ export function useProfileWorkshop() {
     setModalAddress,
     modalHours,
     setModalHours,
+    isDeletingAccount,
     handleSave,
     handleOpenCreateModal,
     handleOpenEditModal,
     handleModalSubmit,
     handleSwitchActiveVenue,
+    handleDeleteAccount,
   };
 }

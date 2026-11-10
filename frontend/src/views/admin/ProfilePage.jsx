@@ -3,6 +3,7 @@ import { useProfileWorkshop } from "@/components/profile/useProfileWorkshop";
 import { ActiveVenueFormCard } from "@/components/profile/ActiveVenueFormCard";
 import { OrganizationVenuesCard } from "@/components/profile/OrganizationVenuesCard";
 import { SubscriptionCard } from "@/components/profile/SubscriptionCard";
+import { DangerZoneCard } from "@/components/profile/DangerZoneCard";
 import { VenueModal } from "@/components/profile/VenueModal";
 import { SubscriptionPlansModal } from "@/components/profile/SubscriptionPlansModal";
 
@@ -41,6 +42,8 @@ export default function ProfilePage() {
     handleOpenEditModal,
     handleModalSubmit,
     handleSwitchActiveVenue,
+    isDeletingAccount,
+    handleDeleteAccount,
   } = useProfileWorkshop();
 
   return (
@@ -83,12 +86,16 @@ export default function ProfilePage() {
           />
         </div>
 
-        {/* Columna Derecha (1/3): Suscripción */}
+        {/* Columna Derecha (1/3): Suscripción y Zona de Peligro */}
         <div className="space-y-6">
           <SubscriptionCard
             subscriptionPlan={subscriptionPlan}
             subscriptionStatus={subscriptionStatus}
             onOpenPlansModal={() => setShowPlansModal(true)}
+          />
+          <DangerZoneCard
+            onDeleteAccount={handleDeleteAccount}
+            isDeletingAccount={isDeletingAccount}
           />
         </div>
       </div>

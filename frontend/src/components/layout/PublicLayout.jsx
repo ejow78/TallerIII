@@ -1,10 +1,11 @@
-import { Outlet, useLocation } from "react-router-dom";
+import { Outlet, useLocation, useNavigate } from "react-router-dom";
 import { Separator } from "@/components/ui/separator";
 import { Button } from "@/components/ui/button";
 import { Search } from "lucide-react";
 
 export default function PublicLayout() {
   const location = useLocation();
+  const navigate = useNavigate();
   const isAuthPage = [
     "/login", 
     "/register", 
@@ -17,12 +18,13 @@ export default function PublicLayout() {
 
   const handleNavClick = (targetUrl) => (e) => {
     e.preventDefault();
-    const isLanding =
-      location.pathname === "/" &&
-      (!window.location.hostname.includes("repairit.cloud") ||
-        window.location.hostname === "repairit.cloud");
+    const isMainHost =
+      !window.location.hostname.includes("repairit.cloud") ||
+      window.location.hostname === "repairit.cloud";
+    const isLanding = location.pathname === "/" && isMainHost;
     const hashIndex = targetUrl.indexOf("#");
     const hash = hashIndex !== -1 ? targetUrl.substring(hashIndex) : "";
+    const relativePath = targetUrl.replace("https://repairit.cloud", "") || "/";
 
     if (isLanding && hash) {
       const targetId = hash.replace("#", "");
@@ -34,17 +36,22 @@ export default function PublicLayout() {
       }
     }
 
-    if (isLanding && !hash) {
+    if (isLanding && !hash && relativePath === "/") {
       window.scrollTo({ top: 0, behavior: "smooth" });
       window.history.pushState(null, "", "/");
+      return;
+    }
+
+    if (!hash && isMainHost) {
+      navigate(relativePath);
+      window.scrollTo({ top: 0, behavior: "smooth" });
       return;
     }
 
     if (window.location.hostname.includes("repairit.cloud")) {
       window.location.href = targetUrl;
     } else {
-      const relativePath = targetUrl.replace("https://repairit.cloud", "");
-      window.location.href = relativePath || "/";
+      window.location.href = relativePath;
     }
   };
 
