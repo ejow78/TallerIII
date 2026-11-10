@@ -57,8 +57,10 @@ manual*
 docs_local/
 
 
-# Documentación interna excluida del repo
+# DocumentaciÃ³n interna excluida del repo
 DER.md
 PROCESOS_BPM_BIZAGI.md
 
 tablas.md
+Guia_Arquitectura_y_Escalabilidad_RepairIT.html
+Guia_Arquitectura_y_Escalabilidad_RepairIT.pdf
