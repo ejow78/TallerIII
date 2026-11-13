@@ -77,44 +77,47 @@ export function LandingContactSection({
                 />
               </div>
 
-              {/* Nombre Completo */}
-              <div className="space-y-2">
-                <label
-                  htmlFor="contact-name"
-                  className="text-xs font-semibold text-foreground/90 flex items-center gap-1.5"
-                >
-                  <User className="w-3.5 h-3.5 text-primary" />
-                  Nombre Completo
-                </label>
-                <Input
-                  id="contact-name"
-                  type="text"
-                  required
-                  placeholder="Ej. Juan Pérez"
-                  value={contactName}
-                  onChange={(e) => setContactName(e.target.value)}
-                  className="bg-background/85 border-border text-xs h-10 rounded-xl"
-                />
-              </div>
+              {/* Nombre y Correo Electrónico a la par */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                {/* Nombre Completo */}
+                <div className="space-y-2">
+                  <label
+                    htmlFor="contact-name"
+                    className="text-xs font-semibold text-foreground/90 flex items-center gap-1.5"
+                  >
+                    <User className="w-3.5 h-3.5 text-primary" />
+                    Nombre Completo
+                  </label>
+                  <Input
+                    id="contact-name"
+                    type="text"
+                    required
+                    placeholder="Ej. Juan Pérez"
+                    value={contactName}
+                    onChange={(e) => setContactName(e.target.value)}
+                    className="bg-background/85 border-border text-xs h-10 rounded-xl"
+                  />
+                </div>
 
-              {/* Correo Electrónico */}
-              <div className="space-y-2">
-                <label
-                  htmlFor="contact-email"
-                  className="text-xs font-semibold text-foreground/90 flex items-center gap-1.5"
-                >
-                  <Mail className="w-3.5 h-3.5 text-primary" />
-                  Correo Electrónico de Contacto
-                </label>
-                <Input
-                  id="contact-email"
-                  type="email"
-                  required
-                  placeholder="Ej. juan@taller.com"
-                  value={contactEmail}
-                  onChange={(e) => setContactEmail(e.target.value)}
-                  className="bg-background/85 border-border text-xs h-10 rounded-xl"
-                />
+                {/* Correo Electrónico */}
+                <div className="space-y-2">
+                  <label
+                    htmlFor="contact-email"
+                    className="text-xs font-semibold text-foreground/90 flex items-center gap-1.5"
+                  >
+                    <Mail className="w-3.5 h-3.5 text-primary" />
+                    Correo Electrónico
+                  </label>
+                  <Input
+                    id="contact-email"
+                    type="email"
+                    required
+                    placeholder="Ej. juan@taller.com"
+                    value={contactEmail}
+                    onChange={(e) => setContactEmail(e.target.value)}
+                    className="bg-background/85 border-border text-xs h-10 rounded-xl"
+                  />
+                </div>
               </div>
 
               {/* Mensaje o Consulta */}
