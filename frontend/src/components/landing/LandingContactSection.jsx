@@ -141,18 +141,18 @@ export function LandingContactSection({
               </div>
 
               {/* Aceptación de Términos y Privacidad */}
-              <div className="flex items-start gap-2.5 pt-1">
+              <div className="flex items-center gap-2.5 pt-1">
                 <input
                   type="checkbox"
                   id="contact-terms"
                   required
                   checked={acceptTerms}
                   onChange={(e) => setAcceptTerms(e.target.checked)}
-                  className="mt-1 h-4 w-4 rounded border-border text-primary focus:ring-primary cursor-pointer accent-primary"
+                  className="h-4 w-4 rounded border-border text-primary focus:ring-primary cursor-pointer accent-primary shrink-0"
                 />
                 <label
                   htmlFor="contact-terms"
-                  className="text-xs text-muted-foreground font-light leading-snug cursor-pointer select-none"
+                  className="text-xs text-muted-foreground font-light cursor-pointer select-none"
                 >
                   Acepto los{" "}
                   <Link

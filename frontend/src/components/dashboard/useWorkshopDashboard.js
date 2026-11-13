@@ -237,9 +237,11 @@ export function useWorkshopDashboard(user) {
     breakdownData,
     metrics: {
       activeOrdersCount,
+      diagnosticsCount,
+      repairCount,
+      readyToPickupCount,
       activeOrdersDetail,
       deliveredCount,
-      readyToPickupCount,
       totalSalesRevenue,
       approvedBudgetsRevenue,
       totalRevenue,

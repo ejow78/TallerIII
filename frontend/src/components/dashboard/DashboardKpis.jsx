@@ -1,4 +1,5 @@
 import { Card } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
 import {
   Wrench,
   PackageCheck,
@@ -12,9 +13,10 @@ import {
 export default function DashboardKpis({ metrics, salesLength }) {
   const {
     activeOrdersCount,
-    activeOrdersDetail,
+    diagnosticsCount = 0,
+    repairCount = 0,
+    readyToPickupCount = 0,
     deliveredCount,
-    readyToPickupCount,
     totalRevenue,
     approvedBudgetsRevenue,
     isBasicPlan,
@@ -38,13 +40,32 @@ export default function DashboardKpis({ metrics, salesLength }) {
             <Wrench className="h-4 w-4 text-primary" />
           </div>
         </div>
-        <div className="mt-3.5 space-y-1.5">
+        <div className="mt-3.5 space-y-2">
           <span className="text-3xl sm:text-4xl font-outfit font-black text-foreground block tracking-tight leading-none">
             {activeOrdersCount}
           </span>
-          <span className="text-xs text-primary block font-medium leading-snug line-clamp-1">
-            {activeOrdersDetail}
-          </span>
+          <div className="flex flex-wrap items-center gap-1.5 pt-0.5">
+            <Badge
+              variant="outline"
+              className="text-[10px] font-semibold bg-sky-500/10 text-sky-400 border-sky-500/30 px-1.5 py-0 h-5"
+            >
+              {diagnosticsCount} en revisión
+            </Badge>
+            <Badge
+              variant="outline"
+              className="text-[10px] font-semibold bg-amber-500/10 text-amber-400 border-amber-500/30 px-1.5 py-0 h-5"
+            >
+              {repairCount} en rep.
+            </Badge>
+            {readyToPickupCount > 0 && (
+              <Badge
+                variant="outline"
+                className="text-[10px] font-semibold bg-emerald-500/10 text-emerald-400 border-emerald-500/30 px-1.5 py-0 h-5"
+              >
+                {readyToPickupCount} listos
+              </Badge>
+            )}
+          </div>
         </div>
       </Card>
 
@@ -58,15 +79,24 @@ export default function DashboardKpis({ metrics, salesLength }) {
             <PackageCheck className="h-4 w-4 text-emerald-400" />
           </div>
         </div>
-        <div className="mt-3.5 space-y-1.5">
+        <div className="mt-3.5 space-y-2">
           <span className="text-3xl sm:text-4xl font-outfit font-black text-foreground block tracking-tight leading-none">
             {deliveredCount}
           </span>
-          <span className="text-xs text-emerald-400 block font-medium leading-snug line-clamp-1">
-            {readyToPickupCount > 0
-              ? `+ ${readyToPickupCount} listos esperando retiro`
-              : "Dispositivos retirados por clientes"}
-          </span>
+          {readyToPickupCount > 0 ? (
+            <div className="flex flex-wrap items-center gap-1.5 pt-0.5">
+              <Badge
+                variant="outline"
+                className="text-[10px] font-semibold bg-amber-500/10 text-amber-400 border-amber-500/30 px-1.5 py-0 h-5"
+              >
+                +{readyToPickupCount} por retirar
+              </Badge>
+            </div>
+          ) : (
+            <span className="text-xs text-muted-foreground/70 block font-normal leading-snug line-clamp-1">
+              Dispositivos retirados
+            </span>
+          )}
         </div>
       </Card>
 
